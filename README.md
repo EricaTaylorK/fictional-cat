@@ -26,6 +26,15 @@ python3 -m http.server 8080
 
 Then open `http://localhost:8080`. This serves static files only (no hot reload).
 
+## Git identity (first time on this Mac)
+
+This repo was committed with a placeholder author so Git would work. Set your real name (repo-only or global):
+
+```bash
+git config user.name "Your Name"
+git config user.email "your.email@example.com"
+```
+
 ## Put it on GitHub (private is fine)
 
 1. Create a **new empty** repo on GitHub (no README), e.g. `my-prototypes`.
