@@ -1,9 +1,32 @@
-import { Fragment, useCallback, useState } from "react";
-import { CRAFT_PILLARS, HERO_CHIPS, MARQUEE_PHRASES, MENU_ITEMS } from "./circaContent.js";
+import { Fragment, useCallback, useEffect, useState } from "react";
+import BundleBuilder from "./components/BundleBuilder.jsx";
+import { CRAFT_PILLARS, HERO_CHIPS, MARQUEE_PHRASES, MENU_ITEMS } from "./siteContent.js";
 import "./style.css";
+
+function useScrollReveal() {
+  useEffect(() => {
+    const nodes = document.querySelectorAll("[data-reveal]");
+    if (!nodes.length) return undefined;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("is-inview");
+          }
+        });
+      },
+      { root: null, rootMargin: "0px 0px -6% 0px", threshold: 0.06 }
+    );
+
+    nodes.forEach((el) => observer.observe(el));
+    return () => observer.disconnect();
+  }, []);
+}
 
 export default function App() {
   const [navOpen, setNavOpen] = useState(false);
+  useScrollReveal();
 
   const closeNav = useCallback(() => {
     setNavOpen(false);
@@ -21,12 +44,13 @@ export default function App() {
       <div className="page">
         <header className="site-header">
           <div className="site-header__inner">
-            <a className="logo" href="#" aria-label="Circa home">
-              Circa
+            <a className="logo" href="#" aria-label="Fishwife home">
+              Fishwife
             </a>
             <nav className="nav" aria-label="Primary">
+              <a href="#bundle">Bundle</a>
               <a href="#menu">Menu</a>
-              <a href="#craft">Craft</a>
+              <a href="#craft">Our way</a>
               <a href="#visit">Visit</a>
               <a className="nav__cta" href="#order">
                 Order ahead
@@ -45,11 +69,14 @@ export default function App() {
             </button>
           </div>
           <div id="nav-panel" className="nav-panel" hidden={!navOpen}>
+            <a href="#bundle" onClick={closeNav}>
+              Bundle
+            </a>
             <a href="#menu" onClick={closeNav}>
               Menu
             </a>
             <a href="#craft" onClick={closeNav}>
-              Craft
+              Our way
             </a>
             <a href="#visit" onClick={closeNav}>
               Visit
@@ -61,24 +88,24 @@ export default function App() {
         </header>
 
         <main id="main">
-          <section className="hero">
+          <section className="hero reveal" data-reveal>
             <div className="hero__bg" aria-hidden="true" />
             <div className="hero__grid">
               <div className="hero__content">
-                <p className="eyebrow">Fast casual · kettle &amp; stone</p>
+                <p className="eyebrow">Fishwife bagels · kettle &amp; stone</p>
                 <h1 className="hero__title">
-                  The bagel shop, <em>edited</em> for how you actually eat.
+                  Tinned excellence—<em>bagel-shaped.</em>
                 </h1>
                 <p className="hero__lede">
-                  Hand-shaped rings, overnight ferment, and schmears you can taste the butter in. Line moves fast; the
-                  ritual still feels like yours.
+                  Build a twenty-four ring tin across eight styles, add two schmears, and we pack it with the same care
+                  as a coastal pantry staple.
                 </p>
                 <div className="hero__actions">
-                  <a className="btn btn--primary" href="#menu">
-                    View menu
+                  <a className="btn btn--primary" href="#bundle">
+                    Start your bundle
                   </a>
                   <a className="btn btn--ghost" href="#visit">
-                    Hours &amp; location
+                    Hours &amp; pickup
                   </a>
                 </div>
                 <ul className="hero__chips" aria-label="Highlights">
@@ -93,13 +120,15 @@ export default function App() {
                   <span className="hero__mark-hole" />
                 </div>
                 <p className="hero__stamp">
-                  Est. today
+                  24 + 2
                   <br />
-                  <span>always small-batch</span>
+                  <span>the signature tin</span>
                 </p>
               </div>
             </div>
           </section>
+
+          <BundleBuilder />
 
           <section className="marquee" aria-label="Brand notes">
             <div className="marquee__track">
@@ -114,12 +143,13 @@ export default function App() {
             </div>
           </section>
 
-          <section id="craft" className="section craft">
+          <section id="craft" className="section craft reveal" data-reveal>
             <div className="section__head section__head--left">
-              <p className="section__label">Why it tastes different</p>
-              <h2>Craft at counter speed.</h2>
+              <p className="section__label">Our way</p>
+              <h2>Serious bagels. Light touch.</h2>
               <p className="section__deck">
-                We built Circa for people who care where flour comes from—and still need to make a 9:02 meeting.
+                Fishwife is fast-casual without the plastic soul—counter service, real ingredients, zero apology for
+                caring.
               </p>
             </div>
             <ul className="craft__grid">
@@ -133,13 +163,11 @@ export default function App() {
             </ul>
           </section>
 
-          <section id="menu" className="section menu">
+          <section id="menu" className="section menu reveal" data-reveal>
             <div className="section__head">
-              <p className="section__label">The board</p>
-              <h2>Order like a regular.</h2>
-              <p className="section__deck">
-                Everything is baked in limited runs. When the board clears, we’re done for the day.
-              </p>
+              <p className="section__label">Beyond the tin</p>
+              <h2>When you’re not building a bundle.</h2>
+              <p className="section__deck">A few other things we love to hand across the pass.</p>
             </div>
             <ul className="menu-list">
               {MENU_ITEMS.map((item) => (
@@ -157,11 +185,11 @@ export default function App() {
             </ul>
           </section>
 
-          <section id="visit" className="section visit">
+          <section id="visit" className="section visit reveal" data-reveal>
             <div className="visit__layout">
               <div className="visit__copy">
                 <p className="section__label">Visit</p>
-                <h2>Riverside &amp; rising.</h2>
+                <h2>Meridian Row</h2>
                 <address className="visit__address">
                   428 Meridian Row
                   <br />
@@ -189,11 +217,11 @@ export default function App() {
             </div>
           </section>
 
-          <section id="order" className="section cta">
+          <section id="order" className="section cta reveal" data-reveal>
             <div className="cta__inner">
               <p className="section__label section__label--on-dark">Order</p>
-              <h2>Your bagel should be hot when you are.</h2>
-              <p>Call ahead for pickup—we’ll text when your order hits the pass. Catering trays for offices of 8–40.</p>
+              <h2>We’ll text when your tin is ready.</h2>
+              <p>Call ahead for pickup—or reserve a bundle online when we flip that switch.</p>
               <p>
                 <a className="cta__phone" href="tel:+15555550147">
                   (555) 555-0147
@@ -209,9 +237,9 @@ export default function App() {
         <footer className="site-footer">
           <div className="site-footer__row">
             <p className="site-footer__brand">
-              <strong>Circa</strong> · Bagels &amp; brew
+              <strong>Fishwife</strong> · Bagels &amp; schmear
             </p>
-            <p className="site-footer__fine">Fictional demo for a prototype project.</p>
+            <p className="site-footer__fine">Prototype — not a real restaurant.</p>
           </div>
         </footer>
       </div>
