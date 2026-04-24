@@ -1,0 +1,18 @@
+---
+description: After editing this repo, commit and push to origin/main so GitHub stays in sync
+alwaysApply: true
+---
+
+# Git: commit and push (required)
+
+The maintainer will not remember to sync GitHub manually. **Whenever you finish meaningful work in this repository** (code, styles, copy, config, or docs), you must:
+
+1. Run `git status` in the project root (`my-prototypes`).
+2. If there are changes: `git add -A`, then `git commit -m "<clear imperative message describing what changed>"`.
+3. Run `git push origin main` (request **git_write** and **network** permissions if the environment blocks this).
+4. If the working tree is clean after commit, still run `git push` if local `main` might be ahead of `origin/main`.
+5. If push fails (auth, network): say exactly what failed and tell them to open **GitHub Desktop** for this repo and push, or run `git push` in Terminal once credentials are fixed—do not claim success.
+
+**Do not** skip commit/push because the task was "small." **Do** skip only when there were literally no file changes.
+
+If the user only asked a question and you made **no** edits, skip git steps.
