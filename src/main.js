@@ -1,5 +1,3 @@
-import "./style.css";
-
 document.querySelector("#app").innerHTML = `
   <a class="skip-link" href="#main">Skip to content</a>
   <div class="page">
