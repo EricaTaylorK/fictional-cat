@@ -1,0 +1,55 @@
+:root {
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  line-height: 1.5;
+  color: #0f172a;
+  background: #f8fafc;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100dvh;
+}
+
+.layout {
+  max-width: 40rem;
+  margin: 0 auto;
+  padding: 3rem 1.5rem;
+}
+
+h1 {
+  font-size: 1.75rem;
+  margin: 0 0 0.75rem;
+}
+
+code {
+  font-size: 0.95em;
+  background: #e2e8f0;
+  padding: 0.15em 0.35em;
+  border-radius: 0.25rem;
+}
+
+button {
+  margin-top: 1rem;
+  padding: 0.6rem 1rem;
+  font: inherit;
+  border-radius: 0.5rem;
+  border: 1px solid #cbd5e1;
+  background: #fff;
+  cursor: pointer;
+}
+
+button:hover {
+  border-color: #94a3b8;
+}
+
+.msg {
+  margin-top: 1rem;
+  min-height: 1.5rem;
+  color: #334155;
+}
