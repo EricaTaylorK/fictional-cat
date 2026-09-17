@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { MastheadCat } from "./components/CatPeek.jsx";
 import EntryForm from "./components/EntryForm.jsx";
 import EntryList from "./components/EntryList.jsx";
 import TotalsBar from "./components/TotalsBar.jsx";
@@ -16,8 +17,14 @@ export default function App() {
   const toastTimer = useRef(null);
   const peekTimer = useRef(null);
   const undoRef = useRef(null);
+  const loaded = useRef(false);
 
   useEffect(() => {
+    // Skip the mount pass so a failed load can never overwrite stored entries.
+    if (!loaded.current) {
+      loaded.current = true;
+      return;
+    }
     saveEntries(entries);
   }, [entries]);
 
@@ -84,9 +91,7 @@ export default function App() {
       </a>
       <div className="page">
         <header className="masthead">
-          <p className="masthead__mark" aria-hidden="true">
-            ∧ ∧
-          </p>
+          <MastheadCat />
           <div>
             <h1>PawLedger</h1>
             <p>Hours that stay on this device, with a cat in the margins.</p>

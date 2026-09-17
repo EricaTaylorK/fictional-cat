@@ -92,12 +92,11 @@ input {
 }
 
 .masthead__mark {
-  font-family: var(--font-display);
-  font-size: 1.6rem;
-  line-height: 1;
-  color: var(--capex);
-  transform: rotate(-8deg);
-  margin-top: 0.15rem;
+  flex: 0 0 auto;
+  width: 2.75rem;
+  height: 2.75rem;
+  margin-top: 0.1rem;
+  transform: rotate(-5deg);
 }
 
 .masthead h1 {

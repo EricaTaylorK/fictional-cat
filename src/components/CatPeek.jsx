@@ -22,6 +22,36 @@ export default function CatPeek({ active }) {
   );
 }
 
+export function MastheadCat() {
+  return (
+    <svg className="masthead__mark" viewBox="0 0 40 40" aria-hidden="true">
+      <path d="M10 16L7.5 4.5 18.5 10Z" fill="#f4c9a0" stroke="#3b2a22" strokeWidth="1.6" strokeLinejoin="round" />
+      <path d="M30 16L32.5 4.5 21.5 10Z" fill="#f4c9a0" stroke="#3b2a22" strokeWidth="1.6" strokeLinejoin="round" />
+      <path d="M11.6 13.4L10.2 7.6 16.4 10.7Z" fill="#e8a57a" />
+      <path d="M28.4 13.4L29.8 7.6 23.6 10.7Z" fill="#e8a57a" />
+      <circle cx="20" cy="24" r="12.5" fill="#f4c9a0" stroke="#3b2a22" strokeWidth="1.6" />
+      <circle cx="15.4" cy="22.4" r="1.9" fill="#2b1c16" />
+      <circle cx="24.6" cy="22.4" r="1.9" fill="#2b1c16" />
+      <circle cx="16" cy="21.6" r="0.6" fill="#fffaf4" />
+      <circle cx="25.2" cy="21.6" r="0.6" fill="#fffaf4" />
+      <path d="M20 26.6L18.6 25.4h2.8Z" fill="#c97b8a" />
+      <path
+        d="M20 27.2c-.9 1.3-2.7 1.2-3.4-.2M20 27.2c.9 1.3 2.7 1.2 3.4-.2"
+        stroke="#3b2a22"
+        strokeWidth="1.3"
+        fill="none"
+        strokeLinecap="round"
+      />
+      <path
+        d="M11.8 23.4L6.4 22.2M11.8 26L6.6 26.4M28.2 23.4L33.6 22.2M28.2 26L33.4 26.4"
+        stroke="#3b2a22"
+        strokeWidth="1.2"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
 export function SleepingCat() {
   return (
     <svg className="sleeping-cat" viewBox="0 0 160 72" width="160" height="72" aria-hidden="true">
