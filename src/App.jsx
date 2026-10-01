@@ -1,131 +1,110 @@
-import { useCallback, useEffect, useRef, useState } from "react";
-import { MastheadCat } from "./components/CatPeek.jsx";
-import EntryForm from "./components/EntryForm.jsx";
-import EntryList from "./components/EntryList.jsx";
-import TotalsBar from "./components/TotalsBar.jsx";
-import { loadEntries, newId, saveEntries } from "./storage.js";
+import { useCallback, useMemo, useState } from "react";
+import { PRODUCTS, SORTS } from "./data/catalog.js";
+import {
+  cloneFilters,
+  emptyFilters,
+  matchingProducts,
+  sortProducts,
+} from "./filters.js";
+import FilterBar from "./components/FilterBar.jsx";
+import FilterSheet from "./components/FilterSheet.jsx";
+import ProductGrid from "./components/ProductGrid.jsx";
+import SiteFooter from "./components/SiteFooter.jsx";
+import SiteHeader from "./components/SiteHeader.jsx";
 import "./style.css";
 
-const TOAST_MS = 5000;
-const PEEK_MS = 1200;
-
 export default function App() {
-  const [entries, setEntries] = useState(() => loadEntries());
-  const [editingId, setEditingId] = useState(null);
-  const [toast, setToast] = useState(null);
-  const [peeking, setPeeking] = useState(false);
-  const toastTimer = useRef(null);
-  const peekTimer = useRef(null);
-  const undoRef = useRef(null);
-  const loaded = useRef(false);
+  const [search, setSearch] = useState("");
+  const [sort, setSort] = useState("featured");
+  const [applied, setApplied] = useState(emptyFilters);
+  const [draft, setDraft] = useState(emptyFilters);
+  const [sheetOpen, setSheetOpen] = useState(false);
+  const [openFacet, setOpenFacet] = useState(null);
 
-  useEffect(() => {
-    // Skip the mount pass so a failed load can never overwrite stored entries.
-    if (!loaded.current) {
-      loaded.current = true;
-      return;
-    }
-    saveEntries(entries);
-  }, [entries]);
+  const visible = useMemo(
+    () => sortProducts(matchingProducts(PRODUCTS, applied, search), sort),
+    [applied, search, sort]
+  );
 
-  useEffect(() => {
-    return () => {
-      clearTimeout(toastTimer.current);
-      clearTimeout(peekTimer.current);
-    };
-  }, []);
-
-  const editing = entries.find((row) => row.id === editingId) ?? null;
-
-  const triggerPeek = useCallback(() => {
-    setPeeking(true);
-    clearTimeout(peekTimer.current);
-    peekTimer.current = setTimeout(() => setPeeking(false), PEEK_MS);
-  }, []);
-
-  const showToast = useCallback((message, { onUndo } = {}) => {
-    undoRef.current = onUndo ?? null;
-    setToast({ message, undo: Boolean(onUndo) });
-    clearTimeout(toastTimer.current);
-    toastTimer.current = setTimeout(() => {
-      setToast(null);
-      undoRef.current = null;
-    }, TOAST_MS);
-  }, []);
-
-  function handleSubmit(payload) {
-    if (editing) {
-      setEntries((prev) =>
-        prev.map((row) => (row.id === editing.id ? { ...row, ...payload } : row))
-      );
-      setEditingId(null);
-      triggerPeek();
-      return;
-    }
-
-    setEntries((prev) => [{ id: newId(), ...payload }, ...prev]);
-    triggerPeek();
+  function openSheet(facetId) {
+    setDraft(cloneFilters(applied));
+    setOpenFacet(facetId);
+    setSheetOpen(true);
   }
 
-  function handleDelete(entry) {
-    setEntries((prev) => prev.filter((row) => row.id !== entry.id));
-    if (editingId === entry.id) setEditingId(null);
-    showToast("Entry deleted", {
-      onUndo: () => {
-        setEntries((prev) => (prev.some((row) => row.id === entry.id) ? prev : [entry, ...prev]));
-      },
-    });
+  const closeSheet = useCallback(() => {
+    setSheetOpen(false);
+  }, []);
+
+  function applySheet(next) {
+    setApplied(cloneFilters(next));
+    setSheetOpen(false);
   }
 
-  function handleUndo() {
-    undoRef.current?.();
-    undoRef.current = null;
-    setToast(null);
-    clearTimeout(toastTimer.current);
+  function clearDraft() {
+    setDraft(emptyFilters());
   }
+
+  function clearApplied() {
+    setApplied(emptyFilters());
+    setSearch("");
+  }
+
+  const countLabel = `${visible.length} ${visible.length === 1 ? "item" : "items"}`;
 
   return (
-    <>
-      <a className="skip-link" href="#main">
-        Skip to log
-      </a>
-      <div className="page">
-        <header className="masthead">
-          <MastheadCat />
-          <div>
-            <h1>PawLedger</h1>
-            <p>Hours that stay on this device, with a cat in the margins.</p>
+    <div className="page">
+      <SiteHeader search={search} onSearch={setSearch} />
+      <main id="suits">
+        <div className="listing-head">
+          <p className="crumbs">
+            <span>Home</span>
+            <span aria-hidden="true">/</span>
+            <span>Men&apos;s Clothing</span>
+            <span aria-hidden="true">/</span>
+            <span className="here">Men&apos;s Suits</span>
+          </p>
+          <div className="title-row">
+            <div>
+              <h1>Men&apos;s Suits</h1>
+              <p className="count" data-testid="result-count">
+                {countLabel}
+              </p>
+            </div>
+            <label className="sort">
+              <span>Sort</span>
+              <select value={sort} onChange={(event) => setSort(event.target.value)} aria-label="Sort">
+                {SORTS.map((option) => (
+                  <option key={option.id} value={option.id}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </label>
           </div>
-        </header>
-
-        <main id="main" className="main">
-          <EntryForm
-            editing={editing}
-            peeking={peeking}
-            onSubmit={handleSubmit}
-            onCancel={() => setEditingId(null)}
-          />
-          <EntryList
-            entries={entries}
-            editingId={editingId}
-            onEdit={(entry) => setEditingId(entry.id)}
-            onDelete={handleDelete}
-          />
-        </main>
-
-        <TotalsBar entries={entries} />
-      </div>
-
-      {toast ? (
-        <div className="toast" role="status">
-          <span>{toast.message}</span>
-          {toast.undo ? (
-            <button type="button" className="btn-text" onClick={handleUndo}>
-              Undo
-            </button>
-          ) : null}
         </div>
-      ) : null}
-    </>
+        <FilterBar
+          applied={applied}
+          sheetOpen={sheetOpen}
+          openFacet={openFacet}
+          onOpen={openSheet}
+        />
+        <ProductGrid products={visible} onClear={clearApplied} />
+      </main>
+      <SiteFooter />
+      {sheetOpen && (
+        <FilterSheet
+          key={openFacet ?? "all"}
+          initialFacet={openFacet}
+          draft={draft}
+          products={PRODUCTS}
+          search={search}
+          onChange={setDraft}
+          onApply={applySheet}
+          onClear={clearDraft}
+          onClose={closeSheet}
+        />
+      )}
+    </div>
   );
 }
