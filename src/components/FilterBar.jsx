@@ -26,6 +26,7 @@ export default function FilterBar({ applied, sheetOpen, openFacet, onOpen }) {
               key={facet.id}
               type="button"
               className={count > 0 ? "chip has-selection" : "chip"}
+              aria-pressed={count > 0}
               data-testid={`chip-${facet.id}`}
               aria-expanded={sheetOpen && openFacet === facet.id}
               aria-controls="filter-sheet"

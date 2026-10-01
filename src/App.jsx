@@ -57,13 +57,15 @@ export default function App() {
       <SiteHeader search={search} onSearch={setSearch} />
       <main id="suits">
         <div className="listing-head">
-          <p className="crumbs">
-            <span>Home</span>
-            <span aria-hidden="true">/</span>
-            <span>Men&apos;s Clothing</span>
-            <span aria-hidden="true">/</span>
-            <span className="here">Men&apos;s Suits</span>
-          </p>
+          <nav className="crumbs" aria-label="Breadcrumb">
+            <ol>
+              <li>Home</li>
+              <li className="crumb-dot" aria-hidden="true" />
+              <li>Men&apos;s Clothing</li>
+              <li className="crumb-dot" aria-hidden="true" />
+              <li className="here">Men&apos;s Suits</li>
+            </ol>
+          </nav>
           <div className="title-row">
             <div>
               <h1>Men&apos;s Suits</h1>

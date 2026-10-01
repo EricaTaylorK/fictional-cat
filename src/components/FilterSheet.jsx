@@ -89,6 +89,7 @@ export default function FilterSheet({
         aria-labelledby="filter-title"
       >
         <header className="sheet-header">
+          <span className="sheet-header-spacer" aria-hidden="true" />
           <h2 id="filter-title">Filter by</h2>
           <button
             type="button"
@@ -164,18 +165,31 @@ export default function FilterSheet({
 
 function OptionList({ facet, draft, products, search, onToggle }) {
   const selected = draft.selections[facet.id] ?? [];
+  const layout = facet.id === "color" ? "swatches" : facet.id === "size" ? "sizes" : "list";
   return (
-    <div className="options">
+    <div className={`options options-${layout}`}>
       {facet.options.map((option) => {
         const count = countOption(products, draft, search, facet.id, option.id);
         const checked = selected.includes(option.id);
         return (
-          <label key={option.id} className={count === 0 ? "option is-empty" : "option"}>
-            <span>
-              {facet.id === "color" && (
-                <i className="option-swatch" style={{ background: COLORS[option.id].hex }} />
-              )}
-              {option.label} <span className="option-count">({count})</span>
+          <label
+            key={option.id}
+            className={[
+              "option",
+              count === 0 ? "is-empty" : "",
+              checked ? "is-checked" : "",
+            ]
+              .filter(Boolean)
+              .join(" ")}
+          >
+            {layout === "swatches" && (
+              <span className="swatch-ring">
+                <span className="swatch-disc" style={{ background: COLORS[option.id].hex }} />
+              </span>
+            )}
+            <span className="option-copy">
+              {option.label}
+              {layout === "list" && <span className="option-count"> ({count})</span>}
             </span>
             <input
               type="checkbox"
