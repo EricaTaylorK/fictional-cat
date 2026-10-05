@@ -117,6 +117,10 @@ export default function SizeFilter({ draft, search, onChange }) {
     selected.filter((id) => id.startsWith("finish:")).map((id) => id.slice(7))
   );
 
+  const finishControls = (
+    <FinishControls finishSelected={finishSelected} stocked={stocked} toggleFinish={toggleFinish} />
+  );
+
   return (
     <div className="size-filter">
       {chestColumns.length > 0 && (
@@ -157,39 +161,45 @@ export default function SizeFilter({ draft, search, onChange }) {
             isAvailable={(inseam) => inseamAvailable(inseam, waists, stocked)}
             onToggle={toggleInseam}
           />
+          {finishControls}
         </section>
       )}
 
-      <div className="size-rule" role="separator" />
-      <section className="size-block">
-        <h3>Pant Finish</h3>
-        <p className="size-note">
-          Unhemmed pants include extra length and need tailoring before wearing.
-        </p>
-        <ul className="size-finish">
-          {PANT_FINISHES.map((item) => {
-            const checked = finishSelected.has(item.id);
-            const count = stocked.filter((product) => product.pantFinish === item.id).length;
-            return (
-              <li key={item.id}>
-                <label className={count === 0 && !checked ? "is-empty" : undefined}>
-                  <input
-                    type="checkbox"
-                    checked={checked}
-                    disabled={count === 0 && !checked}
-                    onChange={() => toggleFinish(item.id)}
-                  />
-                  <span>
-                    <span className="size-finish-label">{item.label}</span>
-                    <span className="size-finish-caption">{item.caption}</span>
-                  </span>
-                </label>
-              </li>
-            );
-          })}
-        </ul>
-      </section>
+      {waistColumns.length === 0 && <section className="size-block">{finishControls}</section>}
     </div>
+  );
+}
+
+function FinishControls({ finishSelected, stocked, toggleFinish }) {
+  return (
+    <>
+      <p className="size-axis">Pant Finish</p>
+      <p className="size-note">
+        Unhemmed pants include extra length and need tailoring before wearing.
+      </p>
+      <ul className="size-finish">
+        {PANT_FINISHES.map((item) => {
+          const checked = finishSelected.has(item.id);
+          const count = stocked.filter((product) => product.pantFinish === item.id).length;
+          return (
+            <li key={item.id}>
+              <label className={count === 0 && !checked ? "is-empty" : undefined}>
+                <input
+                  type="checkbox"
+                  checked={checked}
+                  disabled={count === 0 && !checked}
+                  onChange={() => toggleFinish(item.id)}
+                />
+                <span>
+                  <span className="size-finish-label">{item.label}</span>
+                  <span className="size-finish-caption">{item.caption}</span>
+                </span>
+              </label>
+            </li>
+          );
+        })}
+      </ul>
+    </>
   );
 }
 
