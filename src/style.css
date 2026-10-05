@@ -743,10 +743,11 @@ h1 {
 .size-grid-lengths,
 .size-grid-numbers { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 
-.size-guided-head,
-.size-tile.is-guided {
+.size-guided-head {
   display: flex;
   justify-content: center;
+  align-items: flex-end;
+  min-height: 32px;
 }
 
 .size-guide {
@@ -789,11 +790,10 @@ h1 {
   text-align: center;
 }
 
-.size-tile.is-guided { min-height: 56px; }
-
-.size-tile.is-selected { border-color: var(--color-neutral-black); }
-
-.size-tile.is-guided.is-selected .size-guide-name { font-weight: 700; }
+.size-tile.is-selected {
+  border-color: var(--color-neutral-black);
+  font-weight: 500;
+}
 
 .size-tile:disabled {
   cursor: not-allowed;

@@ -100,7 +100,12 @@ export default function SizeFilter({ draft, search, onChange }) {
     onChange(next);
   }
 
-  const lengths = JACKET_LENGTHS.filter((item) => universe.lengths.has(item.id));
+  const lengthColumnsJacket = JACKET_LENGTHS.filter((item) => universe.lengths.has(item.id)).map(
+    (item) => ({
+      ...item,
+      values: [item.id],
+    })
+  );
   const chestColumns = groupNumbers(CHEST_GROUPS, universe.chests);
   const waistColumns = groupNumbers(WAIST_GROUPS, universe.waists);
   const lengthColumns = PANT_LENGTH_GROUPS.map((group) => ({
@@ -118,22 +123,13 @@ export default function SizeFilter({ draft, search, onChange }) {
         <section className="size-block">
           <h3>Jacket</h3>
           <p className="size-axis">Jacket Length</p>
-          <div className="size-grid size-grid-lengths">
-            {lengths.map((item) => (
-              <SizeTile
-                key={item.id}
-                guided
-                selected={jacketLengths.has(item.id)}
-                disabled={
-                  !jacketLengths.has(item.id) &&
-                  !lengthAvailable(item.id, jacketChests, stocked)
-                }
-                label={item.label}
-                range={item.range}
-                onToggle={() => toggleJacketLength(item.id)}
-              />
-            ))}
-          </div>
+          <GuidedColumns
+            columns={lengthColumnsJacket}
+            selected={jacketLengths}
+            isAvailable={(length) => lengthAvailable(length, jacketChests, stocked)}
+            onToggle={toggleJacketLength}
+            labelFor={(id) => JACKET_LENGTHS.find((item) => item.id === id)?.label ?? id}
+          />
           <p className="size-axis">Chest Size</p>
           <GuidedColumns
             columns={chestColumns}
@@ -197,29 +193,37 @@ export default function SizeFilter({ draft, search, onChange }) {
   );
 }
 
-function GuidedColumns({ columns, selected, isAvailable, onToggle }) {
+function GuidedColumns({ columns, selected, isAvailable, onToggle, labelFor = (id) => id }) {
   const rows = Math.max(0, ...columns.map((column) => column.values.length));
   return (
     <div
       className="size-guided"
       style={{ gridTemplateColumns: `repeat(${columns.length}, minmax(0, 1fr))` }}
     >
-      {columns.map((column) => (
-        <div key={column.id} className="size-guided-head">
-          <SizeGuide label={column.label} range={column.range} />
-        </div>
-      ))}
+      {columns.map((column) => {
+        const only =
+          column.values.length === 1 ? labelFor(String(column.values[0])) : null;
+        const name = only === column.label ? null : column.label;
+        return (
+          <div key={column.id} className="size-guided-head">
+            <SizeGuide label={name} range={column.range} />
+          </div>
+        );
+      })}
       {Array.from({ length: rows }, (_, row) =>
         columns.map((column) => {
           const value = column.values[row];
           if (value == null) return <div key={`${column.id}-${row}`} className="size-spacer" />;
           const id = String(value);
+          const label = labelFor(id);
+          const guide = label === column.label ? column.range : `${column.label}, ${column.range}`;
           return (
             <SizeTile
               key={`${column.id}-${id}`}
               selected={selected.has(id)}
               disabled={!isAvailable(id) && !selected.has(id)}
-              label={id}
+              label={label}
+              ariaLabel={`${guide}, ${label}`}
               onToggle={() => onToggle(id)}
             />
           );
@@ -232,25 +236,24 @@ function GuidedColumns({ columns, selected, isAvailable, onToggle }) {
 function SizeGuide({ label, range }) {
   return (
     <span className="size-guide">
-      <span className="size-guide-name">{label}</span>
-      <span className="size-guide-range">{range}</span>
+      {label && <span className="size-guide-name">{label}</span>}
+      {range && <span className="size-guide-range">{range}</span>}
     </span>
   );
 }
 
-function SizeTile({ label, range, selected, disabled, guided, onToggle }) {
+function SizeTile({ label, ariaLabel, selected, disabled, onToggle }) {
   return (
     <button
       type="button"
       role="checkbox"
       aria-checked={selected}
+      aria-label={ariaLabel}
       disabled={disabled}
-      className={["size-tile", guided ? "is-guided" : "", selected ? "is-selected" : ""]
-        .filter(Boolean)
-        .join(" ")}
+      className={["size-tile", selected ? "is-selected" : ""].filter(Boolean).join(" ")}
       onClick={onToggle}
     >
-      {guided ? <SizeGuide label={label} range={range} /> : <span>{label}</span>}
+      <span>{label}</span>
     </button>
   );
 }
