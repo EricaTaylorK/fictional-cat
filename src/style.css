@@ -748,28 +748,15 @@ h1 {
   justify-content: center;
   align-items: flex-end;
   min-height: 32px;
+  padding: 0 2px;
 }
 
-.size-guide {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1px;
-  text-align: center;
-}
-
-.size-guide-name {
-  font-size: 13px;
+.size-guide-line {
+  font-size: 12px;
   font-weight: 500;
   line-height: 16px;
-  color: var(--color-neutral-black);
-}
-
-.size-guide-range {
-  font-size: 11px;
-  font-weight: 400;
-  line-height: 14px;
-  color: var(--color-neutral-medium-gray);
+  text-align: center;
+  color: var(--color-neutral-dark-gray);
 }
 
 .size-tile {

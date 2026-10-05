@@ -202,7 +202,7 @@ function GuidedColumns({ columns, selected, isAvailable, onToggle, labelFor = (i
     >
       {columns.map((column) => (
         <div key={column.id} className="size-guided-head">
-          <SizeGuide label={column.label} range={column.range} />
+          <span className="size-guide-line">{column.hint}</span>
         </div>
       ))}
       {Array.from({ length: rows }, (_, row) =>
@@ -211,10 +211,7 @@ function GuidedColumns({ columns, selected, isAvailable, onToggle, labelFor = (i
           if (value == null) return <div key={`${column.id}-${row}`} className="size-spacer" />;
           const id = String(value);
           const label = labelFor(id);
-          const ariaLabel =
-            label === column.label
-              ? `${column.label}, ${column.range}`
-              : `${column.label}, ${column.range}, ${label}`;
+          const ariaLabel = `${column.hint}, ${label}`;
           return (
             <SizeTile
               key={`${column.id}-${id}`}
@@ -228,15 +225,6 @@ function GuidedColumns({ columns, selected, isAvailable, onToggle, labelFor = (i
         })
       )}
     </div>
-  );
-}
-
-function SizeGuide({ label, range }) {
-  return (
-    <span className="size-guide">
-      {label && <span className="size-guide-name">{label}</span>}
-      {range && <span className="size-guide-range">{range}</span>}
-    </span>
   );
 }
 
