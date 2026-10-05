@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { COLORS, FACETS, PRICE_RANGES } from "../data/catalog.js";
-import { commitPrice, countOption } from "../filters.js";
+import { commitPrice, countOption, totalSelections } from "../filters.js";
+import SizeFilter from "./SizeFilter.jsx";
 
 export default function FilterSheet({
   initialFacet,
@@ -78,6 +79,9 @@ export default function FilterSheet({
     onClear();
   }
 
+  const ready =
+    totalSelections(draft) > 0 || String(minInput).trim() !== "" || String(maxInput).trim() !== "";
+
   return (
     <>
       <button type="button" className="scrim" aria-label="Close filters" onClick={onClose} />
@@ -89,7 +93,6 @@ export default function FilterSheet({
         aria-labelledby="filter-title"
       >
         <header className="sheet-header">
-          <span className="sheet-header-spacer" aria-hidden="true" />
           <h2 id="filter-title">Filter by</h2>
           <button
             type="button"
@@ -122,7 +125,18 @@ export default function FilterSheet({
                 </button>
                 {open && (
                   <div className="facet-body">
-                    {facet.kind === "price" ? (
+                    {facet.kind === "size" ? (
+                      <SizeFilter
+                        draft={draft}
+                        search={search}
+                        onChange={(ids) =>
+                          onChange({
+                            ...draft,
+                            selections: { ...draft.selections, size: ids },
+                          })
+                        }
+                      />
+                    ) : facet.kind === "price" ? (
                       <PriceEditor
                         draft={draft}
                         products={products}
@@ -151,10 +165,20 @@ export default function FilterSheet({
           })}
         </div>
         <footer className="sheet-actions">
-          <button type="button" className="btn-clear" data-testid="clear-filters" onClick={clearSheet}>
+          <button
+            type="button"
+            className={ready ? "btn-clear is-ready" : "btn-clear"}
+            data-testid="clear-filters"
+            onClick={clearSheet}
+          >
             Clear all
           </button>
-          <button type="button" className="btn-apply" data-testid="apply-filters" onClick={applySheet}>
+          <button
+            type="button"
+            className={ready ? "btn-apply is-ready" : "btn-apply"}
+            data-testid="apply-filters"
+            onClick={applySheet}
+          >
             Apply
           </button>
         </footer>
@@ -165,7 +189,7 @@ export default function FilterSheet({
 
 function OptionList({ facet, draft, products, search, onToggle }) {
   const selected = draft.selections[facet.id] ?? [];
-  const layout = facet.id === "color" ? "swatches" : facet.id === "size" ? "sizes" : "list";
+  const layout = facet.id === "color" ? "swatches" : "list";
   return (
     <div className={`options options-${layout}`}>
       {facet.options.map((option) => {

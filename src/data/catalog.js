@@ -1,3 +1,5 @@
+import { expandSuitSizes, pantFinishFor } from "./sizes.js";
+
 export const COLORS = {
   black: { label: "Black", hex: "#161616" },
   navy: { label: "Navy", hex: "#1c2c4c" },
@@ -34,27 +36,18 @@ export const PRICE_RANGES = [
   { id: "above-500", label: "Above $500", min: 500.01, max: Infinity },
 ];
 
-const sizes = ["36", "38", "40", "42", "44", "46", "48", "50"];
+export const QUICK_FACETS = ["color", "size", "type", "brand", "occasion", "price"];
 
 export const FACETS = [
-  {
-    id: "promo",
-    label: "Sales & Promotions",
-    options: [
-      { id: "sale", label: "Sale" },
-      { id: "clearance", label: "Clearance" },
-      { id: "bogo", label: "Buy 1 Get 1" },
-    ],
-  },
-  {
-    id: "size",
-    label: "Size",
-    options: sizes.map((id) => ({ id, label: id })),
-  },
   {
     id: "color",
     label: "Color",
     options: Object.entries(COLORS).map(([id, color]) => ({ id, label: color.label })),
+  },
+  {
+    id: "size",
+    label: "Size",
+    kind: "size",
   },
   {
     id: "fit",
@@ -66,7 +59,6 @@ export const FACETS = [
       { id: "athletic", label: "Athletic" },
     ],
   },
-  { id: "price", label: "Price", kind: "price" },
   {
     id: "type",
     label: "Type",
@@ -89,17 +81,6 @@ export const FACETS = [
       { id: "michael-kors", label: "Michael Kors" },
       { id: "kenneth-cole", label: "Awearness Kenneth Cole" },
       { id: "wilke", label: "Wilke Rodriguez" },
-    ],
-  },
-  {
-    id: "material",
-    label: "Material",
-    options: [
-      { id: "wool", label: "Wool" },
-      { id: "wool-blend", label: "Wool Blend" },
-      { id: "cotton", label: "Cotton" },
-      { id: "linen", label: "Linen" },
-      { id: "polyester", label: "Polyester" },
     ],
   },
   {
@@ -132,6 +113,7 @@ export const FACETS = [
       { id: "double", label: "Double Breasted" },
     ],
   },
+  { id: "price", label: "Price", kind: "price" },
   {
     id: "lining",
     label: "Jacket Lining",
@@ -150,6 +132,26 @@ export const FACETS = [
       { id: "shawl", label: "Shawl" },
     ],
   },
+  {
+    id: "material",
+    label: "Material",
+    options: [
+      { id: "wool", label: "Wool" },
+      { id: "wool-blend", label: "Wool Blend" },
+      { id: "cotton", label: "Cotton" },
+      { id: "linen", label: "Linen" },
+      { id: "polyester", label: "Polyester" },
+    ],
+  },
+  {
+    id: "promo",
+    label: "Sales & Promotions",
+    options: [
+      { id: "sale", label: "Sale" },
+      { id: "clearance", label: "Clearance" },
+      { id: "bogo", label: "Buy 1 Get 1" },
+    ],
+  },
 ];
 
 export const SORTS = [
@@ -161,7 +163,7 @@ export const SORTS = [
 ];
 
 function suit(overrides) {
-  return {
+  const product = {
     promos: [],
     occasions: ["business"],
     jacket: "single",
@@ -172,6 +174,9 @@ function suit(overrides) {
     compareAt: null,
     ...overrides,
   };
+  product.pantFinish = pantFinishFor(product.id);
+  product.sizes = expandSuitSizes(product.sizes ?? [], product.id);
+  return product;
 }
 
 export const PRODUCTS = [

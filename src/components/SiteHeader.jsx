@@ -1,50 +1,69 @@
+import { useState } from "react";
+
 export default function SiteHeader({ search, onSearch }) {
+  const [searchOpen, setSearchOpen] = useState(Boolean(search));
+
   return (
     <header className="site-header">
-      <div className="promo">Suits from $39 — Free shipping on orders $99+</div>
+      <div className="promo">
+        <p>
+          Clearance up to 75% off original prices | <a href="#suits">Shop now &gt;</a>
+        </p>
+      </div>
       <div className="header-bar">
-        <a className="logo" href="#suits">
-          Men&apos;s Wearhouse
+        <button type="button" className="icon-btn" aria-label="Open menu">
+          <MenuIcon />
+        </button>
+        <a className="logo" href="#suits" aria-label="Men's Wearhouse">
+          <img src="/mw-logo.svg" alt="" />
         </a>
         <div className="header-icons">
-          <button type="button" className="icon-btn" aria-label="Account">
-            <AccountIcon />
+          <button
+            type="button"
+            className="icon-btn icon-search"
+            aria-label="Search"
+            aria-expanded={searchOpen}
+            onClick={() => setSearchOpen((open) => !open)}
+          >
+            <SearchIcon />
           </button>
           <button type="button" className="icon-btn" aria-label="Bag">
             <BagIcon />
           </button>
         </div>
       </div>
-      <form className="search-form" role="search" onSubmit={(event) => event.preventDefault()}>
-        <label className="search-field">
-          <SearchIcon />
-          <input
-            type="search"
-            value={search}
-            onChange={(event) => onSearch(event.target.value)}
-            placeholder="Search suits"
-            aria-label="Search suits"
-          />
-        </label>
-      </form>
+      {searchOpen && (
+        <form className="search-form" role="search" onSubmit={(event) => event.preventDefault()}>
+          <label className="search-field">
+            <SearchIcon />
+            <input
+              type="search"
+              value={search}
+              onChange={(event) => onSearch(event.target.value)}
+              placeholder="Search suits"
+              aria-label="Search suits"
+              autoFocus
+            />
+          </label>
+        </form>
+      )}
     </header>
+  );
+}
+
+function MenuIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M4 6h16M4 12h16M4 18h16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+    </svg>
   );
 }
 
 function SearchIcon() {
   return (
     <svg className="search-icon" viewBox="0 0 24 24" aria-hidden="true">
-      <circle cx="10.5" cy="10.5" r="6.25" fill="none" stroke="currentColor" strokeWidth="1.6" />
-      <path d="M15.2 15.2 L20 20" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
-    </svg>
-  );
-}
-
-function AccountIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <circle cx="12" cy="8" r="3.25" fill="none" stroke="currentColor" strokeWidth="1.6" />
-      <path d="M5 19.2c1.4-3 3.8-4.4 7-4.4s5.6 1.4 7 4.4" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+      <circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" strokeWidth="1.75" />
+      <path d="M16.5 16.5 L20.5 20.5" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" />
     </svg>
   );
 }
@@ -52,8 +71,8 @@ function AccountIcon() {
 function BagIcon() {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M6.5 8.5h11l-.8 11h-9.4l-.8-11z" fill="none" stroke="currentColor" strokeWidth="1.6" />
-      <path d="M9 8.5V7a3 3 0 0 1 6 0v1.5" fill="none" stroke="currentColor" strokeWidth="1.6" />
+      <path d="M6.5 8h11l-.7 12H7.2L6.5 8z" fill="none" stroke="currentColor" strokeWidth="1.4" />
+      <path d="M9 8V6.8a3 3 0 0 1 6 0V8" fill="none" stroke="currentColor" strokeWidth="1.4" />
     </svg>
   );
 }

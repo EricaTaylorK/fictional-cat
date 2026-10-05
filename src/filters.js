@@ -1,4 +1,5 @@
 import { PRICE_RANGES } from "./data/catalog.js";
+import { parseSizeId } from "./data/sizes.js";
 
 const FIELD = {
   promo: "promos",
@@ -70,10 +71,21 @@ function matchesPrice(price, filters) {
   return bucketOk && customOk;
 }
 
+function matchesSize(product, selected) {
+  const finishes = selected.filter((id) => parseSizeId(id)?.kind === "finish");
+  const sizes = selected.filter((id) => parseSizeId(id)?.kind !== "finish");
+  const sizeOk = sizes.length === 0 || sizes.some((id) => product.sizes.includes(id));
+  const finishOk =
+    finishes.length === 0 ||
+    finishes.some((id) => product.pantFinish === parseSizeId(id).finish);
+  return sizeOk && finishOk;
+}
+
 function matchesFacet(product, filters, facetId) {
   if (facetId === "price") return matchesPrice(product.price, filters);
   const selected = filters.selections[facetId] ?? [];
   if (selected.length === 0) return true;
+  if (facetId === "size") return matchesSize(product, selected);
   return selected.some((optionId) => hasValue(product, facetId, optionId));
 }
 

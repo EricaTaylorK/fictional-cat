@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState } from "react";
-import { PRODUCTS, SORTS } from "./data/catalog.js";
+import { PRODUCTS } from "./data/catalog.js";
 import {
   cloneFilters,
   emptyFilters,
@@ -50,8 +50,6 @@ export default function App() {
     setSearch("");
   }
 
-  const countLabel = `${visible.length} ${visible.length === 1 ? "item" : "items"}`;
-
   return (
     <div className="page">
       <SiteHeader search={search} onSearch={setSearch} />
@@ -60,36 +58,24 @@ export default function App() {
           <nav className="crumbs" aria-label="Breadcrumb">
             <ol>
               <li>Home</li>
-              <li className="crumb-dot" aria-hidden="true" />
-              <li>Men&apos;s Clothing</li>
-              <li className="crumb-dot" aria-hidden="true" />
-              <li className="here">Men&apos;s Suits</li>
+              <li>Mens Clothing</li>
+              <li className="here">Mens Suits</li>
             </ol>
           </nav>
-          <div className="title-row">
-            <div>
-              <h1>Men&apos;s Suits</h1>
-              <p className="count" data-testid="result-count">
-                {countLabel}
-              </p>
-            </div>
-            <label className="sort">
-              <span>Sort</span>
-              <select value={sort} onChange={(event) => setSort(event.target.value)} aria-label="Sort">
-                {SORTS.map((option) => (
-                  <option key={option.id} value={option.id}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-            </label>
-          </div>
+          <h1>
+            Men&apos;s Suits
+            <span className="count" data-testid="result-count">
+              ({visible.length})
+            </span>
+          </h1>
         </div>
         <FilterBar
           applied={applied}
           sheetOpen={sheetOpen}
           openFacet={openFacet}
           onOpen={openSheet}
+          sort={sort}
+          onSort={setSort}
         />
         <ProductGrid products={visible} onClear={clearApplied} />
       </main>
