@@ -6,7 +6,10 @@ import {
   matchingProducts,
   totalSelections,
 } from "../filters.js";
-import SizeFilter from "./SizeFilter.jsx";
+import SizeFilterGuided from "./SizeFilter.jsx";
+import SizeFilterMW from "./SizeFilterMW.jsx";
+
+const SizeFilter = import.meta.env.VITE_SIZE_VARIANT === "mw" ? SizeFilterMW : SizeFilterGuided;
 
 export default function FilterSheet({
   initialFacet,

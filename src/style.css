@@ -906,6 +906,107 @@ h1 {
 
 .size-spacer { min-height: 48px; }
 
+.mw-size { display: flex; flex-direction: column; gap: 8px; }
+
+.mw-size-head {
+  width: 100%;
+  min-height: 64px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border: 1px solid transparent;
+  background: var(--color-neutral-white);
+  color: #3a3a3a;
+  font-size: 14px;
+  line-height: 20px;
+  text-align: left;
+}
+
+.mw-size-group.is-open .mw-size-head { border-color: var(--color-focus-outline, #3d6fe0); }
+
+.mw-size-thumb {
+  width: 40px;
+  height: 40px;
+  flex: none;
+  border-radius: 50%;
+  overflow: hidden;
+  background: #f2f2f2;
+}
+
+.mw-size-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+.mw-size-title { flex: 1; }
+
+.mw-size-icon {
+  position: relative;
+  width: 16px;
+  height: 16px;
+  flex: none;
+}
+
+.mw-size-icon::before,
+.mw-size-icon::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 7.5px;
+  height: 1px;
+  background: currentColor;
+}
+
+.mw-size-icon::after { transform: rotate(90deg); transition: transform 0.15s ease; }
+
+.mw-size-group.is-open .mw-size-icon::after { transform: rotate(0deg); }
+
+.mw-size-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+  gap: 8px;
+  padding: 16px 0 8px;
+}
+
+.mw-size-tile {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 4px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
+  background: var(--color-neutral-white);
+  color: #3a3a3a;
+  font-size: 14px;
+  line-height: 20px;
+  text-align: center;
+  cursor: pointer;
+}
+
+.mw-size-tile input {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  opacity: 0;
+  cursor: inherit;
+}
+
+.mw-size-tile:hover { border-color: rgba(0, 0, 0, 0.7); }
+
+.mw-size-tile.is-selected {
+  border-color: #3a3a3a;
+  box-shadow: inset 0 0 0 1px #3a3a3a;
+}
+
+.mw-size-tile:focus-within { outline: 2px solid var(--color-focus-outline, #3d6fe0); outline-offset: 2px; }
+
+.mw-size-tile.is-empty {
+  cursor: not-allowed;
+  color: #b9b9b9;
+  border-color: rgba(0, 0, 0, 0.06);
+}
+
 .options-sizes {
   flex-direction: row;
   flex-wrap: wrap;
