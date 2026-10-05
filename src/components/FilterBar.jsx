@@ -31,17 +31,30 @@ export default function FilterBar({
 
   return (
     <div className="filter-bar">
-      <div className="filter-row">
-        <div className="filter-scroller">
+      <div className="filter-toolbar">
+        <div className="filter-controls">
+          <button
+            type="button"
+            className="control-btn"
+            data-testid="open-filter"
+            aria-expanded={sheetOpen && openFacet == null}
+            aria-controls="filter-sheet"
+            onClick={() => onOpen(null)}
+          >
+            <span>Filter{total > 0 && ` (${total})`}</span>
+            <FilterIcon />
+          </button>
           <div className="sort-wrap" ref={sortRef}>
             <button
               type="button"
-              className="chip chip-action"
+              className="control-btn"
               aria-expanded={sortOpen}
               aria-haspopup="listbox"
               onClick={() => setSortOpen((open) => !open)}
             >
-              <span>Sort: {sortLabel}</span>
+              <span>
+                Sort<span className="sort-label">: {sortLabel}</span>
+              </span>
               <SortIcon />
             </button>
             {sortOpen && (
@@ -64,46 +77,37 @@ export default function FilterBar({
               </ul>
             )}
           </div>
-          <button
-            type="button"
-            className={total > 0 ? "chip chip-action has-selection" : "chip chip-action"}
-            data-testid="open-filter"
-            aria-expanded={sheetOpen && openFacet == null}
-            aria-controls="filter-sheet"
-            onClick={() => onOpen(null)}
-          >
-            <span>Filter</span>
-            <FilterIcon />
-            {total > 0 && <span className="chip-count">{total}</span>}
-          </button>
-          {chips.map((facet) => {
-            const count = selectionCount(applied, facet.id);
-            return (
-              <button
-                key={facet.id}
-                type="button"
-                className={count > 0 ? "chip has-selection" : "chip"}
-                aria-pressed={count > 0}
-                data-testid={`chip-${facet.id}`}
-                aria-expanded={sheetOpen && openFacet === facet.id}
-                aria-controls="filter-sheet"
-                onClick={() => onOpen(facet.id)}
-              >
-                {facet.label}
-                {count > 0 && <span className="chip-count">{count}</span>}
-              </button>
-            );
-          })}
         </div>
         <label className="pickup">
-          <span>Pick Up (0)</span>
+          <span>Pick Up At Store</span>
           <input
             type="checkbox"
             role="switch"
+            aria-checked={pickup}
             checked={pickup}
             onChange={(event) => setPickup(event.target.checked)}
           />
         </label>
+      </div>
+      <div className="facet-chips">
+        {chips.map((facet) => {
+          const count = selectionCount(applied, facet.id);
+          return (
+            <button
+              key={facet.id}
+              type="button"
+              className="chip"
+              aria-pressed={count > 0}
+              data-testid={`chip-${facet.id}`}
+              aria-expanded={sheetOpen && openFacet === facet.id}
+              aria-controls="filter-sheet"
+              onClick={() => onOpen(facet.id)}
+            >
+              {facet.label}
+              {count > 0 && ` (${count})`}
+            </button>
+          );
+        })}
       </div>
       {selected.length > 0 && (
         <div className="selected-filters" data-testid="selected-filters">
@@ -143,11 +147,10 @@ function FilterIcon() {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true">
       <path
-        d="M4 7h16M7 12h10M10 17h4"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.6"
-        strokeLinecap="round"
+        fill="currentColor"
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M14 7.5a1.5 1.5 0 1 1 3 0 1.5 1.5 0 0 1-3 0Zm-.95-.5H4v1h9.05a2.5 2.5 0 0 0 4.9 0H20V7h-2.05a2.5 2.5 0 0 0-4.9 0ZM20 13h-9.05a2.5 2.5 0 0 1-4.9 0H4v-1h2.05a2.5 2.5 0 0 1 4.9 0H20v1Zm-10-.5v.001a1.5 1.5 0 1 1 0-.002v.001Zm7.95 5.5H20v-1h-2.05a2.5 2.5 0 0 0-4.9 0H4v1h9.05a2.5 2.5 0 0 0 4.9 0ZM14 17.5a1.5 1.5 0 1 0 3 0 1.5 1.5 0 0 0-3 0Z"
       />
     </svg>
   );
@@ -157,10 +160,10 @@ function SortIcon() {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true">
       <path
-        d="M8 7v10M8 7l-2.2 2.2M8 7l2.2 2.2M16 17V7M16 17l-2.2-2.2M16 17l2.2-2.2"
+        d="M8 4v16M8 4 4.5 7.5M16 20V4M16 20l3.5-3.5"
         fill="none"
         stroke="currentColor"
-        strokeWidth="1.6"
+        strokeWidth="1.2"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
