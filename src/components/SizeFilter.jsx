@@ -159,12 +159,10 @@ export default function SizeFilter({ draft, search, onChange }) {
           />
           <p className="size-axis">Pant Length</p>
           <div className="size-modes" role="radiogroup" aria-label="Pant length">
-            <div className={unhemmed ? "size-choice" : "size-choice is-open"}>
+            <div className="size-choice">
               <label className="size-mode">
                 <input type="radio" name="pant-length" checked={!unhemmed} onChange={showHemmed} />
-                <span className="size-finish-copy">
-                  <span>Hemmed</span>
-                </span>
+                <span className="size-mode-label">Hemmed</span>
               </label>
               {!unhemmed && (
                 <GuidedColumns
@@ -175,7 +173,7 @@ export default function SizeFilter({ draft, search, onChange }) {
                 />
               )}
             </div>
-            <div className={unhemmed ? "size-choice is-open" : "size-choice"}>
+            <div className="size-choice">
               <label className={unhemmedInStock || unhemmed ? "size-mode" : "size-mode is-empty"}>
                 <input
                   type="radio"
@@ -184,11 +182,11 @@ export default function SizeFilter({ draft, search, onChange }) {
                   disabled={!unhemmedInStock && !unhemmed}
                   onChange={showUnhemmed}
                 />
-                <span className="size-finish-copy">
-                  <span>Unhemmed</span>
-                  <span>Hemmed to your length on the product page.</span>
-                </span>
+                <span className="size-mode-label">Unhemmed</span>
               </label>
+              {unhemmed && (
+                <p className="size-mode-note">Hemmed to your length on the product page.</p>
+              )}
             </div>
           </div>
         </section>
