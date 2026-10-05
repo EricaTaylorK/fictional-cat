@@ -158,30 +158,35 @@ export default function SizeFilter({ draft, search, onChange }) {
             onToggle={toggleWaist}
           />
           <p className="size-axis">Pant Length</p>
-          <label className={unhemmedInStock || unhemmed ? "size-finish-toggle" : "size-finish-toggle is-empty"}>
-            <input
-              type="checkbox"
-              checked={unhemmed}
-              disabled={!unhemmedInStock && !unhemmed}
-              onChange={() => (unhemmed ? showHemmed() : showUnhemmed())}
-            />
-            <span className="size-finish-copy">
-              <span>{unhemmed ? "Unhemmed pants only" : "Unhemmed pants"}</span>
-              <span>
-                {unhemmed
-                  ? "These will be hemmed to your length on the product page."
-                  : "Can be hemmed to your length on the product page."}
+          <div className="size-modes" role="radiogroup" aria-label="Pant length">
+            <label className="size-mode">
+              <span className="size-finish-copy">
+                <span>Hemmed</span>
               </span>
-            </span>
-          </label>
-          {!unhemmed && (
-            <GuidedColumns
-              columns={lengthColumns}
-              selected={inseams}
-              isAvailable={(inseam) => inseamAvailable(inseam, waists, stocked)}
-              onToggle={toggleInseam}
-            />
-          )}
+              <input type="radio" name="pant-length" checked={!unhemmed} onChange={showHemmed} />
+            </label>
+            {!unhemmed && (
+              <GuidedColumns
+                columns={lengthColumns}
+                selected={inseams}
+                isAvailable={(inseam) => inseamAvailable(inseam, waists, stocked)}
+                onToggle={toggleInseam}
+              />
+            )}
+            <label className={unhemmedInStock || unhemmed ? "size-mode" : "size-mode is-empty"}>
+              <span className="size-finish-copy">
+                <span>Unhemmed</span>
+                <span>Hemmed to your length on the product page.</span>
+              </span>
+              <input
+                type="radio"
+                name="pant-length"
+                checked={unhemmed}
+                disabled={!unhemmedInStock && !unhemmed}
+                onChange={showUnhemmed}
+              />
+            </label>
+          </div>
         </section>
       )}
     </div>

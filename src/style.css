@@ -690,8 +690,7 @@ h1 {
 
 .option-count { color: var(--color-neutral-medium-gray); }
 
-.option input,
-.size-finish-toggle input {
+.option input {
   appearance: none;
   width: 16px;
   height: 16px;
@@ -703,14 +702,12 @@ h1 {
   flex: none;
 }
 
-.option input:checked,
-.size-finish-toggle input:checked {
+.option input:checked {
   background: var(--color-neutral-black);
   border-color: var(--color-neutral-black);
 }
 
-.option input:checked::after,
-.size-finish-toggle input:checked::after {
+.option input:checked::after {
   content: "";
   width: 8px;
   height: 4px;
@@ -793,31 +790,59 @@ h1 {
 
 .size-spacer { min-height: 48px; }
 
-.size-finish-toggle {
+.size-modes { display: flex; flex-direction: column; }
+
+.size-mode {
   display: flex;
   align-items: flex-start;
-  gap: 8px;
-  margin: 0 0 8px;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 40px;
+  padding: 8px 0;
   cursor: pointer;
-  color: var(--color-neutral-dark-gray);
-  font-size: 14px;
-  font-weight: 400;
-  line-height: 20px;
-  text-align: left;
 }
 
-.size-finish-toggle input { margin-top: 2px; }
+.size-mode.is-empty { opacity: 0.35; cursor: not-allowed; }
+
+.size-mode input {
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  margin: 2px 0 0;
+  border: 1px solid var(--color-transparent-black50);
+  border-radius: 50%;
+  background: transparent;
+  display: grid;
+  place-items: center;
+  flex: none;
+}
+
+.size-mode input:checked { border-color: var(--color-neutral-black); }
+
+.size-mode input:checked::after {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-neutral-black);
+}
+
+.size-modes .size-guided { margin-bottom: 4px; }
 
 .size-finish-copy { display: flex; flex-direction: column; }
 
 .size-finish-copy span:first-child {
   color: var(--color-neutral-black);
+  font-size: 14px;
   font-weight: 500;
+  line-height: 20px;
 }
 
 .size-finish-copy span:last-child {
   font-size: 12px;
+  font-weight: 400;
   line-height: 16px;
+  color: var(--color-neutral-dark-gray);
 }
 
 .size-finish-toggle.is-empty { opacity: 0.35; cursor: not-allowed; }
