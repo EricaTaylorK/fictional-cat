@@ -347,6 +347,70 @@ h1 {
   place-items: center;
 }
 
+.selected-filters {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 16px 16px;
+  border-bottom: 1px solid #ececec;
+}
+
+.selected-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  min-width: 0;
+  flex: 1;
+}
+
+.selected-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 30px;
+  padding: 4px 8px 4px 11px;
+  border-radius: 4px;
+  background: var(--color-neutral-lightest-gray);
+  color: var(--color-neutral-black);
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 20px;
+}
+
+.selected-remove {
+  display: inline-grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  border: 0;
+  border-radius: 2px;
+  background: transparent;
+  color: var(--color-neutral-dark-gray);
+}
+
+.selected-remove svg { width: 10px; height: 10px; }
+
+.selected-remove:hover { color: var(--color-neutral-black); }
+
+.selected-clear {
+  flex: none;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  color: var(--color-neutral-black);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  line-height: 16px;
+  text-transform: uppercase;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
 .grid {
   list-style: none;
   margin: 0;

@@ -4,6 +4,7 @@ import {
   cloneFilters,
   emptyFilters,
   matchingProducts,
+  removeAppliedToken,
   sortProducts,
 } from "./filters.js";
 import FilterBar from "./components/FilterBar.jsx";
@@ -90,6 +91,8 @@ export default function App() {
           sheetOpen={sheetOpen}
           openFacet={openFacet}
           onOpen={openSheet}
+          onRemove={(token) => setApplied((current) => removeAppliedToken(current, token))}
+          onClear={() => setApplied(emptyFilters())}
           sort={sort}
           onSort={setSort}
         />

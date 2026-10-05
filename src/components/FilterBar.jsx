@@ -1,9 +1,19 @@
 import { useEffect, useRef, useState } from "react";
 import { FACETS, QUICK_FACETS, SORTS } from "../data/catalog.js";
-import { selectionCount, totalSelections } from "../filters.js";
+import { appliedTokens, selectionCount, totalSelections } from "../filters.js";
 
-export default function FilterBar({ applied, sheetOpen, openFacet, onOpen, sort, onSort }) {
+export default function FilterBar({
+  applied,
+  sheetOpen,
+  openFacet,
+  onOpen,
+  onRemove,
+  onClear,
+  sort,
+  onSort,
+}) {
   const total = totalSelections(applied);
+  const selected = appliedTokens(applied);
   const [sortOpen, setSortOpen] = useState(false);
   const [pickup, setPickup] = useState(false);
   const sortRef = useRef(null);
@@ -94,6 +104,36 @@ export default function FilterBar({ applied, sheetOpen, openFacet, onOpen, sort,
           );
         })}
       </div>
+      {selected.length > 0 && (
+        <div className="selected-filters" data-testid="selected-filters">
+          <ul className="selected-list" aria-label="Selected filters">
+            {selected.map((token) => (
+              <li key={token.key}>
+                <span className="selected-chip">
+                  <span>{token.label}</span>
+                  <button
+                    type="button"
+                    className="selected-remove"
+                    aria-label={`Remove ${token.label}`}
+                    data-testid={`remove-${token.key}`}
+                    onClick={() => onRemove(token)}
+                  >
+                    <CloseIcon />
+                  </button>
+                </span>
+              </li>
+            ))}
+          </ul>
+          <button
+            type="button"
+            className="selected-clear"
+            data-testid="clear-selected"
+            onClick={onClear}
+          >
+            Clear all
+          </button>
+        </div>
+      )}
     </div>
   );
 }
@@ -110,6 +150,14 @@ function SortIcon() {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true">
       <path d="M8 6v12M8 6 5.5 8.5M8 6l2.5 2.5M16 18V6M16 18l-2.5-2.5M16 18l2.5-2.5" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function CloseIcon() {
+  return (
+    <svg viewBox="0 0 12 12" aria-hidden="true">
+      <path d="M2 2 L10 10 M10 2 L2 10" fill="none" stroke="currentColor" strokeWidth="1.4" />
     </svg>
   );
 }

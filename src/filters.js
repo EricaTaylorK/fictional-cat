@@ -1,4 +1,4 @@
-import { PRICE_RANGES } from "./data/catalog.js";
+import { FACETS, PRICE_RANGES } from "./data/catalog.js";
 
 const FIELD = {
   promo: "promos",
@@ -41,6 +41,63 @@ export function totalSelections(filters) {
   const fromFacets = Object.values(filters.selections).reduce((sum, values) => sum + values.length, 0);
   const custom = filters.priceMin != null || filters.priceMax != null ? 1 : 0;
   return fromFacets + custom;
+}
+
+function optionLabel(facetId, optionId) {
+  if (facetId === "price") {
+    return PRICE_RANGES.find((range) => range.id === optionId)?.label ?? optionId;
+  }
+  const facet = FACETS.find((item) => item.id === facetId);
+  return facet?.options?.find((option) => option.id === optionId)?.label ?? optionId;
+}
+
+function customPriceLabel(filters) {
+  if (filters.priceMin != null && filters.priceMax != null) {
+    return `$${filters.priceMin}–$${filters.priceMax}`;
+  }
+  if (filters.priceMax != null) return `Under $${filters.priceMax}`;
+  if (filters.priceMin != null) return `Over $${filters.priceMin}`;
+  return null;
+}
+
+export function appliedTokens(filters) {
+  const tokens = [];
+  for (const facet of FACETS) {
+    for (const optionId of filters.selections[facet.id] ?? []) {
+      tokens.push({
+        key: `${facet.id}:${optionId}`,
+        facetId: facet.id,
+        optionId,
+        label: optionLabel(facet.id, optionId),
+      });
+    }
+  }
+  const custom = customPriceLabel(filters);
+  if (custom) {
+    tokens.push({
+      key: "price:custom",
+      facetId: "price",
+      custom: true,
+      label: custom,
+    });
+  }
+  return tokens;
+}
+
+export function removeAppliedToken(filters, token) {
+  const next = cloneFilters(filters);
+  if (token.custom) {
+    next.priceMin = null;
+    next.priceMax = null;
+    return next;
+  }
+  next.selections[token.facetId] = (next.selections[token.facetId] ?? []).filter(
+    (id) => id !== token.optionId
+  );
+  if (next.selections[token.facetId].length === 0) {
+    delete next.selections[token.facetId];
+  }
+  return next;
 }
 
 function hasValue(product, facetId, optionId) {
