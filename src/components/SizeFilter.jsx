@@ -96,11 +96,17 @@ export default function SizeFilter({ draft, search, onChange }) {
     commit(jacketLengths, jacketChests, waists, next, pickingLength ? false : unhemmed);
   }
 
-  function toggleUnhemmed() {
-    const next = !unhemmed;
-    setUnhemmed(next);
-    if (next) setInseams(new Set());
-    commit(jacketLengths, jacketChests, waists, next ? new Set() : inseams, next);
+  function showHemmed() {
+    if (!unhemmed) return;
+    setUnhemmed(false);
+    commit(jacketLengths, jacketChests, waists, inseams, false);
+  }
+
+  function showUnhemmed() {
+    if (unhemmed) return;
+    setUnhemmed(true);
+    setInseams(new Set());
+    commit(jacketLengths, jacketChests, waists, new Set(), true);
   }
 
   const lengthColumnsJacket = JACKET_LENGTHS.filter((item) => universe.lengths.has(item.id)).map(
@@ -152,24 +158,39 @@ export default function SizeFilter({ draft, search, onChange }) {
             onToggle={toggleWaist}
           />
           <p className="size-axis">Pant Length</p>
-          <GuidedColumns
-            columns={lengthColumns}
-            selected={inseams}
-            isAvailable={(inseam) => inseamAvailable(inseam, waists, stocked)}
-            onToggle={toggleInseam}
-          />
-          <p className="size-note">A chosen length is already hemmed.</p>
-          <button
-            type="button"
-            role="checkbox"
-            aria-checked={unhemmed}
-            className={unhemmed ? "size-unhemmed is-selected" : "size-unhemmed"}
-            disabled={!unhemmedInStock && !unhemmed}
-            onClick={toggleUnhemmed}
-          >
-            <span className="size-unhemmed-label">Unhemmed</span>
-            <span className="size-unhemmed-caption">Regular length, needs hemming</span>
-          </button>
+          <div className="size-segment" role="radiogroup" aria-label="Pant length">
+            <button
+              type="button"
+              role="radio"
+              aria-checked={!unhemmed}
+              className={unhemmed ? undefined : "is-on"}
+              onClick={showHemmed}
+            >
+              <span>Hemmed</span>
+              <span>Ready to wear</span>
+            </button>
+            <button
+              type="button"
+              role="radio"
+              aria-checked={unhemmed}
+              className={unhemmed ? "is-on" : undefined}
+              disabled={!unhemmedInStock && !unhemmed}
+              onClick={showUnhemmed}
+            >
+              <span>Unhemmed</span>
+              <span>Needs hemming</span>
+            </button>
+          </div>
+          {unhemmed ? (
+            <p className="size-mode-note">Regular length. These pants still need hemming.</p>
+          ) : (
+            <GuidedColumns
+              columns={lengthColumns}
+              selected={inseams}
+              isAvailable={(inseam) => inseamAvailable(inseam, waists, stocked)}
+              onToggle={toggleInseam}
+            />
+          )}
         </section>
       )}
     </div>
