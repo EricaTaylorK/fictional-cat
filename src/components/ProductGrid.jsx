@@ -19,7 +19,11 @@ export default function ProductGrid({ products, onClear }) {
         <li key={product.id}>
           <article className="card" data-testid="product-card">
             <div className="card-media">
-              <img src={SUIT_IMAGES[product.image]} alt="" />
+              <img
+                src={product.imageUrl || SUIT_IMAGES[product.image] || SUIT_IMAGES.navy}
+                alt=""
+                loading="lazy"
+              />
               {product.promos[0] && <span className="badge">{PROMO_BADGES[product.promos[0]]}</span>}
             </div>
             <div className="card-copy">
