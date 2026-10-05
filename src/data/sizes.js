@@ -26,11 +26,6 @@ export const WAIST_GROUPS = [
   { id: "X Large", label: "X Large", hint: "X Large", min: 39, max: Infinity },
 ];
 
-export const PANT_FINISHES = [
-  { id: "hemmed", label: "Hemmed", caption: "ready to wear" },
-  { id: "unhemmed", label: "Unhemmed", caption: "requires hemming" },
-];
-
 const LENGTH_IDS = JACKET_LENGTHS.map((item) => item.id);
 const INSEAMS = PANT_LENGTH_GROUPS.flatMap((group) => group.inseams);
 
@@ -42,6 +37,10 @@ export function pantSizeId(waist, inseam) {
   return `${waist}W x ${inseam}L`;
 }
 
+export function waistId(waist) {
+  return `${waist}W`;
+}
+
 export function finishId(finish) {
   return `finish:${finish}`;
 }
@@ -50,6 +49,8 @@ export function parseSizeId(id) {
   if (id.startsWith("finish:")) return { kind: "finish", finish: id.slice(7) };
   const jacket = id.match(/^(\d+) (Short|Regular|Long|Extra Long)$/);
   if (jacket) return { kind: "jacket", chest: jacket[1], length: jacket[2] };
+  const waistOnly = id.match(/^(\d+)W$/);
+  if (waistOnly) return { kind: "waist", waist: waistOnly[1] };
   const pant = id.match(/^(\d+)W x (\d+)L$/);
   if (pant) return { kind: "pant", waist: pant[1], inseam: pant[2] };
   return null;

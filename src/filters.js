@@ -71,14 +71,32 @@ function matchesPrice(price, filters) {
   return bucketOk && customOk;
 }
 
+function matchesSizeToken(product, id) {
+  const parsed = parseSizeId(id);
+  if (parsed?.kind === "waist") {
+    return product.sizes.some((sizeId) => {
+      const size = parseSizeId(sizeId);
+      return size?.kind === "pant" && size.waist === parsed.waist;
+    });
+  }
+  return product.sizes.includes(id);
+}
+
 function matchesSize(product, selected) {
   const finishes = selected.filter((id) => parseSizeId(id)?.kind === "finish");
-  const sizes = selected.filter((id) => parseSizeId(id)?.kind !== "finish");
-  const sizeOk = sizes.length === 0 || sizes.some((id) => product.sizes.includes(id));
-  const finishOk =
-    finishes.length === 0 ||
-    finishes.some((id) => product.pantFinish === parseSizeId(id).finish);
-  return sizeOk && finishOk;
+  const sizes = selected.filter((id) => {
+    const kind = parseSizeId(id)?.kind;
+    return kind && kind !== "finish";
+  });
+  const sizeOk = sizes.length === 0 || sizes.some((id) => matchesSizeToken(product, id));
+  const wantsUnhemmed = finishes.some((id) => parseSizeId(id).finish === "unhemmed");
+  if (wantsUnhemmed) return product.pantFinish === "unhemmed" && sizeOk;
+  const constrainsPants = sizes.some((id) => {
+    const kind = parseSizeId(id)?.kind;
+    return kind === "pant" || kind === "waist";
+  });
+  if (constrainsPants && product.pantFinish === "unhemmed") return false;
+  return sizeOk;
 }
 
 function matchesFacet(product, filters, facetId) {

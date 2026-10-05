@@ -3,13 +3,13 @@ import { PRODUCTS } from "../data/catalog.js";
 import {
   CHEST_GROUPS,
   JACKET_LENGTHS,
-  PANT_FINISHES,
   PANT_LENGTH_GROUPS,
   WAIST_GROUPS,
   finishId,
   jacketSizeId,
   pantSizeId,
   parseSizeId,
+  waistId,
 } from "../data/sizes.js";
 import { matchingProducts } from "../filters.js";
 
@@ -21,6 +21,7 @@ export default function SizeFilter({ draft, search, onChange }) {
   const [jacketChests, setJacketChests] = useState(axes.jacketChests);
   const [waists, setWaists] = useState(axes.waists);
   const [inseams, setInseams] = useState(axes.inseams);
+  const [unhemmed, setUnhemmed] = useState(axes.unhemmed);
   const written = useRef(signature);
 
   useEffect(() => {
@@ -30,6 +31,7 @@ export default function SizeFilter({ draft, search, onChange }) {
     setJacketChests(next.jacketChests);
     setWaists(next.waists);
     setInseams(next.inseams);
+    setUnhemmed(next.unhemmed);
     written.current = signature;
   }, [signature, selected]);
 
@@ -43,7 +45,7 @@ export default function SizeFilter({ draft, search, onChange }) {
 
   const universe = useMemo(() => inventory(PRODUCTS), []);
 
-  function commit(nextJacketLengths, nextJacketChests, nextWaists, nextInseams) {
+  function commit(nextJacketLengths, nextJacketChests, nextWaists, nextInseams, nextUnhemmed) {
     const jacket = [];
     for (const length of nextJacketLengths) {
       for (const chest of nextJacketChests) {
@@ -52,13 +54,17 @@ export default function SizeFilter({ draft, search, onChange }) {
       }
     }
     const pants = [];
-    for (const waist of nextWaists) {
-      for (const inseam of nextInseams) {
-        const id = pantSizeId(waist, inseam);
-        if (universe.pantIds.has(id)) pants.push(id);
+    if (nextUnhemmed) {
+      for (const waist of nextWaists) pants.push(waistId(waist));
+    } else {
+      for (const waist of nextWaists) {
+        for (const inseam of nextInseams) {
+          const id = pantSizeId(waist, inseam);
+          if (universe.pantIds.has(id)) pants.push(id);
+        }
       }
     }
-    const finishes = selected.filter((id) => id.startsWith("finish:"));
+    const finishes = nextUnhemmed ? [finishId("unhemmed")] : [];
     const next = [...jacket, ...pants, ...finishes];
     written.current = [...next].sort().join("|");
     onChange(next);
@@ -67,37 +73,34 @@ export default function SizeFilter({ draft, search, onChange }) {
   function toggleJacketLength(id) {
     const next = toggleSet(jacketLengths, id);
     setJacketLengths(next);
-    commit(next, jacketChests, waists, inseams);
+    commit(next, jacketChests, waists, inseams, unhemmed);
   }
 
   function toggleChest(id) {
     const next = toggleSet(jacketChests, id);
     setJacketChests(next);
-    commit(jacketLengths, next, waists, inseams);
+    commit(jacketLengths, next, waists, inseams, unhemmed);
   }
 
   function toggleWaist(id) {
     const next = toggleSet(waists, id);
     setWaists(next);
-    commit(jacketLengths, jacketChests, next, inseams);
+    commit(jacketLengths, jacketChests, next, inseams, unhemmed);
   }
 
   function toggleInseam(id) {
     const next = toggleSet(inseams, id);
+    const pickingLength = next.has(id);
     setInseams(next);
-    commit(jacketLengths, jacketChests, waists, next);
+    if (pickingLength) setUnhemmed(false);
+    commit(jacketLengths, jacketChests, waists, next, pickingLength ? false : unhemmed);
   }
 
-  function toggleFinish(id) {
-    const key = finishId(id);
-    const without = selected.filter((item) => !item.startsWith("finish:"));
-    const finishes = selected.filter((item) => item.startsWith("finish:"));
-    const nextFinishes = finishes.includes(key)
-      ? finishes.filter((item) => item !== key)
-      : [...finishes, key];
-    const next = [...without, ...nextFinishes];
-    written.current = [...next].sort().join("|");
-    onChange(next);
+  function toggleUnhemmed() {
+    const next = !unhemmed;
+    setUnhemmed(next);
+    if (next) setInseams(new Set());
+    commit(jacketLengths, jacketChests, waists, next ? new Set() : inseams, next);
   }
 
   const lengthColumnsJacket = JACKET_LENGTHS.filter((item) => universe.lengths.has(item.id)).map(
@@ -113,13 +116,7 @@ export default function SizeFilter({ draft, search, onChange }) {
     values: group.inseams.filter((value) => universe.inseams.has(String(value))),
   })).filter((group) => group.values.length > 0);
 
-  const finishSelected = new Set(
-    selected.filter((id) => id.startsWith("finish:")).map((id) => id.slice(7))
-  );
-
-  const finishControls = (
-    <FinishControls finishSelected={finishSelected} stocked={stocked} toggleFinish={toggleFinish} />
-  );
+  const unhemmedInStock = unhemmedAvailable(waists, stocked);
 
   return (
     <div className="size-filter">
@@ -151,7 +148,7 @@ export default function SizeFilter({ draft, search, onChange }) {
           <GuidedColumns
             columns={waistColumns}
             selected={waists}
-            isAvailable={(waist) => waistAvailable(waist, inseams, stocked)}
+            isAvailable={(waist) => waistAvailable(waist, inseams, stocked, unhemmed)}
             onToggle={toggleWaist}
           />
           <p className="size-axis">Pant Length</p>
@@ -161,45 +158,21 @@ export default function SizeFilter({ draft, search, onChange }) {
             isAvailable={(inseam) => inseamAvailable(inseam, waists, stocked)}
             onToggle={toggleInseam}
           />
-          {finishControls}
+          <p className="size-note">A chosen length is already hemmed.</p>
+          <button
+            type="button"
+            role="checkbox"
+            aria-checked={unhemmed}
+            className={unhemmed ? "size-unhemmed is-selected" : "size-unhemmed"}
+            disabled={!unhemmedInStock && !unhemmed}
+            onClick={toggleUnhemmed}
+          >
+            <span className="size-unhemmed-label">Unhemmed</span>
+            <span className="size-unhemmed-caption">Regular length, needs hemming</span>
+          </button>
         </section>
       )}
-
-      {waistColumns.length === 0 && <section className="size-block">{finishControls}</section>}
     </div>
-  );
-}
-
-function FinishControls({ finishSelected, stocked, toggleFinish }) {
-  return (
-    <>
-      <p className="size-axis">Pant Finish</p>
-      <p className="size-note">
-        Unhemmed pants include extra length and need tailoring before wearing.
-      </p>
-      <ul className="size-finish">
-        {PANT_FINISHES.map((item) => {
-          const checked = finishSelected.has(item.id);
-          const count = stocked.filter((product) => product.pantFinish === item.id).length;
-          return (
-            <li key={item.id}>
-              <label className={count === 0 && !checked ? "is-empty" : undefined}>
-                <input
-                  type="checkbox"
-                  checked={checked}
-                  disabled={count === 0 && !checked}
-                  onChange={() => toggleFinish(item.id)}
-                />
-                <span>
-                  <span className="size-finish-label">{item.label}</span>
-                  <span className="size-finish-caption">{item.caption}</span>
-                </span>
-              </label>
-            </li>
-          );
-        })}
-      </ul>
-    </>
   );
 }
 
@@ -293,32 +266,48 @@ function chestAvailable(chest, lengths, products) {
   );
 }
 
-function waistAvailable(waist, inseams, products) {
-  const inseamList = inseams.size ? [...inseams] : null;
-  return products.some((product) =>
-    product.sizes.some((id) => {
+function waistAvailable(waist, inseams, products, unhemmed) {
+  const inseamList = !unhemmed && inseams.size ? [...inseams] : null;
+  return products.some((product) => {
+    if (unhemmed && product.pantFinish !== "unhemmed") return false;
+    if (inseamList && product.pantFinish === "unhemmed") return false;
+    return product.sizes.some((id) => {
       const parsed = parseSizeId(id);
       return (
         parsed?.kind === "pant" &&
         parsed.waist === waist &&
         (inseamList == null || inseamList.includes(parsed.inseam))
       );
-    })
-  );
+    });
+  });
 }
 
 function inseamAvailable(inseam, waists, products) {
   const waistList = waists.size ? [...waists] : null;
-  return products.some((product) =>
-    product.sizes.some((id) => {
-      const parsed = parseSizeId(id);
-      return (
-        parsed?.kind === "pant" &&
-        parsed.inseam === inseam &&
-        (waistList == null || waistList.includes(parsed.waist))
-      );
-    })
+  return products.some(
+    (product) =>
+      product.pantFinish !== "unhemmed" &&
+      product.sizes.some((id) => {
+        const parsed = parseSizeId(id);
+        return (
+          parsed?.kind === "pant" &&
+          parsed.inseam === inseam &&
+          (waistList == null || waistList.includes(parsed.waist))
+        );
+      })
   );
+}
+
+function unhemmedAvailable(waists, products) {
+  const waistList = waists.size ? [...waists] : null;
+  return products.some((product) => {
+    if (product.pantFinish !== "unhemmed") return false;
+    if (waistList == null) return true;
+    return product.sizes.some((id) => {
+      const parsed = parseSizeId(id);
+      return parsed?.kind === "pant" && waistList.includes(parsed.waist);
+    });
+  });
 }
 
 function inventory(products) {
@@ -351,18 +340,21 @@ function axesFromSelected(ids) {
   const jacketChests = new Set();
   const waists = new Set();
   const inseams = new Set();
+  const unhemmed = ids.includes(finishId("unhemmed"));
   for (const id of ids) {
     const parsed = parseSizeId(id);
     if (!parsed) continue;
     if (parsed.kind === "jacket") {
       jacketLengths.add(parsed.length);
       jacketChests.add(parsed.chest);
+    } else if (parsed.kind === "waist") {
+      waists.add(parsed.waist);
     } else if (parsed.kind === "pant") {
       waists.add(parsed.waist);
-      inseams.add(parsed.inseam);
+      if (!unhemmed) inseams.add(parsed.inseam);
     }
   }
-  return { jacketLengths, jacketChests, waists, inseams };
+  return { jacketLengths, jacketChests, waists, inseams, unhemmed };
 }
 
 function toggleSet(current, id) {
