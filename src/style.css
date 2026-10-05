@@ -1068,9 +1068,9 @@ h1 {
 
   .header-utility {
     display: grid;
-    grid-template-columns: 180px minmax(280px, 520px) 1fr;
+    grid-template-columns: auto minmax(0, 1fr) auto;
     align-items: center;
-    gap: 24px;
+    gap: clamp(16px, 2.5vw, 40px);
     max-width: 1280px;
     margin: 0 auto;
     padding: 16px 24px 10px;
@@ -1079,11 +1079,14 @@ h1 {
   .header-utility .logo { flex: none; }
 
   .header-utility .logo img {
-    height: 16px;
+    height: clamp(12px, 1.25vw, 16px);
     max-width: none;
   }
 
   .header-search {
+    width: 100%;
+    max-width: 560px;
+    justify-self: center;
     display: flex;
     align-items: center;
     gap: 10px;
@@ -1122,7 +1125,8 @@ h1 {
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    gap: 8px;
+    gap: 4px;
+    white-space: nowrap;
   }
 
   .text-link {
@@ -1140,19 +1144,20 @@ h1 {
 
   .primary-nav {
     display: flex;
-    justify-content: center;
-    gap: 4px;
+    justify-content: safe center;
+    gap: clamp(0px, 0.4vw, 4px);
     max-width: 1280px;
     margin: 0 auto;
     padding: 0 16px 12px;
     overflow-x: auto;
+    scrollbar-width: none;
   }
 
   .primary-nav button {
     border: 0;
     background: transparent;
-    padding: 8px 12px;
-    font-size: 14px;
+    padding: 8px clamp(6px, 0.9vw, 12px);
+    font-size: clamp(13px, 1.1vw, 14px);
     font-weight: 500;
     color: var(--color-neutral-black);
     white-space: nowrap;
