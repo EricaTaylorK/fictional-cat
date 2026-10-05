@@ -15,9 +15,9 @@ export default function FilterBar({
   const total = totalSelections(applied);
   const selected = appliedTokens(applied);
   const [sortOpen, setSortOpen] = useState(false);
-  const [pickup, setPickup] = useState(false);
   const sortRef = useRef(null);
   const chips = QUICK_FACETS.map((id) => FACETS.find((facet) => facet.id === id)).filter(Boolean);
+  const sortLabel = SORTS.find((option) => option.id === sort)?.label ?? "Featured";
 
   useEffect(() => {
     if (!sortOpen) return undefined;
@@ -30,28 +30,16 @@ export default function FilterBar({
 
   return (
     <div className="filter-bar">
-      <div className="toolbar">
-        <button
-          type="button"
-          className="tool"
-          data-testid="open-filter"
-          aria-expanded={sheetOpen && openFacet == null}
-          aria-controls="filter-sheet"
-          onClick={() => onOpen(null)}
-        >
-          Filter
-          <FilterIcon />
-          {total > 0 && <span className="tool-count">{total}</span>}
-        </button>
+      <div className="filter-scroller">
         <div className="sort-wrap" ref={sortRef}>
           <button
             type="button"
-            className="tool"
+            className="chip chip-action"
             aria-expanded={sortOpen}
             aria-haspopup="listbox"
             onClick={() => setSortOpen((open) => !open)}
           >
-            Sort
+            <span>Sort: {sortLabel}</span>
             <SortIcon />
           </button>
           {sortOpen && (
@@ -74,17 +62,18 @@ export default function FilterBar({
             </ul>
           )}
         </div>
-        <label className="pickup">
-          <span>Pick Up (0)</span>
-          <input
-            type="checkbox"
-            role="switch"
-            checked={pickup}
-            onChange={(event) => setPickup(event.target.checked)}
-          />
-        </label>
-      </div>
-      <div className="filter-scroller">
+        <button
+          type="button"
+          className={total > 0 ? "chip chip-action has-selection" : "chip chip-action"}
+          data-testid="open-filter"
+          aria-expanded={sheetOpen && openFacet == null}
+          aria-controls="filter-sheet"
+          onClick={() => onOpen(null)}
+        >
+          <span>Filter</span>
+          <FilterIcon />
+          {total > 0 && <span className="chip-count">{total}</span>}
+        </button>
         {chips.map((facet) => {
           const count = selectionCount(applied, facet.id);
           return (
@@ -141,7 +130,13 @@ export default function FilterBar({
 function FilterIcon() {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M4 7h16M7 12h10M10 17h4" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+      <path
+        d="M4 7h16M7 12h10M10 17h4"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+      />
     </svg>
   );
 }
@@ -149,7 +144,14 @@ function FilterIcon() {
 function SortIcon() {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M8 6v12M8 6 5.5 8.5M8 6l2.5 2.5M16 18V6M16 18l-2.5-2.5M16 18l2.5-2.5" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+      <path
+        d="M8 7v10M8 7l-2.2 2.2M8 7l2.2 2.2M16 17V7M16 17l-2.2-2.2M16 17l2.2-2.2"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
     </svg>
   );
 }
@@ -157,7 +159,7 @@ function SortIcon() {
 function CloseIcon() {
   return (
     <svg viewBox="0 0 12 12" aria-hidden="true">
-      <path d="M2 2 L10 10 M10 2 L2 10" fill="none" stroke="currentColor" strokeWidth="1.4" />
+      <path d="M3.2 3.2 L8.8 8.8 M8.8 3.2 L3.2 8.8" fill="none" stroke="currentColor" strokeWidth="1.6" />
     </svg>
   );
 }

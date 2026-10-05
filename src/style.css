@@ -201,43 +201,10 @@ h1 {
 .filter-bar {
   background: var(--color-neutral-white);
   margin: 18px 0 0;
-}
-
-.toolbar {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  padding: 8px 16px 12px;
   border-bottom: 1px solid #ececec;
 }
 
-.tool {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  border: 0;
-  background: transparent;
-  padding: 0;
-  color: var(--color-neutral-black);
-  font-size: 15px;
-  line-height: 22px;
-}
-
-.tool svg { width: 18px; height: 18px; }
-
-.tool-count {
-  min-width: 18px;
-  height: 18px;
-  padding: 0 5px;
-  border-radius: 9px;
-  background: var(--color-neutral-black);
-  color: var(--color-neutral-white);
-  font-size: 11px;
-  display: inline-grid;
-  place-items: center;
-}
-
-.sort-wrap { position: relative; }
+.sort-wrap { position: relative; flex: none; }
 
 .sort-menu {
   position: absolute;
@@ -265,47 +232,12 @@ h1 {
 
 .sort-menu button[aria-selected="true"] { font-weight: 700; }
 
-.pickup {
-  margin-left: auto;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 15px;
-  color: var(--color-neutral-black);
-}
-
-.pickup input {
-  appearance: none;
-  width: 36px;
-  height: 20px;
-  margin: 0;
-  border-radius: 10px;
-  background: #d5d5d5;
-  position: relative;
-  cursor: pointer;
-}
-
-.pickup input::after {
-  content: "";
-  position: absolute;
-  top: 2px;
-  left: 2px;
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  background: var(--color-neutral-white);
-  transition: transform 0.15s ease;
-}
-
-.pickup input:checked { background: var(--color-neutral-black); }
-
-.pickup input:checked::after { transform: translateX(16px); }
-
 .filter-scroller {
   display: flex;
+  align-items: center;
   gap: 8px;
   overflow-x: auto;
-  padding: 12px 16px 16px;
+  padding: 12px 16px;
   scrollbar-width: none;
 }
 
@@ -316,17 +248,23 @@ h1 {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  height: 30px;
-  padding: 5px 11px;
+  gap: 8px;
+  height: 36px;
+  padding: 0 14px;
   border: 0;
-  background: var(--color-neutral-lightest-gray);
-  color: var(--color-neutral-dark-gray);
-  border-radius: 4px;
+  background: #f2f2f2;
+  color: var(--color-neutral-black);
+  border-radius: 18px;
   font-size: 14px;
   font-weight: 400;
   line-height: 20px;
   white-space: nowrap;
+}
+
+.chip-action svg {
+  width: 16px;
+  height: 16px;
+  flex: none;
 }
 
 .chip.has-selection {
@@ -351,8 +289,7 @@ h1 {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 0 16px 16px;
-  border-bottom: 1px solid #ececec;
+  padding: 0 16px 14px;
 }
 
 .selected-list {
@@ -369,11 +306,12 @@ h1 {
 .selected-chip {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  min-height: 30px;
-  padding: 4px 8px 4px 11px;
-  border-radius: 4px;
-  background: var(--color-neutral-lightest-gray);
+  gap: 8px;
+  min-height: 32px;
+  padding: 4px 6px 4px 12px;
+  border: 1px solid #d9d9d9;
+  border-radius: 999px;
+  background: var(--color-neutral-white);
   color: var(--color-neutral-black);
   font-size: 14px;
   font-weight: 400;
@@ -387,14 +325,14 @@ h1 {
   height: 18px;
   padding: 0;
   border: 0;
-  border-radius: 2px;
-  background: transparent;
-  color: var(--color-neutral-dark-gray);
+  border-radius: 50%;
+  background: #8a8a8a;
+  color: var(--color-neutral-white);
 }
 
-.selected-remove svg { width: 10px; height: 10px; }
+.selected-remove svg { width: 8px; height: 8px; }
 
-.selected-remove:hover { color: var(--color-neutral-black); }
+.selected-remove:hover { background: var(--color-neutral-dark-gray); }
 
 .selected-clear {
   flex: none;
