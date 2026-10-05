@@ -808,6 +808,18 @@ h1 {
 
 .size-finish-toggle input { margin-top: 2px; }
 
+.size-finish-copy { display: flex; flex-direction: column; }
+
+.size-finish-copy span:first-child {
+  color: var(--color-neutral-black);
+  font-weight: 500;
+}
+
+.size-finish-copy span:last-child {
+  font-size: 12px;
+  line-height: 16px;
+}
+
 .size-finish-toggle.is-empty { opacity: 0.35; cursor: not-allowed; }
 
 .options-sizes {
