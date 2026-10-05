@@ -147,6 +147,24 @@ export function commitPrice(filters, minInput, maxInput) {
   return { filters: { ...filters, priceMin, priceMax } };
 }
 
+export function priceSummary(filters) {
+  const parts = [];
+  if (filters.priceMin != null || filters.priceMax != null) {
+    if (filters.priceMin != null && filters.priceMax != null) {
+      parts.push(`$${filters.priceMin}–$${filters.priceMax}`);
+    } else if (filters.priceMax != null) {
+      parts.push(`Under $${filters.priceMax}`);
+    } else {
+      parts.push(`Over $${filters.priceMin}`);
+    }
+  }
+  for (const id of filters.selections.price ?? []) {
+    const range = PRICE_RANGES.find((item) => item.id === id);
+    if (range) parts.push(range.label);
+  }
+  return parts.length ? parts.join(", ") : null;
+}
+
 export function money(amount) {
   return amount.toLocaleString("en-US", { style: "currency", currency: "USD" });
 }

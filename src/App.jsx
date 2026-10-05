@@ -11,9 +11,11 @@ import FilterSheet from "./components/FilterSheet.jsx";
 import ProductGrid from "./components/ProductGrid.jsx";
 import SiteFooter from "./components/SiteFooter.jsx";
 import SiteHeader from "./components/SiteHeader.jsx";
+import useDesktop from "./hooks/useDesktop.js";
 import "./style.css";
 
 export default function App() {
+  const desktop = useDesktop();
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState("featured");
   const [applied, setApplied] = useState(emptyFilters);
@@ -43,11 +45,25 @@ export default function App() {
 
   function clearDraft() {
     setDraft(emptyFilters());
+    if (desktop) setApplied(emptyFilters());
   }
 
   function clearApplied() {
     setApplied(emptyFilters());
     setSearch("");
+  }
+
+  function livePrice(nextDraft) {
+    setDraft(nextDraft);
+    setApplied((current) => ({
+      ...current,
+      selections: {
+        ...current.selections,
+        price: [...(nextDraft.selections.price ?? [])],
+      },
+      priceMin: nextDraft.priceMin,
+      priceMax: nextDraft.priceMax,
+    }));
   }
 
   return (
@@ -87,7 +103,9 @@ export default function App() {
           draft={draft}
           products={PRODUCTS}
           search={search}
+          desktop={desktop}
           onChange={setDraft}
+          onLivePrice={livePrice}
           onApply={applySheet}
           onClear={clearDraft}
           onClose={closeSheet}

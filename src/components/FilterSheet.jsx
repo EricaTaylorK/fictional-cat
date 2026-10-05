@@ -1,6 +1,11 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { COLORS, FACETS, PRICE_RANGES } from "../data/catalog.js";
-import { commitPrice, countOption, totalSelections } from "../filters.js";
+import {
+  commitPrice,
+  countOption,
+  matchingProducts,
+  totalSelections,
+} from "../filters.js";
 import SizeFilter from "./SizeFilter.jsx";
 
 export default function FilterSheet({
@@ -8,20 +13,22 @@ export default function FilterSheet({
   draft,
   products,
   search,
+  desktop,
   onChange,
+  onLivePrice,
   onApply,
   onClear,
   onClose,
 }) {
   // The clicked facet is expanded in this first render, not after the sheet opens.
   const [expanded, setExpanded] = useState(initialFacet);
-  const [minInput, setMinInput] = useState(draft.priceMin ?? "");
-  const [maxInput, setMaxInput] = useState(draft.priceMax ?? "");
+  const [minInput, setMinInput] = useState(formatBound(draft.priceMin));
+  const [maxInput, setMaxInput] = useState(formatBound(draft.priceMax));
   const [priceError, setPriceError] = useState("");
 
   useEffect(() => {
-    setMinInput(draft.priceMin ?? "");
-    setMaxInput(draft.priceMax ?? "");
+    setMinInput(formatBound(draft.priceMin));
+    setMaxInput(formatBound(draft.priceMax));
   }, [draft.priceMin, draft.priceMax]);
 
   useEffect(() => {
@@ -37,8 +44,23 @@ export default function FilterSheet({
     };
   }, [onClose]);
 
+  const preview = useMemo(() => {
+    const result = commitPrice(draft, minInput, maxInput);
+    return result.filters ?? draft;
+  }, [draft, minInput, maxInput]);
+
+  const previewCount = useMemo(
+    () => matchingProducts(products, preview, search).length,
+    [products, preview, search]
+  );
+
   function toggleFacet(facetId) {
     setExpanded((current) => (current === facetId ? null : facetId));
+  }
+
+  function pushDraft(next) {
+    if (desktop) onLivePrice(next);
+    else onChange(next);
   }
 
   function toggleOption(facetId, optionId) {
@@ -46,20 +68,26 @@ export default function FilterSheet({
     const next = current.includes(optionId)
       ? current.filter((id) => id !== optionId)
       : [...current, optionId];
-    onChange({
+    const nextDraft = {
       ...draft,
       selections: { ...draft.selections, [facetId]: next },
-    });
+    };
+    if (desktop && facetId === "price") pushDraft(nextDraft);
+    else onChange(nextDraft);
   }
 
-  function applyCustomPrice() {
+  function commitCustomPrice() {
     const result = commitPrice(draft, minInput, maxInput);
     if (result.error) {
       setPriceError(result.error);
-      return;
+      return false;
     }
     setPriceError("");
-    onChange(result.filters);
+    setMinInput(formatBound(result.filters.priceMin));
+    setMaxInput(formatBound(result.filters.priceMax));
+    if (desktop) onLivePrice(result.filters);
+    else onChange(result.filters);
+    return true;
   }
 
   function applySheet() {
@@ -144,9 +172,15 @@ export default function FilterSheet({
                         minInput={minInput}
                         maxInput={maxInput}
                         error={priceError}
-                        onMin={setMinInput}
-                        onMax={setMaxInput}
-                        onApplyRange={applyCustomPrice}
+                        onMin={(value) => {
+                          setPriceError("");
+                          setMinInput(value);
+                        }}
+                        onMax={(value) => {
+                          setPriceError("");
+                          setMaxInput(value);
+                        }}
+                        onCommitRange={commitCustomPrice}
                         onToggle={(optionId) => toggleOption("price", optionId)}
                       />
                     ) : (
@@ -179,7 +213,7 @@ export default function FilterSheet({
             data-testid="apply-filters"
             onClick={applySheet}
           >
-            Apply
+            {desktop ? "Apply" : `Apply (${previewCount})`}
           </button>
         </footer>
       </div>
@@ -236,7 +270,7 @@ function PriceEditor({
   error,
   onMin,
   onMax,
-  onApplyRange,
+  onCommitRange,
   onToggle,
 }) {
   const selected = draft.selections.price ?? [];
@@ -244,13 +278,18 @@ function PriceEditor({
   function onKeyDown(event) {
     if (event.key === "Enter") {
       event.preventDefault();
-      onApplyRange();
+      onCommitRange();
     }
+  }
+
+  function onRangeFocusOut(event) {
+    if (event.currentTarget.contains(event.relatedTarget)) return;
+    onCommitRange();
   }
 
   return (
     <div className="price-editor">
-      <div className="price-range">
+      <div className="price-range" onBlur={onRangeFocusOut}>
         <label className="money-field">
           <span aria-hidden="true">$</span>
           <input
@@ -274,9 +313,6 @@ function PriceEditor({
             onKeyDown={onKeyDown}
           />
         </label>
-        <button type="button" className="price-apply" onClick={onApplyRange}>
-          Apply
-        </button>
       </div>
       {error && <p className="price-error">{error}</p>}
       <div className="options">
@@ -299,6 +335,10 @@ function PriceEditor({
       </div>
     </div>
   );
+}
+
+function formatBound(value) {
+  return value == null ? "" : String(value);
 }
 
 function Chevron() {
