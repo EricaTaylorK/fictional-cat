@@ -165,11 +165,9 @@ export default function SizeFilter({ draft, search, onChange }) {
               disabled={!unhemmedInStock && !unhemmed}
               onChange={() => (unhemmed ? showHemmed() : showUnhemmed())}
             />
-            <span>Unhemmed</span>
+            <span>Show only unhemmed pants. Hem them to your length on the product page.</span>
           </label>
-          {unhemmed ? (
-            <p className="size-mode-note">Regular length, needs hemming.</p>
-          ) : (
+          {!unhemmed && (
             <GuidedColumns
               columns={lengthColumns}
               selected={inseams}

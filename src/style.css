@@ -795,26 +795,20 @@ h1 {
 
 .size-finish-toggle {
   display: flex;
-  align-items: center;
-  justify-content: center;
+  align-items: flex-start;
   gap: 8px;
   margin: 0 0 8px;
   cursor: pointer;
-  color: var(--color-neutral-black);
-  font-size: 14px;
-  line-height: 20px;
-}
-
-.size-finish-toggle.is-empty { opacity: 0.35; cursor: not-allowed; }
-
-.size-mode-note {
-  margin: 0;
+  color: var(--color-neutral-dark-gray);
   font-size: 14px;
   font-weight: 400;
   line-height: 20px;
-  text-align: center;
-  color: var(--color-neutral-dark-gray);
+  text-align: left;
 }
+
+.size-finish-toggle input { margin-top: 2px; }
+
+.size-finish-toggle.is-empty { opacity: 0.35; cursor: not-allowed; }
 
 .options-sizes {
   flex-direction: row;
