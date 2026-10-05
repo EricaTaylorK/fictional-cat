@@ -6,10 +6,10 @@ export const JACKET_LENGTHS = [
 ];
 
 export const CHEST_GROUPS = [
-  { id: "Small", label: "Small", range: "~130–165 lb", min: 36, max: 38 },
-  { id: "Medium", label: "Medium", range: "~165–200 lb", min: 40, max: 42 },
-  { id: "Large", label: "Large", range: "~200–235 lb", min: 44, max: 46 },
-  { id: "X Large", label: "X Large", range: "~235 lb+", min: 48, max: Infinity },
+  { id: "Small", label: "Small", range: '36"–38" chest', min: 36, max: 38 },
+  { id: "Medium", label: "Medium", range: '40"–42" chest', min: 40, max: 42 },
+  { id: "Large", label: "Large", range: '44"–46" chest', min: 44, max: 46 },
+  { id: "X Large", label: "X Large", range: '48"+ chest', min: 48, max: Infinity },
 ];
 
 export const PANT_LENGTH_GROUPS = [

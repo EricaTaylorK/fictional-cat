@@ -200,30 +200,28 @@ function GuidedColumns({ columns, selected, isAvailable, onToggle, labelFor = (i
       className="size-guided"
       style={{ gridTemplateColumns: `repeat(${columns.length}, minmax(0, 1fr))` }}
     >
-      {columns.map((column) => {
-        const only =
-          column.values.length === 1 ? labelFor(String(column.values[0])) : null;
-        const name = only === column.label ? null : column.label;
-        return (
-          <div key={column.id} className="size-guided-head">
-            <SizeGuide label={name} range={column.range} />
-          </div>
-        );
-      })}
+      {columns.map((column) => (
+        <div key={column.id} className="size-guided-head">
+          <SizeGuide label={column.label} range={column.range} />
+        </div>
+      ))}
       {Array.from({ length: rows }, (_, row) =>
         columns.map((column) => {
           const value = column.values[row];
           if (value == null) return <div key={`${column.id}-${row}`} className="size-spacer" />;
           const id = String(value);
           const label = labelFor(id);
-          const guide = label === column.label ? column.range : `${column.label}, ${column.range}`;
+          const ariaLabel =
+            label === column.label
+              ? `${column.label}, ${column.range}`
+              : `${column.label}, ${column.range}, ${label}`;
           return (
             <SizeTile
               key={`${column.id}-${id}`}
               selected={selected.has(id)}
               disabled={!isAvailable(id) && !selected.has(id)}
               label={label}
-              ariaLabel={`${guide}, ${label}`}
+              ariaLabel={ariaLabel}
               onToggle={() => onToggle(id)}
             />
           );
