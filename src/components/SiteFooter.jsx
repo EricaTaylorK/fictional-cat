@@ -5,6 +5,13 @@ export default function SiteFooter() {
 
   return (
     <footer className="site-footer">
+      <div className="footer-band">
+        <div className="footer-band-inner">
+          <h2>Perfect Fit® Rewards</h2>
+          <p>Earn points on every purchase and get free shipping, exclusive offers, and more.</p>
+          <button type="button">Join for free</button>
+        </div>
+      </div>
       <div className="footer-referral">
         <h2>Give $20, Get $20!</h2>
         <p>Give friends $20 off their first order, and you’ll get $20 when they make a purchase.</p>

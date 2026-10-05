@@ -15,6 +15,7 @@ export default function FilterBar({
   const total = totalSelections(applied);
   const selected = appliedTokens(applied);
   const [sortOpen, setSortOpen] = useState(false);
+  const [pickup, setPickup] = useState(false);
   const sortRef = useRef(null);
   const chips = QUICK_FACETS.map((id) => FACETS.find((facet) => facet.id === id)).filter(Boolean);
   const sortLabel = SORTS.find((option) => option.id === sort)?.label ?? "Featured";
@@ -30,68 +31,79 @@ export default function FilterBar({
 
   return (
     <div className="filter-bar">
-      <div className="filter-scroller">
-        <div className="sort-wrap" ref={sortRef}>
+      <div className="filter-row">
+        <div className="filter-scroller">
+          <div className="sort-wrap" ref={sortRef}>
+            <button
+              type="button"
+              className="chip chip-action"
+              aria-expanded={sortOpen}
+              aria-haspopup="listbox"
+              onClick={() => setSortOpen((open) => !open)}
+            >
+              <span>Sort: {sortLabel}</span>
+              <SortIcon />
+            </button>
+            {sortOpen && (
+              <ul className="sort-menu" role="listbox" aria-label="Sort">
+                {SORTS.map((option) => (
+                  <li key={option.id}>
+                    <button
+                      type="button"
+                      role="option"
+                      aria-selected={sort === option.id}
+                      onClick={() => {
+                        onSort(option.id);
+                        setSortOpen(false);
+                      }}
+                    >
+                      {option.label}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
           <button
             type="button"
-            className="chip chip-action"
-            aria-expanded={sortOpen}
-            aria-haspopup="listbox"
-            onClick={() => setSortOpen((open) => !open)}
+            className={total > 0 ? "chip chip-action has-selection" : "chip chip-action"}
+            data-testid="open-filter"
+            aria-expanded={sheetOpen && openFacet == null}
+            aria-controls="filter-sheet"
+            onClick={() => onOpen(null)}
           >
-            <span>Sort: {sortLabel}</span>
-            <SortIcon />
+            <span>Filter</span>
+            <FilterIcon />
+            {total > 0 && <span className="chip-count">{total}</span>}
           </button>
-          {sortOpen && (
-            <ul className="sort-menu" role="listbox" aria-label="Sort">
-              {SORTS.map((option) => (
-                <li key={option.id}>
-                  <button
-                    type="button"
-                    role="option"
-                    aria-selected={sort === option.id}
-                    onClick={() => {
-                      onSort(option.id);
-                      setSortOpen(false);
-                    }}
-                  >
-                    {option.label}
-                  </button>
-                </li>
-              ))}
-            </ul>
-          )}
+          {chips.map((facet) => {
+            const count = selectionCount(applied, facet.id);
+            return (
+              <button
+                key={facet.id}
+                type="button"
+                className={count > 0 ? "chip has-selection" : "chip"}
+                aria-pressed={count > 0}
+                data-testid={`chip-${facet.id}`}
+                aria-expanded={sheetOpen && openFacet === facet.id}
+                aria-controls="filter-sheet"
+                onClick={() => onOpen(facet.id)}
+              >
+                {facet.label}
+                {count > 0 && <span className="chip-count">{count}</span>}
+              </button>
+            );
+          })}
         </div>
-        <button
-          type="button"
-          className={total > 0 ? "chip chip-action has-selection" : "chip chip-action"}
-          data-testid="open-filter"
-          aria-expanded={sheetOpen && openFacet == null}
-          aria-controls="filter-sheet"
-          onClick={() => onOpen(null)}
-        >
-          <span>Filter</span>
-          <FilterIcon />
-          {total > 0 && <span className="chip-count">{total}</span>}
-        </button>
-        {chips.map((facet) => {
-          const count = selectionCount(applied, facet.id);
-          return (
-            <button
-              key={facet.id}
-              type="button"
-              className={count > 0 ? "chip has-selection" : "chip"}
-              aria-pressed={count > 0}
-              data-testid={`chip-${facet.id}`}
-              aria-expanded={sheetOpen && openFacet === facet.id}
-              aria-controls="filter-sheet"
-              onClick={() => onOpen(facet.id)}
-            >
-              {facet.label}
-              {count > 0 && <span className="chip-count">{count}</span>}
-            </button>
-          );
-        })}
+        <label className="pickup">
+          <span>Pick Up (0)</span>
+          <input
+            type="checkbox"
+            role="switch"
+            checked={pickup}
+            onChange={(event) => setPickup(event.target.checked)}
+          />
+        </label>
       </div>
       {selected.length > 0 && (
         <div className="selected-filters" data-testid="selected-filters">

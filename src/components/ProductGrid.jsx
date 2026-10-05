@@ -31,21 +31,23 @@ export default function ProductGrid({ products, onClear }) {
                 <span className="price">{money(product.price)}</span>
                 {product.compareAt && <span className="compare">{money(product.compareAt)}</span>}
               </p>
-              <div className="swatches">
-                {product.colors.map((colorId, index) => (
-                  <span
-                    key={colorId}
-                    className={index === 0 ? "swatch is-selected" : "swatch"}
-                    title={COLORS[colorId].label}
-                  >
-                    <span style={{ background: COLORS[colorId].hex }} />
-                  </span>
-                ))}
+              <div className="swatch-brand">
+                <div className="swatches">
+                  {product.colors.map((colorId, index) => (
+                    <span
+                      key={colorId}
+                      className={index === 0 ? "swatch is-selected" : "swatch"}
+                      title={COLORS[colorId]?.label ?? colorId}
+                    >
+                      <span style={{ background: COLORS[colorId]?.hex ?? "#888" }} />
+                    </span>
+                  ))}
+                </div>
+                <h2 className="brand">{product.brandName}</h2>
+                <p className="name">{product.name}</p>
               </div>
-              <h2 className="brand">{product.brandName}</h2>
-              <p className="name">{product.name}</p>
               <p className="rating">
-                <Star />
+                <Stars value={product.rating} />
                 <span>
                   {product.rating.toFixed(1)} ({product.reviews})
                 </span>
@@ -58,13 +60,14 @@ export default function ProductGrid({ products, onClear }) {
   );
 }
 
-function Star() {
+function Stars({ value }) {
   return (
-    <svg className="star" viewBox="0 0 20 20" aria-hidden="true">
-      <path
-        fill="#747474"
-        d="M10 1.6 12.5 7l5.9.6-4.4 3.9 1.3 5.8L10 14.6 4.7 17.3 6 11.5 1.6 7.6 7.5 7 10 1.6z"
-      />
-    </svg>
+    <span className="stars" aria-hidden="true">
+      {[1, 2, 3, 4, 5].map((star) => (
+        <svg key={star} className={star <= Math.round(value) ? "star is-on" : "star"} viewBox="0 0 20 20">
+          <path d="M10 1.6 12.5 7l5.9.6-4.4 3.9 1.3 5.8L10 14.6 4.7 17.3 6 11.5 1.6 7.6 7.5 7 10 1.6z" />
+        </svg>
+      ))}
+    </span>
   );
 }
