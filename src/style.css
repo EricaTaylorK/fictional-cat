@@ -790,17 +790,16 @@ h1 {
 
 .size-spacer { min-height: 48px; }
 
-.size-modes { display: flex; flex-direction: column; }
+.size-modes { display: flex; flex-direction: column; gap: 12px; }
 
 .size-mode {
   display: flex;
   align-items: flex-start;
-  justify-content: space-between;
-  gap: 12px;
-  min-height: 40px;
-  padding: 8px 0;
+  gap: 10px;
   cursor: pointer;
 }
+
+.size-choice.is-open .size-mode { margin-bottom: 8px; }
 
 .size-mode.is-empty { opacity: 0.35; cursor: not-allowed; }
 
@@ -811,7 +810,7 @@ h1 {
   margin: 2px 0 0;
   border: 1px solid var(--color-transparent-black50);
   border-radius: 50%;
-  background: transparent;
+  background: var(--color-neutral-white);
   display: grid;
   place-items: center;
   flex: none;
@@ -826,8 +825,6 @@ h1 {
   border-radius: 50%;
   background: var(--color-neutral-black);
 }
-
-.size-modes .size-guided { margin-bottom: 4px; }
 
 .size-finish-copy { display: flex; flex-direction: column; }
 
@@ -844,8 +841,6 @@ h1 {
   line-height: 16px;
   color: var(--color-neutral-dark-gray);
 }
-
-.size-finish-toggle.is-empty { opacity: 0.35; cursor: not-allowed; }
 
 .options-sizes {
   flex-direction: row;
