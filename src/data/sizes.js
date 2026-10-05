@@ -1,8 +1,8 @@
 export const JACKET_LENGTHS = [
-  { id: "Short", label: "Short", hint: "5'6\"–5'8\" tall" },
-  { id: "Regular", label: "Regular", hint: "5'8\"–6'1\" tall" },
-  { id: "Long", label: "Long", hint: "6'0\"–6'3\" tall" },
-  { id: "Extra Long", label: "X Tall", hint: "6'4\"–6'6\" tall" },
+  { id: "Short", label: "Short", hint: "5'6\"–5'8\"" },
+  { id: "Regular", label: "Regular", hint: "5'8\"–6'1\"" },
+  { id: "Long", label: "Long", hint: "6'0\"–6'3\"" },
+  { id: "Extra Long", label: "X Tall", hint: "6'4\"–6'6\"" },
 ];
 
 export const CHEST_GROUPS = [
@@ -13,10 +13,10 @@ export const CHEST_GROUPS = [
 ];
 
 export const PANT_LENGTH_GROUPS = [
-  { id: "Short", label: "Short", hint: "Under 5'7\" tall", inseams: [29] },
-  { id: "Regular", label: "Regular", hint: "5'7\"–6'0\" tall", inseams: [30, 32] },
-  { id: "Long", label: "Long", hint: "6'0\"–6'2\" tall", inseams: [34] },
-  { id: "X Tall", label: "X Tall", hint: "6'2\"+ tall", inseams: [36] },
+  { id: "Short", label: "Short", hint: "Under 5'7\"", inseams: [29] },
+  { id: "Regular", label: "Regular", hint: "5'7\"–6'0\"", inseams: [30, 32] },
+  { id: "Long", label: "Long", hint: "6'0\"–6'2\"", inseams: [34] },
+  { id: "X Tall", label: "X Tall", hint: "6'2\"+", inseams: [36] },
 ];
 
 export const WAIST_GROUPS = [

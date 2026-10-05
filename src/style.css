@@ -690,7 +690,8 @@ h1 {
 
 .option-count { color: var(--color-neutral-medium-gray); }
 
-.option input {
+.option input,
+.size-finish-toggle input {
   appearance: none;
   width: 16px;
   height: 16px;
@@ -702,12 +703,14 @@ h1 {
   flex: none;
 }
 
-.option input:checked {
+.option input:checked,
+.size-finish-toggle input:checked {
   background: var(--color-neutral-black);
   border-color: var(--color-neutral-black);
 }
 
-.option input:checked::after {
+.option input:checked::after,
+.size-finish-toggle input:checked::after {
   content: "";
   width: 8px;
   height: 4px;
@@ -731,6 +734,7 @@ h1 {
   font-size: 14px;
   font-weight: 500;
   line-height: 20px;
+  text-align: center;
   color: var(--color-neutral-black);
 }
 
@@ -789,60 +793,26 @@ h1 {
 
 .size-spacer { min-height: 48px; }
 
-.size-segment {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  margin-bottom: 8px;
-  border: 1px solid #e5e5e5;
-  border-radius: 4px;
-  overflow: hidden;
-}
-
-.size-segment button {
+.size-finish-toggle {
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: 48px;
-  padding: 6px 8px;
-  border: 0;
-  background: var(--color-neutral-white);
-  color: var(--color-neutral-black);
+  gap: 8px;
+  margin: 0 0 8px;
   cursor: pointer;
-}
-
-.size-segment button + button { border-left: 1px solid #e5e5e5; }
-
-.size-segment button span:first-child {
+  color: var(--color-neutral-black);
   font-size: 14px;
-  font-weight: 500;
-  line-height: 18px;
+  line-height: 20px;
 }
 
-.size-segment button span:last-child {
-  font-size: 12px;
-  font-weight: 400;
-  line-height: 16px;
-  color: var(--color-neutral-dark-gray);
-}
-
-.size-segment button.is-on {
-  background: var(--color-neutral-black);
-  color: var(--color-neutral-white);
-}
-
-.size-segment button.is-on span:last-child { color: #d0d0d0; }
-
-.size-segment button:disabled {
-  cursor: not-allowed;
-  opacity: 0.35;
-}
+.size-finish-toggle.is-empty { opacity: 0.35; cursor: not-allowed; }
 
 .size-mode-note {
   margin: 0;
   font-size: 14px;
   font-weight: 400;
   line-height: 20px;
+  text-align: center;
   color: var(--color-neutral-dark-gray);
 }
 

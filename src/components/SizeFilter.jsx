@@ -158,31 +158,17 @@ export default function SizeFilter({ draft, search, onChange }) {
             onToggle={toggleWaist}
           />
           <p className="size-axis">Pant Length</p>
-          <div className="size-segment" role="radiogroup" aria-label="Pant length">
-            <button
-              type="button"
-              role="radio"
-              aria-checked={!unhemmed}
-              className={unhemmed ? undefined : "is-on"}
-              onClick={showHemmed}
-            >
-              <span>Hemmed</span>
-              <span>Ready to wear</span>
-            </button>
-            <button
-              type="button"
-              role="radio"
-              aria-checked={unhemmed}
-              className={unhemmed ? "is-on" : undefined}
+          <label className={unhemmedInStock || unhemmed ? "size-finish-toggle" : "size-finish-toggle is-empty"}>
+            <input
+              type="checkbox"
+              checked={unhemmed}
               disabled={!unhemmedInStock && !unhemmed}
-              onClick={showUnhemmed}
-            >
-              <span>Unhemmed</span>
-              <span>Needs hemming</span>
-            </button>
-          </div>
+              onChange={() => (unhemmed ? showHemmed() : showUnhemmed())}
+            />
+            <span>Unhemmed</span>
+          </label>
           {unhemmed ? (
-            <p className="size-mode-note">Regular length. These pants still need hemming.</p>
+            <p className="size-mode-note">Regular length, needs hemming.</p>
           ) : (
             <GuidedColumns
               columns={lengthColumns}
