@@ -213,7 +213,7 @@ export default function FilterSheet({
             data-testid="apply-filters"
             onClick={applySheet}
           >
-            {desktop ? "Apply" : `Apply (${previewCount})`}
+            {desktop ? "Apply" : `Show ${previewCount} ${previewCount === 1 ? "item" : "items"}`}
           </button>
         </footer>
       </div>
