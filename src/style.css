@@ -747,8 +747,8 @@ h1 {
   display: flex;
   justify-content: center;
   align-items: flex-end;
-  min-height: 32px;
   padding: 0 2px;
+  margin-bottom: -4px;
 }
 
 .size-guide-line {
