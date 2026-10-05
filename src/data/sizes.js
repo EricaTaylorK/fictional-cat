@@ -37,20 +37,9 @@ export function pantSizeId(waist, inseam) {
   return `${waist}W x ${inseam}L`;
 }
 
-export function waistId(waist) {
-  return `${waist}W`;
-}
-
-export function finishId(finish) {
-  return `finish:${finish}`;
-}
-
 export function parseSizeId(id) {
-  if (id.startsWith("finish:")) return { kind: "finish", finish: id.slice(7) };
   const jacket = id.match(/^(\d+) (Short|Regular|Long|Extra Long)$/);
   if (jacket) return { kind: "jacket", chest: jacket[1], length: jacket[2] };
-  const waistOnly = id.match(/^(\d+)W$/);
-  if (waistOnly) return { kind: "waist", waist: waistOnly[1] };
   const pant = id.match(/^(\d+)W x (\d+)L$/);
   if (pant) return { kind: "pant", waist: pant[1], inseam: pant[2] };
   return null;
@@ -79,8 +68,4 @@ export function expandSuitSizes(chests, productId) {
     }
   });
   return [...new Set(ids)];
-}
-
-export function pantFinishFor(productId) {
-  return seedFromId(productId) % 3 === 0 ? "unhemmed" : "hemmed";
 }

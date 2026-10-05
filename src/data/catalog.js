@@ -1,4 +1,4 @@
-import { expandSuitSizes, pantFinishFor } from "./sizes.js";
+import { expandSuitSizes } from "./sizes.js";
 
 export const COLORS = {
   black: { label: "Black", hex: "#161616" },
@@ -174,7 +174,6 @@ function suit(overrides) {
     compareAt: null,
     ...overrides,
   };
-  product.pantFinish = pantFinishFor(product.id);
   product.sizes = expandSuitSizes(product.sizes ?? [], product.id);
   return product;
 }

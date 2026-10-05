@@ -790,57 +790,6 @@ h1 {
 
 .size-spacer { min-height: 48px; }
 
-.size-modes { display: flex; flex-direction: column; gap: 20px; }
-
-.size-choice { display: flex; flex-direction: column; gap: 16px; }
-
-.size-mode {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  cursor: pointer;
-}
-
-.size-mode.is-empty { opacity: 0.35; cursor: not-allowed; }
-
-.size-mode-label {
-  color: var(--color-neutral-black);
-  font-size: 14px;
-  font-weight: 500;
-  line-height: 20px;
-}
-
-.size-mode input {
-  appearance: none;
-  width: 16px;
-  height: 16px;
-  margin: 0;
-  border: 1px solid var(--color-transparent-black50);
-  border-radius: 50%;
-  background: var(--color-neutral-white);
-  display: grid;
-  place-items: center;
-  flex: none;
-}
-
-.size-mode input:checked { border-color: var(--color-neutral-black); }
-
-.size-mode input:checked::after {
-  content: "";
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--color-neutral-black);
-}
-
-.size-mode-note {
-  margin: 0;
-  color: var(--color-neutral-dark-gray);
-  font-size: 14px;
-  font-weight: 400;
-  line-height: 20px;
-}
-
 .options-sizes {
   flex-direction: row;
   flex-wrap: wrap;
