@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { FACETS, QUICK_FACETS, SORTS } from "../data/catalog.js";
-import { priceSummary, selectionCount, totalSelections } from "../filters.js";
+import { selectionCount, totalSelections } from "../filters.js";
 
 export default function FilterBar({ applied, sheetOpen, openFacet, onOpen, sort, onSort }) {
   const total = totalSelections(applied);
@@ -77,8 +77,6 @@ export default function FilterBar({ applied, sheetOpen, openFacet, onOpen, sort,
       <div className="filter-scroller">
         {chips.map((facet) => {
           const count = selectionCount(applied, facet.id);
-          const summary = facet.id === "price" ? priceSummary(applied) : null;
-          const label = summary && count > 0 ? summary : facet.label;
           return (
             <button
               key={facet.id}
@@ -90,9 +88,8 @@ export default function FilterBar({ applied, sheetOpen, openFacet, onOpen, sort,
               aria-controls="filter-sheet"
               onClick={() => onOpen(facet.id)}
             >
-              {label}
-              {count > 0 && !summary && <span className="chip-count">{count}</span>}
-              {count > 1 && summary && <span className="chip-count">{count}</span>}
+              {facet.label}
+              {count > 0 && <span className="chip-count">{count}</span>}
             </button>
           );
         })}

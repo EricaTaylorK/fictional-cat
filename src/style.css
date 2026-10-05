@@ -318,12 +318,8 @@ h1 {
   justify-content: center;
   gap: 6px;
   height: 30px;
-  max-width: min(220px, 70vw);
   padding: 5px 11px;
   border: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
   background: var(--color-neutral-lightest-gray);
   color: var(--color-neutral-dark-gray);
   border-radius: 4px;

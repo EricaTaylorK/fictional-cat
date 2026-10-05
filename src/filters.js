@@ -65,9 +65,9 @@ function matchesPrice(price, filters) {
   const hasBuckets = buckets.length > 0;
   const hasCustom = filters.priceMin != null || filters.priceMax != null;
   if (!hasBuckets && !hasCustom) return true;
-  const bucketOk = !hasBuckets || buckets.some((id) => inBucket(price, id));
-  const customOk = !hasCustom || matchesCustomRange(price, filters);
-  return bucketOk && customOk;
+  if (hasBuckets && buckets.some((id) => inBucket(price, id))) return true;
+  if (hasCustom && matchesCustomRange(price, filters)) return true;
+  return false;
 }
 
 function matchesSize(product, selected) {
@@ -110,7 +110,7 @@ export function countOption(products, filters, search, facetId, optionId) {
     if (!matchesSearch(product, search)) return false;
     if (!matchesFilters(product, filters, facetId)) return false;
     if (facetId === "price") {
-      return inBucket(product.price, optionId) && matchesCustomRange(product.price, filters);
+      return inBucket(product.price, optionId);
     }
     return hasValue(product, facetId, optionId);
   }).length;
@@ -145,24 +145,6 @@ export function commitPrice(filters, minInput, maxInput) {
     return { error: "Min must be less than or equal to max" };
   }
   return { filters: { ...filters, priceMin, priceMax } };
-}
-
-export function priceSummary(filters) {
-  const parts = [];
-  if (filters.priceMin != null || filters.priceMax != null) {
-    if (filters.priceMin != null && filters.priceMax != null) {
-      parts.push(`$${filters.priceMin}–$${filters.priceMax}`);
-    } else if (filters.priceMax != null) {
-      parts.push(`Under $${filters.priceMax}`);
-    } else {
-      parts.push(`Over $${filters.priceMin}`);
-    }
-  }
-  for (const id of filters.selections.price ?? []) {
-    const range = PRICE_RANGES.find((item) => item.id === id);
-    if (range) parts.push(range.label);
-  }
-  return parts.length ? parts.join(", ") : null;
 }
 
 export function money(amount) {
