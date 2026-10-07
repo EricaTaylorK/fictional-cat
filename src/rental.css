@@ -350,20 +350,6 @@
   color: #046de9;
 }
 
-.nudge {
-  display: block;
-  width: 100%;
-  margin: 0 0 10px;
-  padding: 8px 12px;
-  border: 1px solid #046de9;
-  border-radius: 4px;
-  background: #f3f7fd;
-  color: #001e56;
-  font-size: 13px;
-  line-height: 18px;
-  text-align: left;
-}
-
 .packages {
   display: flex;
   flex-direction: column;
@@ -459,11 +445,9 @@
 
 .package-offer {
   display: flex;
-  align-items: baseline;
-  justify-content: flex-end;
-  gap: 8px;
-  min-height: 20px;
-  padding-top: 0;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0;
   white-space: nowrap;
 }
 
@@ -477,6 +461,7 @@
 
 .package-offer .save {
   margin: 0;
+  line-height: 16px;
 }
 
 .best-for {
@@ -863,11 +848,13 @@
   letter-spacing: 0.01em;
 }
 
-.rent-btn {
+.page-pdp .rent-btn {
+  flex: none;
   min-width: 188px;
   height: 52px;
   padding: 0 24px;
   border: 0;
+  border-radius: 0;
   background: #001e56;
   color: #fff;
   font-size: 14px;
@@ -875,6 +862,7 @@
   letter-spacing: 0.01em;
   line-height: 24px;
   text-transform: uppercase;
+  white-space: nowrap;
 }
 
 .page-pdp button:focus-visible,

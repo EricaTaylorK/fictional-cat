@@ -184,12 +184,6 @@ export default function RentalPdp({ onNavigate }) {
           <section className="buy" aria-label="Outfit packages">
 
             <div className="outfit">
-              {offer && (
-                <button type="button" className="nudge" data-testid="nudge" onClick={() => takeOffer(offer.pkg.id)}>
-                  {offerCopy(offer)}
-                </button>
-              )}
-
               <div className="packages" role="radiogroup" aria-label="Rental packages">
                 {PACKAGES.map((item) => (
                   <PackageColumn
