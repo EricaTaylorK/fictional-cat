@@ -1,3 +1,4 @@
+import { sizesForChests } from "./mwSizes.js";
 import { expandSuitSizes } from "./sizes.js";
 
 export const COLORS = {
@@ -184,7 +185,11 @@ function suit(overrides) {
     compareAt: null,
     ...overrides,
   };
-  product.sizes = expandSuitSizes(product.sizes ?? [], product.id);
+  const chests = product.sizes ?? [];
+  product.sizes =
+    import.meta.env.VITE_SIZE_VARIANT === "lite"
+      ? sizesForChests(chests)
+      : expandSuitSizes(chests, product.id);
   return product;
 }
 
