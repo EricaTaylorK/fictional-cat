@@ -1088,12 +1088,6 @@ h1 {
 
 .lite-size-tile:focus-within { outline: 2px solid var(--color-focus-outline, #3d6fe0); outline-offset: 2px; }
 
-.lite-size-tile.is-empty {
-  cursor: not-allowed;
-  color: #b9b9b9;
-  border-color: rgba(0, 0, 0, 0.06);
-}
-
 .options-sizes {
   flex-direction: row;
   flex-wrap: wrap;

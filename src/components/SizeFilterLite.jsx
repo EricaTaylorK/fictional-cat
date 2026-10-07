@@ -20,12 +20,18 @@ export default function SizeFilterLite({ draft, search, onChange }) {
     onChange(selected.includes(id) ? selected.filter((value) => value !== id) : [...selected, id]);
   }
 
+  function carried(id) {
+    return stocked.has(id) || selected.includes(id);
+  }
+
   const jacketGroups = JACKET_LENGTHS.map((length) => ({
     id: length.id,
     name: length.id,
     height: length.hint,
-    sizes: MW_SUIT_SIZES.filter((id) => parseSizeId(id)?.length === length.id),
+    sizes: MW_SUIT_SIZES.filter((id) => parseSizeId(id)?.length === length.id && carried(id)),
   })).filter((group) => group.sizes.length > 0);
+
+  const pantSizes = MW_PANT_SIZES.filter(carried);
 
   return (
     <div className="lite-size">
@@ -45,7 +51,6 @@ export default function SizeFilterLite({ draft, search, onChange }) {
                   id={id}
                   label={id.split(" ")[0]}
                   selected={selected.includes(id)}
-                  unavailable={!selected.includes(id) && !stocked.has(id)}
                   onToggle={toggleSize}
                 />
               ))}
@@ -60,13 +65,12 @@ export default function SizeFilterLite({ draft, search, onChange }) {
           <p className="lite-guide-name">32W × 30L is a 32-inch waist and a 30-inch inseam.</p>
         </div>
         <div className="lite-size-grid" role="group" aria-label="Pants, waist and inseam">
-          {MW_PANT_SIZES.map((id) => (
+          {pantSizes.map((id) => (
             <SizeTile
               key={id}
               id={id}
               label={id}
               selected={selected.includes(id)}
-              unavailable={!selected.includes(id) && !stocked.has(id)}
               onToggle={toggleSize}
             />
           ))}
@@ -76,14 +80,10 @@ export default function SizeFilterLite({ draft, search, onChange }) {
   );
 }
 
-function SizeTile({ id, label, selected, unavailable, onToggle }) {
+function SizeTile({ id, label, selected, onToggle }) {
   return (
-    <label
-      className={["lite-size-tile", selected ? "is-selected" : "", unavailable ? "is-empty" : ""]
-        .filter(Boolean)
-        .join(" ")}
-    >
-      <input type="checkbox" checked={selected} disabled={unavailable} onChange={() => onToggle(id)} />
+    <label className={selected ? "lite-size-tile is-selected" : "lite-size-tile"}>
+      <input type="checkbox" checked={selected} onChange={() => onToggle(id)} />
       <span>{label}</span>
     </label>
   );
