@@ -13,7 +13,7 @@ const NAV = [
   "Rental",
 ];
 
-export default function SiteHeader({ search, onSearch }) {
+export default function SiteHeader({ search, onSearch, onNavigate }) {
   const [searchOpen, setSearchOpen] = useState(Boolean(search));
 
   return (
@@ -79,7 +79,15 @@ export default function SiteHeader({ search, onSearch }) {
         </div>
         <nav className="primary-nav" aria-label="Primary">
           {NAV.map((item) => (
-            <button key={item} type="button" className={item === "Suits" ? "is-current" : undefined}>
+            <button
+              key={item}
+              type="button"
+              className={item === "Suits" ? "is-current" : undefined}
+              onClick={() => {
+                if (item === "Rental") onNavigate?.("look");
+                if (item === "Suits") onNavigate?.("suits");
+              }}
+            >
               {item}
             </button>
           ))}

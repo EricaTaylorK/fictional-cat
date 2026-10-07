@@ -1,4 +1,5 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import RentalPdp from "./components/RentalPdp.jsx";
 import { PRODUCTS } from "./data/catalog.js";
 import {
   cloneFilters,
@@ -15,7 +16,33 @@ import SiteHeader from "./components/SiteHeader.jsx";
 import useDesktop from "./hooks/useDesktop.js";
 import "./style.css";
 
+function readView() {
+  return window.location.hash === "#suits" ? "suits" : "look";
+}
+
 export default function App() {
+  const [view, setView] = useState(readView);
+
+  useEffect(() => {
+    const sync = () => setView(readView());
+    window.addEventListener("hashchange", sync);
+    return () => window.removeEventListener("hashchange", sync);
+  }, []);
+
+  function navigate(next) {
+    const hash = next === "suits" ? "#suits" : "#look";
+    if (window.location.hash !== hash) window.location.hash = hash;
+    else setView(next === "suits" ? "suits" : "look");
+  }
+
+  if (view === "look") {
+    return <RentalPdp onNavigate={navigate} />;
+  }
+
+  return <SuitsPage onNavigate={navigate} />;
+}
+
+function SuitsPage({ onNavigate }) {
   const desktop = useDesktop();
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState("featured");
@@ -69,7 +96,7 @@ export default function App() {
 
   return (
     <div className="page">
-      <SiteHeader search={search} onSearch={setSearch} />
+      <SiteHeader search={search} onSearch={setSearch} onNavigate={onNavigate} />
       <main id="suits">
         <div className="listing-head">
           <nav className="crumbs" aria-label="Breadcrumb">
