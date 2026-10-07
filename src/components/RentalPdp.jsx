@@ -24,7 +24,6 @@ const PACKAGES = [
     save: 18,
     bestFor: "Best for a head-to-toe look, with nothing to bring from home.",
     included: ["jacket", "pants", "shirt", "neckwear", "shoes", "vest", "cufflinks", "pocketsilk"],
-    marked: true,
   },
   {
     id: "essentials",
@@ -34,7 +33,6 @@ const PACKAGES = [
     save: 60,
     bestFor: "Best for most weddings — dressed from jacket to shoes.",
     included: ["jacket", "pants", "shirt", "neckwear", "shoes"],
-    marked: true,
   },
   {
     id: "base",
@@ -45,7 +43,6 @@ const PACKAGES = [
     save: 0,
     bestFor: "Best if you already own a shirt, shoes, and neckwear.",
     included: ["jacket", "pants"],
-    marked: false,
   },
 ];
 
@@ -150,15 +147,7 @@ export default function RentalPdp({ onNavigate }) {
     setRented(false);
   }
 
-  const showCompare = addOnSum === 0 && pkg.compareAt;
-  const liveLine =
-    pkg.save > 0 && addOnSum === 0
-      ? `You save $${pkg.save} with ${pkg.name}.`
-      : pkg.save > 0
-        ? `You save $${pkg.save} on ${pkg.name}. Add-ons add ${money(addOnSum)}.`
-        : addOnSum > 0
-          ? `Add-ons add ${money(addOnSum)} to ${pkg.name}.`
-          : "Lowest starting price. Add only the pieces you need.";
+  const chosenItems = [...pkg.included, ...extraIds].map((id) => ITEM_MAP[id]);
 
   return (
     <div className="page page-pdp">
@@ -195,39 +184,11 @@ export default function RentalPdp({ onNavigate }) {
           <section className="buy" aria-label="Outfit packages">
 
             <div className="outfit">
-              <div className="outfit-top">
-                <h2>Your Outfit</h2>
-                <p className="price-bits" aria-live="polite">
-                  <span className="now" data-testid="outfit-total">
-                    {pkg.from && addOnSum === 0 ? "from " : ""}
-                    {money(total)}*
-                  </span>
-                  {showCompare && <s className="was">{money(pkg.compareAt)}</s>}
-                  {pkg.save > 0 && (
-                    <span className="save" data-testid="outfit-save">
-                      Save ${pkg.save}
-                    </span>
-                  )}
-                </p>
-              </div>
-
-              <p className="hint">Select a package</p>
-              <p className="live-line" data-testid="live-line">
-                {liveLine}
-              </p>
               {offer && (
                 <button type="button" className="nudge" data-testid="nudge" onClick={() => takeOffer(offer.pkg.id)}>
                   {offerCopy(offer)}
                 </button>
               )}
-              <p className="legend">
-                <span>
-                  <i className="swatch solid" aria-hidden="true" /> Included in the package price
-                </span>
-                <span>
-                  <i className="swatch dashed" aria-hidden="true" /> Add-on, priced with +
-                </span>
-              </p>
 
               <div className="packages" role="radiogroup" aria-label="Rental packages">
                 {PACKAGES.map((item) => (
@@ -294,6 +255,7 @@ export default function RentalPdp({ onNavigate }) {
       <SiteFooter />
       <SummaryBar
         pkg={pkg}
+        chosenItems={chosenItems}
         total={total}
         addOnSum={addOnSum}
         pieceCount={pieceCount}
@@ -329,11 +291,11 @@ function PackageColumn({ pkg, selected, extraIds, onSelect, onToggle }) {
         <span className="package-copy">
           <span className="package-name">
             {pkg.name}
-            {pkg.marked && <Diamond />}
+            <span className="package-pieces">
+              {count} {count === 1 ? "piece" : "pieces"}
+            </span>
           </span>
-          <span className="package-pieces">
-            {count} {count === 1 ? "piece" : "pieces"}
-          </span>
+          <span className="best-for">{pkg.bestFor}</span>
         </span>
         <span className="package-offer">
           <span className="package-price">
@@ -341,50 +303,28 @@ function PackageColumn({ pkg, selected, extraIds, onSelect, onToggle }) {
           </span>
           {pkg.save > 0 && <span className="save">Save ${pkg.save}</span>}
         </span>
-        <span className="best-for">{pkg.bestFor}</span>
       </label>
 
       <div className="package-body">
-        <div className="band">
-          <p className="section-label">Included</p>
-          <div className="band-track">
-            <ItemGroup
-              label="Core outfit"
-              entries={[
-                ...coreIncluded.map((item) => ({ item, mode: "included" })),
-                ...coreAdded.map((item) => ({ item, mode: "added" })),
-              ]}
-              onToggle={onToggle}
-            />
-            <ItemGroup
-              label="Accessories"
-              entries={[
-                ...accessoryIncluded.map((item) => ({ item, mode: "included" })),
-                ...accessoryAdded.map((item) => ({ item, mode: "added" })),
-              ]}
-              onToggle={onToggle}
-            />
-          </div>
-        </div>
-
-        {hasAddons ? (
-          <div className="band">
-            <p className="section-label">Add-ons</p>
-            <div className="band-track">
-              <ItemGroup
-                label="Core outfit"
-                entries={coreAddons.map((item) => ({ item, mode: "addon" }))}
-                onToggle={onToggle}
-              />
-              <ItemGroup
-                label="Accessories"
-                entries={accessoryAddons.map((item) => ({ item, mode: "addon" }))}
-                onToggle={onToggle}
-              />
-            </div>
-          </div>
-        ) : (
-          <p className="all-in">Every piece is included.</p>
+        <ItemGroup
+          label="Included"
+          entries={[
+            ...coreIncluded.map((item) => ({ item, mode: "included" })),
+            ...accessoryIncluded.map((item) => ({ item, mode: "included" })),
+            ...coreAdded.map((item) => ({ item, mode: "added" })),
+            ...accessoryAdded.map((item) => ({ item, mode: "added" })),
+          ]}
+          onToggle={onToggle}
+        />
+        {hasAddons && (
+          <ItemGroup
+            label="Add-ons"
+            entries={[
+              ...coreAddons.map((item) => ({ item, mode: "addon" })),
+              ...accessoryAddons.map((item) => ({ item, mode: "addon" })),
+            ]}
+            onToggle={onToggle}
+          />
         )}
       </div>
     </article>
@@ -395,7 +335,7 @@ function ItemGroup({ label, entries, onToggle }) {
   if (!entries.length) return null;
   return (
     <div className="item-group">
-      <p className="group-label">{label}</p>
+      <p className="section-label">{label}</p>
       <ul className="item-grid">
         {entries.map(({ item, mode }) => (
           <li key={`${mode}-${item.id}`}>
@@ -439,7 +379,7 @@ function ItemCard({ item, mode, onToggle }) {
   );
 }
 
-function SummaryBar({ pkg, total, addOnSum, pieceCount, rented, offer, onOffer, onRent }) {
+function SummaryBar({ pkg, chosenItems, total, addOnSum, pieceCount, rented, offer, onOffer, onRent }) {
   return (
     <div className="summary-bar">
       <div className="summary-copy">
@@ -449,7 +389,13 @@ function SummaryBar({ pkg, total, addOnSum, pieceCount, rented, offer, onOffer, 
             {pieceCount} {pieceCount === 1 ? "piece" : "pieces"}
           </span>
         </p>
-        <p className="summary-for">{pkg.bestFor}</p>
+        <ul className="summary-icons" aria-label="Pieces in this look">
+          {chosenItems.map((item) => (
+            <li key={item.id} title={item.name}>
+              <ItemArt id={item.id} />
+            </li>
+          ))}
+        </ul>
         {offer && (
           <button type="button" className="summary-offer" onClick={onOffer}>
             {offerCopy(offer)}
@@ -616,14 +562,6 @@ function Star({ half = false }) {
       ) : (
         <path fill="#3A3A3A" d="M8 1.4 9.9 5.8l4.7.4-3.6 3.1 1.1 4.6L8 11.6 3.9 13.9l1.1-4.6L1.4 6.2l4.7-.4L8 1.4Z" />
       )}
-    </svg>
-  );
-}
-
-function Diamond() {
-  return (
-    <svg className="diamond" viewBox="0 0 14 14" aria-hidden="true">
-      <path d="M7 1.4 12.2 7 7 12.6 1.8 7 7 1.4Z" fill="none" stroke="#046DE9" strokeWidth="1.2" />
     </svg>
   );
 }
