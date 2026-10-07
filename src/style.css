@@ -1024,7 +1024,15 @@ h1 {
   align-items: center;
 }
 
-.lite-matrix-head { text-align: center; }
+.lite-matrix-head {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  text-align: center;
+  padding-bottom: 8px;
+  background: var(--color-neutral-white);
+  box-shadow: 0 8px 0 var(--color-neutral-white);
+}
 
 .lite-matrix-name {
   display: block;
