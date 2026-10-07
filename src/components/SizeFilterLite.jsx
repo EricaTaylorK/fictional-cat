@@ -37,13 +37,12 @@ export default function SizeFilterLite({ draft, search, onChange }) {
     <div className="lite-size">
       <section className="lite-size-section">
         <h3>Jacket</h3>
-        <p className="lite-size-lead">Pick the height first. The number is the chest size.</p>
         {jacketGroups.map((group) => (
           <div key={group.id} className="lite-size-group">
-            <div className="lite-guide">
-              <p className="lite-guide-height">{group.height}</p>
-              <p className="lite-guide-name">{group.name}</p>
-            </div>
+            <p className="lite-size-label">
+              <span className="lite-size-height">{group.height}</span>
+              <span>{group.name}</span>
+            </p>
             <div className="lite-size-grid" role="group" aria-label={`${group.name}, ${group.height}`}>
               {group.sizes.map((id) => (
                 <SizeTile
@@ -60,10 +59,7 @@ export default function SizeFilterLite({ draft, search, onChange }) {
       </section>
       <section className="lite-size-section">
         <h3>Pants</h3>
-        <div className="lite-guide">
-          <p className="lite-guide-height">Waist × inseam</p>
-          <p className="lite-guide-name">32W × 30L is a 32-inch waist and a 30-inch inseam.</p>
-        </div>
+        <p className="lite-size-note">32W × 30L is waist × inseam.</p>
         <div className="lite-size-grid" role="group" aria-label="Pants, waist and inseam">
           {pantSizes.map((id) => (
             <SizeTile
