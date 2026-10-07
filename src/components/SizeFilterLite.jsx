@@ -26,10 +26,18 @@ export default function SizeFilterLite({ draft, search, onChange }) {
 
   const jacketGroups = JACKET_LENGTHS.map((length) => ({
     id: length.id,
-    name: length.id,
+    name: length.label,
     height: length.hint,
-    sizes: MW_SUIT_SIZES.filter((id) => parseSizeId(id)?.length === length.id && carried(id)),
-  })).filter((group) => group.sizes.length > 0);
+    sizes: new Set(
+      MW_SUIT_SIZES.filter((id) => parseSizeId(id)?.length === length.id && carried(id))
+    ),
+  })).filter((group) => group.sizes.size > 0);
+
+  const chests = [
+    ...new Set(
+      jacketGroups.flatMap((group) => [...group.sizes].map((id) => parseSizeId(id).chest))
+    ),
+  ].sort((a, b) => Number(a) - Number(b));
 
   const pantSizes = MW_PANT_SIZES.filter(carried);
 
@@ -37,29 +45,35 @@ export default function SizeFilterLite({ draft, search, onChange }) {
     <div className="lite-size">
       <section className="lite-size-section">
         <h3>Jacket</h3>
-        {jacketGroups.map((group) => (
-          <div key={group.id} className="lite-size-group">
-            <p className="lite-size-label">
-              <span className="lite-size-height">{group.height}</span>
-              <span>{group.name}</span>
-            </p>
-            <div className="lite-size-grid" role="group" aria-label={`${group.name}, ${group.height}`}>
-              {group.sizes.map((id) => (
+        <div className="lite-matrix" role="grid" aria-label="Jacket size by height">
+          {jacketGroups.map((group) => (
+            <div key={group.id} className="lite-matrix-head" role="columnheader">
+              <span className="lite-matrix-name">{group.name}</span>
+              <span className="lite-matrix-height">{group.height}</span>
+            </div>
+          ))}
+          {chests.map((chest) =>
+            jacketGroups.map((group) => {
+              const id = `${chest} ${group.id}`;
+              if (!group.sizes.has(id)) {
+                return <span key={id} className="lite-matrix-gap" />;
+              }
+              return (
                 <SizeTile
                   key={id}
                   id={id}
-                  label={id.split(" ")[0]}
+                  label={chest}
                   selected={selected.includes(id)}
                   onToggle={toggleSize}
                 />
-              ))}
-            </div>
-          </div>
-        ))}
+              );
+            })
+          )}
+        </div>
       </section>
       <section className="lite-size-section">
         <h3>Pants</h3>
-        <p className="lite-size-note">32W × 30L is waist × inseam.</p>
+        <p className="lite-matrix-height lite-pant-note">Waist × inseam</p>
         <div className="lite-size-grid" role="group" aria-label="Pants, waist and inseam">
           {pantSizes.map((id) => (
             <SizeTile
