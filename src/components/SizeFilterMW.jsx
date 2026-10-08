@@ -1,19 +1,18 @@
 import { useMemo, useState } from "react";
 import { PRODUCTS } from "../data/catalog.js";
+import { MW_PANT_SIZES, MW_SUIT_SIZES } from "../data/mwSizes.js";
 import { parseSizeId } from "../data/sizes.js";
 import { matchingProducts } from "../filters.js";
-
-const LENGTH_ORDER = ["Short", "Regular", "Long", "Extra Long"];
 
 const GROUPS = [
   {
     id: "suits",
-    label: "Jacket size",
+    label: "Jacket Size",
     kind: "jacket",
   },
   {
     id: "pants",
-    label: "Pants size",
+    label: "Pants Size",
     kind: "pant",
   },
 ];
@@ -165,32 +164,12 @@ function normalizeDimension(value) {
 }
 
 function inventory(products) {
-  const jacket = new Set();
-  const pant = new Set();
+  const carried = new Set();
   for (const product of products) {
-    for (const id of product.sizes) {
-      const parsed = parseSizeId(id);
-      if (parsed?.kind === "jacket") jacket.add(id);
-      else if (parsed?.kind === "pant") pant.add(id);
-    }
+    for (const id of product.sizes) carried.add(id);
   }
   return {
-    jacket: [...jacket].sort(compareJacket),
-    pant: [...pant].sort(comparePant),
+    jacket: MW_SUIT_SIZES.filter((id) => carried.has(id)),
+    pant: MW_PANT_SIZES.filter((id) => carried.has(id)),
   };
-}
-
-function compareJacket(a, b) {
-  const x = parseSizeId(a);
-  const y = parseSizeId(b);
-  return (
-    Number(x.chest) - Number(y.chest) ||
-    LENGTH_ORDER.indexOf(x.length) - LENGTH_ORDER.indexOf(y.length)
-  );
-}
-
-function comparePant(a, b) {
-  const x = parseSizeId(a);
-  const y = parseSizeId(b);
-  return Number(x.waist) - Number(y.waist) || Number(x.inseam) - Number(y.inseam);
 }

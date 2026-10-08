@@ -186,8 +186,9 @@ function suit(overrides) {
     ...overrides,
   };
   const chests = product.sizes ?? [];
+  const variant = import.meta.env.VITE_SIZE_VARIANT;
   product.sizes =
-    import.meta.env.VITE_SIZE_VARIANT === "lite"
+    variant === "lite" || variant === "mw"
       ? sizesForChests(chests)
       : expandSuitSizes(chests, product.id);
   return product;

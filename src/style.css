@@ -788,6 +788,8 @@ h1 {
 
 .facet-body { padding: 4px 24px 16px; }
 
+.facet-body:has(.mw-size) { padding-bottom: calc(32px - 1px); }
+
 .options { display: flex; flex-direction: column; }
 
 .option {

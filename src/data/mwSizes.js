@@ -46,6 +46,7 @@ export const MW_SUIT_SIZES = [
   "50 Regular",
   "50 Long",
   "50 Extra Long",
+  "52 Short",
   "52 Regular",
   "52 Long",
   "52 Extra Long",
