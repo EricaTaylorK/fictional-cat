@@ -10,8 +10,9 @@ import SizeFilterGuided from "./SizeFilter.jsx";
 import SizeFilterLite from "./SizeFilterLite.jsx";
 import SizeFilterMW from "./SizeFilterMW.jsx";
 
+const SIZE_VARIANT = import.meta.env.VITE_SIZE_VARIANT;
 const SIZE_VARIANTS = { mw: SizeFilterMW, lite: SizeFilterLite };
-const SizeFilter = SIZE_VARIANTS[import.meta.env.VITE_SIZE_VARIANT] ?? SizeFilterGuided;
+const SizeFilter = SIZE_VARIANTS[SIZE_VARIANT] ?? SizeFilterGuided;
 
 export default function FilterSheet({
   initialFacet,
@@ -26,7 +27,7 @@ export default function FilterSheet({
   onClose,
 }) {
   // The clicked facet is expanded in this first render, not after the sheet opens.
-  const [expanded, setExpanded] = useState(initialFacet);
+  const [expanded, setExpanded] = useState(initialFacet ?? (SIZE_VARIANT === "mw" ? "size" : null));
   const [minInput, setMinInput] = useState(formatBound(draft.priceMin));
   const [maxInput, setMaxInput] = useState(formatBound(draft.priceMax));
   const [priceError, setPriceError] = useState("");
