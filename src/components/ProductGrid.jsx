@@ -5,7 +5,7 @@ export default function ProductGrid({ products, onClear }) {
   if (products.length === 0) {
     return (
       <div className="empty">
-        <p>No suits match these filters.</p>
+        <p>No items match these filters.</p>
         <button type="button" onClick={onClear}>
           Clear filters
         </button>

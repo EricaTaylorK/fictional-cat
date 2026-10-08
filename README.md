@@ -1,6 +1,15 @@
-# Men's Suits filter prototype
+# Men's Clothing Sale price-filter prototype
 
-A single-page men's suits gallery modeled on the Men's Wearhouse product listing. Filter opens a sheet with every facet collapsed. A facet chip, such as Price, opens that same sheet with that facet already expanded. Apply updates the grid. There is no pagination and no product page.
+The sale product grid uses the existing Men's Wearhouse catalog, header, filter sheet, and footer. Search turns the same listing into the search results page.
+
+## Price filter treatments
+
+Both links stay on one experience. There is no random split.
+
+- Treatment 1, groupings plus Min/Max: `?variant=groupings`
+- Treatment 2, Min/Max only: `?variant=minmax`
+
+Min and Max sit side by side under Price. Treatment 1 also keeps the price groupings below the fields. Typing a custom range clears selected groupings. Choosing a grouping clears the fields. Only Apply updates the products. Closing the sheet drops unapplied changes.
 
 ## Run
 
@@ -9,4 +18,4 @@ npm install
 npm run dev
 ```
 
-Open the URL it prints (usually `http://localhost:5173`).
+Open the URL it prints, then add `?variant=groupings` or `?variant=minmax`.

@@ -21,7 +21,7 @@ export default function SiteHeader({ search, onSearch, onNavigate }) {
       <div className="promo">
         <p>
           New markdowns — clearance up to 70% off original prices |{" "}
-          <a href="#suits">Shop now &gt;</a>
+          <a href="#sale">Shop now &gt;</a>
         </p>
       </div>
 
@@ -29,7 +29,7 @@ export default function SiteHeader({ search, onSearch, onNavigate }) {
         <button type="button" className="icon-btn" aria-label="Open menu">
           <MenuIcon />
         </button>
-        <a className="logo" href="#suits" aria-label="Men's Wearhouse">
+        <a className="logo" href="#sale" aria-label="Men's Wearhouse">
           <img src="/mw-logo.svg" alt="" />
         </a>
         <div className="header-icons">
@@ -50,7 +50,7 @@ export default function SiteHeader({ search, onSearch, onNavigate }) {
 
       <div className="header-desktop">
         <div className="header-utility">
-          <a className="logo" href="#suits" aria-label="Men's Wearhouse">
+          <a className="logo" href="#sale" aria-label="Men's Wearhouse">
             <img src="/mw-logo.svg" alt="" />
           </a>
           <form className="header-search" role="search" onSubmit={(event) => event.preventDefault()}>
@@ -82,10 +82,10 @@ export default function SiteHeader({ search, onSearch, onNavigate }) {
             <button
               key={item}
               type="button"
-              className={item === "Suits" ? "is-current" : undefined}
+              className={item === "Sale" ? "is-current" : undefined}
               onClick={() => {
                 if (item === "Rental") onNavigate?.("look");
-                if (item === "Suits") onNavigate?.("suits");
+                if (item === "Sale") onNavigate?.("sale");
               }}
             >
               {item}
@@ -103,7 +103,7 @@ export default function SiteHeader({ search, onSearch, onNavigate }) {
               value={search}
               onChange={(event) => onSearch(event.target.value)}
               placeholder="What are you looking for?"
-              aria-label="Search suits"
+              aria-label="Search"
               autoFocus
             />
           </label>

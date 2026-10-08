@@ -1218,27 +1218,29 @@ h1 {
   outline-offset: 2px;
 }
 
+.price-fields { margin: 0 0 12px; }
+
 .price-range {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 8px;
-  margin: 4px 0 12px;
 }
 
+.price-field { flex: 1; min-width: 0; }
+
 .money-field {
-  flex: 1;
   display: flex;
   align-items: center;
-  gap: 4px;
-  height: 48px;
+  height: 40px;
   padding: 0 12px;
-  border: 1px solid var(--color-transparent-black10);
-  border-radius: 4px;
-  color: var(--color-neutral-medium-gray);
+  border: 1px solid #d9d9d9;
+  border-radius: 2px;
   background: var(--color-neutral-white);
 }
 
-.money-field:focus-within { border-color: var(--color-focus-outline); }
+.money-field:focus-within { border-color: var(--color-neutral-black); }
+
+.money-field.has-error { border-color: var(--color-danger-red); }
 
 .money-field input {
   width: 100%;
@@ -1247,19 +1249,28 @@ h1 {
   background: transparent;
   color: var(--color-neutral-black);
   font-size: 14px;
+  line-height: 20px;
   min-width: 0;
 }
 
-.money-field input::placeholder { color: var(--color-neutral-medium-gray); }
+.money-field input::placeholder { color: #8a8a8a; }
 
-.price-to { color: var(--color-neutral-medium-gray); font-size: 14px; }
+.price-to {
+  display: flex;
+  align-items: center;
+  height: 40px;
+  color: var(--color-neutral-medium-gray);
+  font-size: 14px;
+}
 
 .price-error {
-  margin: 0 0 8px;
+  margin: 4px 0 0;
   color: var(--color-danger-red);
   font-size: 12px;
   line-height: 16px;
 }
+
+.price-error-range { margin-top: 8px; }
 
 .sheet-actions {
   flex: none;
@@ -1284,24 +1295,21 @@ h1 {
 
 .btn-clear {
   background: var(--color-neutral-white);
-  border: 1px solid #e0e0e0;
-  color: #b0b0b0;
-}
-
-.btn-apply {
-  background: #ededed;
-  border: 0;
-  color: #a5a5a5;
-}
-
-.btn-clear.is-ready {
-  border-color: var(--color-neutral-black);
+  border: 1px solid var(--color-neutral-black);
   color: var(--color-neutral-black);
 }
 
-.btn-apply.is-ready {
-  background: var(--color-neutral-black);
+.btn-apply {
+  background: var(--color-primary-blue);
+  border: 0;
   color: var(--color-neutral-white);
+}
+
+.btn-apply:disabled,
+.btn-apply:disabled.is-ready {
+  background: #ededed;
+  color: #a5a5a5;
+  cursor: not-allowed;
 }
 
 .sheet-mw .sheet-actions {

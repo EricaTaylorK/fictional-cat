@@ -187,21 +187,35 @@ export function sortProducts(products, sort) {
 export function parseBound(raw) {
   const trimmed = String(raw).trim();
   if (!trimmed) return null;
-  const value = Number(trimmed.replace(/[$,\s]/g, ""));
+  const cleaned = trimmed.replace(/[$,\s]/g, "");
+  if (!/^\d+(\.\d+)?$/.test(cleaned)) return undefined;
+  const value = Number(cleaned);
   if (!Number.isFinite(value) || value < 0) return undefined;
   return value;
 }
 
-export function commitPrice(filters, minInput, maxInput) {
+export function readPrice(minInput, maxInput) {
   const priceMin = parseBound(minInput);
   const priceMax = parseBound(maxInput);
-  if (priceMin === undefined || priceMax === undefined) {
-    return { error: "Enter a valid price" };
-  }
-  if (priceMin != null && priceMax != null && priceMin > priceMax) {
-    return { error: "Min must be less than or equal to max" };
-  }
-  return { filters: { ...filters, priceMin, priceMax } };
+  const minError = priceMin === undefined ? "Enter a valid price" : "";
+  const maxError = priceMax === undefined ? "Enter a valid price" : "";
+  const rangeError =
+    !minError && !maxError && priceMin != null && priceMax != null && priceMax < priceMin
+      ? "Maximum price must be at least minimum price"
+      : "";
+  return {
+    priceMin: priceMin == null ? null : priceMin,
+    priceMax: priceMax == null ? null : priceMax,
+    minError,
+    maxError,
+    rangeError,
+    valid: !minError && !maxError && !rangeError,
+  };
+}
+
+export function priceVariant() {
+  const value = new URLSearchParams(window.location.search).get("variant");
+  return value === "minmax" ? "minmax" : "groupings";
 }
 
 export function money(amount) {

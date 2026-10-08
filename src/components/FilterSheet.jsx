@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
 import { COLORS, FACETS, PRICE_RANGES } from "../data/catalog.js";
 import {
-  commitPrice,
   countOption,
   matchingProducts,
+  readPrice,
   totalSelections,
 } from "../filters.js";
 import SizeFilterGuided from "./SizeFilter.jsx";
@@ -20,8 +20,8 @@ export default function FilterSheet({
   products,
   search,
   desktop,
+  variant,
   onChange,
-  onLivePrice,
   onApply,
   onClear,
   onClose,
@@ -30,12 +30,8 @@ export default function FilterSheet({
   const [expanded, setExpanded] = useState(initialFacet ?? (SIZE_VARIANT === "mw" ? "size" : null));
   const [minInput, setMinInput] = useState(formatBound(draft.priceMin));
   const [maxInput, setMaxInput] = useState(formatBound(draft.priceMax));
-  const [priceError, setPriceError] = useState("");
-
-  useEffect(() => {
-    setMinInput(formatBound(draft.priceMin));
-    setMaxInput(formatBound(draft.priceMax));
-  }, [draft.priceMin, draft.priceMax]);
+  const [minTouched, setMinTouched] = useState(false);
+  const [maxTouched, setMaxTouched] = useState(false);
 
   useEffect(() => {
     const previous = document.body.style.overflow;
@@ -50,10 +46,24 @@ export default function FilterSheet({
     };
   }, [onClose]);
 
+  const price = readPrice(minInput, maxInput);
+  const showMinError = minTouched && price.minError;
+  const showMaxError = maxTouched && price.maxError;
+  const showRangeError = (minTouched || maxTouched) && price.rangeError;
+
   const preview = useMemo(() => {
-    const result = commitPrice(draft, minInput, maxInput);
-    return result.filters ?? draft;
-  }, [draft, minInput, maxInput]);
+    if (!price.valid) return draft;
+    const hasCustom = price.priceMin != null || price.priceMax != null;
+    return {
+      ...draft,
+      priceMin: price.priceMin,
+      priceMax: price.priceMax,
+      selections: {
+        ...draft.selections,
+        price: hasCustom ? [] : [...(draft.selections.price ?? [])],
+      },
+    };
+  }, [draft, price]);
 
   const previewCount = useMemo(
     () => matchingProducts(products, preview, search).length,
@@ -64,50 +74,69 @@ export default function FilterSheet({
     setExpanded((current) => (current === facetId ? null : facetId));
   }
 
-  function pushDraft(next) {
-    if (desktop) onLivePrice(next);
-    else onChange(next);
-  }
-
   function toggleOption(facetId, optionId) {
     const current = draft.selections[facetId] ?? [];
     const next = current.includes(optionId)
       ? current.filter((id) => id !== optionId)
       : [...current, optionId];
-    const nextDraft = {
+    onChange({
       ...draft,
       selections: { ...draft.selections, [facetId]: next },
-    };
-    if (desktop && facetId === "price") pushDraft(nextDraft);
-    else onChange(nextDraft);
+    });
   }
 
-  function commitCustomPrice() {
-    const result = commitPrice(draft, minInput, maxInput);
-    if (result.error) {
-      setPriceError(result.error);
-      return false;
-    }
-    setPriceError("");
-    setMinInput(formatBound(result.filters.priceMin));
-    setMaxInput(formatBound(result.filters.priceMax));
-    if (desktop) onLivePrice(result.filters);
-    else onChange(result.filters);
-    return true;
+  function editPrice(which, value) {
+    if (which === "min") setMinInput(value);
+    else setMaxInput(value);
+    const hasGroupings = (draft.selections.price ?? []).length > 0;
+    const hasCustom = draft.priceMin != null || draft.priceMax != null;
+    if (!hasGroupings && !hasCustom) return;
+    onChange({
+      ...draft,
+      priceMin: null,
+      priceMax: null,
+      selections: { ...draft.selections, price: [] },
+    });
+  }
+
+  function togglePrice(optionId) {
+    setMinInput("");
+    setMaxInput("");
+    setMinTouched(false);
+    setMaxTouched(false);
+    const current = draft.selections.price ?? [];
+    const next = current.includes(optionId)
+      ? current.filter((id) => id !== optionId)
+      : [...current, optionId];
+    onChange({
+      ...draft,
+      priceMin: null,
+      priceMax: null,
+      selections: { ...draft.selections, price: next },
+    });
   }
 
   function applySheet() {
-    const result = commitPrice(draft, minInput, maxInput);
-    if (result.error) {
-      setPriceError(result.error);
+    if (!price.valid) {
+      setMinTouched(true);
+      setMaxTouched(true);
       setExpanded("price");
       return;
     }
-    onApply(result.filters);
+    const hasCustom = price.priceMin != null || price.priceMax != null;
+    const selections = { ...draft.selections };
+    if (hasCustom) selections.price = [];
+    onApply({
+      ...draft,
+      selections,
+      priceMin: price.priceMin,
+      priceMax: price.priceMax,
+    });
   }
 
   function clearSheet() {
-    setPriceError("");
+    setMinTouched(false);
+    setMaxTouched(false);
     setMinInput("");
     setMaxInput("");
     onClear();
@@ -172,22 +201,20 @@ export default function FilterSheet({
                       />
                     ) : facet.kind === "price" ? (
                       <PriceEditor
+                        variant={variant}
                         draft={draft}
                         products={products}
                         search={search}
                         minInput={minInput}
                         maxInput={maxInput}
-                        error={priceError}
-                        onMin={(value) => {
-                          setPriceError("");
-                          setMinInput(value);
-                        }}
-                        onMax={(value) => {
-                          setPriceError("");
-                          setMaxInput(value);
-                        }}
-                        onCommitRange={commitCustomPrice}
-                        onToggle={(optionId) => toggleOption("price", optionId)}
+                        minError={showMinError}
+                        maxError={showMaxError}
+                        rangeError={showRangeError}
+                        onMin={(value) => editPrice("min", value)}
+                        onMax={(value) => editPrice("max", value)}
+                        onMinBlur={() => setMinTouched(true)}
+                        onMaxBlur={() => setMaxTouched(true)}
+                        onToggle={togglePrice}
                       />
                     ) : (
                       <OptionList
@@ -217,8 +244,9 @@ export default function FilterSheet({
           </button>
           <button
             type="button"
-            className={ready ? "btn-apply is-ready" : "btn-apply"}
+            className={ready && price.valid ? "btn-apply is-ready" : "btn-apply"}
             data-testid="apply-filters"
+            disabled={!price.valid}
             onClick={applySheet}
           >
             {desktop ? "Apply" : `Show ${previewCount} ${previewCount === 1 ? "item" : "items"}`}
@@ -269,60 +297,85 @@ function OptionList({ facet, draft, products, search, onToggle }) {
   );
 }
 
+function PriceFields({ minInput, maxInput, minError, maxError, rangeError, onMin, onMax, onMinBlur, onMaxBlur }) {
+  return (
+    <div className="price-fields">
+      <div className="price-range">
+        <div className="price-field">
+          <label className={minError ? "money-field has-error" : "money-field"}>
+            <input
+              type="text"
+              inputMode="decimal"
+              placeholder="$ Min"
+              aria-label="Minimum price"
+              data-testid="price-min"
+              aria-invalid={minError ? "true" : "false"}
+              value={minInput}
+              onChange={(event) => onMin(event.target.value)}
+              onBlur={onMinBlur}
+            />
+          </label>
+          {minError && <p className="price-error">{minError}</p>}
+        </div>
+        <span className="price-to">to</span>
+        <div className="price-field">
+          <label className={maxError ? "money-field has-error" : "money-field"}>
+            <input
+              type="text"
+              inputMode="decimal"
+              placeholder="$ Max"
+              aria-label="Maximum price"
+              data-testid="price-max"
+              aria-invalid={maxError ? "true" : "false"}
+              value={maxInput}
+              onChange={(event) => onMax(event.target.value)}
+              onBlur={onMaxBlur}
+            />
+          </label>
+          {maxError && <p className="price-error">{maxError}</p>}
+        </div>
+      </div>
+      {rangeError && <p className="price-error price-error-range">{rangeError}</p>}
+    </div>
+  );
+}
+
 function PriceEditor({
+  variant,
   draft,
   products,
   search,
   minInput,
   maxInput,
-  error,
+  minError,
+  maxError,
+  rangeError,
   onMin,
   onMax,
-  onCommitRange,
+  onMinBlur,
+  onMaxBlur,
   onToggle,
 }) {
   const selected = draft.selections.price ?? [];
+  const fields = (
+    <PriceFields
+      minInput={minInput}
+      maxInput={maxInput}
+      minError={minError}
+      maxError={maxError}
+      rangeError={rangeError}
+      onMin={onMin}
+      onMax={onMax}
+      onMinBlur={onMinBlur}
+      onMaxBlur={onMaxBlur}
+    />
+  );
 
-  function onKeyDown(event) {
-    if (event.key === "Enter") {
-      event.preventDefault();
-      onCommitRange();
-    }
-  }
-
-  function onRangeFocusOut(event) {
-    if (event.currentTarget.contains(event.relatedTarget)) return;
-    onCommitRange();
-  }
+  if (variant === "minmax") return <div className="price-editor">{fields}</div>;
 
   return (
     <div className="price-editor">
-      <div className="price-range" onBlur={onRangeFocusOut}>
-        <label className="money-field">
-          <span aria-hidden="true">$</span>
-          <input
-            inputMode="decimal"
-            placeholder="Min"
-            aria-label="Minimum price"
-            value={minInput}
-            onChange={(event) => onMin(event.target.value)}
-            onKeyDown={onKeyDown}
-          />
-        </label>
-        <span className="price-to">to</span>
-        <label className="money-field">
-          <span aria-hidden="true">$</span>
-          <input
-            inputMode="decimal"
-            placeholder="Max"
-            aria-label="Maximum price"
-            value={maxInput}
-            onChange={(event) => onMax(event.target.value)}
-            onKeyDown={onKeyDown}
-          />
-        </label>
-      </div>
-      {error && <p className="price-error">{error}</p>}
+      {fields}
       <div className="options">
         {PRICE_RANGES.map((range) => {
           const count = countOption(products, draft, search, "price", range.id);

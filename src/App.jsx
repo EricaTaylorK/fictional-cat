@@ -5,6 +5,7 @@ import {
   cloneFilters,
   emptyFilters,
   matchingProducts,
+  priceVariant,
   removeAppliedToken,
   sortProducts,
 } from "./filters.js";
@@ -17,7 +18,7 @@ import useDesktop from "./hooks/useDesktop.js";
 import "./style.css";
 
 function readView() {
-  return window.location.hash === "#suits" ? "suits" : "look";
+  return window.location.hash === "#look" ? "look" : "sale";
 }
 
 export default function App() {
@@ -30,20 +31,21 @@ export default function App() {
   }, []);
 
   function navigate(next) {
-    const hash = next === "suits" ? "#suits" : "#look";
+    const hash = next === "look" ? "#look" : "#sale";
     if (window.location.hash !== hash) window.location.hash = hash;
-    else setView(next === "suits" ? "suits" : "look");
+    else setView(next === "look" ? "look" : "sale");
   }
 
   if (view === "look") {
     return <RentalPdp onNavigate={navigate} />;
   }
 
-  return <SuitsPage onNavigate={navigate} />;
+  return <SalePage onNavigate={navigate} />;
 }
 
-function SuitsPage({ onNavigate }) {
+function SalePage({ onNavigate }) {
   const desktop = useDesktop();
+  const variant = priceVariant();
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState("featured");
   const [applied, setApplied] = useState(emptyFilters);
@@ -81,33 +83,20 @@ function SuitsPage({ onNavigate }) {
     setSearch("");
   }
 
-  function livePrice(nextDraft) {
-    setDraft(nextDraft);
-    setApplied((current) => ({
-      ...current,
-      selections: {
-        ...current.selections,
-        price: [...(nextDraft.selections.price ?? [])],
-      },
-      priceMin: nextDraft.priceMin,
-      priceMax: nextDraft.priceMax,
-    }));
-  }
-
   return (
     <div className="page">
       <SiteHeader search={search} onSearch={setSearch} onNavigate={onNavigate} />
-      <main id="suits">
+      <main id="sale">
         <div className="listing-head">
           <nav className="crumbs" aria-label="Breadcrumb">
             <ol>
               <li>Home</li>
-              <li>Mens Clothing</li>
-              <li className="here">Mens Suits</li>
+              <li>Men&apos;s Clothing</li>
+              <li className="here">Sale</li>
             </ol>
           </nav>
           <h1>
-            Men&apos;s Suits
+            Men&apos;s Clothing Sale
             <span className="count" data-testid="result-count">
               ({visible.length})
             </span>
@@ -134,8 +123,8 @@ function SuitsPage({ onNavigate }) {
           products={PRODUCTS}
           search={search}
           desktop={desktop}
+          variant={variant}
           onChange={setDraft}
-          onLivePrice={livePrice}
           onApply={applySheet}
           onClear={clearDraft}
           onClose={closeSheet}
