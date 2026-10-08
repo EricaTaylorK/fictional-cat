@@ -77,13 +77,16 @@ export const MW_PANT_SIZES = [
   "31W x 30L",
   "31W x 32L",
   "31W x 34L",
+  "32",
   "32W x 29L",
   "32W x 30L",
   "32W x 32L",
   "32W x 34L",
+  "33",
   "33W x 30L",
   "33W x 32L",
   "33W x 34L",
+  "34",
   "34W x 29L",
   "34W x 30L",
   "34W x 32L",
@@ -92,11 +95,13 @@ export const MW_PANT_SIZES = [
   "35W x 30L",
   "35W x 32L",
   "35W x 34L",
+  "36",
   "36W x 29L",
   "36W x 30L",
   "36W x 32L",
   "36W x 34L",
   "36W x 36L",
+  "38",
   "38W x 29L",
   "38W x 30L",
   "38W x 32L",
@@ -105,21 +110,25 @@ export const MW_PANT_SIZES = [
   "39W x 30L",
   "39W x 32L",
   "39W x 34L",
+  "40",
   "40W x 29L",
   "40W x 30L",
   "40W x 32L",
   "40W x 34L",
   "40W x 36L",
+  "42",
   "42W x 29L",
   "42W x 30L",
   "42W x 32L",
   "42W x 34L",
   "42W x 36L",
+  "44",
   "44W x 29L",
   "44W x 30L",
   "44W x 32L",
   "44W x 34L",
   "44W x 36L",
+  "46",
   "46W x 30L",
   "46W x 32L",
   "46W x 34L",
@@ -157,7 +166,13 @@ export function sizesForChests(chests) {
     waists.add(chest - 4);
   }
   const jackets = MW_SUIT_SIZES.filter((id) => jacketChests.has(Number(id.split(" ")[0])));
-  const pants = MW_PANT_SIZES.filter((id) => waists.has(pantWaist(id)));
+  const waistValues = [...waists];
+  const minWaist = waistValues.length ? Math.min(...waistValues) : Infinity;
+  const maxWaist = waistValues.length ? Math.max(...waistValues) : -Infinity;
+  const pants = MW_PANT_SIZES.filter((id) => {
+    const waist = pantWaist(id);
+    return waist >= minWaist && waist <= maxWaist;
+  });
   return [...jackets, ...pants].filter((id, index, list) => list.indexOf(id) === index && (SUIT_SET.has(id) || PANT_SET.has(id)));
 }
 

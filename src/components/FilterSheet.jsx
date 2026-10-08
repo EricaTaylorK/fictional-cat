@@ -120,7 +120,7 @@ export default function FilterSheet({
     <>
       <button type="button" className="scrim" aria-label="Close filters" onClick={onClose} />
       <div
-        className="sheet"
+        className={SIZE_VARIANT === "mw" ? "sheet sheet-mw" : "sheet"}
         id="filter-sheet"
         role="dialog"
         aria-modal="true"
@@ -211,7 +211,9 @@ export default function FilterSheet({
             data-testid="clear-filters"
             onClick={clearSheet}
           >
-            Clear all
+            {SIZE_VARIANT === "mw" && totalSelections(draft) > 0
+              ? `Clear all (${totalSelections(draft)})`
+              : "Clear all"}
           </button>
           <button
             type="button"

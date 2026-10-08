@@ -42,6 +42,8 @@ export function parseSizeId(id) {
   if (jacket) return { kind: "jacket", chest: jacket[1], length: jacket[2] };
   const pant = id.match(/^(\d+)W x (\d+)L$/);
   if (pant) return { kind: "pant", waist: pant[1], inseam: pant[2] };
+  const waistOnly = id.match(/^(\d+)$/);
+  if (waistOnly) return { kind: "pant", waist: waistOnly[1], inseam: "" };
   return null;
 }
 
