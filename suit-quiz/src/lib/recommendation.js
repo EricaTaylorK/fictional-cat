@@ -104,13 +104,14 @@ export function getSizeEstimate(answers) {
   const length = inferLength(answers);
   const entered = Number(answers.measurements?.jacket || answers.measurements?.chest);
   if (!entered) {
-    return { jacket: null, pants: null, length: length ? LENGTH_NAMES[length] : null };
+    return { jacket: null, pants: null, length: length ? LENGTH_NAMES[length] : null, lengthCode: length };
   }
   const jacketSize = Math.round(entered / 2) * 2;
   return {
     jacket: `${jacketSize}${length ?? "R"}`,
     pants: `${inferPantWaist(answers, jacketSize)}W`,
     length: LENGTH_NAMES[length ?? "R"],
+    lengthCode: length ?? "R",
   };
 }
 
@@ -118,9 +119,7 @@ export function inferLikelySize(answers) {
   const length = inferLength(answers);
   const estimate = getSizeEstimate(answers);
   if (!estimate.jacket) {
-    return length
-      ? `${LENGTH_NAMES[length]} (${length}) length; confirm chest size at a fitting`
-      : "Confirm your size with a fitting";
+    return length ? `${LENGTH_NAMES[length]} (${length}) length` : "Regular (R) length";
   }
   return `${estimate.jacket} jacket, ${estimate.pants.replace("W", "")} waist pants`;
 }
@@ -128,15 +127,38 @@ export function inferLikelySize(answers) {
 export function recommendTailoring(answers) {
   const signals = getFitSignals(answers);
   if (signals.has("athleticBuild")) {
-    return { id: "signature", reason: "Shapes the jacket waist to your trimmer build and sets the pants waist." };
+    return {
+      id: "signature",
+      reason: "Shapes the jacket waist to your trimmer build and sets the pants waist.",
+      because: "Your chest and waist point to an athletic build, so we'll take in the jacket and pants waist to match.",
+    };
   }
   if (signals.has("fullerMidsection")) {
-    return { id: "signature", reason: "Adjusts the jacket button point and pants waist so nothing pulls." };
+    return {
+      id: "signature",
+      reason: "Adjusts the jacket button point and pants waist so nothing pulls.",
+      because: "You said jackets pull at the button or pants pinch at the waist, so we'll adjust both so nothing pulls.",
+    };
   }
-  if (signals.has("runsLong") || signals.has("runsShort")) {
-    return { id: "essentials", reason: "Sets the sleeves to your arm length and hems the pants." };
+  if (signals.has("runsLong")) {
+    return {
+      id: "essentials",
+      reason: "Sets the sleeves to your arm length and hems the pants.",
+      because: "You said sleeves and jackets usually run long, so we'll set the sleeves to your arms and hem the pants.",
+    };
   }
-  return { id: "essentials", reason: "Every suit needs a hem and a sleeve check." };
+  if (signals.has("runsShort")) {
+    return {
+      id: "essentials",
+      reason: "Sets the sleeves to your arm length and hems the pants.",
+      because: "You said sleeves and jackets usually run short, so we'll start in a longer length and finish the sleeves and hem.",
+    };
+  }
+  return {
+    id: "essentials",
+    reason: "Every suit needs a hem and a sleeve check.",
+    because: "Your size usually fits off the rack, so a hem and a sleeve check is all this suit needs.",
+  };
 }
 
 const budgetLabels = {

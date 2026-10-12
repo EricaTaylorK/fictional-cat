@@ -35,9 +35,9 @@ const outfitOptions = [
 const optionLabels = ["Best match", "Also a strong fit", "Another way to go"];
 
 function sizeDetail(size) {
-  if (size.jacket) return `${size.jacket} jacket · ${size.pants} pants`;
-  if (size.length) return `${size.length} length · size confirmed in store`;
-  return "Size confirmed in store";
+  if (size.jacket) return `Your size: ${size.jacket} jacket · ${size.pants} pants`;
+  if (size.length) return `Your size: ${size.length} (${size.lengthCode})`;
+  return null;
 }
 
 function SuitOption({ product, size, label, recommendedTailoring, selected, onSelect }) {
@@ -55,7 +55,10 @@ function SuitOption({ product, size, label, recommendedTailoring, selected, onSe
         <img src={product.image} alt="" />
       </div>
       <div className="suit-option-body">
-        <p className={label === "Best match" ? "option-kicker option-kicker-best" : "option-kicker"}>{label}</p>
+        <div className="option-head">
+          <p className={label === "Best match" ? "option-kicker option-kicker-best" : "option-kicker"}>{label}</p>
+          <span className="match-score">{product.matchPercent}% match</span>
+        </div>
         <p className="product-brand">{product.brand}</p>
         <h3 className="product-title">{product.name}</h3>
         <p className="product-price">
@@ -63,7 +66,8 @@ function SuitOption({ product, size, label, recommendedTailoring, selected, onSe
           {product.compareAt && <s>{formatPrice(product.compareAt)}</s>}
         </p>
         <p className="product-meta">
-          {product.color} · {product.fabric} · {sizeDetail(size)}
+          {product.color} · {product.fabric}
+          {sizeDetail(size) && <> · {sizeDetail(size)}</>}
           {product.reviews >= 100 && (
             <span className="product-rating">
               <img src="/icons/content_starfilled.svg" alt="" />
@@ -92,7 +96,7 @@ export default function Results({ answers, onEditAnswers }) {
   const recommendations = useMemo(() => getRecommendations(answers), [answers]);
   const summary = useMemo(() => buildResultSummary(answers), [answers]);
   const recommendedTailoring = tailoringPackages.find((item) => item.id === summary.tailoring.id);
-  const [selectedId, setSelectedId] = useState(null);
+  const [selectedId, setSelectedId] = useState(recommendations[0].id);
   const [tailoringId, setTailoringId] = useState(null);
   const [selectedExtras, setSelectedExtras] = useState([]);
   const [handoff, setHandoff] = useState("");
@@ -129,7 +133,7 @@ export default function Results({ answers, onEditAnswers }) {
         <h1 id="results-title">Your recommendations</h1>
         <p className="results-lede">
           Three suits that fit {summary.occasion}, in a fit that feels {summary.fit}. Each one is
-          sized from your answers. Select a suit to build your plan.
+          sized from your answers, and your best match is selected.
         </p>
         <p className="based-on">
           Based on: {basedOn}{" "}
@@ -150,13 +154,6 @@ export default function Results({ answers, onEditAnswers }) {
           ))}
         </div>
 
-        <p className="tailoring-why">
-          <img src="/icons/product_size.svg" alt="" />
-          <span>
-            <strong>Why {recommendedTailoring.name}?</strong> {summary.tailoring.reason} You can choose it, or skip it, once you've picked a suit.
-          </span>
-        </p>
-
         {selected && (
           <div className="results-card">
             <section className="card-section" aria-labelledby="tailoring-title">
@@ -168,6 +165,10 @@ export default function Results({ answers, onEditAnswers }) {
                 For the {selected.brand} {selected.name}. Our tailors measure you in store and fine-tune
                 the fit, so it looks and feels made for you.
               </p>
+              <div className="fit-pick">
+                <p className="fit-pick-label">Our pick for you: {recommendedTailoring.name}</p>
+                <p>{summary.tailoring.because}</p>
+              </div>
               <div className="tier-list" role="radiogroup" aria-labelledby="tailoring-title">
                 {tailoringPackages.map((option) => {
                   const recommended = option.id === summary.tailoring.id;
@@ -185,13 +186,14 @@ export default function Results({ answers, onEditAnswers }) {
                       <img className="tier-icon" src={option.icon} alt="" />
                       <span className="tier-copy">
                         <span className="tier-name">{option.name}</span>
-                        <span className="tier-detail">{recommended ? summary.tailoring.reason : option.detail}</span>
+                        <span className="tier-detail">{option.detail}</span>
                       </span>
                       <span className="tier-price">+{formatPrice(option.price)}</span>
                     </label>
                   );
                 })}
                 <label className="tier tier-none">
+                  <span className="tier-icon tier-icon-empty" aria-hidden="true" />
                   <input
                     className="visually-hidden"
                     type="radio"
@@ -242,7 +244,7 @@ export default function Results({ answers, onEditAnswers }) {
             <p className="summary-suit">{selected.brand} {selected.name}</p>
             <ul className="summary-lines">
               <li>
-                <span>Jacket{size.jacket ? ` · ${size.jacket}` : ""}</span>
+                <span>Jacket{size.jacket ? ` · ${size.jacket}` : size.length ? ` · ${size.length} (${size.lengthCode})` : ""}</span>
                 <span className="summary-amount">
                   {selected.compareAt && <s>{formatPrice(selected.compareAt)}</s>}
                   {formatPrice(selected.price)}

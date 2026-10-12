@@ -124,8 +124,8 @@ describe("recommendations", () => {
   });
 
   it("splits the size into jacket and pants for the product card", () => {
-    expect(getSizeEstimate(baseAnswers)).toEqual({ jacket: "40R", pants: "34W", length: "Regular" });
-    expect(getSizeEstimate({ measurementKnowledge: "no", height: "short" })).toEqual({ jacket: null, pants: null, length: "Short" });
+    expect(getSizeEstimate(baseAnswers)).toEqual({ jacket: "40R", pants: "34W", length: "Regular", lengthCode: "R" });
+    expect(getSizeEstimate({ measurementKnowledge: "no", height: "short" })).toEqual({ jacket: null, pants: null, length: "Short", lengthCode: "S" });
   });
 
   it("breaks exact ties by original assortment order", () => {
