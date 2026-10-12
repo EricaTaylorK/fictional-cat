@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import Results from "./components/Results.jsx";
 import TextInput from "./components/TextInput.jsx";
 import { getQuestionFlow, questions } from "./data/quizConfig.js";
@@ -100,6 +100,77 @@ function MeasurementsQuestion({ value = {}, onChange }) {
   );
 }
 
+function SizesQuestion({ question, value = {}, onChange }) {
+  return (
+    <div className="size-groups">
+      {question.groups.map((group) => (
+        <fieldset className="size-group" key={group.id}>
+          <legend>{group.label}</legend>
+          <div className="size-chips">
+            {group.options.map((option) => (
+              <label className="size-chip" key={option.value}>
+                <input
+                  type="radio"
+                  name={`${question.id}-${group.id}`}
+                  value={option.value}
+                  checked={value[group.id] === option.value}
+                  onChange={() => onChange({ ...value, [group.id]: option.value })}
+                />
+                <span>{option.label}</span>
+              </label>
+            ))}
+          </div>
+        </fieldset>
+      ))}
+    </div>
+  );
+}
+
+const MATCHING_STEPS = [
+  "Reading your occasion",
+  "Working out your jacket and pants sizes",
+  "Comparing cuts against how you want it to feel",
+  "Choosing your tailoring",
+];
+const MATCHING_STEP_MS = 750;
+
+function MatchingScreen({ onDone }) {
+  const [step, setStep] = useState(0);
+
+  useEffect(() => {
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const delay = reduceMotion ? 250 : MATCHING_STEP_MS;
+    if (step >= MATCHING_STEPS.length) {
+      const done = setTimeout(onDone, reduceMotion ? 0 : 400);
+      return () => clearTimeout(done);
+    }
+    const next = setTimeout(() => setStep((current) => current + 1), delay);
+    return () => clearTimeout(next);
+  }, [step, onDone]);
+
+  return (
+    <section className="matching" aria-labelledby="matching-title" aria-live="polite">
+      <div className="matching-scan" aria-hidden="true">
+        <img src="/icons/product_hanger.svg" alt="" />
+      </div>
+      <h1 id="matching-title">Finding your best fit</h1>
+      <p className="matching-copy">Checking every suit against your answers.</p>
+      <ol className="matching-steps">
+        {MATCHING_STEPS.map((label, index) => {
+          const state = index < step ? "done" : index === step ? "active" : "pending";
+          return (
+            <li className={`matching-step matching-step-${state}`} key={label}>
+              <span className="matching-dot" aria-hidden="true" />
+              {label}
+              {state === "done" && <span className="visually-hidden"> (done)</span>}
+            </li>
+          );
+        })}
+      </ol>
+    </section>
+  );
+}
+
 function ArrowLeftIcon() {
   return (
     <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true">
@@ -112,6 +183,9 @@ function isAnswered(question, answer) {
   if (question.type === "multi") return Array.isArray(answer) && answer.length > 0;
   if (question.type === "measurements") {
     return Boolean(answer?.jacket || answer?.chest || answer?.waist);
+  }
+  if (question.type === "sizes") {
+    return question.groups.every((group) => Boolean(answer?.[group.id]));
   }
   return Boolean(answer);
 }
@@ -144,7 +218,7 @@ export default function App() {
     const nextFlow = getQuestionFlow(answers);
     const index = nextFlow.indexOf(currentId);
     if (index === nextFlow.length - 1) {
-      setState((previous) => ({ ...previous, screen: "results" }));
+      setState((previous) => ({ ...previous, screen: "matching" }));
       return;
     }
     setState((previous) => ({ ...previous, currentId: nextFlow[index + 1] }));
@@ -171,6 +245,10 @@ export default function App() {
   function resumeQuiz() {
     setState((previous) => ({ ...previous, screen: "question" }));
   }
+
+  const showResults = useCallback(() => {
+    setState((previous) => ({ ...previous, screen: "results" }));
+  }, []);
 
   const hasSavedProgress = Object.keys(answers).length > 0;
 
@@ -255,6 +333,8 @@ export default function App() {
 
             {currentQuestion.type === "measurements" ? (
               <MeasurementsQuestion value={answers[currentId]} onChange={setAnswer} />
+            ) : currentQuestion.type === "sizes" ? (
+              <SizesQuestion question={currentQuestion} value={answers[currentId]} onChange={setAnswer} />
             ) : (
               <ChoiceQuestion question={currentQuestion} value={answers[currentId]} onChange={setAnswer} />
             )}
@@ -271,6 +351,8 @@ export default function App() {
             </div>
           </section>
         )}
+
+        {screen === "matching" && <MatchingScreen onDone={showResults} />}
 
         {screen === "results" && (
           <Results

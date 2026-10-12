@@ -91,27 +91,38 @@ export function inferLength(answers) {
   return LENGTHS[index];
 }
 
-function inferPantWaist(answers, jacketSize) {
-  const waist = Number(answers.measurements?.waist);
-  if (waist) return waist;
+export const SHIRT_SIZE_CHEST = { S: 38, M: 40, L: 42, XL: 46, XXL: 48 };
+
+function buildDrop(answers) {
   const signals = getFitSignals(answers);
-  if (signals.has("athleticBuild")) return jacketSize - 8;
-  if (signals.has("fullerMidsection")) return jacketSize - 4;
-  return jacketSize - STANDARD_DROP;
+  if (signals.has("athleticBuild")) return 8;
+  if (signals.has("fullerMidsection")) return 4;
+  return STANDARD_DROP;
+}
+
+function knownChest(answers) {
+  return Number(answers.measurements?.jacket || answers.measurements?.chest)
+    || SHIRT_SIZE_CHEST[answers.everydaySizes?.shirt]
+    || null;
+}
+
+function knownWaist(answers) {
+  return Number(answers.measurements?.waist || answers.everydaySizes?.waist) || null;
 }
 
 export function getSizeEstimate(answers) {
-  const length = inferLength(answers);
-  const entered = Number(answers.measurements?.jacket || answers.measurements?.chest);
-  if (!entered) {
-    return { jacket: null, pants: null, length: length ? LENGTH_NAMES[length] : null, lengthCode: length };
+  const lengthCode = inferLength(answers) ?? "R";
+  const chest = knownChest(answers);
+  const waist = knownWaist(answers);
+  if (!chest && !waist) {
+    return { jacket: null, pants: null, length: LENGTH_NAMES[lengthCode], lengthCode };
   }
-  const jacketSize = Math.round(entered / 2) * 2;
+  const jacketSize = Math.round((chest ?? waist + buildDrop(answers)) / 2) * 2;
   return {
-    jacket: `${jacketSize}${length ?? "R"}`,
-    pants: `${inferPantWaist(answers, jacketSize)}W`,
-    length: LENGTH_NAMES[length ?? "R"],
-    lengthCode: length ?? "R",
+    jacket: `${jacketSize}${lengthCode}`,
+    pants: `${waist ?? jacketSize - buildDrop(answers)}W`,
+    length: LENGTH_NAMES[lengthCode],
+    lengthCode,
   };
 }
 
@@ -258,10 +269,6 @@ function scoreProduct(product, answers, index) {
     }
   } else if (answers.budget !== "flexible") {
     score -= Math.min(18, Math.ceil(Math.abs(product.price - Math.min(Math.max(product.price, budgetMin), budgetMax)) / 20));
-  }
-
-  if (product.reviews >= 100) {
-    evidence.push(`Rated ${product.rating} out of 5 by ${product.reviews.toLocaleString("en-US")} shoppers.`);
   }
 
   if (answers.wearIntent === "rewear" || answers.wearIntent === "often") {

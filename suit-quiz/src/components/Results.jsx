@@ -33,13 +33,34 @@ const outfitOptions = [
 ];
 
 function cardDetails(product, size) {
-  const sized = [size.jacket, size.pants].filter(Boolean);
-  const sizeLabel = sized.length
-    ? sized.join(" · ")
-    : size.length
-      ? `${size.length} (${size.lengthCode})`
-      : null;
-  return [product.color, sizeLabel, product.fabric].filter(Boolean).join(" · ");
+  const jacket = size.jacket ? `Jacket ${size.jacket}` : size.length ? `Jacket ${size.length} (${size.lengthCode})` : null;
+  const pants = size.pants ? `Pants ${size.pants}` : null;
+  return [product.color, jacket, pants, product.fabric].filter(Boolean).join(" · ");
+}
+
+const RING_RADIUS = 34;
+const RING_LENGTH = 2 * Math.PI * RING_RADIUS;
+
+function MatchRing({ percent }) {
+  return (
+    <div className="match-ring" role="img" aria-label={`${percent}% match`}>
+      <svg viewBox="0 0 80 80" aria-hidden="true">
+        <circle className="match-ring-track" cx="40" cy="40" r={RING_RADIUS} />
+        <circle
+          className="match-ring-fill"
+          cx="40"
+          cy="40"
+          r={RING_RADIUS}
+          strokeDasharray={RING_LENGTH}
+          style={{ "--ring-offset": RING_LENGTH * (1 - percent / 100), "--ring-length": RING_LENGTH }}
+        />
+      </svg>
+      <span className="match-ring-value" aria-hidden="true">
+        {percent}<small>%</small>
+        <span className="match-ring-label">match</span>
+      </span>
+    </div>
+  );
 }
 
 function SuitOption({ product, size, selected, onSelect }) {
@@ -64,15 +85,7 @@ function SuitOption({ product, size, selected, onSelect }) {
           <strong>{formatPrice(product.price)}</strong>
           {product.compareAt && <s>{formatPrice(product.compareAt)}</s>}
         </p>
-        <p className="product-meta">
-          {cardDetails(product, size)}
-          {product.reviews >= 100 && (
-            <span className="product-rating">
-              <img src="/icons/content_starfilled.svg" alt="" />
-              {product.rating} ({product.reviews.toLocaleString("en-US")})
-            </span>
-          )}
-        </p>
+        <p className="product-meta">{cardDetails(product, size)}</p>
       </div>
       <div className="suit-panel">
         <h4 className="reason-title">Why it's a strong pick</h4>
@@ -124,11 +137,34 @@ export default function Results({ answers, onEditAnswers }) {
   return (
     <div className="results-layout">
       <section className="results-main" aria-labelledby="results-title">
-        <h1 id="results-title">Your recommendations</h1>
-        <p className="results-lede">
-          Three suits that fit {summary.occasion}, in a fit that feels {summary.fit}. Each one is
-          sized from your answers, and your best match is selected.
-        </p>
+        <div className="results-hero">
+          <MatchRing percent={recommendations[0].matchPercent} />
+          <div className="results-hero-copy">
+            <p className="results-eyebrow">Your fit is in</p>
+            <h1 id="results-title">We found your suit.</h1>
+            <p className="results-lede">
+              Three suits for {summary.occasion}, in a fit that feels {summary.fit}. Your best match
+              is selected.
+            </p>
+          </div>
+          <ul className="fit-stats">
+            <li className="fit-stat">
+              <img src="/icons/product_modernfit.svg" alt="" />
+              <span className="fit-stat-label">Jacket</span>
+              <strong>{size.jacket ?? `${size.length} (${size.lengthCode})`}</strong>
+            </li>
+            <li className="fit-stat">
+              <img src="/icons/product_size.svg" alt="" />
+              <span className="fit-stat-label">Pants</span>
+              <strong>{size.pants ?? "Measured in store"}</strong>
+            </li>
+            <li className="fit-stat">
+              <img src="/icons/product_hanger.svg" alt="" />
+              <span className="fit-stat-label">Tailoring</span>
+              <strong>{recommendedTailoring.name}</strong>
+            </li>
+          </ul>
+        </div>
         <p className="based-on">
           Based on: {basedOn}{" "}
           <button className="text-link" type="button" onClick={onEditAnswers}>Edit answers</button>
@@ -183,6 +219,11 @@ export default function Results({ answers, onEditAnswers }) {
                         {option.id === summary.tailoring.id && <span className="tier-tag">Our pick for you</span>}
                       </span>
                       <span className="tier-detail">{option.detail}</span>
+                      <span className="tier-total">
+                        {option.price
+                          ? `${formatPrice(selected.price + option.price)} with this suit`
+                          : `${formatPrice(selected.price)}, suit only`}
+                      </span>
                     </span>
                     <span className="tier-price">{option.price ? `+${formatPrice(option.price)}` : "$0"}</span>
                   </label>

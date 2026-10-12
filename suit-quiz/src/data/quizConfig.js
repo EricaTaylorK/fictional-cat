@@ -97,6 +97,24 @@ export const questions = {
       { value: "extra-tall", label: "6′4″ or taller" },
     ],
   },
+  everydaySizes: {
+    id: "everydaySizes",
+    title: "What sizes do you usually buy?",
+    help: "Your everyday shirt and jeans sizes are enough for us to work out your jacket and pants.",
+    type: "sizes",
+    groups: [
+      {
+        id: "shirt",
+        label: "T-shirt or casual shirt",
+        options: ["S", "M", "L", "XL", "XXL"].map((value) => ({ value, label: value })),
+      },
+      {
+        id: "waist",
+        label: "Jeans or pants waist",
+        options: [28, 29, 30, 31, 32, 33, 34, 36, 38, 40, 42, 44].map((value) => ({ value: String(value), label: String(value) })),
+      },
+    ],
+  },
   wearIntent: {
     id: "wearIntent",
     title: "Is this for one moment, or more?",
@@ -142,7 +160,7 @@ export function getQuestionFlow(answers) {
     return [...start, "measurements", ...commonEnd];
   }
   if (answers.measurementKnowledge === "no") {
-    return [...start, "fitIssues", "height", ...commonEnd];
+    return [...start, "everydaySizes", "fitIssues", "height", ...commonEnd];
   }
   return start;
 }

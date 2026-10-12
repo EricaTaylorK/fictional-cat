@@ -37,6 +37,7 @@ describe("quiz routing", () => {
   it("routes unknown measurements through fit issues and height", () => {
     expect(getQuestionFlow({ measurementKnowledge: "no" })).toContain("fitIssues");
     expect(getQuestionFlow({ measurementKnowledge: "no" })).toContain("height");
+    expect(getQuestionFlow({ measurementKnowledge: "no" })).toContain("everydaySizes");
     expect(getQuestionFlow({ measurementKnowledge: "no" })).not.toContain("measurements");
   });
 });
@@ -125,7 +126,19 @@ describe("recommendations", () => {
 
   it("splits the size into jacket and pants for the product card", () => {
     expect(getSizeEstimate(baseAnswers)).toEqual({ jacket: "40R", pants: "34W", length: "Regular", lengthCode: "R" });
-    expect(getSizeEstimate({ measurementKnowledge: "no", height: "short" })).toEqual({ jacket: null, pants: null, length: "Short", lengthCode: "S" });
+  });
+
+  it("always gives a jacket and a pants size from everyday sizes", () => {
+    expect(getSizeEstimate({
+      measurementKnowledge: "no",
+      height: "short",
+      everydaySizes: { shirt: "L", waist: "36" },
+    })).toEqual({ jacket: "42S", pants: "36W", length: "Short", lengthCode: "S" });
+  });
+
+  it("fills in the missing size when only one measurement is known", () => {
+    expect(getSizeEstimate({ measurements: { waist: "34" } })).toMatchObject({ jacket: "40R", pants: "34W" });
+    expect(getSizeEstimate({ measurements: { jacket: "42" } })).toMatchObject({ jacket: "42R", pants: "36W" });
   });
 
   it("breaks exact ties by original assortment order", () => {
