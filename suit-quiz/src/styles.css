@@ -470,12 +470,10 @@ h2 {
   font-size: var(--font-size-14);
   font-weight: var(--font-weight-medium);
   letter-spacing: 0.01em;
-  border-radius: 999px;
   min-height: 56px;
   min-width: 186px;
   padding: var(--spacing-vertical-lg) var(--spacing-horizontal-xl);
   text-transform: uppercase;
-  transition: background 150ms ease;
 }
 
 .button:hover:not(:disabled) {
@@ -508,9 +506,8 @@ h2 {
 }
 
 .button:disabled {
-  background: var(--color-secondary-light-blue);
-  color: var(--color-font-white);
   cursor: not-allowed;
+  opacity: 0.4;
 }
 
 .app-shell-wide {
