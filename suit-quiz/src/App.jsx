@@ -51,6 +51,11 @@ function ChoiceQuestion({ question, value, onChange }) {
               <strong>{option.label}</strong>
               {option.detail && <span>{option.detail}</span>}
             </span>
+            <span className={`choice-mark${isMulti ? " choice-mark-multi" : ""}`} aria-hidden="true">
+              <svg viewBox="0 0 16 16" width="14" height="14">
+                <path fill="currentColor" d="M6.3 12.2 1.8 7.7l1.2-1.2 3.3 3.3 6.7-6.7 1.2 1.2-7.9 7.9Z" />
+              </svg>
+            </span>
           </label>
         );
       })}
@@ -291,14 +296,9 @@ export default function App() {
           )}
         </div>
       </header>
-      {screen === "question" && (
-        <div className="header-progress" aria-hidden="true">
-          <div className="header-progress-fill" style={{ width: `${((currentIndex + 1) / totalQuestions) * 100}%` }} />
-        </div>
-      )}
       <main className={`app-shell${screen === "results" ? " app-shell-wide" : ""}`}>
         {screen === "start" && (
-          <section className="wire-panel" aria-labelledby="start-title">
+          <section className="wire-panel start-panel" aria-labelledby="start-title">
             <p className="eyebrow">Suit finder</p>
             <h1 id="start-title">Get it right for the moment.</h1>
             <p className="lede">
@@ -323,6 +323,11 @@ export default function App() {
 
         {screen === "question" && currentQuestion && (
           <section className="wire-panel" aria-labelledby="question-title">
+            <ol className="quiz-steps" aria-hidden="true">
+              {Array.from({ length: totalQuestions }, (_, index) => (
+                <li className={index <= currentIndex ? "quiz-step-done" : undefined} key={index} />
+              ))}
+            </ol>
             <div className="progress-row">
               <span>Question {currentIndex + 1} of {totalQuestions}</span>
               <span className="save-note">Progress saved on this device</span>

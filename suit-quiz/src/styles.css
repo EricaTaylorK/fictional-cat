@@ -11,13 +11,7 @@
 }
 
 body {
-  background-color: #e8eef6;
-  background-image: url("/backgrounds/wash.jpg");
-  background-attachment: fixed;
-  background-position: center top;
-  background-size: cover;
   margin: 0;
-  min-height: 100vh;
   min-width: 320px;
 }
 
@@ -51,22 +45,30 @@ select:focus-visible,
   text-align: center;
 }
 
-.header-progress {
-  background: var(--color-divider-light-gray);
-  height: 4px;
+.quiz-steps {
+  display: flex;
+  gap: var(--spacing-horizontal-xs);
+  list-style: none;
+  margin: 0 0 var(--spacing-vertical-xl);
+  padding: 0;
 }
 
-.header-progress-fill {
+.quiz-steps li {
+  background: var(--color-info-light-blue);
+  border-radius: 999px;
+  flex: 1 1 0;
+  height: 6px;
+  transition: background 200ms ease;
+}
+
+.quiz-steps .quiz-step-done {
   background: var(--color-background-dark-blue);
-  height: 100%;
-  transition: width 0.2s ease;
 }
 
 .site-header {
   align-items: center;
-  background: rgba(255, 255, 255, 0.56);
-  backdrop-filter: blur(12px);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  background: var(--surface-primary);
+  border-bottom: 1px solid var(--border-primary);
   display: grid;
   gap: var(--spacing-horizontal-md);
   grid-template-columns: 1fr auto 1fr;
@@ -120,9 +122,16 @@ select:focus-visible,
 }
 
 .wire-panel {
-  background: transparent;
-  border: 0;
-  padding: clamp(8px, 2vw, 16px) 0 clamp(24px, 5vw, 48px);
+  background: var(--surface-primary);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--border-radius-xl);
+  padding: clamp(24px, 5vw, 48px);
+}
+
+.start-panel {
+  background: var(--surface-primary) url("/backgrounds/wash.jpg") center / cover no-repeat;
+  border-color: transparent;
+  padding-block: clamp(48px, 9vw, 96px);
 }
 
 .wire-panel h1,
@@ -242,21 +251,60 @@ h2 {
 }
 
 .choice {
-  align-items: flex-start;
-  background: var(--surface-primary);
-  border: 1px solid var(--border-primary);
+  align-items: center;
+  background: var(--color-info-light-blue);
+  border: 0;
+  border-radius: var(--border-radius-lg);
   display: flex;
   gap: var(--spacing-horizontal-md);
-  padding: var(--spacing-vertical-lg);
+  padding: var(--spacing-vertical-lg) var(--spacing-horizontal-lg);
+  position: relative;
+  transition: background 150ms ease;
+}
+
+.choice:hover {
+  background: color-mix(in srgb, var(--color-info-light-blue) 60%, var(--color-secondary-light-blue));
 }
 
 .choice:has(input:checked) {
   background: var(--color-secondary-light-blue);
-  border-color: var(--color-background-dark-blue);
 }
 
 .choice input {
-  margin-top: 5px;
+  height: 1px;
+  margin: 0;
+  opacity: 0;
+  position: absolute;
+  width: 1px;
+}
+
+.choice-copy {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.choice-mark {
+  align-items: center;
+  background: var(--color-transparent-white80);
+  border: 1.5px solid var(--color-divider-light-gray);
+  border-radius: var(--border-radius-circle);
+  color: transparent;
+  display: inline-flex;
+  flex: 0 0 auto;
+  height: 28px;
+  justify-content: center;
+  transition: background 150ms ease, border-color 150ms ease, color 150ms ease;
+  width: 28px;
+}
+
+.choice-mark-multi {
+  border-radius: var(--border-radius-md);
+}
+
+.choice:has(input:checked) .choice-mark {
+  background: var(--color-background-dark-blue);
+  border-color: var(--color-background-dark-blue);
+  color: var(--color-font-white);
 }
 
 .choice-copy strong,
@@ -392,6 +440,7 @@ h2 {
 .field input {
   background: var(--surface-primary);
   border: 1px solid var(--border-strong);
+  border-radius: var(--border-radius-md);
   min-height: 48px;
   padding: var(--spacing-vertical-md) var(--spacing-horizontal-md);
   width: 100%;
@@ -421,10 +470,12 @@ h2 {
   font-size: var(--font-size-14);
   font-weight: var(--font-weight-medium);
   letter-spacing: 0.01em;
+  border-radius: 999px;
   min-height: 56px;
   min-width: 186px;
   padding: var(--spacing-vertical-lg) var(--spacing-horizontal-xl);
   text-transform: uppercase;
+  transition: background 150ms ease;
 }
 
 .button:hover:not(:disabled) {
@@ -457,8 +508,9 @@ h2 {
 }
 
 .button:disabled {
+  background: var(--color-secondary-light-blue);
+  color: var(--color-font-white);
   cursor: not-allowed;
-  opacity: 0.4;
 }
 
 .app-shell-wide {
@@ -521,8 +573,9 @@ h2 {
 
 .size-chip span {
   align-items: center;
-  background: var(--surface-primary);
-  border: 1px solid var(--border-primary);
+  background: var(--color-info-light-blue);
+  border: 1px solid transparent;
+  border-radius: var(--border-radius-md);
   display: inline-flex;
   font-size: var(--font-size-14);
   height: 44px;
@@ -543,8 +596,8 @@ h2 {
 }
 
 .matching {
-  background: var(--surface-primary);
-  border: 1px solid var(--border-primary);
+  background: var(--surface-primary) url("/backgrounds/wash.jpg") center / cover no-repeat;
+  border-radius: var(--border-radius-xl);
   margin: 0 auto;
   max-width: 560px;
   padding: clamp(32px, 6vw, 56px) clamp(24px, 5vw, 48px);
@@ -565,6 +618,7 @@ h2 {
 
 .matching-scan {
   align-items: center;
+  background: var(--surface-primary);
   border: 2px solid var(--color-divider-light-gray);
   border-radius: var(--border-radius-circle);
   display: inline-flex;
@@ -1345,6 +1399,8 @@ h2 {
 }
 
 .email-box {
+  background: var(--surface-primary) url("/backgrounds/wash-wide.jpg") center / cover no-repeat;
+  border-color: transparent;
   margin-top: var(--spacing-vertical-lg);
   padding: var(--spacing-vertical-lg) var(--spacing-vertical-xl);
 }
@@ -1483,6 +1539,22 @@ h2 {
 
   .logo {
     justify-self: center;
+  }
+
+  .app-shell:not(.app-shell-wide) {
+    padding: 0 0 var(--spacing-vertical-xxl);
+  }
+
+  .wire-panel,
+  .matching {
+    border: 0;
+    border-radius: 0;
+    min-height: calc(100vh - 120px);
+    padding: var(--spacing-vertical-lg) var(--spacing-horizontal-lg) var(--spacing-vertical-xl);
+  }
+
+  .progress-row .save-note {
+    display: none;
   }
 
   .logo img {
