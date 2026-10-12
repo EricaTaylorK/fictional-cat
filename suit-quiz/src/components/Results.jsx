@@ -32,10 +32,23 @@ const outfitOptions = [
   { id: "shoes", summaryLabel: "Dress shoes", name: "Black Cap-Toe Oxfords", price: 119.99, image: "/outfit/black-dress-shoes.jpg" },
 ];
 
-function sizeDetail(size) {
-  if (size.jacket) return `Your size: ${size.jacket} jacket · ${size.pants} pants`;
-  if (size.length) return `Your size: ${size.length} (${size.lengthCode})`;
+function jacketSize(size) {
+  if (size.jacket) return size.jacket;
+  if (size.length) return `${size.length} (${size.lengthCode})`;
   return null;
+}
+
+function PieceLine({ label, color, size, piece }) {
+  return (
+    <li className="piece-line">
+      <span className="piece-name">{label}</span>
+      <span className="piece-meta">{[color, size].filter(Boolean).join(" · ")}</span>
+      <span className="piece-price">
+        {piece.compareAt && <s>{formatPrice(piece.compareAt)}</s>}
+        {formatPrice(piece.price)}
+      </span>
+    </li>
+  );
 }
 
 function SuitOption({ product, size, recommendedTailoring, selected, onSelect }) {
@@ -56,13 +69,8 @@ function SuitOption({ product, size, recommendedTailoring, selected, onSelect })
         <span className="match-score">{product.matchPercent}% match</span>
         <p className="product-brand">{product.brand}</p>
         <h3 className="product-title">{product.name}</h3>
-        <p className="product-price">
-          <strong>{formatPrice(product.price)}</strong>
-          {product.compareAt && <s>{formatPrice(product.compareAt)}</s>}
-        </p>
         <p className="product-meta">
-          {product.color} · {product.fabric}
-          {sizeDetail(size) && <> · {sizeDetail(size)}</>}
+          {product.fabric}
           {product.reviews >= 100 && (
             <span className="product-rating">
               <img src="/icons/content_starfilled.svg" alt="" />
@@ -70,10 +78,20 @@ function SuitOption({ product, size, recommendedTailoring, selected, onSelect })
             </span>
           )}
         </p>
-        <p className="panel-prices">
-          <span>Suit only <strong>{formatPrice(product.price)}</strong></span>
-          <span>With {recommendedTailoring.name} <strong>{formatPrice(product.price + recommendedTailoring.price)}</strong></span>
-        </p>
+        <ul className="piece-lines">
+          <PieceLine label="Jacket" color={product.color} size={jacketSize(size)} piece={product.jacket} />
+          <PieceLine label="Pants" color={product.color} size={size.pants} piece={product.pants} />
+        </ul>
+        <dl className="price-pair">
+          <div>
+            <dt>Suit</dt>
+            <dd>{formatPrice(product.price)}</dd>
+          </div>
+          <div className="price-pair-tailored">
+            <dt>Suit + {recommendedTailoring.name}</dt>
+            <dd>{formatPrice(product.price + recommendedTailoring.price)}</dd>
+          </div>
+        </dl>
       </div>
       <div className="suit-panel">
         <h4 className="reason-title">Why it's a strong pick</h4>
@@ -160,48 +178,35 @@ export default function Results({ answers, onEditAnswers }) {
                 the fit, so it looks and feels made for you.
               </p>
               <div className="fit-pick">
-                <p className="fit-pick-label">Our pick for you: {recommendedTailoring.name}</p>
+                <p className="fit-pick-label">We recommend {recommendedTailoring.name}</p>
                 <p>{summary.tailoring.because}</p>
               </div>
               <div className="tier-list" role="radiogroup" aria-labelledby="tailoring-title">
-                {tailoringPackages.map((option) => {
-                  const recommended = option.id === summary.tailoring.id;
-                  return (
-                    <label className={`tier${recommended ? " tier-recommended" : ""}`} key={option.id}>
-                      {recommended && <span className="tier-tag">Recommended for your fit</span>}
-                      <input
-                        className="visually-hidden"
-                        type="radio"
-                        name="tailoring-package"
-                        value={option.id}
-                        checked={tailoringId === option.id}
-                        onChange={() => setTailoringId(option.id)}
-                      />
-                      <img className="tier-icon" src={option.icon} alt="" />
-                      <span className="tier-copy">
-                        <span className="tier-name">{option.name}</span>
-                        <span className="tier-detail">{option.detail}</span>
+                {[...tailoringPackages, {
+                  id: "none",
+                  name: "No tailoring for now",
+                  price: 0,
+                  detail: "Take the suit as it is. You can add tailoring in store later.",
+                }].map((option) => (
+                  <label className="tier" key={option.id}>
+                    <input
+                      className="tier-radio"
+                      type="radio"
+                      name="tailoring-package"
+                      value={option.id}
+                      checked={tailoringId === option.id}
+                      onChange={() => setTailoringId(option.id)}
+                    />
+                    <span className="tier-copy">
+                      <span className="tier-name">
+                        {option.name}
+                        {option.id === summary.tailoring.id && <span className="tier-tag">Our pick for you</span>}
                       </span>
-                      <span className="tier-price">+{formatPrice(option.price)}</span>
-                    </label>
-                  );
-                })}
-                <label className="tier tier-none">
-                  <span className="tier-icon tier-icon-empty" aria-hidden="true" />
-                  <input
-                    className="visually-hidden"
-                    type="radio"
-                    name="tailoring-package"
-                    value="none"
-                    checked={tailoringId === "none"}
-                    onChange={() => setTailoringId("none")}
-                  />
-                  <span className="tier-copy">
-                    <span className="tier-name">No tailoring for now</span>
-                    <span className="tier-detail">Take the suit as it is. You can add tailoring in store later.</span>
-                  </span>
-                  <span className="tier-price">$0</span>
-                </label>
+                      <span className="tier-detail">{option.detail}</span>
+                    </span>
+                    <span className="tier-price">{option.price ? `+${formatPrice(option.price)}` : "$0"}</span>
+                  </label>
+                ))}
               </div>
             </section>
 
@@ -240,13 +245,16 @@ export default function Results({ answers, onEditAnswers }) {
               <li>
                 <span>Jacket{size.jacket ? ` · ${size.jacket}` : size.length ? ` · ${size.length} (${size.lengthCode})` : ""}</span>
                 <span className="summary-amount">
-                  {selected.compareAt && <s>{formatPrice(selected.compareAt)}</s>}
-                  {formatPrice(selected.price)}
+                  {selected.jacket.compareAt && <s>{formatPrice(selected.jacket.compareAt)}</s>}
+                  {formatPrice(selected.jacket.price)}
                 </span>
               </li>
               <li>
                 <span>Pants{size.pants ? ` · ${size.pants}` : ""}</span>
-                <span className="summary-amount">Included</span>
+                <span className="summary-amount">
+                  {selected.pants.compareAt && <s>{formatPrice(selected.pants.compareAt)}</s>}
+                  {formatPrice(selected.pants.price)}
+                </span>
               </li>
               {tailoring && (
                 <li>
@@ -278,11 +286,7 @@ export default function Results({ answers, onEditAnswers }) {
             Prototype: this would add the suit in your sizes{tailoring ? ", the tailoring," : ""} and the add-ons to your bag.
           </p>
         )}
-        <p className="summary-note">
-          {selected && !tailoringId
-            ? `${recommendedTailoring.name} would bring this to ${formatPrice(selected.price + recommendedTailoring.price)}.`
-            : "Tailoring is finished in store after checkout."}
-        </p>
+        {tailoring && <p className="summary-note">Tailoring is finished in store after checkout.</p>}
       </aside>
 
       <div className="results-extra">
