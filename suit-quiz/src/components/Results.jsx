@@ -25,7 +25,7 @@ export default function Results({ answers, onEditAnswers }) {
   const summary = useMemo(() => buildResultSummary(answers), [answers]);
   const [selectedId, setSelectedId] = useState(recommendations[0].id);
   const [tailoringId, setTailoringId] = useState(
-    answers.tailoring === "bundle" ? "signature" : answers.tailoring === "consider" ? "essentials" : "none",
+    answers.tailoring === "skip" ? "none" : summary.tailoring.id,
   );
   const [selectedExtras, setSelectedExtras] = useState([]);
   const [handoff, setHandoff] = useState("");
@@ -65,6 +65,9 @@ export default function Results({ answers, onEditAnswers }) {
           <li><strong>Occasion</strong>{summary.occasion}</li>
           <li><strong>Fit target</strong>{summary.fit}</li>
           <li><strong>Likely size</strong>{summary.size}</li>
+          {summary.fitNotes.length > 0 && (
+            <li><strong>Fit notes</strong>{summary.fitNotes.join(", ")}</li>
+          )}
         </ul>
         <button className="button link" type="button" onClick={onEditAnswers}>Edit my answers</button>
       </div>
@@ -149,8 +152,11 @@ export default function Results({ answers, onEditAnswers }) {
                 onChange={() => setTailoringId(option.id)}
               />
               <span className="choice-copy">
-                <strong>{option.name} · {option.price ? money.format(option.price) : "$0"}</strong>
-                <span>{option.detail}</span>
+                <strong>
+                  {option.name} · {option.price ? money.format(option.price) : "$0"}
+                  {option.id === summary.tailoring.id && <span className="recommended-tag">Recommended for your fit</span>}
+                </strong>
+                <span>{option.id === summary.tailoring.id ? summary.tailoring.reason : option.detail}</span>
               </span>
             </label>
           ))}

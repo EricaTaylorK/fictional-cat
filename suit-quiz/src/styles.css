@@ -232,11 +232,118 @@ h2 {
   margin-top: 2px;
 }
 
+.choice-copy .recommended-tag {
+  background: var(--color-info-light-blue);
+  color: var(--text-tertiary);
+  display: inline-block;
+  font-size: var(--font-size-12);
+  font-weight: var(--font-weight-medium);
+  margin: 0 0 0 var(--spacing-horizontal-sm);
+  padding: 0 var(--spacing-horizontal-xs);
+  vertical-align: middle;
+}
+
 .field-grid {
+  align-items: start;
   display: grid;
-  gap: 16px;
-  grid-template-columns: repeat(2, 1fr);
-  margin: 24px 0 32px;
+  gap: var(--spacing-vertical-lg) var(--spacing-horizontal-lg);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin: var(--spacing-vertical-xl) 0 var(--spacing-vertical-xxl);
+}
+
+.field-pair {
+  border: 0;
+  display: grid;
+  gap: var(--spacing-horizontal-sm);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin: 0;
+  min-width: 0;
+  padding: 0;
+}
+
+.visually-hidden {
+  border: 0;
+  clip: rect(0, 0, 0, 0);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
+}
+
+.text-input {
+  display: flex;
+  flex-direction: column;
+  font-family: var(--font-family-roboto);
+  min-width: 0;
+}
+
+.text-input-row {
+  background-color: var(--color-neutral-white);
+  border: var(--border-width-xs) var(--border-style-solid) var(--color-transparent-black10);
+  border-radius: var(--border-radius-sm);
+  height: var(--spacing-vertical-xxxxxxl);
+  position: relative;
+  transition: border-color 0.2s ease;
+}
+
+.text-input-row:hover,
+.text-input-row:focus-within {
+  border-color: var(--color-transparent-black70);
+}
+
+.text-input-row:has(.text-input-field:focus-visible) {
+  border-color: var(--input-border-focus);
+}
+
+.text-input-field {
+  background: transparent;
+  border: 0;
+  color: var(--color-font-black);
+  font-family: var(--font-family-roboto);
+  font-size: var(--font-size-14);
+  height: 100%;
+  line-height: var(--line-height-20);
+  outline: none;
+  padding: 30px var(--spacing-horizontal-lg) var(--spacing-vertical-md);
+  width: 100%;
+}
+
+.text-input-field:focus-visible {
+  outline: none;
+}
+
+.text-input-field::placeholder {
+  color: transparent;
+}
+
+.text-input-label {
+  color: var(--input-text-secondary);
+  font-size: var(--font-size-14);
+  left: var(--spacing-horizontal-lg);
+  letter-spacing: 0.24px;
+  line-height: var(--line-height-20);
+  pointer-events: none;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  transition: 0.2s ease all;
+}
+
+.text-input-field:focus + .text-input-label,
+.text-input-field:not(:placeholder-shown) + .text-input-label {
+  font-size: var(--font-size-12);
+  top: var(--font-size-20);
+}
+
+.text-input-helper {
+  color: var(--color-font-medium-gray);
+  font-size: var(--font-size-12);
+  letter-spacing: 0.24px;
+  line-height: var(--line-height-14);
+  margin: var(--spacing-vertical-xs) 0 0;
 }
 
 .field {
@@ -244,12 +351,7 @@ h2 {
   gap: 6px;
 }
 
-.field label {
-  font-weight: 700;
-}
-
-.field input,
-.field select {
+.field input {
   background: var(--surface-primary);
   border: 1px solid var(--border-strong);
   min-height: 48px;

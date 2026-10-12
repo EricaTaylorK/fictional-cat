@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import Results from "./components/Results.jsx";
+import TextInput from "./components/TextInput.jsx";
 import { getQuestionFlow, questions } from "./data/quizConfig.js";
 
 const STORAGE_KEY = "suit-quiz-wireframe-progress";
@@ -19,16 +20,18 @@ function ChoiceQuestion({ question, value, onChange }) {
   const selectedValues = isMulti ? value ?? [] : [];
 
   function toggleMulti(optionValue) {
-    if (optionValue === "none") {
-      onChange(selectedValues.includes("none") ? [] : ["none"]);
+    if (selectedValues.includes(optionValue)) {
+      onChange(selectedValues.filter((item) => item !== optionValue));
       return;
     }
-    const withoutNone = selectedValues.filter((item) => item !== "none");
-    onChange(
-      withoutNone.includes(optionValue)
-        ? withoutNone.filter((item) => item !== optionValue)
-        : [...withoutNone, optionValue],
-    );
+    const option = question.options.find((item) => item.value === optionValue);
+    if (option.exclusive) {
+      onChange([optionValue]);
+      return;
+    }
+    const exclusiveValues = question.options.filter((item) => item.exclusive).map((item) => item.value);
+    const blocked = new Set([...exclusiveValues, ...(option.excludes ?? [])]);
+    onChange([...selectedValues.filter((item) => !blocked.has(item)), optionValue]);
   }
 
   return (
@@ -62,26 +65,37 @@ function MeasurementsQuestion({ value = {}, onChange }) {
 
   return (
     <div className="field-grid">
-      <div className="field">
-        <label htmlFor="jacket">Jacket size</label>
-        <input id="jacket" inputMode="numeric" placeholder="e.g. 40" value={value.jacket ?? ""} onChange={(event) => update("jacket", event.target.value)} />
-        <span className="field-hint">The number before S, R, or L</span>
-      </div>
-      <div className="field">
-        <label htmlFor="chest">Chest in inches</label>
-        <input id="chest" inputMode="numeric" placeholder="e.g. 40" value={value.chest ?? ""} onChange={(event) => update("chest", event.target.value)} />
-      </div>
-      <div className="field">
-        <label htmlFor="waist">Waist in inches</label>
-        <input id="waist" inputMode="numeric" placeholder="e.g. 34" value={value.waist ?? ""} onChange={(event) => update("waist", event.target.value)} />
-      </div>
-      <div className="field">
-        <label htmlFor="height-feet">Height</label>
-        <div style={{ display: "flex", gap: 8 }}>
-          <input id="height-feet" inputMode="numeric" aria-label="Height in feet" placeholder="ft" value={value.heightFeet ?? ""} onChange={(event) => update("heightFeet", event.target.value)} />
-          <input inputMode="numeric" aria-label="Additional height in inches" placeholder="in" value={value.heightInches ?? ""} onChange={(event) => update("heightInches", event.target.value)} />
-        </div>
-      </div>
+      <TextInput
+        label="Jacket size"
+        value={value.jacket}
+        onChange={(next) => update("jacket", next)}
+        helperText="The number on the tag before S, R, or L, like 40"
+      />
+      <TextInput
+        label="Chest (inches)"
+        value={value.chest}
+        onChange={(next) => update("chest", next)}
+        helperText="Around the fullest part of your chest"
+      />
+      <TextInput
+        label="Waist (inches)"
+        value={value.waist}
+        onChange={(next) => update("waist", next)}
+        helperText="Where your dress pants usually sit"
+      />
+      <fieldset className="field-pair">
+        <legend className="visually-hidden">Height</legend>
+        <TextInput
+          label="Height (ft)"
+          value={value.heightFeet}
+          onChange={(next) => update("heightFeet", next)}
+        />
+        <TextInput
+          label="Height (in)"
+          value={value.heightInches}
+          onChange={(next) => update("heightInches", next)}
+        />
+      </fieldset>
     </div>
   );
 }
