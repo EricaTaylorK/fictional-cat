@@ -100,16 +100,29 @@ function inferPantWaist(answers, jacketSize) {
   return jacketSize - STANDARD_DROP;
 }
 
-export function inferLikelySize(answers) {
+export function getSizeEstimate(answers) {
   const length = inferLength(answers);
   const entered = Number(answers.measurements?.jacket || answers.measurements?.chest);
   if (!entered) {
+    return { jacket: null, pants: null, length: length ? LENGTH_NAMES[length] : null };
+  }
+  const jacketSize = Math.round(entered / 2) * 2;
+  return {
+    jacket: `${jacketSize}${length ?? "R"}`,
+    pants: `${inferPantWaist(answers, jacketSize)}W`,
+    length: LENGTH_NAMES[length ?? "R"],
+  };
+}
+
+export function inferLikelySize(answers) {
+  const length = inferLength(answers);
+  const estimate = getSizeEstimate(answers);
+  if (!estimate.jacket) {
     return length
       ? `${LENGTH_NAMES[length]} (${length}) length; confirm chest size at a fitting`
       : "Confirm your size with a fitting";
   }
-  const jacketSize = Math.round(entered / 2) * 2;
-  return `${jacketSize}${length ?? "R"} jacket, ${inferPantWaist(answers, jacketSize)} waist pants`;
+  return `${estimate.jacket} jacket, ${estimate.pants.replace("W", "")} waist pants`;
 }
 
 export function recommendTailoring(answers) {
@@ -126,6 +139,19 @@ export function recommendTailoring(answers) {
   return { id: "essentials", reason: "Every suit needs a hem and a sleeve check." };
 }
 
+const budgetLabels = {
+  "under-250": "under-$250 budget",
+  "250-400": "$250–$400 budget",
+  "400-600": "$400–$600 budget",
+  "over-600": "$600+ budget",
+};
+
+const priceFormat = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" });
+
+export function formatPrice(price) {
+  return priceFormat.format(price).replace(/\.00$/, "");
+}
+
 function scoreFitSignals(product, answers, evidence) {
   const signals = getFitSignals(answers);
   let score = 0;
@@ -135,8 +161,10 @@ function scoreFitSignals(product, answers, evidence) {
     if (product.fit === "balanced") score += 4;
     if (product.fit === "close") score -= 8;
     if (product.stretch) score += 6;
-    if (product.fit !== "close" || product.stretch) {
-      evidence.push("Extra room through the shoulders and back, where tailoring can't add it later.");
+    if (product.fit !== "close") {
+      evidence.push(`The ${product.fitName.toLowerCase()} leaves room through the shoulders and back, which a tailor can't add later.`);
+    } else if (product.stretch) {
+      evidence.push("Stretch in the fabric gives across the shoulders and back when you reach.");
     }
   }
 
@@ -144,38 +172,38 @@ function scoreFitSignals(product, answers, evidence) {
     if (product.fit === "close") score += 12;
     if (product.fit === "balanced") score += 6;
     if (product.fit === "roomy") score -= 10;
-    if (product.separates) {
-      score += 12;
-      evidence.push("Jacket and pants are sized separately, so the pants can fit your trimmer waist.");
-    } else if (product.fit === "close") {
-      evidence.push("A tapered cut that follows a broad chest down to a trimmer waist.");
+    if (product.stretch) score += 4;
+    if (product.fit === "close") {
+      evidence.push(`The ${product.fitName.toLowerCase()} tapers from a broad chest down to a trimmer waist.`);
+    } else if (product.fit === "balanced") {
+      evidence.push("Fits a broad chest, and a tailor can take in the jacket and pants waist.");
     }
   }
 
   if (signals.has("fullerMidsection")) {
-    if (product.fit === "roomy") score += 14;
-    if (product.fit === "balanced") score += 4;
-    if (product.fit === "close") score -= 16;
-    if (product.separates) {
-      score += 12;
-      evidence.push("Jacket and pants are sized separately, so you get room at the waist without a bigger jacket.");
-    } else if (product.fit === "roomy") {
-      evidence.push("A classic cut with room at the button and waist.");
+    if (product.fit === "roomy") score += 28;
+    if (product.fit === "close") score -= 20;
+    if (product.fit === "roomy") {
+      evidence.push(`The ${product.fitName.toLowerCase()} gives room at the button and waist, so nothing pulls.`);
     }
   }
 
   if (signals.has("seatThighs")) {
+    if (product.fit === "roomy") score += 20;
+    if (product.stretch) score += 10;
+    if (product.fit === "close" && !product.stretch) score -= 14;
     if (product.stretch) {
-      score += 18;
-      evidence.push("Stretch fabric gives through the seat and thighs when you sit or move.");
-    } else {
-      score -= 8;
+      evidence.push("Stretch in the fabric gives through the seat and thighs when you sit or move.");
+    } else if (product.fit === "roomy") {
+      evidence.push(`The ${product.fitName.toLowerCase()} cuts the pants fuller through the seat and thighs.`);
     }
-    if (product.fit === "roomy") score += 8;
-    if (product.fit === "close") score -= 12;
   }
 
   return score;
+}
+
+function isAdjacentFit(fit, feel) {
+  return fit === "balanced" || feel === "balanced";
 }
 
 function scoreProduct(product, answers, index) {
@@ -185,7 +213,7 @@ function scoreProduct(product, answers, index) {
 
   if (product.formality.includes(answers.occasion)) {
     score += 32;
-    evidence.push(`It reads correctly for ${occasionLabels[answers.occasion]}.`);
+    evidence.push(product.occasionNotes?.[answers.occasion] ?? `It reads correctly for ${occasionLabels[answers.occasion]}.`);
   } else {
     score -= 18;
   }
@@ -194,21 +222,29 @@ function scoreProduct(product, answers, index) {
 
   if (product.fit === answers.feel) {
     score += 26;
-    evidence.push(`The fit matches how you want it to feel: ${fitLabels[answers.feel]}.`);
-  } else if (product.fit === "balanced") {
+    evidence.push(product.cutNote ?? `The fit matches how you want it to feel: ${fitLabels[answers.feel]}.`);
+  } else if (isAdjacentFit(product.fit, answers.feel)) {
     score += 9;
   }
 
   if (product.price >= budgetMin && product.price <= budgetMax) {
     score += 18;
-    evidence.push(answers.budget === "flexible" ? "Chosen for the moment and the fit, with room in the budget." : "It sits inside the budget you set.");
+    if (budgetLabels[answers.budget]) {
+      evidence.push(product.compareAt
+        ? `On sale at ${formatPrice(product.price)} (was ${formatPrice(product.compareAt)}), inside your ${budgetLabels[answers.budget]}.`
+        : `${formatPrice(product.price)}, inside your ${budgetLabels[answers.budget]}.`);
+    }
   } else if (answers.budget !== "flexible") {
     score -= Math.min(18, Math.ceil(Math.abs(product.price - Math.min(Math.max(product.price, budgetMin), budgetMax)) / 20));
   }
 
+  if (product.reviews >= 100) {
+    evidence.push(`Rated ${product.rating} out of 5 by ${product.reviews.toLocaleString("en-US")} shoppers.`);
+  }
+
   if (answers.wearIntent === "rewear" || answers.wearIntent === "often") {
     score += product.versatility * 4;
-    if (product.versatility >= 4) evidence.push("The color and formality travel well past this one occasion.");
+    if (product.versatility >= 4 && product.rewearNote) evidence.push(product.rewearNote);
   } else if (product.formality.includes(answers.occasion)) {
     score += 8;
   }
@@ -216,7 +252,6 @@ function scoreProduct(product, answers, index) {
   if (answers.feel === "roomy") score += product.comfort * 2;
   if (answers.tailoring !== "skip") {
     score += product.tailoringEase * 2;
-    if (product.tailoringEase >= 4) evidence.push("There's room for a tailor to finish the fit.");
   }
   return {
     ...product,
@@ -244,6 +279,7 @@ export function buildResultSummary(answers) {
     occasion: occasionLabels[answers.occasion] ?? "your event",
     fit: fitLabels[answers.feel] ?? "a balanced fit",
     size: inferLikelySize(answers),
+    sizeEstimate: getSizeEstimate(answers),
     tailoring: recommendTailoring(answers),
     fitNotes: [...getFitSignals(answers)].map((signal) => fitNoteLabels[signal]),
     needsMeasurementHelp: isLowConfidence(answers),

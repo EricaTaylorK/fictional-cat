@@ -163,8 +163,24 @@ export default function App() {
     setState({ screen: "start", currentId: "occasion", answers: {} });
   }
 
+  function saveAndExit() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    setState((previous) => ({ ...previous, screen: "start" }));
+  }
+
+  function resumeQuiz() {
+    setState((previous) => ({ ...previous, screen: "question" }));
+  }
+
+  const hasSavedProgress = Object.keys(answers).length > 0;
+
   return (
     <>
+      <p className="promo-banner">
+        {screen === "results"
+          ? "Your sizes and today's prices are in your plan below."
+          : "Suits are on sale now. Finish the quiz to see your size and your price."}
+      </p>
       <header className="site-header">
         <div className="header-slot header-slot-start">
           {screen === "question" && (
@@ -189,12 +205,20 @@ export default function App() {
           <img src="/mw-logo.svg" alt="" />
         </a>
         <div className="header-slot header-slot-end">
-          {screen !== "start" && (
+          {screen === "question" && (
+            <button className="nav-control" type="button" onClick={saveAndExit}>Save and exit</button>
+          )}
+          {screen === "results" && (
             <button className="nav-control" type="button" onClick={restart}>Start over</button>
           )}
         </div>
       </header>
-      <main className="app-shell">
+      {screen === "question" && (
+        <div className="header-progress" aria-hidden="true">
+          <div className="header-progress-fill" style={{ width: `${((currentIndex + 1) / totalQuestions) * 100}%` }} />
+        </div>
+      )}
+      <main className={`app-shell${screen === "results" ? " app-shell-wide" : ""}`}>
         {screen === "start" && (
           <section className="wire-panel" aria-labelledby="start-title">
             <p className="eyebrow">Suit finder</p>
@@ -203,7 +227,14 @@ export default function App() {
               Tell us the occasion, how you want the suit to feel, and what you’re comfortable
               spending. We’ll turn that into a clear plan you can trust.
             </p>
-            <button className="button" type="button" onClick={startQuiz}>Find my suit</button>
+            {hasSavedProgress ? (
+              <div className="actions-right">
+                <button className="button" type="button" onClick={resumeQuiz}>Pick up where you left off</button>
+                <button className="button secondary" type="button" onClick={startQuiz}>Start fresh</button>
+              </div>
+            ) : (
+              <button className="button" type="button" onClick={startQuiz}>Find my suit</button>
+            )}
             <ul className="expectations">
               <li>About 3 minutes</li>
               <li>Results right away, email optional</li>
@@ -217,9 +248,6 @@ export default function App() {
             <div className="progress-row">
               <span>Question {currentIndex + 1} of {totalQuestions}</span>
               <span className="save-note">Progress saved on this device</span>
-            </div>
-            <div className="progress-track" aria-hidden="true">
-              <div className="progress-fill" style={{ width: `${((currentIndex + 1) / totalQuestions) * 100}%` }} />
             </div>
             <p className="eyebrow">Getting it right</p>
             <h2 id="question-title">{currentQuestion.title}</h2>

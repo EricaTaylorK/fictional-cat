@@ -4,6 +4,7 @@ import {
   buildResultSummary,
   getFitSignals,
   getRecommendations,
+  getSizeEstimate,
   inferLength,
   inferLikelySize,
   isLowConfidence,
@@ -86,20 +87,22 @@ describe("fit signals", () => {
     expect(getFitSignals({ measurements: { jacket: "42", waist: "36" } }).size).toBe(0);
   });
 
-  it("moves separates to the top for an athletic build", () => {
+  it("keeps classic cuts out of the top match for an athletic build", () => {
     const [best] = getRecommendations({ ...estimate, fitIssues: ["athleticBuild"] });
-    expect(best.separates).toBe(true);
+    expect(best.fit).not.toBe("roomy");
+    expect(best.evidence.join(" ")).toMatch(/waist/);
     expect(recommendTailoring({ fitIssues: ["athleticBuild"] }).id).toBe("signature");
   });
 
-  it("keeps slim cuts out of the top match for a fuller midsection", () => {
-    const [best] = getRecommendations({ ...estimate, feel: "roomy", fitIssues: ["fullerMidsection"] });
-    expect(best.fit).not.toBe("close");
+  it("moves a classic cut to the top for a fuller midsection", () => {
+    const [best] = getRecommendations({ ...estimate, fitIssues: ["fullerMidsection"] });
+    expect(best.fit).toBe("roomy");
   });
 
-  it("favors stretch fabric when pants are tight through the seat and thighs", () => {
+  it("favors room or stretch when pants are tight through the seat and thighs", () => {
     const [best] = getRecommendations({ ...estimate, fitIssues: ["seatThighs"] });
-    expect(best.stretch).toBe(true);
+    expect(best.fit === "roomy" || best.stretch).toBe(true);
+    expect(best.evidence.join(" ")).toMatch(/seat and thighs/);
   });
 
   it("changes the recommendation compared with standard sizes", () => {
@@ -115,7 +118,14 @@ describe("recommendations", () => {
     expect(best.formality).toContain("wedding");
     expect(best.fit).toBe("balanced");
     expect(best.evidence.length).toBeGreaterThanOrEqual(3);
+    expect(best.evidence).toContain(best.occasionNotes.wedding);
+    expect(best.evidence.some((reason) => reason.includes("$250–$400 budget"))).toBe(true);
     expect(best.bundlePrice).toBe(best.price + 85);
+  });
+
+  it("splits the size into jacket and pants for the product card", () => {
+    expect(getSizeEstimate(baseAnswers)).toEqual({ jacket: "40R", pants: "34W", length: "Regular" });
+    expect(getSizeEstimate({ measurementKnowledge: "no", height: "short" })).toEqual({ jacket: null, pants: null, length: "Short" });
   });
 
   it("breaks exact ties by original assortment order", () => {
