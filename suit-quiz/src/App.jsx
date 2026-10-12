@@ -208,6 +208,11 @@ export default function App() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
   }, [state, screen]);
 
+  useEffect(() => {
+    document.documentElement.classList.toggle("results-page", screen === "results");
+    return () => document.documentElement.classList.remove("results-page");
+  }, [screen]);
+
   function startQuiz() {
     setState({ screen: "question", currentId: "occasion", answers: {} });
   }

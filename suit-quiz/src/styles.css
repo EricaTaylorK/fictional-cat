@@ -6,6 +6,10 @@
   line-height: var(--line-height-24);
 }
 
+html.results-page {
+  background: var(--surface-primary);
+}
+
 * {
   box-sizing: border-box;
 }

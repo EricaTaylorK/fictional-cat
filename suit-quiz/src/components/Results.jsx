@@ -175,7 +175,7 @@ export default function Results({ answers, onEditAnswers }) {
             </li>
             <li className="fit-stat">
               <img src="/icons/product_hanger.svg" alt="" />
-              <span className="fit-stat-label">We'll start with</span>
+              <span className="fit-stat-label">Suggested tailoring</span>
               <strong>{recommendedTailoring?.plain}</strong>
             </li>
           </ul>
