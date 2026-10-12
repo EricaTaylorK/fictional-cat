@@ -1,9 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
+import ProductGridEntry from "./components/ProductGridEntry.jsx";
 import Results from "./components/Results.jsx";
 import TextInput from "./components/TextInput.jsx";
-import { products } from "./data/products.js";
 import { getQuestionFlow, questions } from "./data/quizConfig.js";
-import { formatPrice } from "./lib/recommendation.js";
 
 const STORAGE_KEY = "suit-quiz-wireframe-progress";
 
@@ -247,7 +246,7 @@ export default function App() {
 
   function restart() {
     localStorage.removeItem(STORAGE_KEY);
-    setState({ screen: "start", currentId: "occasion", answers: {} });
+    setState({ screen: "question", currentId: "occasion", answers: {} });
   }
 
   function saveAndExit() {
@@ -264,6 +263,10 @@ export default function App() {
   }, []);
 
   const hasSavedProgress = Object.keys(answers).length > 0;
+
+  if (screen === "start") {
+    return <ProductGridEntry onTakeQuiz={hasSavedProgress ? resumeQuiz : startQuiz} />;
+  }
 
   return (
     <>
@@ -306,52 +309,7 @@ export default function App() {
           )}
         </div>
       </header>
-      <main className={`app-shell${screen === "results" || screen === "start" ? " app-shell-wide" : ""}`}>
-        {screen === "start" && (
-          <section className="suits-listing" aria-labelledby="suits-title">
-            <nav className="crumbs" aria-label="Breadcrumb">
-              <ol>
-                <li>Home</li>
-                <li>Clothing</li>
-                <li aria-current="page">Suits</li>
-              </ol>
-            </nav>
-            <h1 id="suits-title">Men's Suits</h1>
-            <div className="quiz-banner">
-              <div className="quiz-banner-photos" aria-hidden="true">
-                {products.slice(0, 3).map((product, index) => (
-                  <img
-                    className={index === 1 ? "quiz-banner-photo-selected" : undefined}
-                    src={product.image}
-                    alt=""
-                    key={product.id}
-                  />
-                ))}
-              </div>
-              <div className="quiz-banner-copy">
-                <p className="quiz-banner-kicker">Want help choosing a suit?</p>
-                <p className="quiz-banner-title">Get personalized recommendations in less than a minute.</p>
-              </div>
-              <button className="quiz-banner-button" type="button" onClick={hasSavedProgress ? resumeQuiz : startQuiz}>
-                <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true">
-                  <path fill="currentColor" d="M8 1.2 9.1 5.4 13.4 6.2 9.1 7.3 8 11.5 6.9 7.3 2.6 6.2 6.9 5.4 8 1.2Zm4.2 8.1.6 2.1 2.2.6-2.2.7-.6 2.1-.6-2.1-2.1-.7 2.1-.6.6-2.1Z" />
-                </svg>
-                Take the Quiz
-              </button>
-            </div>
-            <ul className="suits-grid">
-              {products.slice(0, 4).map((product) => (
-                <li key={product.id}>
-                  <img src={product.image} alt="" />
-                  <p className="suits-price">{formatPrice(product.price)}</p>
-                  <p className="suits-brand">{product.brand}</p>
-                  <p className="suits-name">{product.name}</p>
-                </li>
-              ))}
-            </ul>
-          </section>
-        )}
-
+      <main className={`app-shell${screen === "results" ? " app-shell-wide" : ""}`}>
         {screen === "question" && currentQuestion && (
           <section className="wire-panel" aria-labelledby="question-title">
             <ol className="quiz-steps" aria-hidden="true">
