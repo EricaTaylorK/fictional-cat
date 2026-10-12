@@ -299,7 +299,6 @@ export default function App() {
       <main className={`app-shell${screen === "results" ? " app-shell-wide" : ""}`}>
         {screen === "start" && (
           <section className="wire-panel start-panel" aria-labelledby="start-title">
-            <p className="eyebrow">Suit finder</p>
             <h1 id="start-title">Get it right for the moment.</h1>
             <p className="lede">
               Tell us the occasion, how you want the suit to feel, and what you’re comfortable
@@ -332,7 +331,6 @@ export default function App() {
               <span>Question {currentIndex + 1} of {totalQuestions}</span>
               <span className="save-note">Progress saved on this device</span>
             </div>
-            <p className="eyebrow">Getting it right</p>
             <h2 id="question-title">{currentQuestion.title}</h2>
             <p className="helper">{currentQuestion.help}</p>
 

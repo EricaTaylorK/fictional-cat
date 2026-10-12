@@ -6,9 +6,8 @@ export const questions = {
     type: "single",
     options: [
       { value: "wedding", label: "A wedding", detail: "Guest, wedding party, or groom. We'll match the room." },
-      { value: "work", label: "Work or a professional event", detail: "Sharp enough to be taken seriously, easy to wear again." },
+      { value: "work", label: "Work or an interview", detail: "The office, a new job, or a professional event. Sharp enough to wear again." },
       { value: "versatile", label: "A go-to suit for whatever comes up", detail: "A classic suit you can trust when the dress code is unclear." },
-      { value: "interview", label: "An interview or new job", detail: "Appropriate, confident, and ready for the room." },
       { value: "formal", label: "A black-tie or formal evening", detail: "Elevated evening dressing that still feels like you." },
       { value: "milestone", label: "A graduation, prom, or milestone", detail: "A big day that deserves to look the part." },
       { value: "funeral", label: "A funeral or memorial", detail: "Respectful and quiet. Nothing that pulls focus." },

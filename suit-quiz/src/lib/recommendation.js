@@ -3,8 +3,7 @@ import { products, TAILORING_ESTIMATE } from "../data/products.js";
 const occasionLabels = {
   wedding: "a wedding",
   funeral: "a funeral or memorial",
-  work: "work and professional events",
-  interview: "an interview",
+  work: "work or an interview",
   formal: "a black-tie or formal evening",
   milestone: "a graduation, prom, or milestone",
   versatile: "whatever comes up",

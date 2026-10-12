@@ -143,14 +143,6 @@ select:focus-visible,
   text-transform: uppercase;
 }
 
-.eyebrow {
-  font-size: 0.8rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  margin: 0 0 8px;
-  text-transform: uppercase;
-}
-
 h1,
 h2,
 h3,
@@ -169,6 +161,10 @@ h2 {
   font-size: var(--font-size-h2);
   font-weight: var(--font-weight-medium);
   line-height: var(--line-height-32);
+}
+
+#question-title {
+  margin-bottom: var(--spacing-vertical-xs);
 }
 
 .lede {
@@ -252,22 +248,24 @@ h2 {
 
 .choice {
   align-items: center;
-  background: var(--color-info-light-blue);
-  border: 0;
+  background: var(--surface-primary);
+  border: 2px solid var(--color-divider-light-gray);
   border-radius: var(--border-radius-lg);
   display: flex;
   gap: var(--spacing-horizontal-md);
   padding: var(--spacing-vertical-lg) var(--spacing-horizontal-lg);
   position: relative;
-  transition: background 150ms ease;
+  transition: background 150ms ease, border-color 150ms ease, box-shadow 180ms ease;
 }
 
 .choice:hover {
-  background: color-mix(in srgb, var(--color-info-light-blue) 60%, var(--color-secondary-light-blue));
+  border-color: var(--color-info-blue);
 }
 
 .choice:has(input:checked) {
-  background: var(--color-secondary-light-blue);
+  background: var(--color-info-light-blue);
+  border-color: var(--color-info-blue);
+  box-shadow: 0 4px 20px 10px rgba(0, 30, 86, 0.08);
 }
 
 .choice input {
@@ -302,8 +300,8 @@ h2 {
 }
 
 .choice:has(input:checked) .choice-mark {
-  background: var(--color-background-dark-blue);
-  border-color: var(--color-background-dark-blue);
+  background: var(--color-info-blue);
+  border-color: var(--color-info-blue);
   color: var(--color-font-white);
 }
 
@@ -570,8 +568,8 @@ h2 {
 
 .size-chip span {
   align-items: center;
-  background: var(--color-info-light-blue);
-  border: 1px solid transparent;
+  background: var(--surface-primary);
+  border: 2px solid var(--color-divider-light-gray);
   border-radius: var(--border-radius-md);
   display: inline-flex;
   font-size: var(--font-size-14);
@@ -582,9 +580,9 @@ h2 {
 }
 
 .size-chip input:checked + span {
-  background: var(--color-background-dark-blue);
-  border-color: var(--color-background-dark-blue);
-  color: var(--color-font-white);
+  background: var(--color-info-light-blue);
+  border-color: var(--color-info-blue);
+  color: var(--color-font-black);
 }
 
 .size-chip input:focus-visible + span {
@@ -728,17 +726,19 @@ h2 {
 
 .results-hero {
   align-items: center;
-  background: var(--color-background-dark-blue);
-  color: var(--color-font-white);
+  background: var(--surface-primary) url("/backgrounds/wash-wide.jpg") center / cover no-repeat;
+  border-radius: calc(var(--border-radius-xl) + var(--border-radius-md));
+  color: var(--color-font-black);
   display: grid;
   gap: var(--spacing-vertical-lg) var(--spacing-horizontal-xl);
   grid-template-columns: auto minmax(0, 1fr);
   margin-bottom: var(--spacing-vertical-xl);
+  overflow: hidden;
   padding: var(--spacing-vertical-xl);
 }
 
 .results-main .results-hero h1 {
-  color: var(--color-font-white);
+  color: var(--color-background-dark-blue);
   font-family: var(--font-family-oswald);
   font-weight: 500;
   letter-spacing: 0.02em;
@@ -748,7 +748,7 @@ h2 {
 }
 
 .results-lede {
-  color: var(--color-transparent-white80);
+  color: var(--color-font-dark-gray);
   font-size: var(--font-size-16);
   line-height: var(--line-height-24);
   margin: 0;
@@ -773,12 +773,12 @@ h2 {
 }
 
 .match-ring-track {
-  stroke: var(--color-transparent-white20);
+  stroke: var(--color-divider-light-gray);
 }
 
 .match-ring-fill {
   animation: ring-fill 1.2s cubic-bezier(0.2, 0.7, 0.2, 1) 200ms both;
-  stroke: var(--color-font-white);
+  stroke: var(--color-background-dark-blue);
   stroke-dashoffset: var(--ring-offset);
   stroke-linecap: round;
 }
@@ -787,31 +787,38 @@ h2 {
   align-items: center;
   display: flex;
   flex-direction: column;
+  gap: 2px;
+  inset: 0;
+  justify-content: center;
+  position: absolute;
+}
+
+.match-ring-figure {
+  align-items: flex-start;
+  color: var(--color-font-black);
+  display: flex;
   font-family: var(--font-family-oswald);
   font-size: 32px;
   font-weight: 500;
-  letter-spacing: 0.02em;
-  text-transform: uppercase;
-  inset: 0;
-  justify-content: center;
-  letter-spacing: 0.02em;
+  letter-spacing: 0;
   line-height: 1;
-  position: absolute;
 }
 
-.match-ring-value small {
-  font-size: var(--font-size-14);
-  position: absolute;
-  transform: translate(36px, -10px);
+.match-ring-figure small {
+  font-size: 0.45em;
+  line-height: 1;
+  margin-left: 1px;
+  margin-top: 0.15em;
 }
 
 .match-ring-label {
-  color: var(--color-transparent-white80);
+  color: var(--color-font-medium-gray);
   font-family: var(--font-family-roboto);
   font-size: var(--font-size-12);
   font-weight: var(--font-weight-medium);
-  letter-spacing: 0;
-  margin-top: var(--spacing-vertical-xs);
+  letter-spacing: 0.06em;
+  line-height: 1;
+  text-transform: uppercase;
 }
 
 @keyframes ring-fill {
@@ -830,8 +837,9 @@ h2 {
 
 .fit-stat {
   animation: stat-rise 500ms ease-out both;
-  background: var(--color-transparent-white10);
-  border: 1px solid var(--color-transparent-white20);
+  background: var(--surface-primary);
+  border: 0;
+  border-radius: var(--border-radius-lg);
   display: grid;
   gap: 2px;
   padding: var(--spacing-vertical-md);
@@ -841,14 +849,13 @@ h2 {
 .fit-stat:nth-child(3) { animation-delay: 240ms; }
 
 .fit-stat img {
-  filter: invert(1);
   height: 24px;
   margin-bottom: var(--spacing-vertical-xs);
   width: 24px;
 }
 
 .fit-stat-label {
-  color: var(--color-transparent-white80);
+  color: var(--color-font-medium-gray);
   font-size: var(--font-size-12);
 }
 
@@ -874,14 +881,10 @@ h2 {
 }
 
 .results-hero .based-on {
-  color: var(--color-transparent-white80);
+  color: var(--color-font-dark-gray);
   font-size: var(--font-size-12);
   line-height: var(--line-height-20);
   margin: var(--spacing-vertical-sm) 0 0;
-}
-
-.results-hero .text-link {
-  color: var(--color-font-white);
 }
 
 .text-link {
@@ -1396,8 +1399,6 @@ h2 {
 }
 
 .email-box {
-  background: var(--surface-primary) url("/backgrounds/wash-wide.jpg") center / cover no-repeat;
-  border-color: transparent;
   margin-top: var(--spacing-vertical-lg);
   padding: var(--spacing-vertical-lg) var(--spacing-vertical-xl);
 }
@@ -1604,13 +1605,8 @@ h2 {
     margin: 0;
   }
 
-  .match-ring-value {
+  .match-ring-figure {
     font-size: 22px;
-  }
-
-  .match-ring-value small {
-    font-size: var(--font-size-12);
-    transform: translate(24px, -7px);
   }
 
   .match-ring-label {

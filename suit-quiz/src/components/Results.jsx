@@ -56,7 +56,7 @@ function MatchRing({ percent }) {
         />
       </svg>
       <span className="match-ring-value" aria-hidden="true">
-        {percent}<small>%</small>
+        <span className="match-ring-figure">{percent}<small>%</small></span>
         <span className="match-ring-label">match</span>
       </span>
     </div>

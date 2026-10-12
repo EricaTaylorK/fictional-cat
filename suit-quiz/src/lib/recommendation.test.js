@@ -159,7 +159,7 @@ describe("recommendations", () => {
   });
 
   it("matches every occasion option to at least two suits", () => {
-    for (const occasion of ["wedding", "work", "versatile", "interview", "formal", "milestone", "funeral"]) {
+    for (const occasion of ["wedding", "work", "versatile", "formal", "milestone", "funeral"]) {
       const relevant = getRecommendations({ ...baseAnswers, occasion })
         .filter((product) => product.formality.includes(occasion));
       expect(relevant.length).toBeGreaterThanOrEqual(2);
