@@ -1,0 +1,7 @@
+@use '../../../base/tokens' as *;
+@use '../base' as *;
+
+:root[data-brand='jab'][data-mode='prom'],
+:root[data-brand='jab'] [data-mode='prom'] {
+    --color-tertiary-blue: var(--foundation-color-tertiary-blue);
+}

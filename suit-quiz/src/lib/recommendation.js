@@ -11,7 +11,7 @@ const occasionLabels = {
 
 const fitLabels = {
   close: "close and sharp",
-  balanced: "polished without feeling tight",
+  balanced: "polished, with room to move",
   roomy: "comfortable with room",
 };
 
@@ -57,7 +57,7 @@ function lengthFromHeight(answers) {
 
 export function inferLikelySize(answers) {
   const entered = Number(answers.measurements?.jacket || answers.measurements?.chest);
-  if (!entered) return "Confirm your size in store";
+  if (!entered) return "Confirm your size with a fitting";
   const evenSize = Math.round(entered / 2) * 2;
   return `${evenSize}${lengthFromHeight(answers)} starting point`;
 }
@@ -69,28 +69,28 @@ function scoreProduct(product, answers, index) {
 
   if (product.formality.includes(answers.occasion)) {
     score += 32;
-    evidence.push(`Appropriate for ${occasionLabels[answers.occasion]}.`);
+    evidence.push(`It reads correctly for ${occasionLabels[answers.occasion]}.`);
   } else {
     score -= 18;
   }
 
   if (product.fit === answers.feel) {
     score += 26;
-    evidence.push(`Its ${product.fit === "balanced" ? "modern" : product.fit} fit matches your “${fitLabels[answers.feel]}” preference.`);
+    evidence.push(`The fit matches how you want it to feel: ${fitLabels[answers.feel]}.`);
   } else if (product.fit === "balanced") {
     score += 9;
   }
 
   if (product.price >= budgetMin && product.price <= budgetMax) {
     score += 18;
-    evidence.push(answers.budget === "flexible" ? "It earns its place on fit and use, not a price cutoff." : "The suit lands inside your selected budget.");
+    evidence.push(answers.budget === "flexible" ? "Chosen for the moment and the fit, with room in the budget." : "It sits inside the budget you set.");
   } else if (answers.budget !== "flexible") {
     score -= Math.min(18, Math.ceil(Math.abs(product.price - Math.min(Math.max(product.price, budgetMin), budgetMax)) / 20));
   }
 
   if (answers.wearIntent === "rewear" || answers.wearIntent === "often") {
     score += product.versatility * 4;
-    if (product.versatility >= 4) evidence.push("The color and formality level make it easy to rewear.");
+    if (product.versatility >= 4) evidence.push("The color and formality travel well past this one occasion.");
   } else if (product.formality.includes(answers.occasion)) {
     score += 8;
   }
@@ -98,13 +98,13 @@ function scoreProduct(product, answers, index) {
   if (answers.feel === "roomy") score += product.comfort * 2;
   if (answers.tailoring !== "skip") {
     score += product.tailoringEase * 2;
-    if (product.tailoringEase >= 4) evidence.push("Its construction gives a tailor useful room for final adjustments.");
+    if (product.tailoringEase >= 4) evidence.push("There's room for a tailor to finish the fit.");
   }
 
   const fitIssueCount = (answers.fitIssues ?? []).filter((issue) => issue !== "none").length;
   if (fitIssueCount >= 2 && product.id === "navy-value") {
     score += 8;
-    evidence.push("Separate jacket and pant sizing helps with the fit issues you flagged.");
+    evidence.push("Jacket and pants are sized separately, which helps with the fit issues you mentioned.");
   }
 
   return {

@@ -144,22 +144,22 @@ export default function App() {
   return (
     <>
       <header className="site-header">
-        <p className="wordmark">Suit Finder</p>
+        <p className="wordmark">Men's Wearhouse</p>
         <span className="prototype-tag">Wireframe</span>
       </header>
       <main className="app-shell">
         {screen === "start" && (
           <section className="wire-panel" aria-labelledby="start-title">
-            <p className="eyebrow">Fit-first suit finder</p>
-            <h1 id="start-title">Find the suit that fits the moment—and you.</h1>
+            <p className="eyebrow">Suit finder</p>
+            <h1 id="start-title">Get it right for the moment.</h1>
             <p className="lede">
-              Answer a few plain-language questions. We’ll turn your occasion, fit needs, and
-              budget into one clear recommendation.
+              Tell us the occasion, how you want the suit to feel, and what you’re comfortable
+              spending. We’ll turn that into a clear plan you can trust.
             </p>
             <ul className="expectations">
-              <li><strong>About 3 minutes</strong>7–8 quick questions</li>
-              <li><strong>Instant results</strong>No email required</li>
-              <li><strong>Saved here</strong>Come back on this device</li>
+              <li><strong>About 3 minutes</strong>A short set of plain questions</li>
+              <li><strong>See it right away</strong>Your plan appears here. Email is optional.</li>
+              <li><strong>Saved on this device</strong>Come back and pick up where you left off</li>
             </ul>
             <button className="button" type="button" onClick={startQuiz}>Find my suit</button>
           </section>
@@ -174,7 +174,7 @@ export default function App() {
             <div className="progress-track" aria-hidden="true">
               <div className="progress-fill" style={{ width: `${((currentIndex + 1) / totalQuestions) * 100}%` }} />
             </div>
-            <p className="eyebrow">Your suit plan</p>
+            <p className="eyebrow">Getting it right</p>
             <h2 id="question-title">{currentQuestion.title}</h2>
             <p className="helper">{currentQuestion.help}</p>
 

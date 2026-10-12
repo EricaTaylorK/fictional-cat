@@ -1,0 +1,8 @@
+@use '../../../base/tokens' as *;
+@use '../base' as *;
+
+:root[data-brand='tmw'][data-mode='wedding'],
+:root[data-brand='tmw'] [data-mode='wedding'] {
+    --color-tertiary-blue: var(--foundation-color-tertiary-blue);
+    --color-primary-text: var(--foundation-color-tertiary-blue);
+}

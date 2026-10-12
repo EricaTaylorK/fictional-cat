@@ -8,7 +8,7 @@ export const products = [
     versatility: 5,
     comfort: 4,
     tailoringEase: 5,
-    description: "A dependable navy two-piece with clean structure and enough ease for repeat wear.",
+    description: "For weddings, interviews, and work days when the dress code is a little unclear. Navy reads as prepared, and the fit stays comfortable enough to wear again.",
   },
   {
     id: "charcoal-classic-wool",
@@ -19,7 +19,7 @@ export const products = [
     versatility: 5,
     comfort: 5,
     tailoringEase: 5,
-    description: "A comfortable, understated option with room through the chest and seat.",
+    description: "A quieter suit for rooms where you want to be taken seriously. Room through the chest and seat, so it feels settled from the first wear.",
   },
   {
     id: "blue-slim-stretch",
@@ -30,7 +30,7 @@ export const products = [
     versatility: 4,
     comfort: 4,
     tailoringEase: 4,
-    description: "A sharper silhouette with stretch for movement and a polished blue finish.",
+    description: "A sharper shape for moments when you want to look intentional. Stretch keeps it comfortable once you're in the room.",
   },
   {
     id: "black-formal",
@@ -41,7 +41,7 @@ export const products = [
     versatility: 3,
     comfort: 3,
     tailoringEase: 5,
-    description: "A clean black suit that raises the formality level without moving into tuxedo territory.",
+    description: "For evenings and memorials that call for black. Formal enough to respect the room, and still a suit.",
   },
   {
     id: "navy-value",
@@ -52,7 +52,7 @@ export const products = [
     versatility: 5,
     comfort: 4,
     tailoringEase: 5,
-    description: "A flexible value option with separate jacket and pant sizing for an easier fit.",
+    description: "A classic navy you can buy once and wear often. Jacket and pants are sized separately, so the fit can follow your body more closely.",
   },
   {
     id: "gray-relaxed-stretch",
@@ -63,7 +63,7 @@ export const products = [
     versatility: 4,
     comfort: 5,
     tailoringEase: 4,
-    description: "A softer performance suit built for comfort, movement, and long days.",
+    description: "For long work days and events where comfort matters as much as looking ready. Soft, with room to move.",
   },
   {
     id: "midnight-tuxedo",
@@ -74,7 +74,7 @@ export const products = [
     versatility: 2,
     comfort: 3,
     tailoringEase: 4,
-    description: "A formal evening option with a modern shape and a softer alternative to black.",
+    description: "For black-tie and formal weddings. Midnight blue is a classic evening choice that still feels considered.",
   },
 ];
 

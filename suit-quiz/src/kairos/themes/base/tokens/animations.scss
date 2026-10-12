@@ -1,0 +1,10 @@
+:root {
+    --foundation-duration-fast: 150ms;
+    --foundation-duration-normal: 300ms;
+    --foundation-easing-ease-in-out: ease-in-out;
+    --foundation-transition-default: all var(--foundation-duration-normal) var(--foundation-easing-ease-in-out);
+    --foundation-motion-ease-standard: cubic-bezier(0.2, 0, 0, 1);
+    --foundation-motion-duration-fast: 150ms;
+    --foundation-motion-duration-standard: 250ms;
+    --foundation-motion-duration-slow: 400ms;
+}

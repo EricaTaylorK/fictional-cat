@@ -1,0 +1,33 @@
+/**
+ * Z-Index Foundation Tokens
+ * 
+ * Purpose: Standardized z-index scale to prevent uncontrolled stacking values.
+ * 
+ * Scope: Defines the foundational numeric scale for layering across the system.
+ * These are raw numeric values that should NOT be referenced directly by components.
+ * Components should use semantic layer tokens instead.
+ * 
+ * Scale: 0-10 (intentionally small to prevent stacking escalation)
+ * 
+ * Reserved Level: z-10 is reserved for system-level or emergency layering scenarios:
+ * - debugging overlays
+ * - system-level UI
+ * - emergency layering conflicts
+ * 
+ * Standard components should NOT use z-10 directly.
+ */
+
+:root {
+  /* Foundation Z-Index Scale (0-10) */
+  --foundation-z-0: 0;
+  --foundation-z-1: 1;
+  --foundation-z-2: 2;
+  --foundation-z-3: 3;
+  --foundation-z-4: 4;
+  --foundation-z-5: 5;
+  --foundation-z-6: 6;
+  --foundation-z-7: 7;
+  --foundation-z-8: 8;
+  --foundation-z-9: 9;
+  --foundation-z-10: 10; /* RESERVED: System-level use only */
+}

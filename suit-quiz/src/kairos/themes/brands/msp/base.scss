@@ -1,0 +1,405 @@
+@use '../../base/tokens';
+
+:root[data-brand='msp'] {
+    
+    /* colors */
+    --color-primary-blue: var(--foundation-color-primary-blue);
+    --color-secondary-light-blue: var(--foundation-color-secondary-light-blue);
+    --color-secondary-medium-blue: var(--foundation-color-secondary-medium-blue);
+    --color-secondary-dark-blue: var(--foundation-color-secondary-dark-blue);
+    --color-neutral-white: var(--foundation-color-neutral-white);
+    --color-neutral-lightest-gray: var(--foundation-color-neutral-lightest-gray);
+    --color-neutral-light-gray: var(--foundation-color-neutral-light-gray);
+    --color-neutral-medium-gray: var(--foundation-color-neutral-medium-gray);
+    --color-neutral-dark-gray: var(--foundation-color-neutral-dark-gray);
+    --color-neutral-black: var(--foundation-color-neutral-black);
+    --color-danger-red: var(--foundation-color-danger-red);
+    --color-danger-light-red: var(--foundation-color-danger-light-red);
+    --color-success-green: var(--foundation-color-success-green);
+    --color-success-light-green: var(--foundation-color-success-light-green);
+    --color-warning-amber: var(--foundation-color-warning-amber);
+    --color-warning-light-amber: var(--foundation-color-warning-light-amber);
+    --color-info-blue: var(--foundation-color-info-blue);
+    --color-info-light-blue: var(--foundation-color-info-light-blue);
+    --color-transparent-black5: var(--foundation-color-transparent-black5);
+    --color-transparent-black10: var(--foundation-color-transparent-black10);
+    --color-transparent-black20: var(--foundation-color-transparent-black20);
+    --color-transparent-black50: var(--foundation-color-transparent-black50);
+    --color-transparent-black70: var(--foundation-color-transparent-black70);
+    --color-transparent-white10: var(--foundation-color-transparent-white10);
+    --color-transparent-white20: var(--foundation-color-transparent-white20);
+    --color-transparent-white40: var(--foundation-color-transparent-white40);
+    --color-transparent-white60: var(--foundation-color-transparent-white60);
+    --color-transparent-white80: var(--foundation-color-transparent-white80);
+    --color-background-white: var(--foundation-color-background-white);
+    --color-background-gray: var(--foundation-color-background-gray);
+    --color-background-dark-blue: var(--foundation-color-background-dark-blue);
+    --color-border-black10: var(--foundation-color-border-black10);
+    --color-border-black: var(--foundation-color-border-black);
+    --color-hover-background-dark-blue: var(--foundation-color-hover-background-dark-blue);
+    --color-hover-border-dark-blue: var(--foundation-color-hover-border-dark-blue);
+    --color-font-black: var(--foundation-color-font-black);
+    --color-font-white: var(--foundation-color-font-white);
+    --color-font-light-gray: var(--foundation-color-font-light-gray);
+    --color-font-medium-gray: var(--foundation-color-font-medium-gray);
+    --color-font-dark-gray: var(--foundation-color-font-dark-gray);
+    --color-divider-light-gray: var(--foundation-color-divider-light-gray);
+    --color-divider-medium-gray: var(--foundation-color-divider-medium-gray);
+    --color-focus-outline: var(--foundation-color-focus-outline);
+
+    /* PROGRESS Colors */
+    --progress-track-color: var(--action-background-tertiary);
+    --progress-fill-color: var(--action-background-primary);
+    --progress-text-color: var(--text-tertiary);
+    
+    /* PROGRESS Sizes */
+    --progress-linear-height: var(--border-width-md);
+    --progress-linear-width: 327px;
+    --progress-circular-size: 60px;
+    --progress-stroke-width: var(--border-width-md);
+    --progress-radius: var(--border-radius-sm);
+
+    /* LOADER (Indeterminate) */
+    --loader-fill-color: var(--action-background-primary);
+    --loader-track-color: var(--action-background-tertiary);
+    --loader-fill-color-inverted: var(--foundation-color-neutral-white);
+    --loader-track-color-inverted: var(--foundation-color-transparent-white20);
+    --loader-stroke-width: var(--border-width-sm);
+    --loader-animation-duration: var(--foundation-motion-duration-slow);
+    --loader-size-small: 16px;
+    --loader-size-medium: 32px;
+    --loader-size-large: 48px;
+    --loader-linear-height-small: 2px;
+    --loader-linear-height-medium: var(--border-width-md);
+    --loader-linear-height-large: var(--border-width-lg);
+
+    /* BORDER Colors */
+    --border-focus: var(--foundation-color-info-blue);
+    --border-primary: var(--foundation-color-transparent-black10);
+    --border-secondary: var(--foundation-color-secondary-dark-blue);
+    --border-subtle: var(--foundation-color-transparent-black5);
+    --border-strong: var(--foundation-color-transparent-black70);
+    --border-error: var(--foundation-color-danger-red);
+
+    /* ACTION Colors */
+    --action-background-primary: var(--foundation-color-primary-blue);
+    --action-background-secondary: var(--foundation-color-neutral-white);
+    --action-background-tertiary: var(--foundation-color-neutral-light-gray);
+    --action-background-error: var(--foundation-color-danger-light-red);
+    --action-background-toggle-error-off: var(--foundation-color-danger-light-red);
+    --action-background-toggle-error-on: var(--foundation-color-danger-red);
+    --action-background-disabled: var(--foundation-color-transparent-black5);
+    --action-background-hover: var(--foundation-color-secondary-dark-blue);
+    --action-background-interaction: var(--foundation-color-info-blue);
+    --action-text-primary: var(--foundation-color-neutral-white);
+    --action-text-secondary: var(--foundation-color-secondary-dark-blue);
+    --action-text-disabled: var(--foundation-color-transparent-black50);
+    --action-text-brand: var(--foundation-color-primary-blue);
+    --action-border-primary: var(--foundation-color-transparent-black10);
+    --action-border-secondary: var(--foundation-color-secondary-dark-blue);
+    --action-border-hover: var(--foundation-color-secondary-dark-blue);
+    --action-border-disabled: var(--foundation-color-transparent-black10);
+    --action-border-selected: var(--foundation-color-transparent-black50);
+    --action-border-error: var(--foundation-color-danger-light-red);
+    --action-background-paypal: var(--foundation-action-background-paypal);
+    --action-background-gpay: var(--foundation-action-background-gpay);
+    --action-background-applepay: var(--foundation-action-background-applepay);
+
+    /* INPUT Colors */
+    --input-background-primary: var(--foundation-color-neutral-white);
+    --input-background-secondary: var(--foundation-color-neutral-black);
+    --input-background-tertiary: var(--foundation-color-secondary-medium-blue);
+    --input-background-error: var(--foundation-color-danger-red);
+    --input-background-disabled: var(--foundation-color-transparent-black5);
+    --input-background-search: var(--foundation-color-neutral-lightest-gray);
+    --input-background-hover: var(--foundation-color-transparent-black5);
+    --input-border-primary: var(--foundation-color-transparent-black10);
+    --input-border-secondary: var(--foundation-color-transparent-black50);
+    --input-border-hover: var(--foundation-color-transparent-black70);
+    --input-border-error: var(--foundation-color-danger-red);
+    --input-border-disabled: var(--foundation-color-transparent-black5);
+    --input-border-unavailable: var(--foundation-color-transparent-black50);
+    --input-border-brand: var(--foundation-color-primary-blue);
+    --input-text-primary: var(--foundation-color-neutral-black);
+    --input-text-secondary: var(--foundation-color-neutral-medium-gray);
+    --input-text-cursor: var(--foundation-color-secondary-medium-blue);
+    --input-text-error: var(--foundation-color-danger-red);
+    --input-text-disabled: var(--foundation-color-neutral-light-gray);
+    --input-border-success: var(--foundation-color-success-green);
+    --input-border-focus: var(--foundation-color-focus-outline);
+
+    /* spacings */
+    --spacing-horizontal-xxs: var(--foundation-spacing-horizontal-xxs);
+    --spacing-horizontal-xs: var(--foundation-spacing-horizontal-xs);
+    --spacing-horizontal-sm: var(--foundation-spacing-horizontal-sm);
+    --spacing-horizontal-md: var(--foundation-spacing-horizontal-md);
+    --spacing-horizontal-lg: var(--foundation-spacing-horizontal-lg);
+    --spacing-horizontal-xl: var(--foundation-spacing-horizontal-xl);
+    --spacing-horizontal-xxl: var(--foundation-spacing-horizontal-xxl);
+    --spacing-horizontal-xxxl: var(--foundation-spacing-horizontal-xxxl);
+    --spacing-horizontal-xxxxl: var(--foundation-spacing-horizontal-xxxxl);
+    --spacing-horizontal-xxxxxl: var(--foundation-spacing-horizontal-xxxxxl);
+    --spacing-horizontal-xxxxxxl: var(--foundation-spacing-horizontal-xxxxxxl);
+    --spacing-horizontal-xxxxxxxl: var(--foundation-spacing-horizontal-xxxxxxxl);
+    --spacing-horizontal-xxxxxxxxl: var(--foundation-spacing-horizontal-xxxxxxxxl);
+    --spacing-horizontal-xxxxxxxxxl: var(--foundation-spacing-horizontal-xxxxxxxxxl);
+    --spacing-horizontal-xxxxxxxxxxl: var(--foundation-spacing-horizontal-xxxxxxxxxxl);
+    --spacing-horizontal-xxxxxxxxxxxl: var(--foundation-spacing-horizontal-xxxxxxxxxxxl);
+    --spacing-horizontal-xxxxxxxxxxxxl: var(--foundation-spacing-horizontal-xxxxxxxxxxxxl);
+    --spacing-vertical-xxs: var(--foundation-spacing-vertical-xxs);
+    --spacing-vertical-xs: var(--foundation-spacing-vertical-xs);
+    --spacing-vertical-sm: var(--foundation-spacing-vertical-sm);
+    --spacing-vertical-md: var(--foundation-spacing-vertical-md);
+    --spacing-vertical-lg: var(--foundation-spacing-vertical-lg);
+    --spacing-vertical-xl: var(--foundation-spacing-vertical-xl);
+    --spacing-vertical-xxl: var(--foundation-spacing-vertical-xxl);
+    --spacing-vertical-xxxl: var(--foundation-spacing-vertical-xxxl);
+    --spacing-vertical-xxxxl: var(--foundation-spacing-vertical-xxxxl);
+    --spacing-vertical-xxxxxl: var(--foundation-spacing-vertical-xxxxxl);
+    --spacing-vertical-xxxxxxl: var(--foundation-spacing-vertical-xxxxxxl);
+    --spacing-vertical-xxxxxxxl: var(--foundation-spacing-vertical-xxxxxxxl);
+    --spacing-vertical-xxxxxxxxl: var(--foundation-spacing-vertical-xxxxxxxxl);
+    --spacing-vertical-xxxxxxxxxl: var(--foundation-spacing-vertical-xxxxxxxxxl);
+    --spacing-vertical-xxxxxxxxxxl: var(--foundation-spacing-vertical-xxxxxxxxxxl);
+    --spacing-vertical-xxxxxxxxxxxl: var(--foundation-spacing-vertical-xxxxxxxxxxxl);
+    --spacing-vertical-xxxxxxxxxxxxl: var(--foundation-spacing-vertical-xxxxxxxxxxxxl);
+
+    /* typography */
+    --font-family-roboto: var(--foundation-font-family-roboto);
+    --font-family-oswald: var(--foundation-font-family-oswald);
+    --font-size-base: var(--foundation-font-size-base);
+    --font-size-10: var(--foundation-font-size-10);
+    --font-size-12: var(--foundation-font-size-12);
+    --font-size-14: var(--foundation-font-size-14);
+    --font-size-16: var(--foundation-font-size-16);
+    --font-size-18: var(--foundation-font-size-18);
+    --font-size-20: var(--foundation-font-size-20);
+    --font-size-24: var(--foundation-font-size-24);
+    --font-size-32: var(--foundation-font-size-32);
+    --font-size-40: var(--foundation-font-size-40);
+    --font-size-48: var(--foundation-font-size-48);
+    --font-size-56: var(--foundation-font-size-56);
+    --font-size-64: var(--foundation-font-size-64);
+    --font-size-72: var(--foundation-font-size-72);
+    --font-size-h1: var(--foundation-font-size-h1);
+    --font-size-h2: var(--foundation-font-size-h2);
+    --font-size-h3: var(--foundation-font-size-h3);
+    --font-size-h3-mobile: var(--foundation-font-size-h3-mobile);
+    --font-size-md-body: var(--foundation-font-size-md-body);
+    --font-size-lg-body: var(--foundation-font-size-lg-body);
+    --font-size-button-cta: var(--foundation-font-size-button-cta);
+    --font-size-legal: var(--foundation-font-size-legal);
+    --font-size-label: var(--foundation-font-size-label);
+    --font-size-xs: var(--foundation-font-size-xs);
+    --font-size-s: var(--foundation-font-size-s);
+    --font-size-m: var(--foundation-font-size-m);
+    --font-size-l: var(--foundation-font-size-l);
+    --font-size-xl: var(--foundation-font-size-xl);
+    --font-size-2xl: var(--foundation-font-size-2xl);
+    --font-size-3xl: var(--foundation-font-size-3xl);
+    --font-size-6xl: var(--foundation-font-size-6xl);
+    --font-weight-light: var(--foundation-font-weight-light);
+    --font-weight-regular: var(--foundation-font-weight-regular);
+    --font-weight-medium: var(--foundation-font-weight-medium);
+    --font-weight-semibold: var(--foundation-font-weight-semi-bold);
+    --font-weight-bold: var(--foundation-font-weight-bold);
+    --font-weight-black: var(--foundation-font-weight-black);
+    --line-height-12: var(--foundation-line-height-12);
+    --line-height-14: var(--foundation-line-height-14);
+    --line-height-16: var(--foundation-line-height-16);
+    --line-height-18: var(--foundation-line-height-18);
+    --line-height-20: var(--foundation-line-height-20);
+    --line-height-24: var(--foundation-line-height-24);
+    --line-height-26: var(--foundation-line-height-26);
+    --line-height-28: var(--foundation-line-height-28);
+    --line-height-32: var(--foundation-line-height-32);
+    --line-height-36: var(--foundation-line-height-36);
+    --line-height-40: var(--foundation-line-height-40);
+    --line-height-48: var(--foundation-line-height-48);
+    --line-height-56: var(--foundation-line-height-56);
+    --line-height-64: var(--foundation-line-height-64);
+    --line-height-72: var(--foundation-line-height-72);
+    --line-height-80: var(--foundation-line-height-80);
+    --line-height-xxs: var(--foundation-line-height-xxs);
+    --line-height-xs: var(--foundation-line-height-xs);
+    --line-height-s: var(--foundation-line-height-s);
+    --line-height-m: var(--foundation-line-height-m);
+    --line-height-l: var(--foundation-line-height-l);
+    --line-height-xl: var(--foundation-line-height-xl);
+    --line-height-3xl: var(--foundation-line-height-3xl);
+    --line-height-5xl: var(--foundation-line-height-5xl);
+    --line-height-6xl: var(--foundation-line-height-6xl);
+    --letter-spacing-xxs: var(--foundation-letter-spacing-xxs);
+    --letter-spacing-xs: var(--foundation-letter-spacing-xs);
+    --letter-spacing-sm: var(--foundation-letter-spacing-sm);
+    --letter-spacing-md: var(--foundation-letter-spacing-md);
+    --letter-spacing-normal: var(--foundation-letter-spacing-normal);
+    --letter-spacing-lg: var(--foundation-letter-spacing-lg);
+    --letter-spacing-none: var(--foundation-letter-spacing-none);
+    --letter-spacing-m: var(--foundation-letter-spacing-m);
+    --letter-spacing-l: var(--foundation-letter-spacing-l);
+    --text-transform-none: var(--foundation-text-transform-none);
+    --text-transform-uppercase: var(--foundation-text-transform-uppercase);
+    --text-transform-lowercase: var(--foundation-text-transform-lowercase);
+    --text-transform-capitalize: var(--foundation-text-transform-capitalize);
+    --text-transform-italic: var(--foundation-text-transform-italic);
+    --text-transform-normal: var(--foundation-text-transform-normal);
+    --text-decoration-none: var(--foundation-text-decoration-none);
+    --text-decoration-underline: var(--foundation-text-decoration-underline);
+    --text-decoration-line-through: var(--foundation-text-decoration-line-through);
+
+    /* Semantic Typography Tokens */
+    // Text / Body - X-Large Medium
+    --text-body-xl-medium-font-weight: var(--foundation-text-body-xl-medium-font-weight);
+    --text-body-xl-medium-font-size: var(--foundation-text-body-xl-medium-font-size);
+    --text-body-xl-medium-line-height: var(--foundation-text-body-xl-medium-line-height);
+    --text-body-xl-medium-line-height-mobile: var(--foundation-text-body-xl-medium-line-height-mobile);
+    --text-body-xl-medium-letter-spacing: var(--foundation-text-body-xl-medium-letter-spacing);
+
+    // Text / Body - X-Large
+    --text-body-xl-font-weight: var(--foundation-text-body-xl-font-weight);
+    --text-body-xl-font-size: var(--foundation-text-body-xl-font-size);
+    --text-body-xl-line-height: var(--foundation-text-body-xl-line-height);
+    --text-body-xl-line-height-mobile: var(--foundation-text-body-xl-line-height-mobile);
+    --text-body-xl-letter-spacing: var(--foundation-text-body-xl-letter-spacing);
+
+    // Text / Body - Large Medium
+    --text-body-large-medium-font-weight: var(--foundation-text-body-large-medium-font-weight);
+    --text-body-large-medium-font-size: var(--foundation-text-body-large-medium-font-size);
+    --text-body-large-medium-line-height: var(--foundation-text-body-large-medium-line-height);
+    --text-body-large-medium-line-height-mobile: var(--foundation-text-body-large-medium-line-height-mobile);
+    --text-body-large-medium-letter-spacing: var(--foundation-text-body-large-medium-letter-spacing);
+
+    // Text / Body - Medium
+    --text-body-medium-font-weight: var(--foundation-text-body-medium-font-weight);
+    --text-body-medium-font-size: var(--foundation-text-body-medium-font-size);
+    --text-body-medium-line-height: var(--foundation-text-body-medium-line-height);
+    --text-body-medium-letter-spacing: var(--foundation-text-body-medium-letter-spacing);
+
+    // Text / Label - X-Small
+    --text-label-xs-font-weight: var(--foundation-text-label-xs-font-weight);
+    --text-label-xs-font-size: var(--foundation-text-label-xs-font-size);
+    --text-label-xs-line-height: var(--foundation-text-label-xs-line-height);
+    --text-label-xs-letter-spacing: var(--foundation-text-label-xs-letter-spacing);
+
+    // Text / Legal - Light
+    --text-legal-light-font-weight: var(--foundation-text-legal-light-font-weight);
+    --text-legal-light-font-size: var(--foundation-text-legal-light-font-size);
+    --text-legal-light-line-height: var(--foundation-text-legal-light-line-height);
+    --text-legal-light-line-height-mobile: var(--foundation-text-legal-light-line-height-mobile);
+    --text-legal-light-letter-spacing: var(--foundation-text-legal-light-letter-spacing);
+
+    // Text / Legal - SemiBold
+    --text-legal-semibold-font-weight: var(--foundation-text-legal-semibold-font-weight);
+    --text-legal-semibold-font-size: var(--foundation-text-legal-semibold-font-size);
+    --text-legal-semibold-line-height: var(--foundation-text-legal-semibold-line-height);
+    --text-legal-semibold-line-height-mobile: var(--foundation-text-legal-semibold-line-height-mobile);
+    --text-legal-semibold-letter-spacing: var(--foundation-text-legal-semibold-letter-spacing);
+
+    // Text / Legal - Regular (ticket: --text-legal-regular; values match md-body / line-height-20)
+    --text-legal-regular: var(--foundation-text-legal-regular-font-size);
+    --text-legal-regular-font-weight: var(--foundation-text-legal-regular-font-weight);
+    --text-legal-regular-line-height: var(--foundation-text-legal-regular-line-height);
+    --text-legal-regular-line-height-mobile: var(--foundation-text-legal-regular-line-height-mobile);
+    --text-legal-regular-letter-spacing: var(--foundation-text-legal-regular-letter-spacing);
+
+    /* border */
+    --border-width-xs: var(--foundation-border-width-xs);
+    --border-width-sm: var(--foundation-border-width-sm);
+    --border-width-md: var(--foundation-border-width-md);
+    --border-width-lg: var(--foundation-border-width-lg);
+    --border-width-thin: var(--foundation-border-width-xs);
+    --border-width-medium: var(--foundation-border-width-sm);
+    --border-width-heavy: var(--foundation-border-width-md);
+    --border-width-thick: var(--foundation-border-width-lg);
+    --border-style-solid: var(--foundation-border-style-solid);
+    --border-style-dashed: var(--foundation-border-style-dashed);
+    --border-radius-none: var(--foundation-border-radius-none);
+    --border-radius-sm: var(--foundation-border-radius-sm);
+    --border-radius-md: var(--foundation-border-radius-md);
+    --border-radius-lg: var(--foundation-border-radius-lg);
+    --border-radius-xl: var(--foundation-border-radius-xl);
+    --border-radius-circle: var(--foundation-border-radius-circle);
+    --border-radius-pill: var(--foundation-border-radius-pill);
+
+    /* breakpoints */
+    --breakpoint-xs: var(--foundation-breakpoint-xs);
+    --breakpoint-sm: var(--foundation-breakpoint-sm);
+    --breakpoint-md: var(--foundation-breakpoint-md);
+    --breakpoint-lg: var(--foundation-breakpoint-lg);
+    --breakpoint-xl: var(--foundation-breakpoint-xl);
+
+    /* grid */
+    --grid-columns: var(--foundation-grid-columns);
+    --grid-gutter: var(--foundation-grid-gutter);
+    --grid-container-max-width: var(--foundation-grid-container-max-width);
+
+    /* animations */
+    --duration-fast: var(--foundation-duration-fast);
+    --duration-normal: var(--foundation-duration-normal);
+    --easing-ease-in-out: var(--foundation-easing-ease-in-out);
+    --transition-default: var(--foundation-transition-default);
+    --motion-expand-collapse-duration: var(--foundation-motion-duration-standard);
+    --motion-expand-collapse-ease: var(--foundation-motion-ease-standard);
+    --motion-enter-duration: var(--foundation-motion-duration-fast);
+    --motion-enter-ease: var(--foundation-motion-ease-standard);
+    --motion-exit-duration: var(--foundation-motion-duration-fast);
+    --motion-exit-ease: var(--foundation-motion-ease-standard);
+    --motion-emphasis-duration: var(--foundation-motion-duration-slow);
+    --motion-emphasis-ease: var(--foundation-motion-ease-standard);
+
+    /* icons */
+    --icon-size-small: var(--foundation-icon-size-small);
+    --icon-size-medium: var(--foundation-icon-size-medium);
+    --icon-size-large: var(--foundation-icon-size-large);
+    --icon-size-xlarge: var(--foundation-icon-size-xlarge);
+    --icon-size-xxlarge: var(--foundation-icon-size-xxlarge);
+    --icon-size-xxxlarge: var(--foundation-icon-size-xxxlarge);
+    --icon-size-xxxxlarge: var(--foundation-icon-size-xxxxlarge);
+    --icon-size-xxxxxxlarge: var(--foundation-icon-size-xxxxxxlarge);
+
+    /* units - Semantic Unit Tokens for sizing utilities */
+    --unit-8: var(--foundation-unit-8);
+    --unit-16: var(--foundation-unit-16);
+    --unit-24: var(--foundation-unit-24);
+    --unit-40: var(--foundation-unit-40);
+    --unit-64: var(--foundation-unit-64);
+
+    /* Text colors */
+    --text-primary: var(--foundation-color-neutral-medium-gray);
+    --text-secondary: var(--foundation-color-neutral-dark-gray);
+    --text-tertiary: var(--foundation-color-neutral-black);
+    --text-inverse: var(--foundation-color-neutral-white);
+    --text-disabled: var(--foundation-color-transparent-black50);
+    --text-link: var(--foundation-color-neutral-black);
+    --text-link-hover: var(--foundation-color-secondary-dark-blue);
+    --text-success: var(--foundation-color-success-green);
+    --text-error: var(--foundation-color-danger-red);
+    --text-toast: var(--foundation-color-info-blue);
+
+    /* BADGES Colors */
+    --badges-going-fast: var(--foundation-color-transparent-danger-red85);
+    --badges-made-in-usa: var(--foundation-color-transparent-royalblue85);
+    --badges-new: var(--foundation-color-transparent-bright-royalblue85);
+    --badges-best-sellers: var(--foundation-color-transparent-success-green85);
+    --badges-top-rated: var(--foundation-color-transparent-purple85);
+
+    /* OVERLAY Colors */
+    --overlay-background: var(--foundation-color-transparent-black50);
+
+    /* SURFACE Colors */
+    --surface-inverse: var(--foundation-color-neutral-black);
+    --surface-banner-subtle: var(--foundation-surface-banner-subtle);
+
+    /* z-index - Semantic Layer Tokens */
+    --z-base: var(--foundation-z-0);           /* Base layer (z-index: 0) - Default stacking context */
+    --z-sticky: var(--foundation-z-2);         /* Sticky elements (z-index: 2) - Sticky headers, toolbars */
+    --z-dropdown: var(--foundation-z-3);       /* Dropdown menus (z-index: 3) - Select dropdowns, autocomplete */
+    --z-popout: var(--foundation-z-4);         /* Popover/Tooltip (z-index: 4) - Popovers, tooltips, floating UI */
+    --z-backdrop: var(--foundation-z-5);       /* Modal backdrop (z-index: 5) - Overlay backgrounds */
+    --z-drawer: var(--foundation-z-6);         /* Drawer/Sidebar (z-index: 6) - Side panels, off-canvas menus */
+    --z-modal: var(--foundation-z-7);          /* Modal dialogs (z-index: 7) - Dialog boxes, lightboxes */
+    --z-foreground: var(--foundation-z-8);     /* Foreground content (z-index: 8) - Content above modals */
+    --z-toast: var(--foundation-z-9);          /* Toast notifications (z-index: 9) - Snackbars, alerts, toasts */
+    /* Note: z-10 is intentionally NOT mapped - reserved for system-level/emergency use only */
+}

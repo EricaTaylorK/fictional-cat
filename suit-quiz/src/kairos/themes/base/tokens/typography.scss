@@ -1,0 +1,159 @@
+:root {
+    /* Topography */
+  // font family
+  --foundation-font-family-roboto: 'Roboto', sans-serif;
+  --foundation-font-family-oswald: 'Oswald', sans-serif;
+  // font sizes
+  --foundation-font-size-base: 16px;
+  --foundation-font-size-10: 0.625rem; // 10px
+  --foundation-font-size-12: 0.75rem; // 12px
+  --foundation-font-size-14: 0.875rem; // 14px
+  --foundation-font-size-16: 1rem; // 16px
+  --foundation-font-size-18: 1.125rem; // 18px
+  --foundation-font-size-20: 1.25rem; // 20px
+  --foundation-font-size-24: 1.5rem; // 24px
+  --foundation-font-size-32: 2rem; // 32px
+  --foundation-font-size-40: 2.5rem; // 40px
+  --foundation-font-size-48: 3rem; //48px
+  --foundation-font-size-56: 3.5rem; //56px
+  --foundation-font-size-64: 4rem; // 64px
+  --foundation-font-size-72: 4.5rem; //72px
+
+  --foundation-font-size-h1: 2.5rem; // 40px
+  --foundation-font-size-h2: 1.5rem; // 24px
+  --foundation-font-size-h3: 1.25rem; // 20px
+  --foundation-font-size-h3-mobile: 1.125rem; // 18px
+  --foundation-font-size-md-body: 0.875rem; // 14px
+  --foundation-font-size-lg-body: 1rem; // 16px
+  --foundation-font-size-button-cta: 0.875rem; // 14px
+  --foundation-font-size-legal: 0.75rem; // 12px
+  --foundation-font-size-label: 0.875rem; // 14px
+
+  // semantic size mappings
+  --foundation-font-size-xs: var(--foundation-font-size-10); // 10px 
+  --foundation-font-size-s: var(--foundation-font-size-12); // 12px 
+  --foundation-font-size-m: var(--foundation-font-size-14); // 14px 
+  --foundation-font-size-l: var(--foundation-font-size-16); // 16px 
+  --foundation-font-size-xl: var(--foundation-font-size-18); // 18px
+  --foundation-font-size-2xl: var(--foundation-font-size-20); // 20px
+  --foundation-font-size-3xl: var(--foundation-font-size-24); // 24px
+  --foundation-font-size-6xl: var(--foundation-font-size-40); // 40px
+
+  // font weights
+  --foundation-font-weight-light: 300;
+  --foundation-font-weight-regular: 400;
+  --foundation-font-weight-medium: 500;
+  --foundation-font-weight-semi-bold: 600;
+  --foundation-font-weight-bold: 700;
+  --foundation-font-weight-black: 900;
+
+  // line heights
+  --foundation-line-height-12: 0.75rem; // 12px
+  --foundation-line-height-14: 0.875rem; // 14px
+  --foundation-line-height-16: 1rem; // 16px
+  --foundation-line-height-18: 1.125rem; // 18px
+  --foundation-line-height-20: 1.25rem; // 20px
+  --foundation-line-height-24: 1.5rem; // 24px
+  --foundation-line-height-26: 1.625rem; // 26px
+  --foundation-line-height-28: 1.75rem; // 28px
+  --foundation-line-height-32: 2rem; // 32px
+  --foundation-line-height-36: 2.25rem; // 36px
+  --foundation-line-height-40: 2.5rem; // 40px
+  --foundation-line-height-48: 3rem; // 48px
+  --foundation-line-height-56: 3.5rem; // 56px
+  --foundation-line-height-64: 4rem; // 64px
+  --foundation-line-height-72: 4.5rem; // 72px
+  --foundation-line-height-80: 5rem; // 80px
+
+  // semantic line-height mappings (align with design scale)
+  --foundation-line-height-xxs: var(--foundation-line-height-12); // 12px
+  --foundation-line-height-xs: var(--foundation-line-height-14); // 14px
+  --foundation-line-height-s: var(--foundation-line-height-16); // 16px
+  --foundation-line-height-m: var(--foundation-line-height-20); // 20px
+  --foundation-line-height-l: var(--foundation-line-height-24); // 24px
+  --foundation-line-height-xl: var(--foundation-line-height-28); // 28px 
+  --foundation-line-height-3xl: var(--foundation-line-height-32); // 32px
+  --foundation-line-height-5xl: var(--foundation-line-height-40); // 40px
+  --foundation-line-height-6xl: var(--foundation-line-height-48); // 48px
+
+
+  // letter spacings
+  --foundation-letter-spacing-xxs: -0.125rem;
+  --foundation-letter-spacing-xs: -0.0625rem;
+  --foundation-letter-spacing-normal: 0rem;
+  --foundation-letter-spacing-sm: 0.03125rem;
+  --foundation-letter-spacing-md: 0.0625rem;
+  --foundation-letter-spacing-lg: 0.125rem;
+
+  // semantic letter spacing mappings 
+  --foundation-letter-spacing-none: var(--foundation-letter-spacing-normal);
+  --foundation-letter-spacing-m: var(--foundation-letter-spacing-md);
+  --foundation-letter-spacing-l: var(--foundation-letter-spacing-lg);
+
+  // text transformations
+  --foundation-text-transform-none: none;
+  --foundation-text-transform-uppercase: uppercase;
+  --foundation-text-transform-lowercase: lowercase;
+  --foundation-text-transform-capitalize: capitalize;
+  --foundation-text-transform-italic: italic;
+  --foundation-text-transform-normal: normal;
+
+  // text decorations
+  --foundation-text-decoration-none: none;
+  --foundation-text-decoration-underline: underline;
+  --foundation-text-decoration-line-through: line-through;
+  
+  // Text / Body - X-Large Medium
+  --foundation-text-body-xl-medium-font-weight: var(--foundation-font-weight-medium);
+  --foundation-text-body-xl-medium-font-size: var(--foundation-font-size-xl);
+  --foundation-text-body-xl-medium-line-height: var(--foundation-line-height-l); // Desktop/Tablet
+  --foundation-text-body-xl-medium-line-height-mobile: var(--foundation-line-height-m); // Mobile
+  --foundation-text-body-xl-medium-letter-spacing: var(--foundation-letter-spacing-normal);
+
+  // Text / Body - X-Large
+  --foundation-text-body-xl-font-weight: var(--foundation-font-weight-regular);
+  --foundation-text-body-xl-font-size: var(--foundation-font-size-xl);
+  --foundation-text-body-xl-line-height: var(--foundation-line-height-l); // Desktop/Tablet
+  --foundation-text-body-xl-line-height-mobile: var(--foundation-line-height-m); // Mobile
+  --foundation-text-body-xl-letter-spacing: var(--foundation-letter-spacing-normal);
+
+  // Text / Body - Large Medium
+  --foundation-text-body-large-medium-font-weight: var(--foundation-font-weight-medium);
+  --foundation-text-body-large-medium-font-size: var(--foundation-font-size-l);
+  --foundation-text-body-large-medium-line-height: var(--foundation-line-height-l); // Desktop/Tablet
+  --foundation-text-body-large-medium-line-height-mobile: var(--foundation-line-height-m); // Mobile
+  --foundation-text-body-large-medium-letter-spacing: var(--foundation-letter-spacing-normal);
+
+  // Text / Body - Medium
+  --foundation-text-body-medium-font-weight: var(--foundation-font-weight-medium);
+  --foundation-text-body-medium-font-size: var(--foundation-font-size-m);
+  --foundation-text-body-medium-line-height: var(--foundation-line-height-m);
+  --foundation-text-body-medium-letter-spacing: var(--foundation-letter-spacing-normal);
+
+  // Text / Label - X-Small
+  --foundation-text-label-xs-font-weight: var(--foundation-font-weight-medium);
+  --foundation-text-label-xs-font-size: var(--foundation-font-size-xs);
+  --foundation-text-label-xs-line-height: var(--foundation-line-height-xxs);
+  --foundation-text-label-xs-letter-spacing: var(--foundation-letter-spacing-lg);
+
+  // Text / Legal - Light
+  --foundation-text-legal-light-font-weight: var(--foundation-font-weight-light);
+  --foundation-text-legal-light-font-size: var(--foundation-font-size-s);
+  --foundation-text-legal-light-line-height: var(--foundation-line-height-l); // Desktop/Tablet
+  --foundation-text-legal-light-line-height-mobile: var(--foundation-line-height-m); // Mobile
+  --foundation-text-legal-light-letter-spacing: var(--foundation-letter-spacing-lg);
+
+  // Text / Legal - SemiBold
+  --foundation-text-legal-semibold-font-weight: var(--foundation-font-weight-semi-bold);
+  --foundation-text-legal-semibold-font-size: var(--foundation-font-size-s);
+  --foundation-text-legal-semibold-line-height: var(--foundation-line-height-l); // Desktop/Tablet
+  --foundation-text-legal-semibold-line-height-mobile: var(--foundation-line-height-m); // Mobile
+  --foundation-text-legal-semibold-letter-spacing: var(--foundation-letter-spacing-lg);
+
+  // Text / Legal - Regular (same scale as md-body: 14px / 20px; for Breadcrumbs and similar)
+  --foundation-text-legal-regular-font-weight: var(--foundation-font-weight-regular);
+  --foundation-text-legal-regular-font-size: var(--foundation-font-size-md-body);
+  --foundation-text-legal-regular-line-height: var(--foundation-line-height-20);
+  --foundation-text-legal-regular-line-height-mobile: var(--foundation-line-height-20);
+  --foundation-text-legal-regular-letter-spacing: var(--foundation-letter-spacing-normal);
+}

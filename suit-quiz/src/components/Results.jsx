@@ -8,10 +8,10 @@ const money = new Intl.NumberFormat("en-US", {
 });
 
 const tailoringPackages = [
-  { id: "none", name: "No tailoring yet", price: 0, detail: "Keep the suit as-is for now." },
-  { id: "essentials", name: "Fit Essentials", price: 55, detail: "Hem pants and adjust sleeve length." },
-  { id: "signature", name: "Signature Fit", price: 100, detail: "Shape the jacket and refine waist, sleeves, and pants." },
-  { id: "custom", name: "Custom-Level Fit", price: 150, detail: "Our most complete in-store tailoring plan." },
+  { id: "none", name: "No tailoring yet", price: 0, detail: "Take the suit as it is, and decide on adjustments later." },
+  { id: "essentials", name: "Fit Essentials", price: 55, detail: "Hem the pants and set the sleeve length. The details people notice first." },
+  { id: "signature", name: "Signature Fit", price: 100, detail: "Shape the jacket and refine the waist, sleeves, and pants." },
+  { id: "custom", name: "Custom-Level Fit", price: 150, detail: "The fullest in-store plan, for when you want the fit finished." },
 ];
 
 const outfitOptions = [
@@ -52,11 +52,11 @@ export default function Results({ answers, onEditAnswers, onRestart }) {
 
   return (
     <section className="wire-panel" aria-labelledby="results-title">
-      <p className="eyebrow">Your suit plan</p>
-      <h1 id="results-title">Built around fit, not guesswork.</h1>
+      <p className="eyebrow">Your plan</p>
+      <h1 id="results-title">A suit you can walk in sure of.</h1>
       <p className="lede">
-        You asked for something {summary.fit} for {summary.occasion}. Here is the strongest
-        starting point and the evidence behind it.
+        You want something {summary.fit} for {summary.occasion}. This is the strongest
+        starting point, and why it fits the moment.
       </p>
 
       <div className="result-summary">
@@ -71,14 +71,14 @@ export default function Results({ answers, onEditAnswers, onRestart }) {
 
       {summary.needsMeasurementHelp && (
         <aside className="confidence-callout">
-          <p className="eyebrow">Fit confidence: needs a check</p>
-          <h2>A free measurement is the smarter next step.</h2>
+          <p className="eyebrow">Fit confidence</p>
+          <h2>A measurement will make this surer.</h2>
           <p>
-            Your height or usual fit issues suggest that an in-store measurement could prevent
-            avoidable alterations. Your recommendation is still ready below.
+            Your answers already point to a strong starting suit. A free in-store measurement
+            catches the details a quiz can’t, so you leave knowing it fits.
           </p>
           <button className="button secondary" type="button" onClick={() => setHandoff("appointment")}>
-            Find a store and book a measurement
+            Book a free measurement
           </button>
         </aside>
       )}
@@ -92,7 +92,7 @@ export default function Results({ answers, onEditAnswers, onRestart }) {
           <span className="score">{selected.matchPercent}% match</span>
         </div>
         <p>{selected.description}</p>
-        <h3>Why this is right for you</h3>
+        <h3>Why this fits the moment</h3>
         <ul className="evidence-list">
           {selected.evidence.map((reason) => <li key={reason}>{reason}</li>)}
         </ul>
@@ -117,26 +117,26 @@ export default function Results({ answers, onEditAnswers, onRestart }) {
         )}
       </article>
 
-      <h2>Two purposeful alternatives</h2>
+      <h2>Other ways to get it right</h2>
       <div className="alternatives">
         {alternatives.map((product, index) => (
           <article className="alternative" key={product.id}>
-            <p className="eyebrow">{index === 0 ? "Next-best match" : "Another route"}</p>
+            <p className="eyebrow">{index === 0 ? "Close second" : "A different read of the room"}</p>
             <h3>{product.name}</h3>
             <p>{product.description}</p>
             <p><strong>{money.format(product.price)}</strong> · {product.matchPercent}% match</p>
             <button className="button secondary" type="button" onClick={() => setSelectedId(product.id)}>
-              Swap to this suit
+              Use this suit instead
             </button>
           </article>
         ))}
       </div>
 
       <section className="result-section" aria-labelledby="tailoring-title">
-        <p className="eyebrow">Make it fit</p>
-        <h2 id="tailoring-title">Choose your tailoring plan</h2>
+        <p className="eyebrow">Dial in the fit</p>
+        <h2 id="tailoring-title">Choose how the suit gets finished</h2>
         <p>
-          Tailoring is selected separately so you can see exactly how it changes your complete plan.
+          Tailoring sits on its own line so you can see exactly what it adds to the plan.
         </p>
         <div className="choice-grid">
           {tailoringPackages.map((option) => (
@@ -149,7 +149,7 @@ export default function Results({ answers, onEditAnswers, onRestart }) {
                 onChange={() => setTailoringId(option.id)}
               />
               <span className="choice-copy">
-                <strong>{option.name} · {option.price ? money.format(option.price) : "Included later"}</strong>
+                <strong>{option.name} · {option.price ? money.format(option.price) : "$0"}</strong>
                 <span>{option.detail}</span>
               </span>
             </label>
@@ -158,9 +158,9 @@ export default function Results({ answers, onEditAnswers, onRestart }) {
       </section>
 
       <section className="result-section" aria-labelledby="outfit-title">
-        <p className="eyebrow">Optional outfit builder</p>
-        <h2 id="outfit-title">Wear the suit with these</h2>
-        <p>Add only what helps. These suggestions follow the same occasion and versatility signals.</p>
+        <p className="eyebrow">Finish the look</p>
+        <h2 id="outfit-title">Pieces that belong with this suit</h2>
+        <p>Add only what the moment calls for. Each piece follows the same occasion, so the outfit reads as one decision.</p>
         <div className="alternatives">
           {outfitOptions.map((item) => (
             <label className="choice" key={item.id}>
@@ -171,7 +171,7 @@ export default function Results({ answers, onEditAnswers, onRestart }) {
               />
               <span className="choice-copy">
                 <strong>{item.name}</strong>
-                <span>{money.format(item.price)} · Add or remove from your plan</span>
+                <span>{money.format(item.price)} · Add it if the moment calls for it</span>
               </span>
             </label>
           ))}
@@ -179,8 +179,8 @@ export default function Results({ answers, onEditAnswers, onRestart }) {
       </section>
 
       <section className="order-summary" aria-labelledby="summary-title">
-        <p className="eyebrow">Your complete plan</p>
-        <h2 id="summary-title">Review before the next step</h2>
+        <p className="eyebrow">Before you go further</p>
+        <h2 id="summary-title">Your plan</h2>
         <ul className="summary-lines">
           <li><span>{selected.name}</span><strong>{money.format(selected.price)}</strong></li>
           <li><span>{tailoring.name}</span><strong>{money.format(tailoring.price)}</strong></li>
@@ -201,8 +201,8 @@ export default function Results({ answers, onEditAnswers, onRestart }) {
 
       <aside className="email-box">
         <p className="eyebrow">Optional</p>
-        <h2>Email me my results</h2>
-        <p>Your result is already visible. Use this only if you want a copy for later.</p>
+        <h2>Send this plan to yourself</h2>
+        <p>Your results are already here. Use email only if you want a copy for later.</p>
         {emailSent ? (
           <p className="success-note" role="status">Prototype complete — a real experience would send the plan now.</p>
         ) : (

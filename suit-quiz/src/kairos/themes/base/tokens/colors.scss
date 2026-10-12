@@ -1,0 +1,88 @@
+/* Primitive Token */
+:root {
+/* colors */
+  // primary shades of blue
+  --foundation-color-primary-blue: #001e56;
+
+  // secondary shades
+  --foundation-color-secondary-light-blue: #cfe0f5;
+  --foundation-color-secondary-medium-blue: #046de9;
+  --foundation-color-secondary-dark-blue: #000c2c;
+  --foundation-color-tertiary-blue: #1dabd3; // Remove this token
+
+  // neutral shades
+  --foundation-color-neutral-white: #ffffff;
+  --foundation-color-neutral-lightest-gray: #f2f2f2;
+  --foundation-color-neutral-light-gray: #b9b9b9;
+  --foundation-color-neutral-medium-gray: #747474;
+  --foundation-color-neutral-dark-gray: #3a3a3a;
+  --foundation-color-neutral-black: #232323;
+
+  // Indicators
+  --foundation-color-danger-red: #da3535;
+  --foundation-color-danger-light-red: #fbebeb;
+  --foundation-color-success-green: #008756;
+  --foundation-color-success-light-green: #e6f3ee;
+  --foundation-color-warning-amber: #ffab2e;
+  --foundation-color-warning-light-amber: #fff6ea;
+  --foundation-color-info-blue: #4b6eff;
+  --foundation-color-info-light-blue: #edefff;
+
+  // transparent colors
+  --foundation-color-transparent-black5: rgba(0, 0, 0, 0.05);
+  --foundation-color-transparent-black10: rgba(0, 0, 0, 0.1);
+  --foundation-color-transparent-black20: rgba(0, 0, 0, 0.2);
+  --foundation-color-transparent-black50: rgba(0, 0, 0, 0.5);
+  --foundation-color-transparent-black70: rgba(0, 0, 0, 0.7);
+
+  --foundation-color-transparent-white10: rgba(255, 255, 255, 0.1);
+  --foundation-color-transparent-white20: rgba(255, 255, 255, 0.2);
+  --foundation-color-transparent-white40: rgba(255, 255, 255, 0.4);
+  --foundation-color-transparent-white60: rgba(255, 255, 255, 0.6);
+  --foundation-color-transparent-white80: rgba(255, 255, 255, 0.8);
+
+  --foundation-color-transparent-bright-royalblue0: #046de9;
+  --foundation-color-transparent-bright-royalblue85: rgba(4, 109, 233, 0.85); // #046de9;
+  --foundation-color-transparent-royalblue85: rgba(25, 70, 156, 0.85); //#19469c;
+
+  --foundation-color-transparent-success-green85: rgba(0, 135, 86, 0.85); //#008756;
+
+  --foundation-color-transparent-danger-red85: rgba(218, 53, 53, 0.85); //#ffab2e;
+
+  --foundation-color-transparent-purple85: rgba(97, 9, 213, 0.85); //tag v2
+
+  // background colors
+  --foundation-color-background-white: #ffffff;
+  --foundation-color-background-gray: #b9b9b9;
+  --foundation-color-background-dark-blue: #001e56;
+
+  // border colors
+  --foundation-color-border-black10: rgba(0, 0, 0, 0.1);
+  --foundation-color-border-black: #232323;
+
+  // hover colors
+  --foundation-color-hover-background-dark-blue: #000c2c;
+  --foundation-color-hover-border-dark-blue: #000c2c;
+
+  // font colors
+  --foundation-color-font-black: #232323;
+  --foundation-color-font-white: #ffffff;
+  --foundation-color-font-light-gray: #b9b9b9;
+  --foundation-color-font-medium-gray: #747474;
+  --foundation-color-font-dark-gray: #3a3a3a;
+
+  // divider colors
+  --foundation-color-divider-light-gray: #b9b9b9;
+  --foundation-color-divider-medium-gray: #747474;
+
+  // focus colors
+  --foundation-color-focus-outline: #4b6eff;
+
+  // surface colors
+  --foundation-surface-banner-subtle: #f3f7fd;
+
+  // action colors
+  --foundation-action-background-paypal: #ffbd5d;
+  --foundation-action-background-gpay: #000;
+  --foundation-action-background-applepay: #000;
+}

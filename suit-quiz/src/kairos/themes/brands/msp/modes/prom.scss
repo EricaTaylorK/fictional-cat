@@ -1,0 +1,7 @@
+@use '../../../base/tokens' as *;
+@use '../base' as *;
+
+:root[data-brand='msp'][data-mode='prom'],
+:root[data-brand='msp'] [data-mode='prom'] {
+    --color-tertiary-blue: var(--foundation-color-tertiary-blue);
+}

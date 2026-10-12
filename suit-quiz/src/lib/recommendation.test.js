@@ -88,7 +88,7 @@ describe("recommendations", () => {
   it("reflects the shopper inputs in the result summary", () => {
     expect(buildResultSummary(baseAnswers)).toMatchObject({
       occasion: "a wedding",
-      fit: "polished without feeling tight",
+      fit: "polished, with room to move",
       size: "40R starting point",
       needsMeasurementHelp: false,
     });
