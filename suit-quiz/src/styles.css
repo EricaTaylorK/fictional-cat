@@ -964,13 +964,23 @@ h2 {
 }
 
 .match-score {
-  background: var(--color-info-light-blue);
-  color: var(--text-tertiary);
   display: inline-block;
-  font-size: var(--font-size-12);
-  font-weight: var(--font-weight-medium);
+  font-size: var(--font-size-10);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: 0.06em;
   margin-bottom: var(--spacing-vertical-sm);
   padding: 2px var(--spacing-horizontal-sm);
+  text-transform: uppercase;
+}
+
+.match-score-best {
+  background: var(--color-success-light-green);
+  color: var(--color-success-green);
+}
+
+.match-score-mid {
+  background: var(--color-warning-light-amber);
+  color: var(--color-font-black);
 }
 
 .suit-option .product-image {

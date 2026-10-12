@@ -6,6 +6,7 @@ const tailoringPackages = [
   {
     id: "essentials",
     name: "Fit Essentials",
+    plain: "Hem and sleeves",
     price: 55,
     icon: "/icons/product_size.svg",
     detail: "We'll hem the pants and set the sleeve length for a clean, finished look.",
@@ -13,6 +14,7 @@ const tailoringPackages = [
   {
     id: "signature",
     name: "Signature Fit",
+    plain: "Jacket and waist",
     price: 100,
     icon: "/icons/product_modernfit.svg",
     detail: "Everything in Essentials, plus we shape the jacket and waist so it looks sharper.",
@@ -20,6 +22,7 @@ const tailoringPackages = [
   {
     id: "custom",
     name: "Custom-Level Fit",
+    plain: "A full reshape",
     price: 150,
     icon: "/icons/product_hanger.svg",
     detail: "Our most complete tailoring: refined lines, cleaner drape, and a made-for-you shape.",
@@ -63,6 +66,10 @@ function MatchRing({ percent }) {
   );
 }
 
+function matchTone(percent) {
+  return percent >= 90 ? "best" : "mid";
+}
+
 function SuitOption({ product, size, selected, onSelect }) {
   return (
     <label className={`suit-option${selected ? " suit-option-selected" : ""}`}>
@@ -78,7 +85,7 @@ function SuitOption({ product, size, selected, onSelect }) {
         <img src={product.image} alt="" />
       </div>
       <div className="suit-option-body">
-        <span className="match-score">{product.matchPercent}% match</span>
+        <span className={`match-score match-score-${matchTone(product.matchPercent)}`}>{product.matchPercent}% match</span>
         <p className="product-brand">{product.brand}</p>
         <h3 className="product-title">{product.name}</h3>
         <p className="product-price">
@@ -168,8 +175,8 @@ export default function Results({ answers, onEditAnswers }) {
             </li>
             <li className="fit-stat">
               <img src="/icons/product_hanger.svg" alt="" />
-              <span className="fit-stat-label">Tailoring</span>
-              <strong>{recommendedTailoring.name}</strong>
+              <span className="fit-stat-label">We'll start with</span>
+              <strong>{recommendedTailoring?.plain}</strong>
             </li>
           </ul>
         </div>
