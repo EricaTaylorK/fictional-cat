@@ -1,7 +1,9 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Results from "./components/Results.jsx";
 import TextInput from "./components/TextInput.jsx";
+import { products } from "./data/products.js";
 import { getQuestionFlow, questions } from "./data/quizConfig.js";
+import { formatPrice } from "./lib/recommendation.js";
 
 const STORAGE_KEY = "suit-quiz-wireframe-progress";
 
@@ -209,8 +211,9 @@ export default function App() {
   }, [state, screen]);
 
   useEffect(() => {
-    document.documentElement.classList.toggle("results-page", screen === "results");
-    return () => document.documentElement.classList.remove("results-page");
+    const lightPage = screen === "start" || screen === "matching" || screen === "results";
+    document.documentElement.classList.toggle("page-white", lightPage);
+    return () => document.documentElement.classList.remove("page-white");
   }, [screen]);
 
   function startQuiz() {
@@ -267,7 +270,9 @@ export default function App() {
       <p className="promo-banner">
         {screen === "results"
           ? "Your sizes and today's prices are in your plan below."
-          : "Suits are on sale now. Finish the quiz to see your size and your price."}
+          : screen === "start"
+            ? "Suits are on sale now."
+            : "Suits are on sale now. Finish the quiz to see your size and your price."}
       </p>
       <header className="site-header">
         <div className="header-slot header-slot-start">
@@ -301,26 +306,48 @@ export default function App() {
           )}
         </div>
       </header>
-      <main className={`app-shell${screen === "results" ? " app-shell-wide" : ""}`}>
+      <main className={`app-shell${screen === "results" || screen === "start" ? " app-shell-wide" : ""}`}>
         {screen === "start" && (
-          <section className="wire-panel start-panel" aria-labelledby="start-title">
-            <h1 id="start-title">Get it right for the moment.</h1>
-            <p className="lede">
-              Tell us the occasion, how you want the suit to feel, and what you’re comfortable
-              spending. We’ll turn that into a clear plan you can trust.
-            </p>
-            {hasSavedProgress ? (
-              <div className="actions-right">
-                <button className="button" type="button" onClick={resumeQuiz}>Pick up where you left off</button>
-                <button className="button secondary" type="button" onClick={startQuiz}>Start fresh</button>
+          <section className="suits-listing" aria-labelledby="suits-title">
+            <nav className="crumbs" aria-label="Breadcrumb">
+              <ol>
+                <li>Home</li>
+                <li>Clothing</li>
+                <li aria-current="page">Suits</li>
+              </ol>
+            </nav>
+            <h1 id="suits-title">Men's Suits</h1>
+            <div className="quiz-banner">
+              <div className="quiz-banner-photos" aria-hidden="true">
+                {products.slice(0, 3).map((product, index) => (
+                  <img
+                    className={index === 1 ? "quiz-banner-photo-selected" : undefined}
+                    src={product.image}
+                    alt=""
+                    key={product.id}
+                  />
+                ))}
               </div>
-            ) : (
-              <button className="button" type="button" onClick={startQuiz}>Find my suit</button>
-            )}
-            <ul className="expectations">
-              <li>About 3 minutes</li>
-              <li>Results right away, email optional</li>
-              <li>Progress saved on this device</li>
+              <div className="quiz-banner-copy">
+                <p className="quiz-banner-kicker">Want help choosing a suit?</p>
+                <p className="quiz-banner-title">Get personalized recommendations in less than a minute.</p>
+              </div>
+              <button className="quiz-banner-button" type="button" onClick={hasSavedProgress ? resumeQuiz : startQuiz}>
+                <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true">
+                  <path fill="currentColor" d="M8 1.2 9.1 5.4 13.4 6.2 9.1 7.3 8 11.5 6.9 7.3 2.6 6.2 6.9 5.4 8 1.2Zm4.2 8.1.6 2.1 2.2.6-2.2.7-.6 2.1-.6-2.1-2.1-.7 2.1-.6.6-2.1Z" />
+                </svg>
+                Take the Quiz
+              </button>
+            </div>
+            <ul className="suits-grid">
+              {products.slice(0, 4).map((product) => (
+                <li key={product.id}>
+                  <img src={product.image} alt="" />
+                  <p className="suits-price">{formatPrice(product.price)}</p>
+                  <p className="suits-brand">{product.brand}</p>
+                  <p className="suits-name">{product.name}</p>
+                </li>
+              ))}
             </ul>
           </section>
         )}

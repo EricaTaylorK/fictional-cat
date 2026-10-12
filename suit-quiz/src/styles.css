@@ -6,7 +6,7 @@
   line-height: var(--line-height-24);
 }
 
-html.results-page {
+html.page-white {
   background: var(--surface-primary);
 }
 
@@ -132,12 +132,6 @@ select:focus-visible,
   padding: clamp(24px, 5vw, 48px);
 }
 
-.start-panel {
-  background: var(--surface-primary) url("/backgrounds/wash.jpg") center / cover no-repeat;
-  border-color: transparent;
-  padding-block: clamp(48px, 9vw, 96px);
-}
-
 .wire-panel h1,
 .wire-panel h2,
 .matching h1 {
@@ -171,26 +165,123 @@ h2 {
   margin-bottom: var(--spacing-vertical-xs);
 }
 
-.lede {
-  font-size: 1.1rem;
-  max-width: 58ch;
-}
-
-.expectations {
+.crumbs ol {
   color: var(--text-secondary);
   display: flex;
-  flex-wrap: wrap;
-  font-size: var(--font-size-14);
-  gap: var(--spacing-vertical-xs) var(--spacing-horizontal-lg);
+  font-size: var(--font-size-12);
+  gap: var(--spacing-horizontal-sm);
   list-style: none;
-  margin: var(--spacing-vertical-lg) 0 0;
+  margin: 0 0 var(--spacing-vertical-sm);
   padding: 0;
 }
 
-.expectations li + li::before {
-  color: var(--border-primary);
-  content: "·";
-  margin-right: var(--spacing-horizontal-lg);
+.crumbs li + li::before {
+  content: "/";
+  margin-right: var(--spacing-horizontal-sm);
+}
+
+.suits-listing h1 {
+  font-size: var(--font-size-h2);
+  line-height: var(--line-height-32);
+  margin-bottom: var(--spacing-vertical-lg);
+  max-width: none;
+}
+
+.quiz-banner {
+  align-items: center;
+  background: var(--color-info-light-blue);
+  border-radius: var(--border-radius-xl);
+  display: grid;
+  gap: var(--spacing-horizontal-lg);
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  margin-bottom: var(--spacing-vertical-xl);
+  padding: var(--spacing-vertical-lg) var(--spacing-horizontal-xl);
+}
+
+.quiz-banner-photos {
+  display: flex;
+  gap: var(--spacing-horizontal-xs);
+}
+
+.quiz-banner-photos img {
+  background: var(--color-neutral-lightest-gray);
+  border-radius: var(--border-radius-md);
+  height: 88px;
+  object-fit: cover;
+  width: 72px;
+}
+
+.quiz-banner-photo-selected {
+  box-shadow: 0 0 0 2px var(--color-info-blue);
+}
+
+.quiz-banner-kicker {
+  font-size: var(--font-size-12);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: 0.06em;
+  margin-bottom: var(--spacing-vertical-xs);
+  text-transform: uppercase;
+}
+
+.quiz-banner-title {
+  font-size: var(--font-size-20, 1.25rem);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-28, 1.4);
+  margin: 0;
+  max-width: 28ch;
+}
+
+.quiz-banner-button {
+  align-items: center;
+  background: var(--color-info-blue);
+  border: 0;
+  border-radius: var(--border-radius-lg);
+  color: var(--color-font-white);
+  display: inline-flex;
+  font-weight: var(--font-weight-medium);
+  gap: var(--spacing-horizontal-xs);
+  min-height: 44px;
+  padding: var(--spacing-vertical-sm) var(--spacing-horizontal-lg);
+}
+
+.quiz-banner-button:hover {
+  background: var(--color-background-dark-blue);
+}
+
+.suits-grid {
+  display: grid;
+  gap: var(--spacing-horizontal-lg);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.suits-grid img {
+  background: var(--color-neutral-lightest-gray);
+  display: block;
+  margin-bottom: var(--spacing-vertical-sm);
+  width: 100%;
+}
+
+.suits-price,
+.suits-brand,
+.suits-name {
+  margin: 0;
+}
+
+.suits-price {
+  font-weight: var(--font-weight-bold);
+}
+
+.suits-brand {
+  font-size: var(--font-size-14);
+  font-weight: var(--font-weight-bold);
+}
+
+.suits-name {
+  color: var(--text-secondary);
+  font-size: var(--font-size-14);
 }
 
 .proof-list {
@@ -594,12 +685,19 @@ h2 {
   outline-offset: 2px;
 }
 
+.app-shell:has(.matching) {
+  max-width: none;
+  padding: 0;
+}
+
 .matching {
-  background: var(--surface-primary) url("/backgrounds/wash.jpg") center / cover no-repeat;
-  border-radius: var(--border-radius-xl);
-  margin: 0 auto;
-  max-width: 560px;
-  padding: clamp(32px, 6vw, 56px) clamp(24px, 5vw, 48px);
+  align-items: center;
+  background: var(--surface-primary);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: calc(100vh - 108px);
+  padding: var(--spacing-vertical-xxl) var(--spacing-horizontal-lg);
   text-align: center;
 }
 
@@ -904,16 +1002,11 @@ h2 {
   color: var(--text-link-hover);
 }
 
-.results-card,
 .order-summary,
 .email-box,
 .confidence-callout {
   background: var(--surface-primary);
   border: 1px solid var(--border-primary);
-}
-
-.results-card {
-  padding: var(--spacing-vertical-xl);
 }
 
 
@@ -1078,23 +1171,6 @@ h2 {
   margin-top: 2px;
 }
 
-.fit-pick {
-  border-left: 2px solid var(--color-background-dark-blue);
-  margin: var(--spacing-vertical-md) 0 0;
-  padding-left: var(--spacing-horizontal-md);
-}
-
-.fit-pick p {
-  font-size: var(--font-size-14);
-  line-height: var(--line-height-20);
-  margin: 0;
-  text-wrap: pretty;
-}
-
-.fit-pick .fit-pick-label {
-  font-weight: var(--font-weight-medium);
-}
-
 .results-main .results-card {
   margin-top: var(--spacing-vertical-xl);
 }
@@ -1241,8 +1317,6 @@ h2 {
 }
 
 .tier-list {
-  border: 1px solid var(--border-primary);
-  border-radius: var(--border-radius-sm);
   display: grid;
   margin: var(--spacing-vertical-lg) 0 0;
 }
@@ -1253,7 +1327,7 @@ h2 {
   display: grid;
   gap: var(--spacing-horizontal-md);
   grid-template-columns: 20px minmax(0, 1fr) auto;
-  padding: var(--spacing-vertical-md) var(--spacing-horizontal-lg);
+  padding: var(--spacing-vertical-md) 0;
 }
 
 .tier + .tier {
@@ -1557,12 +1631,20 @@ h2 {
     padding: 0 0 var(--spacing-vertical-xxl);
   }
 
-  .wire-panel,
-  .matching {
+  .wire-panel {
     border: 0;
     border-radius: 0;
     min-height: calc(100vh - 120px);
     padding: var(--spacing-vertical-lg) var(--spacing-horizontal-lg) var(--spacing-vertical-xl);
+  }
+
+  .quiz-banner {
+    grid-template-columns: 1fr;
+    justify-items: start;
+  }
+
+  .suits-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .progress-row .save-note {
@@ -1575,14 +1657,6 @@ h2 {
 
   .nav-label {
     display: none;
-  }
-
-  .expectations {
-    flex-direction: column;
-  }
-
-  .expectations li + li::before {
-    content: none;
   }
 
   .proof-list,
@@ -1598,10 +1672,6 @@ h2 {
   .actions-right {
     align-items: stretch;
     flex-direction: column;
-  }
-
-  .results-card {
-    padding: var(--spacing-vertical-lg);
   }
 
   .results-hero {

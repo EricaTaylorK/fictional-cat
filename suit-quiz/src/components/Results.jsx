@@ -201,13 +201,8 @@ export default function Results({ answers, onEditAnswers }) {
                 Make it a perfect fit
               </h2>
               <p className="section-copy">
-                For the {selected.brand} {selected.name}. Our tailors measure you in store and fine-tune
-                the fit, so it looks and feels made for you.
+                For the {selected.brand} {selected.name}. {summary.tailoring.because}
               </p>
-              <div className="fit-pick">
-                <p className="fit-pick-label">We recommend {recommendedTailoring.name}</p>
-                <p>{summary.tailoring.because}</p>
-              </div>
               <div className="tier-list" role="radiogroup" aria-labelledby="tailoring-title">
                 {[...tailoringPackages, {
                   id: "none",
