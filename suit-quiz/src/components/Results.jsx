@@ -91,7 +91,12 @@ function SuitOption({ product, size, selected, onSelect }) {
         <h4 className="reason-title">Why it's a strong pick</h4>
         <ul className="reason-list">
           {product.evidence.slice(0, 3).map((reason) => (
-            <li key={reason}>{reason}</li>
+            <li key={reason}>
+              <svg className="reason-check" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
+                <path fill="currentColor" d="M6.3 12.2 1.8 7.7l1.2-1.2 3.3 3.3 6.7-6.7 1.2 1.2-7.9 7.9Z" />
+              </svg>
+              <span>{reason}</span>
+            </li>
           ))}
         </ul>
       </div>
@@ -140,11 +145,14 @@ export default function Results({ answers, onEditAnswers }) {
         <div className="results-hero">
           <MatchRing percent={recommendations[0].matchPercent} />
           <div className="results-hero-copy">
-            <p className="results-eyebrow">Your fit is in</p>
             <h1 id="results-title">We found your suit.</h1>
             <p className="results-lede">
               Three suits for {summary.occasion}, in a fit that feels {summary.fit}. Your best match
               is selected.
+            </p>
+            <p className="based-on">
+              Based on: {basedOn}{" "}
+              <button className="text-link" type="button" onClick={onEditAnswers}>Edit answers</button>
             </p>
           </div>
           <ul className="fit-stats">
@@ -165,10 +173,6 @@ export default function Results({ answers, onEditAnswers }) {
             </li>
           </ul>
         </div>
-        <p className="based-on">
-          Based on: {basedOn}{" "}
-          <button className="text-link" type="button" onClick={onEditAnswers}>Edit answers</button>
-        </p>
 
         <div className="suit-options" role="radiogroup" aria-labelledby="results-title">
           {recommendations.map((product) => (
