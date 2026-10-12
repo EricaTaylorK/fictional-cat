@@ -20,7 +20,7 @@ const outfitOptions = [
   { id: "shoes", name: "Black dress shoes", price: 110 },
 ];
 
-export default function Results({ answers, onEditAnswers, onRestart }) {
+export default function Results({ answers, onEditAnswers }) {
   const recommendations = useMemo(() => getRecommendations(answers), [answers]);
   const summary = useMemo(() => buildResultSummary(answers), [answers]);
   const [selectedId, setSelectedId] = useState(recommendations[0].id);
@@ -221,10 +221,6 @@ export default function Results({ answers, onEditAnswers, onRestart }) {
           </form>
         )}
       </aside>
-
-      <div className="actions">
-        <button className="button link" type="button" onClick={onRestart}>Start over</button>
-      </div>
     </section>
   );
 }

@@ -86,6 +86,14 @@ function MeasurementsQuestion({ value = {}, onChange }) {
   );
 }
 
+function ArrowLeftIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true">
+      <path fill="currentColor" fillRule="evenodd" d="M9.5 5.5 3 12l6.5 6.5.707-.707L4.914 12.5H21v-1H4.913l5.294-5.293L9.5 5.5Z" clipRule="evenodd" />
+    </svg>
+  );
+}
+
 function isAnswered(question, answer) {
   if (question.type === "multi") return Array.isArray(answer) && answer.length > 0;
   if (question.type === "measurements") {
@@ -144,8 +152,33 @@ export default function App() {
   return (
     <>
       <header className="site-header">
-        <p className="wordmark">Men's Wearhouse</p>
-        <span className="prototype-tag">Wireframe</span>
+        <div className="header-slot header-slot-start">
+          {screen === "question" && (
+            <button className="nav-control" type="button" onClick={goBack} aria-label="Back">
+              <ArrowLeftIcon />
+              <span className="nav-label">Back</span>
+            </button>
+          )}
+          {screen === "results" && (
+            <button
+              className="nav-control"
+              type="button"
+              onClick={() => setState((previous) => ({ ...previous, screen: "question", currentId: "occasion" }))}
+              aria-label="Edit answers"
+            >
+              <ArrowLeftIcon />
+              <span className="nav-label">Edit answers</span>
+            </button>
+          )}
+        </div>
+        <a className="logo" href="/" aria-label="Men's Wearhouse">
+          <img src="/mw-logo.svg" alt="" />
+        </a>
+        <div className="header-slot header-slot-end">
+          {screen !== "start" && (
+            <button className="nav-control" type="button" onClick={restart}>Start over</button>
+          )}
+        </div>
       </header>
       <main className="app-shell">
         {screen === "start" && (
@@ -156,12 +189,12 @@ export default function App() {
               Tell us the occasion, how you want the suit to feel, and what you’re comfortable
               spending. We’ll turn that into a clear plan you can trust.
             </p>
-            <ul className="expectations">
-              <li><strong>About 3 minutes</strong>A short set of plain questions</li>
-              <li><strong>See it right away</strong>Your plan appears here. Email is optional.</li>
-              <li><strong>Saved on this device</strong>Come back and pick up where you left off</li>
-            </ul>
             <button className="button" type="button" onClick={startQuiz}>Find my suit</button>
+            <ul className="expectations">
+              <li>About 3 minutes</li>
+              <li>Results right away, email optional</li>
+              <li>Progress saved on this device</li>
+            </ul>
           </section>
         )}
 
@@ -184,19 +217,15 @@ export default function App() {
               <ChoiceQuestion question={currentQuestion} value={answers[currentId]} onChange={setAnswer} />
             )}
 
-            <div className="actions">
-              <button className="button secondary" type="button" onClick={goBack}>Back</button>
-              <div className="actions-right">
-                <button className="button link" type="button" onClick={restart}>Start over</button>
-                <button
-                  className="button"
-                  type="button"
-                  disabled={!isAnswered(currentQuestion, answers[currentId])}
-                  onClick={continueQuiz}
-                >
-                  {currentIndex === flow.length - 1 ? "See my results" : "Continue"}
-                </button>
-              </div>
+            <div className="actions actions-end">
+              <button
+                className="button"
+                type="button"
+                disabled={!isAnswered(currentQuestion, answers[currentId])}
+                onClick={continueQuiz}
+              >
+                {currentIndex === flow.length - 1 ? "See my results" : "Continue"}
+              </button>
             </div>
           </section>
         )}
@@ -204,9 +233,7 @@ export default function App() {
         {screen === "results" && (
           <Results
             answers={answers}
-            onEditAnswers={() => setState((previous) => ({ ...previous, screen: "question", currentId: "occasion" }))}
-            onRestart={restart}
-          />
+            onEditAnswers={() => setState((previous) => ({ ...previous, screen: "question", currentId: "occasion" }))}          />
         )}
       </main>
     </>
