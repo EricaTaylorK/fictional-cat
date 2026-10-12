@@ -32,26 +32,17 @@ const outfitOptions = [
   { id: "shoes", summaryLabel: "Dress shoes", name: "Black Cap-Toe Oxfords", price: 119.99, image: "/outfit/black-dress-shoes.jpg" },
 ];
 
-function jacketSize(size) {
-  if (size.jacket) return size.jacket;
-  if (size.length) return `${size.length} (${size.lengthCode})`;
-  return null;
+function cardDetails(product, size) {
+  const sized = [size.jacket, size.pants].filter(Boolean);
+  const sizeLabel = sized.length
+    ? sized.join(" · ")
+    : size.length
+      ? `${size.length} (${size.lengthCode})`
+      : null;
+  return [product.color, sizeLabel, product.fabric].filter(Boolean).join(" · ");
 }
 
-function PieceLine({ label, color, size, piece }) {
-  return (
-    <li className="piece-line">
-      <span className="piece-name">{label}</span>
-      <span className="piece-meta">{[color, size].filter(Boolean).join(" · ")}</span>
-      <span className="piece-price">
-        {piece.compareAt && <s>{formatPrice(piece.compareAt)}</s>}
-        {formatPrice(piece.price)}
-      </span>
-    </li>
-  );
-}
-
-function SuitOption({ product, size, recommendedTailoring, selected, onSelect }) {
+function SuitOption({ product, size, selected, onSelect }) {
   return (
     <label className={`suit-option${selected ? " suit-option-selected" : ""}`}>
       <input
@@ -69,8 +60,12 @@ function SuitOption({ product, size, recommendedTailoring, selected, onSelect })
         <span className="match-score">{product.matchPercent}% match</span>
         <p className="product-brand">{product.brand}</p>
         <h3 className="product-title">{product.name}</h3>
+        <p className="product-price">
+          <strong>{formatPrice(product.price)}</strong>
+          {product.compareAt && <s>{formatPrice(product.compareAt)}</s>}
+        </p>
         <p className="product-meta">
-          {product.fabric}
+          {cardDetails(product, size)}
           {product.reviews >= 100 && (
             <span className="product-rating">
               <img src="/icons/content_starfilled.svg" alt="" />
@@ -78,20 +73,6 @@ function SuitOption({ product, size, recommendedTailoring, selected, onSelect })
             </span>
           )}
         </p>
-        <ul className="piece-lines">
-          <PieceLine label="Jacket" color={product.color} size={jacketSize(size)} piece={product.jacket} />
-          <PieceLine label="Pants" color={product.color} size={size.pants} piece={product.pants} />
-        </ul>
-        <dl className="price-pair">
-          <div>
-            <dt>Suit</dt>
-            <dd>{formatPrice(product.price)}</dd>
-          </div>
-          <div className="price-pair-tailored">
-            <dt>Suit + {recommendedTailoring.name}</dt>
-            <dd>{formatPrice(product.price + recommendedTailoring.price)}</dd>
-          </div>
-        </dl>
       </div>
       <div className="suit-panel">
         <h4 className="reason-title">Why it's a strong pick</h4>
@@ -159,7 +140,6 @@ export default function Results({ answers, onEditAnswers }) {
               key={product.id}
               product={product}
               size={size}
-              recommendedTailoring={recommendedTailoring}
               selected={product.id === selectedId}
               onSelect={setSelectedId}
             />
