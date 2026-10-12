@@ -32,15 +32,13 @@ const outfitOptions = [
   { id: "shoes", summaryLabel: "Dress shoes", name: "Black Cap-Toe Oxfords", price: 119.99, image: "/outfit/black-dress-shoes.jpg" },
 ];
 
-const optionLabels = ["Best match", "Also a strong fit", "Another way to go"];
-
 function sizeDetail(size) {
   if (size.jacket) return `Your size: ${size.jacket} jacket · ${size.pants} pants`;
   if (size.length) return `Your size: ${size.length} (${size.lengthCode})`;
   return null;
 }
 
-function SuitOption({ product, size, label, recommendedTailoring, selected, onSelect }) {
+function SuitOption({ product, size, recommendedTailoring, selected, onSelect }) {
   return (
     <label className={`suit-option${selected ? " suit-option-selected" : ""}`}>
       <input
@@ -55,10 +53,7 @@ function SuitOption({ product, size, label, recommendedTailoring, selected, onSe
         <img src={product.image} alt="" />
       </div>
       <div className="suit-option-body">
-        <div className="option-head">
-          <p className={label === "Best match" ? "option-kicker option-kicker-best" : "option-kicker"}>{label}</p>
-          <span className="match-score">{product.matchPercent}% match</span>
-        </div>
+        <span className="match-score">{product.matchPercent}% match</span>
         <p className="product-brand">{product.brand}</p>
         <h3 className="product-title">{product.name}</h3>
         <p className="product-price">
@@ -75,18 +70,18 @@ function SuitOption({ product, size, label, recommendedTailoring, selected, onSe
             </span>
           )}
         </p>
-        <div className="suit-panel">
-          <h4 className="reason-title">Why it's a strong pick</h4>
-          <ul className="reason-list">
-            {product.evidence.slice(0, 3).map((reason) => (
-              <li key={reason}>{reason}</li>
-            ))}
-          </ul>
-          <p className="panel-prices">
-            <span>Suit only <strong>{formatPrice(product.price)}</strong></span>
-            <span>With {recommendedTailoring.name} <strong>{formatPrice(product.price + recommendedTailoring.price)}</strong></span>
-          </p>
-        </div>
+        <p className="panel-prices">
+          <span>Suit only <strong>{formatPrice(product.price)}</strong></span>
+          <span>With {recommendedTailoring.name} <strong>{formatPrice(product.price + recommendedTailoring.price)}</strong></span>
+        </p>
+      </div>
+      <div className="suit-panel">
+        <h4 className="reason-title">Why it's a strong pick</h4>
+        <ul className="reason-list">
+          {product.evidence.slice(0, 3).map((reason) => (
+            <li key={reason}>{reason}</li>
+          ))}
+        </ul>
       </div>
     </label>
   );
@@ -141,12 +136,11 @@ export default function Results({ answers, onEditAnswers }) {
         </p>
 
         <div className="suit-options" role="radiogroup" aria-labelledby="results-title">
-          {recommendations.map((product, index) => (
+          {recommendations.map((product) => (
             <SuitOption
               key={product.id}
               product={product}
               size={size}
-              label={optionLabels[index]}
               recommendedTailoring={recommendedTailoring}
               selected={product.id === selectedId}
               onSelect={setSelectedId}
