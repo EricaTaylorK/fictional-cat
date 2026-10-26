@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { TAILORING_TIERS } from "../data/products.js";
-import { getQuestionFlow } from "../data/quizConfig.js";
-import { RENTAL_PIECES } from "../data/rentals.js";
+import { products, SWATCH_HEX, TAILORING_TIERS } from "../data/products.js";
+import { colorThemes, getQuestionFlow } from "../data/quizConfig.js";
+import { RENTAL_PIECES, rentals } from "../data/rentals.js";
 import {
   buildResultSummary,
   describeSize,
@@ -38,9 +38,18 @@ describe("quiz routing", () => {
       "colors",
       "measurementKnowledge",
       "measurements",
+      "fitIssues",
       "tailoring",
       "budget",
     ]);
+  });
+
+  it("asks where suits feel off on both measurement paths, and height only once", () => {
+    const some = getQuestionFlow({ measurementKnowledge: "some" });
+    expect(some.indexOf("fitIssues")).toBe(some.indexOf("measurements") + 1);
+    expect(some).not.toContain("height");
+    const estimate = getQuestionFlow({ measurementKnowledge: "no" });
+    expect(estimate.filter((id) => id === "height")).toHaveLength(1);
   });
 
   it("routes unknown measurements through fit issues and height", () => {
@@ -258,7 +267,7 @@ describe("recommendations", () => {
     );
   });
 
-  it("keeps skipped colors out unless nothing else qualifies", () => {
+  it("ranks suits in a picked palette first", () => {
     const navy = {
       id: "navy",
       fit: "balanced",
@@ -271,20 +280,48 @@ describe("recommendations", () => {
       comfort: 4,
       tailoringEase: 4,
     };
-    const black = { ...navy, id: "black", color: "Black", colorKey: "black" };
-    const skipped = getRecommendations(
-      { ...baseAnswers, colors: { prefer: ["navy"], avoid: ["black"] } },
-      [black, navy],
-    );
-    expect(skipped.map((product) => product.id)).toEqual(["navy"]);
-    expect(skipped[0].evidence.join(" ")).toMatch(/navy/i);
+    const tan = { ...navy, id: "tan", color: "Tan", colorKey: "tan" };
+    const warm = getRecommendations({ ...baseAnswers, colors: { prefer: ["warm"] } }, [navy, tan]);
+    expect(warm.map((product) => product.id)).toEqual(["tan", "navy"]);
+    expect(warm[0].evidence.join(" ")).toMatch(/tan, a color you picked/);
+    expect(warm[1].tradeoffs.join(" ")).toMatch(/wasn't a color you picked/);
 
-    const onlySkipped = getRecommendations(
-      { ...baseAnswers, colors: { prefer: [], avoid: ["black"] } },
-      [black],
-    );
-    expect(onlySkipped[0].id).toBe("black");
-    expect(onlySkipped[0].tradeoffs.join(" ")).toMatch(/skip/i);
+    const darks = getRecommendations({ ...baseAnswers, colors: { prefer: ["darks"] } }, [tan, navy]);
+    expect(darks[0].id).toBe("navy");
+  });
+
+  it("ignores colors to skip from older saved answers", () => {
+    const black = {
+      id: "black",
+      fit: "balanced",
+      fitName: "Modern fit",
+      color: "Black",
+      colorKey: "black",
+      price: 300,
+      formality: ["wedding"],
+    };
+    const ranked = getRecommendations({ ...baseAnswers, colors: { prefer: [], avoid: ["black"] } }, [black]);
+    expect(ranked[0].id).toBe("black");
+    expect(ranked[0].tradeoffs.join(" ")).not.toMatch(/skip/i);
+    expect(getRentalRecommendations({ mode: "rent", colors: { avoid: ["darks"] } }).length).toBe(rentals.length);
+  });
+
+  it("builds every color theme from colors the catalog actually carries", () => {
+    const buyKeys = new Set(products.flatMap((product) => [product, ...(product.variants ?? [])]).map((item) => item.colorKey));
+    const rentKeys = new Set(rentals.map((look) => look.colorKey));
+    for (const [mode, keys] of [["buy", buyKeys], ["rent", rentKeys]]) {
+      const themes = colorThemes(mode);
+      expect(themes.length).toBeGreaterThan(0);
+      for (const theme of themes) {
+        for (const swatch of theme.swatches) {
+          expect(keys.has(swatch.key)).toBe(true);
+          expect(swatch.hex).toBe(SWATCH_HEX[swatch.key]);
+        }
+      }
+      expect(new Set(themes.flatMap((theme) => theme.colors))).toEqual(keys);
+    }
+    expect(colorThemes("buy").map((theme) => theme.value)).not.toContain("light");
+    expect(colorThemes("rent").map((theme) => theme.value)).toContain("light");
   });
 
   it("puts in-budget suits first and says when the budget misses", () => {

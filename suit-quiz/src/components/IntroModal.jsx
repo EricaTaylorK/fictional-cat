@@ -76,19 +76,19 @@ function SparkleIcon() {
   );
 }
 
-export default function IntroModal({ onStart, onResume, onClose }) {
+export default function IntroModal({ onStart, onResume, onClose, onBack, progress, children }) {
   const dialogRef = useRef(null);
   const startRef = useRef(null);
 
   useEffect(() => {
-    startRef.current?.focus();
+    if (!children) startRef.current?.focus();
     const { overflow } = document.body.style;
     document.body.style.overflow = "hidden";
 
     function handleKey(event) {
       if (event.key === "Escape") onClose();
       if (event.key !== "Tab") return;
-      const focusable = dialogRef.current?.querySelectorAll("button");
+      const focusable = dialogRef.current?.querySelectorAll("button, input, select, textarea");
       if (!focusable?.length) return;
       const first = focusable[0];
       const last = focusable[focusable.length - 1];
@@ -106,12 +106,20 @@ export default function IntroModal({ onStart, onResume, onClose }) {
       document.body.style.overflow = overflow;
       document.removeEventListener("keydown", handleKey);
     };
-  }, [onClose]);
+  }, [onClose, children]);
 
   return (
     <div className="intro-backdrop" onClick={(event) => event.target === event.currentTarget && onClose()}>
       <div className="intro-modal" role="dialog" aria-modal="true" aria-labelledby="intro-title" ref={dialogRef}>
         <header className="intro-header">
+          {onBack ? (
+            <button className="intro-back" type="button" onClick={onBack}>
+              <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true">
+                <path fill="currentColor" d="M14.5 5.5 8 12l6.5 6.5.7-.7L9.4 12l5.8-5.8-.7-.7Z" />
+              </svg>
+              Back
+            </button>
+          ) : <span />}
           <span className="intro-brand">
             <span className="intro-badge" aria-hidden="true">MW</span>
             <span className="intro-header-title">Find the Right Suit for You</span>
@@ -121,7 +129,13 @@ export default function IntroModal({ onStart, onResume, onClose }) {
               <path d="m3 3 10 10M13 3 3 13" stroke="currentColor" strokeLinecap="round" strokeWidth="1.5" />
             </svg>
           </button>
+          {progress != null && (
+            <span className="intro-progress" aria-hidden="true">
+              <span style={{ width: `${Math.round(progress * 100)}%` }} />
+            </span>
+          )}
         </header>
+        {children ?? (
         <div className="intro-body">
           <IntroIllustration />
           <h1 id="intro-title" className="intro-title">Let’s Find Your Suit</h1>
@@ -139,6 +153,7 @@ export default function IntroModal({ onStart, onResume, onClose }) {
             </button>
           )}
         </div>
+        )}
       </div>
     </div>
   );

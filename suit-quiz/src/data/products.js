@@ -21,12 +21,6 @@ function moneyParts(price, compareAt = null) {
   };
 }
 
-export const FIT_DESCRIPTIONS = {
-  close: "Trim through the chest, waist, and leg.",
-  balanced: "Shaped through the chest, with a bit more room than a slim fit.",
-  roomy: "The fullest cut, with room through the chest, waist, and seat.",
-};
-
 export const SWATCH_HEX = {
   navy: "#1c2c4c",
   blue: "#3c6494",
@@ -36,6 +30,7 @@ export const SWATCH_HEX = {
   tan: "#c4a574",
   burgundy: "#6e2430",
   green: "#9aaa98",
+  white: "#f2eee4",
 };
 
 // Placeholder days until real tailoring turnaround times are set.
@@ -73,15 +68,80 @@ export const TAILORING_TIERS = [
 
 export const TAILORING_PERKS = "Every alteration includes a free seam re-alteration and free lifetime pressing.";
 
-export const OUTFIT_PAIRINGS = {
-  navy: { shirt: "White or light blue shirt", tie: "Burgundy, silver, or navy tie" },
-  blue: { shirt: "White or pale pink shirt", tie: "Navy, burgundy, or silver tie" },
-  gray: { shirt: "White, light blue, or pink shirt", tie: "Navy, burgundy, or silver tie" },
-  black: { shirt: "White shirt", tie: "Black, silver, or a quiet navy tie" },
-  brown: { shirt: "White or light blue shirt", tie: "Navy, tan, or a patterned tie" },
-  tan: { shirt: "White or light blue shirt", tie: "Navy, brown, or a knit tie" },
-  burgundy: { shirt: "White or light blue shirt", tie: "Navy, silver, or a solid burgundy tie" },
-  green: { shirt: "White or light blue shirt", tie: "Navy or brown tie" },
+export const PAIRING_HEX = {
+  ...SWATCH_HEX,
+  lightBlue: "#cfe0ee",
+  silver: "#c7c9cc",
+  charcoal: "#4b4b4b",
+};
+
+export const PAIRING_LABELS = {
+  white: "White",
+  lightBlue: "Light blue",
+  navy: "Navy",
+  burgundy: "Burgundy",
+  silver: "Silver",
+  black: "Black",
+  brown: "Brown",
+  tan: "Tan",
+  charcoal: "Charcoal",
+};
+
+export const SUIT_PAIRINGS = {
+  navy: {
+    shirts: ["white", "lightBlue"],
+    ties: ["burgundy", "silver", "navy"],
+    shoes: "Black leather shoes",
+    note: "White or light blue keeps it sharp. A burgundy, silver, or navy tie adds contrast without matching the suit exactly.",
+  },
+  blue: {
+    shirts: ["white", "lightBlue"],
+    ties: ["navy", "burgundy", "silver"],
+    shoes: "Black leather shoes",
+    note: "White or light blue stays classic. Navy, burgundy, or silver ties look dressed up without competing with the blue.",
+  },
+  gray: {
+    shirts: ["white", "lightBlue"],
+    ties: ["navy", "burgundy", "silver"],
+    shoes: "Black leather shoes",
+    note: "White or light blue is the safe pairing. Navy, burgundy, or silver ties stand out against gray.",
+  },
+  black: {
+    shirts: ["white"],
+    ties: ["black", "silver", "burgundy"],
+    shoes: "Black leather shoes",
+    note: "White is the standard shirt with black. A black or silver tie keeps it formal, or burgundy adds a little warmth.",
+  },
+  brown: {
+    shirts: ["white", "lightBlue"],
+    ties: ["navy", "burgundy", "brown"],
+    shoes: "Brown leather shoes",
+    note: "White or light blue keeps brown from feeling heavy. Navy or burgundy ties add contrast.",
+  },
+  tan: {
+    shirts: ["white", "lightBlue"],
+    ties: ["navy", "burgundy", "brown"],
+    shoes: "Brown leather shoes",
+    note: "White or light blue stays light with tan. Navy or burgundy ties ground the look.",
+  },
+  burgundy: {
+    shirts: ["white", "lightBlue"],
+    ties: ["navy", "charcoal"],
+    shoes: "Brown leather shoes",
+    note: "White or light blue lets the burgundy stand out. A navy or charcoal tie keeps it from competing with the plaid.",
+  },
+  green: {
+    shirts: ["white", "lightBlue"],
+    ties: ["navy", "burgundy", "brown"],
+    shoes: "Brown leather shoes",
+    note: "White or light blue keeps sage grounded. Navy, burgundy, or brown ties add depth.",
+  },
+  white: {
+    shirts: ["white"],
+    ties: ["black", "burgundy"],
+    shoes: "Black patent shoes",
+    note: "A white dinner jacket is traditionally worn with a black bow tie and a crisp white shirt.",
+  },
 };
 
 export const TAILORING_ESTIMATE = 85;

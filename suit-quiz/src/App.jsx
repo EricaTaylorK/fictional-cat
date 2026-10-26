@@ -4,7 +4,7 @@ import ProductGridEntry from "./components/ProductGridEntry.jsx";
 import Results from "./components/Results.jsx";
 import TextInput from "./components/TextInput.jsx";
 import { FULL_LOOK, RENTAL_PIECES } from "./data/rentals.js";
-import { getQuestionFlow, occasionOptions, questions } from "./data/quizConfig.js";
+import { colorThemes, getQuestionFlow, occasionOptions, questions } from "./data/quizConfig.js";
 import { formatDate, formatPrice, quizCatalogIds, quizListingFilters, rentalDates } from "./lib/recommendation.js";
 
 const STORAGE_KEY = "suit-quiz-wireframe-progress";
@@ -19,9 +19,53 @@ function loadProgress() {
   return { screen: "start", currentId: "mode", answers: {} };
 }
 
-function ChoiceQuestion({ question, value, onChange }) {
+function OptionCards({ options, isSelected, onPick, label }) {
+  return (
+    <div className="option-cards" role="group" aria-label={label}>
+      {options.map((option) => (
+        <button
+          className="option-card"
+          type="button"
+          key={option.value}
+          aria-pressed={isSelected(option.value)}
+          onClick={() => onPick(option.value)}
+        >
+          {option.swatches ? (
+            <span className="option-palette" aria-hidden="true">
+              {option.swatches.map((swatch) => (
+                <span className={`option-swatch option-swatch-${swatch.key}`} key={swatch.key} style={{ background: swatch.hex }} />
+              ))}
+            </span>
+          ) : option.icon ? (
+            <img className="option-icon" src={option.icon} alt="" />
+          ) : null}
+          <span className="option-copy">
+            <strong>{option.label}</strong>
+            {option.detail && <span>{option.detail}</span>}
+          </span>
+        </button>
+      ))}
+    </div>
+  );
+}
+
+function ChoiceQuestion({ question, value, onChange, onCommit }) {
   const isMulti = question.type === "multi";
   const selectedValues = isMulti ? value ?? [] : [];
+
+  if (!isMulti) {
+    return (
+      <OptionCards
+        label={question.title}
+        options={question.options}
+        isSelected={(optionValue) => value === optionValue}
+        onPick={(optionValue) => {
+          onChange(optionValue);
+          onCommit?.(optionValue);
+        }}
+      />
+    );
+  }
 
   function toggleMulti(optionValue) {
     if (selectedValues.includes(optionValue)) {
@@ -39,7 +83,7 @@ function ChoiceQuestion({ question, value, onChange }) {
   }
 
   return (
-    <div className="choice-grid">
+    <div className={`choice-grid choice-cards${question.options.length <= 3 ? " choice-cards-few" : ""}`}>
       {question.options.map((option) => {
         const checked = isMulti ? selectedValues.includes(option.value) : value === option.value;
         return (
@@ -49,7 +93,13 @@ function ChoiceQuestion({ question, value, onChange }) {
               name={question.id}
               value={option.value}
               checked={checked}
-              onChange={() => isMulti ? toggleMulti(option.value) : onChange(option.value)}
+              onChange={() => {
+                if (isMulti) toggleMulti(option.value);
+                else {
+                  onChange(option.value);
+                  onCommit?.(option.value);
+                }
+              }}
             />
             {option.icon && <img className="choice-icon" src={option.icon} alt="" />}
             <span className="choice-copy">
@@ -68,74 +118,31 @@ function ChoiceQuestion({ question, value, onChange }) {
   );
 }
 
-function OccasionQuestion({ question, answers, onChange }) {
+function OccasionQuestion({ question, answers, onChange, onCommit }) {
   const options = occasionOptions(question, answers);
   return (
-    <ChoiceQuestion question={{ ...question, options }} value={answers.occasion} onChange={(occasion) => onChange({ occasion })} />
+    <ChoiceQuestion
+      question={{ ...question, options }}
+      value={answers.occasion}
+      onChange={(occasion) => onChange({ occasion })}
+      onCommit={(occasion) => onCommit?.({ occasion })}
+    />
   );
 }
 
-function ColorQuestion({ question, mode, value = { prefer: [], avoid: [] }, onChange }) {
-  const options = question.options.filter((option) => !option.modes || option.modes.includes(mode));
-  const prefer = value.prefer ?? [];
-  const avoid = value.avoid ?? [];
-  const noPreference = prefer.length === 0 && avoid.length === 0;
-
-  function toggle(list, color) {
-    return list.includes(color) ? list.filter((item) => item !== color) : [...list, color];
-  }
+function ColorQuestion({ mode, value, onChange }) {
+  const options = colorThemes(mode);
+  const prefer = (value?.prefer ?? []).filter((item) => options.some((option) => option.value === item));
 
   return (
-    <div className="size-groups">
-      <fieldset className="size-group">
-        <legend>Colors you like</legend>
-        <div className="size-chips">
-          {options.map((option) => (
-            <label className="size-chip" key={`prefer-${option.value}`}>
-              <input
-                type="checkbox"
-                name="colors-prefer"
-                value={option.value}
-                checked={prefer.includes(option.value)}
-                onChange={() => onChange({
-                  prefer: toggle(prefer, option.value),
-                  avoid: avoid.filter((item) => item !== option.value),
-                })}
-              />
-              <span>{option.label}</span>
-            </label>
-          ))}
-        </div>
-      </fieldset>
-      <fieldset className="size-group">
-        <legend>Colors to skip</legend>
-        <div className="size-chips">
-          {options.map((option) => (
-            <label className="size-chip" key={`avoid-${option.value}`}>
-              <input
-                type="checkbox"
-                name="colors-avoid"
-                value={option.value}
-                checked={avoid.includes(option.value)}
-                onChange={() => onChange({
-                  avoid: toggle(avoid, option.value),
-                  prefer: prefer.filter((item) => item !== option.value),
-                })}
-              />
-              <span>{option.label}</span>
-            </label>
-          ))}
-        </div>
-      </fieldset>
-      <label className="size-chip">
-        <input
-          type="checkbox"
-          checked={noPreference}
-          onChange={() => onChange({ prefer: [], avoid: [] })}
-        />
-        <span>No preference</span>
-      </label>
-    </div>
+    <OptionCards
+      label="Color palettes"
+      options={options}
+      isSelected={(theme) => prefer.includes(theme)}
+      onPick={(theme) => onChange({
+        prefer: prefer.includes(theme) ? prefer.filter((item) => item !== theme) : [...prefer, theme],
+      })}
+    />
   );
 }
 
@@ -230,41 +237,151 @@ function PiecesQuestion({ value = [], onChange }) {
   );
 }
 
-function MeasurementsQuestion({ value = {}, onChange }) {
-  function update(field, nextValue) {
-    onChange({ ...value, [field]: nextValue });
+const CHEST_SIZES = [36, 38, 40, 42, 44, 46, 48, 50, 52, 54];
+const WAIST_SIZES = [28, 29, 30, 31, 32, 33, 34, 36, 38, 40, 42, 44, 46, 48];
+const HEIGHT_MIN = 58;
+const HEIGHT_MAX = 84;
+
+function SizeChips({ label, name, options, value, onChange }) {
+  return (
+    <fieldset className="size-group">
+      <legend>{label}</legend>
+      <div className="size-chips">
+        {options.map((option) => (
+          <label className="size-chip" key={option.value}>
+            <input
+              type="radio"
+              name={name}
+              value={option.value}
+              checked={value === option.value}
+              onClick={() => {
+                if (value === option.value) onChange("");
+              }}
+              onChange={() => onChange(option.value)}
+            />
+            <span>{option.label}</span>
+          </label>
+        ))}
+      </div>
+    </fieldset>
+  );
+}
+
+function MeasurementsQuestion({ value = {}, onChange, onEstimate, heightValue, onHeightChange }) {
+  const chest = value.chest ? String(value.chest) : "";
+  const waist = value.waist ? String(value.waist) : "";
+
+  function update(partial) {
+    const next = { ...value, ...partial };
+    const nextChest = next.chest ? String(next.chest) : "";
+    onChange({
+      chest: nextChest,
+      waist: next.waist ? String(next.waist) : "",
+      jacket: nextChest,
+    });
   }
 
   return (
-    <div className="field-grid">
-      <TextInput
-        label="Jacket size"
-        value={value.jacket}
-        onChange={(next) => update("jacket", next)}
-        inputMode="text"
-        autoComplete="off"
-        helperText="A number like 40, or with a length like 44L. S = short, R = regular, L = long."
+    <div className="size-groups">
+      <SizeChips
+        label="Jacket chest"
+        name="jacket-chest"
+        value={chest}
+        options={CHEST_SIZES.map((size) => ({ value: String(size), label: String(size) }))}
+        onChange={(next) => update({ chest: next })}
       />
-      <TextInput
-        label="Chest (inches)"
-        value={value.chest}
-        onChange={(next) => update("chest", next)}
-        helperText="Around the fullest part of your chest"
+      <SizeChips
+        label="Pants waist"
+        name="pants-waist"
+        value={waist}
+        options={WAIST_SIZES.map((size) => ({ value: String(size), label: String(size) }))}
+        onChange={(next) => update({ waist: next })}
       />
-      <TextInput
-        label="Waist (inches)"
-        value={value.waist}
-        onChange={(next) => update("waist", next)}
-        helperText="Where your dress pants usually sit"
-      />
-      <TextInput
-        label="Height"
-        value={value.height}
-        onChange={(next) => update("height", next)}
-        inputMode="text"
-        autoComplete="off"
-        helperText="Feet and inches, like 6'5&quot;, or total inches, like 77."
-      />
+      <fieldset className="size-group">
+        <legend>Height</legend>
+        <HeightQuestion value={heightValue} onChange={onHeightChange} />
+      </fieldset>
+      <button className="text-link estimate-link" type="button" onClick={onEstimate}>
+        I don't know these. Help me estimate.
+      </button>
+    </div>
+  );
+}
+
+function formatHeight(total) {
+  const feet = Math.floor(total / 12);
+  const inches = total % 12;
+  return `${feet}′ ${inches}″`;
+}
+
+function HeightQuestion({ value, onChange }) {
+  const total = Number(value);
+  const set = Number.isFinite(total) && total >= HEIGHT_MIN && total <= HEIGHT_MAX;
+  const shown = set ? total : 70;
+  const feet = Math.floor(shown / 12);
+  const inches = shown % 12;
+
+  function setTotal(next) {
+    const clamped = Math.min(HEIGHT_MAX, Math.max(HEIGHT_MIN, next));
+    onChange(clamped);
+  }
+
+  return (
+    <div className="height-question">
+      <p className="height-readout">{set ? formatHeight(shown) : "Set your height"}</p>
+      <label className="height-slider">
+        <span className="visually-hidden">Height</span>
+        <input
+          type="range"
+          min={HEIGHT_MIN}
+          max={HEIGHT_MAX}
+          step="1"
+          value={shown}
+          aria-valuemin={HEIGHT_MIN}
+          aria-valuemax={HEIGHT_MAX}
+          aria-valuenow={set ? shown : undefined}
+          aria-valuetext={set ? formatHeight(shown) : "Not set"}
+          onChange={(event) => setTotal(Number(event.target.value))}
+        />
+      </label>
+      <div className="height-scale" aria-hidden="true">
+        <span>4′ 10″</span>
+        <span>7′ 0″</span>
+      </div>
+      <div className="height-inputs">
+        <label>
+          <span>Feet</span>
+          <input
+            type="number"
+            inputMode="numeric"
+            min="4"
+            max="7"
+            value={set ? feet : ""}
+            placeholder="5"
+            onChange={(event) => {
+              const nextFeet = Number(event.target.value);
+              if (!Number.isFinite(nextFeet)) return;
+              setTotal(nextFeet * 12 + (set ? inches : 0));
+            }}
+          />
+        </label>
+        <label>
+          <span>Inches</span>
+          <input
+            type="number"
+            inputMode="numeric"
+            min="0"
+            max="11"
+            value={set ? inches : ""}
+            placeholder="10"
+            onChange={(event) => {
+              const nextInches = Number(event.target.value);
+              if (!Number.isFinite(nextInches)) return;
+              setTotal((set ? feet : 5) * 12 + nextInches);
+            }}
+          />
+        </label>
+      </div>
     </div>
   );
 }
@@ -365,6 +482,10 @@ function isAnswered(question, answers) {
     return Boolean(answers.occasion);
   }
   if (question.type === "colors" || question.type === "measurements" || question.type === "pieces") return true;
+  if (question.type === "height") {
+    const inches = Number(answers.height);
+    return inches >= 58 && inches <= 84;
+  }
   if (question.type === "date") {
     const dates = rentalDates(answer);
     return Boolean(dates && !dates.past);
@@ -420,7 +541,31 @@ export default function App() {
     }));
   }
 
+  function advanceWithAnswer(key, value) {
+    setState((previous) => {
+      const nextAnswers = key === "mode" && previous.answers.mode !== value
+        ? { mode: value }
+        : { ...previous.answers, [key]: value };
+      const nextFlow = getQuestionFlow(nextAnswers);
+      const index = nextFlow.indexOf(previous.currentId);
+      if (index === nextFlow.length - 1) {
+        return { ...previous, answers: nextAnswers, screen: "matching" };
+      }
+      return { ...previous, answers: nextAnswers, currentId: nextFlow[index + 1] };
+    });
+  }
+
   function continueQuiz() {
+    const measurements = answers.measurements ?? {};
+    const hasSize = Boolean(measurements.chest || measurements.waist || measurements.jacket);
+    if (currentId === "measurements" && !hasSize) {
+      setState((previous) => ({
+        ...previous,
+        answers: { ...previous.answers, measurementKnowledge: "no" },
+        currentId: "everydaySizes",
+      }));
+      return;
+    }
     const nextFlow = getQuestionFlow(answers);
     const index = nextFlow.indexOf(currentId);
     if (index === nextFlow.length - 1) {
@@ -528,7 +673,7 @@ export default function App() {
             <button className="nav-control" type="button" onClick={saveAndExit}>Save and exit</button>
           )}
           {screen === "results" && (
-            <button className="nav-control nav-control-strong" type="button" onClick={restart}>Retake quiz</button>
+            <button className="nav-control" type="button" onClick={restart}>Retake quiz</button>
           )}
         </div>
       </header>
@@ -555,31 +700,61 @@ export default function App() {
             </div>
 
             {currentQuestion.type === "occasionPlus" ? (
-              <OccasionQuestion question={currentQuestion} answers={answers} onChange={mergeAnswers} />
+              <OccasionQuestion
+                question={currentQuestion}
+                answers={answers}
+                onChange={mergeAnswers}
+                onCommit={(partial) => advanceWithAnswer("occasion", partial.occasion)}
+              />
             ) : currentQuestion.type === "colors" ? (
-              <ColorQuestion question={currentQuestion} mode={answers.mode} value={answers.colors} onChange={setAnswer} />
+              <ColorQuestion mode={answers.mode} value={answers.colors} onChange={setAnswer} />
             ) : currentQuestion.type === "date" ? (
               <DateQuestion value={answers.eventDate} onChange={setAnswer} />
             ) : currentQuestion.type === "pieces" ? (
               <PiecesQuestion value={answers.pieces} onChange={setAnswer} />
             ) : currentQuestion.type === "measurements" ? (
-              <MeasurementsQuestion value={answers[currentId]} onChange={setAnswer} />
+              <MeasurementsQuestion
+                value={answers[currentId]}
+                onChange={setAnswer}
+                heightValue={answers.height}
+                onHeightChange={(height) => mergeAnswers({ height })}
+                onEstimate={() => setState((previous) => ({
+                  ...previous,
+                  answers: { ...previous.answers, measurementKnowledge: "no" },
+                  currentId: "everydaySizes",
+                }))}
+              />
+            ) : currentQuestion.type === "height" ? (
+              <HeightQuestion value={answers.height} onChange={setAnswer} />
             ) : currentQuestion.type === "sizes" ? (
               <SizesQuestion question={currentQuestion} value={answers[currentId]} onChange={setAnswer} />
             ) : (
-              <ChoiceQuestion question={currentQuestion} value={answers[currentId]} onChange={setAnswer} />
+              <ChoiceQuestion
+                question={currentQuestion}
+                value={answers[currentId]}
+                onChange={setAnswer}
+                onCommit={(value) => advanceWithAnswer(currentId, value)}
+              />
             )}
 
-            <div className="actions actions-end">
-              <button
-                className="button"
-                type="button"
-                disabled={!isAnswered(currentQuestion, answers)}
-                onClick={continueQuiz}
-              >
-                {currentIndex === flow.length - 1 ? "See my results" : "Continue"}
+            {currentQuestion.skippable && (
+              <button className="button secondary skip-button" type="button" onClick={continueQuiz}>
+                I'm Not Sure, Skip It
               </button>
-            </div>
+            )}
+
+            {currentQuestion.type !== "single" && currentQuestion.type !== "occasionPlus" && (
+              <div className="actions actions-end">
+                <button
+                  className="button"
+                  type="button"
+                  disabled={!isAnswered(currentQuestion, answers)}
+                  onClick={continueQuiz}
+                >
+                  {currentIndex === flow.length - 1 ? "See my results" : "Continue"}
+                </button>
+              </div>
+            )}
           </section>
         )}
 
@@ -590,8 +765,6 @@ export default function App() {
             answers={answers}
             moreMode={moreMode}
             onSeeAll={() => setState((previous) => ({ ...previous, screen: "matches" }))}
-            onRetake={restart}
-            onEditAnswers={() => setState((previous) => ({ ...previous, screen: "question", currentId: "mode" }))}
           />
         )}
       </main>

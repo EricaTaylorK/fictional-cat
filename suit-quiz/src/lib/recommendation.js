@@ -1,3 +1,4 @@
+import { colorsIn, questions, resolvedOccasion } from "../data/quizConfig.js";
 import { products, TAILORING_ESTIMATE } from "../data/products.js";
 import {
   RENTAL_MIN_LEAD_DAYS,
@@ -10,11 +11,14 @@ import {
 const occasionLabels = {
   wedding: "a wedding",
   funeral: "a funeral or memorial",
-  work: "work or an interview",
-  formal: "a black-tie or formal evening",
-  milestone: "a graduation, prom, or milestone",
-  versatile: "whatever comes up",
-  prom: "prom or homecoming",
+  work: "work",
+  business: "business",
+  formal: "a black-tie evening",
+  milestone: "a graduation or prom",
+  versatile: "a bit of everything",
+  travel: "travel",
+  prom: "prom",
+  mixed: "a bit of everything",
   special: "a special event",
 };
 
@@ -65,6 +69,8 @@ export function isLowConfidence(answers) {
     return knownNumbers.length === 0;
   }
   if (answers.measurementKnowledge !== "no") return false;
+  const inches = Number(answers.height);
+  if (Number.isFinite(inches) && inches >= 48) return inches < 67 || inches > 75;
 
   return (
     issues.length >= 2 ||
@@ -166,6 +172,12 @@ function heightLength(answers) {
   if (answers.height === "short") return "S";
   if (answers.height === "regular") return "R";
   if (answers.height === "tall" || answers.height === "extra-tall") return "L";
+  const inches = Number(answers.height);
+  if (Number.isFinite(inches) && inches >= 48) {
+    if (inches < 67) return "S";
+    if (inches > 72) return "L";
+    return "R";
+  }
 
   const parsed = heightFromMeasurements(answers);
   if (!parsed?.total) return null;
@@ -175,7 +187,8 @@ function heightLength(answers) {
 }
 
 export function inferLength(answers) {
-  const fromJacket = parseJacket(answers.measurements?.jacket)?.length;
+  const fromJacket = parseJacket(answers.measurements?.jacket)?.length
+    || (["S", "R", "L"].includes(answers.measurements?.jacketLength) ? answers.measurements.jacketLength : null);
   if (fromJacket) return fromJacket;
 
   const base = heightLength(answers);
@@ -358,10 +371,6 @@ function isAdjacentFit(fit, feel) {
   return fit === "balanced" || feel === "balanced";
 }
 
-function productColors(product) {
-  return [product.colorKey, ...(product.variants ?? []).map((item) => item.colorKey)].filter(Boolean);
-}
-
 function matchedColor(product, prefer) {
   if (!prefer.length) return null;
   if (prefer.includes(product.colorKey)) return product.color;
@@ -373,12 +382,13 @@ function scoreProduct(product, answers, index) {
   const evidence = [];
   const [budgetMin, budgetMax] = getBudgetRange(answers.budget);
   const formality = product.formality ?? [];
-  const prefer = answers.colors?.prefer ?? [];
+  const prefer = colorsIn(answers.colors?.prefer);
+  const occasion = resolvedOccasion(answers);
 
-  if (answers.occasion && formality.includes(answers.occasion)) {
+  if (occasion && formality.includes(occasion)) {
     score += 32;
-    evidence.push(product.occasionNotes?.[answers.occasion] ?? `It reads correctly for ${occasionLabels[answers.occasion]}.`);
-  } else if (answers.occasion) {
+    evidence.push(product.occasionNotes?.[occasion] ?? `It reads correctly for ${occasionLabels[answers.occasion] ?? occasionLabels[occasion]}.`);
+  } else if (occasion) {
     score -= 18;
   }
 
@@ -402,6 +412,11 @@ function scoreProduct(product, answers, index) {
   } else if (answers.budget && answers.budget !== "flexible") {
     const edge = Math.min(Math.max(product.price, budgetMin), budgetMax);
     score -= Math.min(18, Math.ceil(Math.abs(product.price - edge) / 20));
+  }
+
+  if (answers.occasion === "travel") {
+    score += (product.comfort ?? 0) * 3;
+    if (product.stretch) score += 6;
   }
 
   if (answers.feel === "roomy") score += (product.comfort ?? 0) * 2;
@@ -431,10 +446,11 @@ function budgetMissLabel(budget, count, item = "suit") {
   return `Only ${count} ${noun} ${phrase} matched. Closest options:`;
 }
 
-function buildTradeoffs(product, answers, forcedAvoid) {
+function buildTradeoffs(product, answers) {
   const notes = [];
   const [budgetMin, budgetMax] = getBudgetRange(answers.budget);
-  if (answers.occasion && product.formality && !product.formality.includes(answers.occasion)) {
+  const occasion = resolvedOccasion(answers);
+  if (occasion && product.formality && !product.formality.includes(occasion)) {
     notes.push(`Not the usual choice for ${occasionLabels[answers.occasion]}.`);
   }
   if (answers.feel && product.fit && product.fit !== answers.feel && product.fitName) {
@@ -447,20 +463,16 @@ function buildTradeoffs(product, answers, forcedAvoid) {
       notes.push(`Below your ${budgetLabels[answers.budget] ?? "budget"}.`);
     }
   }
-  const prefer = answers.colors?.prefer ?? [];
-  const avoid = answers.colors?.avoid ?? [];
-  const colors = productColors(product);
-  const fullyAvoided = colors.length > 0 && colors.every((key) => avoid.includes(key));
-  if (forcedAvoid || fullyAvoided) {
-    notes.push(`You asked to skip ${product.color.toLowerCase()}.`);
-  } else if (prefer.length && !matchedColor(product, prefer)) {
+  const prefer = colorsIn(answers.colors?.prefer);
+  if (prefer.length && !matchedColor(product, prefer)) {
     notes.push(`${product.color} wasn't a color you picked.`);
   }
   return notes;
 }
 
 function maxPossibleScore(answers) {
-  const prefer = answers.colors?.prefer?.[0];
+  const prefer = colorsIn(answers.colors?.prefer)[0];
+  const occasion = resolvedOccasion(answers);
   const [budgetMin, budgetMax] = getBudgetRange(answers.budget);
   const price = budgetMax === Infinity ? Math.max(budgetMin, 700) : (budgetMin + budgetMax) / 2;
   let best = 0;
@@ -470,7 +482,7 @@ function maxPossibleScore(answers) {
         fit,
         stretch,
         fitName: "Suit",
-        formality: answers.occasion ? [answers.occasion] : [],
+        formality: occasion ? [occasion] : [],
         versatility: 5,
         comfort: 5,
         tailoringEase: 5,
@@ -493,19 +505,7 @@ function honestPercent(score, maxScore) {
 }
 
 export function getRecommendations(answers, assortment = products) {
-  const scored = assortment.map((product, index) => scoreProduct(product, answers, index));
-  const avoid = new Set(answers.colors?.avoid ?? []);
-  let pool = scored;
-  let forcedAvoid = false;
-  if (avoid.size) {
-    const allowed = scored.filter((product) => {
-      const colors = productColors(product);
-      return colors.length === 0 || colors.some((key) => !avoid.has(key));
-    });
-    if (allowed.length) pool = allowed;
-    else forcedAvoid = true;
-  }
-
+  const pool = assortment.map((product, index) => scoreProduct(product, answers, index));
   const byScore = (a, b) => b.score - a.score || a.originalIndex - b.originalIndex;
   const inBudget = pool.filter((product) => product.inBudget).sort(byScore);
   const overBudget = pool.filter((product) => !product.inBudget).sort(byScore);
@@ -524,7 +524,7 @@ export function getRecommendations(answers, assortment = products) {
       bundlePrice: product.price + (answers.tailoring === "bundle" ? TAILORING_ESTIMATE : 0),
       budgetOver: limitedBudget && product.price > budgetMax ? product.price - budgetMax : null,
       belowBudget: limitedBudget && product.price < budgetMin,
-      tradeoffs: buildTradeoffs(product, answers, forcedAvoid),
+      tradeoffs: buildTradeoffs(product, answers),
     };
   });
   result.budgetMiss = budgetMiss;
@@ -532,15 +532,14 @@ export function getRecommendations(answers, assortment = products) {
 }
 
 export function quizCatalogIds(answers, limit = 9) {
-  const prefer = new Set(answers.colors?.prefer ?? []);
-  const avoid = new Set(answers.colors?.avoid ?? []);
+  const prefer = new Set(colorsIn(answers.colors?.prefer));
   const ids = [];
   for (const product of getRecommendations(answers).slice(0, limit)) {
     const options = product.variants?.length
       ? product.variants
       : [{ colorKey: product.colorKey, catalogId: product.catalogId }];
     const chosen = options.filter((option) => {
-      if (!option.catalogId || avoid.has(option.colorKey)) return false;
+      if (!option.catalogId) return false;
       if (prefer.size && !prefer.has(option.colorKey)) return false;
       return true;
     });
@@ -553,7 +552,7 @@ export function quizCatalogIds(answers, limit = 9) {
 
 export function quizListingFilters(answers) {
   const selections = {};
-  const prefer = answers.colors?.prefer ?? [];
+  const prefer = colorsIn(answers.colors?.prefer);
   if (prefer.length) selections.color = [...prefer];
   if (FIT_TO_CATALOG[answers.feel]) selections.fit = [FIT_TO_CATALOG[answers.feel]];
 
@@ -651,17 +650,18 @@ function scoreRental(look, answers, pieces, index) {
   let score = 0;
   const evidence = [];
   const [budgetMin, budgetMax] = getBudgetRange(answers.rentalBudget);
-  const prefer = answers.colors?.prefer ?? [];
+  const prefer = colorsIn(answers.colors?.prefer);
   const total = rentalTotal(look, pieces);
+  const occasion = resolvedOccasion(answers);
 
-  if (answers.occasion && look.formality.includes(answers.occasion)) {
+  if (occasion && look.formality.includes(occasion)) {
     score += 32;
-    const note = RENTAL_TYPE_NOTES[answers.occasion]?.[look.type];
+    const note = RENTAL_TYPE_NOTES[occasion]?.[look.type];
     if (note) evidence.push(note);
-  } else if (answers.occasion) {
+  } else if (occasion) {
     score -= 18;
   }
-  score += RENTAL_TYPE_SCORES[answers.occasion]?.[look.type] ?? 0;
+  score += RENTAL_TYPE_SCORES[occasion]?.[look.type] ?? 0;
 
   const inBudget = total >= budgetMin && total <= budgetMax;
   if (inBudget) {
@@ -696,21 +696,21 @@ function scoreRental(look, answers, pieces, index) {
   };
 }
 
-function rentalTradeoffs(look, answers, forcedAvoid) {
+function rentalTradeoffs(look, answers) {
   const notes = [];
   const [budgetMin, budgetMax] = getBudgetRange(answers.rentalBudget);
-  if (answers.occasion && !look.formality.includes(answers.occasion)) {
+  const occasion = resolvedOccasion(answers);
+  if (occasion && !look.formality.includes(occasion)) {
     notes.push(`Not the usual choice for ${occasionLabels[answers.occasion]}.`);
-  } else if (answers.occasion === "formal" && look.type === "suit") {
+  } else if (occasion === "formal" && look.type === "suit") {
     notes.push("A suit, not a tuxedo. Some black-tie invitations expect a tux.");
   }
   if (answers.rentalBudget && answers.rentalBudget !== "flexible" && !look.inBudget) {
     if (look.total > budgetMax) notes.push(`Over your budget by ${formatPrice(look.total - budgetMax)}.`);
     else if (look.total < budgetMin) notes.push(`Below your ${budgetLabels[answers.rentalBudget]}.`);
   }
-  const prefer = answers.colors?.prefer ?? [];
-  if (forcedAvoid) notes.push(`You asked to skip ${look.color.toLowerCase()}.`);
-  else if (prefer.length && !prefer.includes(look.colorKey)) notes.push(`${look.color} wasn't a color you picked.`);
+  const prefer = colorsIn(answers.colors?.prefer);
+  if (prefer.length && !prefer.includes(look.colorKey)) notes.push(`${look.color} wasn't a color you picked.`);
   if (look.reviews < 20) notes.push(look.reviews ? `Only ${look.reviews} reviews so far.` : "No reviews yet.");
   return notes;
 }
@@ -724,11 +724,11 @@ function maxRentalScore(answers, pieces) {
     const candidate = {
       type,
       price,
-      colorKey: answers.colors?.prefer?.[0],
+      colorKey: colorsIn(answers.colors?.prefer)[0],
       color: "Black",
       rating: 5,
       reviews: 1000,
-      formality: answers.occasion ? [answers.occasion] : [],
+      formality: resolvedOccasion(answers) ? [resolvedOccasion(answers)] : [],
     };
     best = Math.max(best, scoreRental(candidate, answers, pieces, 0).score);
   }
@@ -737,11 +737,7 @@ function maxRentalScore(answers, pieces) {
 
 export function getRentalRecommendations(answers, assortment = rentals) {
   const pieces = rentalPieces(answers);
-  const scored = assortment.map((look, index) => scoreRental(look, answers, pieces, index));
-  const avoid = new Set(answers.colors?.avoid ?? []);
-  let pool = scored.filter((look) => !avoid.has(look.colorKey));
-  const forcedAvoid = pool.length === 0;
-  if (forcedAvoid) pool = scored;
+  const pool = assortment.map((look, index) => scoreRental(look, answers, pieces, index));
 
   const byScore = (a, b) => b.score - a.score || a.originalIndex - b.originalIndex;
   const inBudget = pool.filter((look) => look.inBudget).sort(byScore);
@@ -755,14 +751,17 @@ export function getRentalRecommendations(answers, assortment = rentals) {
   const result = [...inBudget, ...overBudget].map((look) => ({
     ...look,
     matchPercent: honestPercent(look.score, maxScore),
-    tradeoffs: rentalTradeoffs(look, answers, forcedAvoid),
+    tradeoffs: rentalTradeoffs(look, answers),
   }));
   result.budgetMiss = budgetMiss;
   return result;
 }
 
 export function buildResultSummary(answers) {
-  const prefer = answers.colors?.prefer ?? [];
+  const prefer = (answers.colors?.prefer ?? []).map((value) => {
+    const palette = questions.colors.options.find((option) => option.value === value);
+    return palette?.label ?? value;
+  });
   return {
     mode: answers.mode === "rent" ? "rent" : "buy",
     dates: rentalDates(answers.eventDate),

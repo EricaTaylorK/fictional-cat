@@ -1,3 +1,6 @@
+import { products, SWATCH_HEX } from "./products.js";
+import { rentals } from "./rentals.js";
+
 export const questions = {
   mode: {
     id: "mode",
@@ -6,28 +9,28 @@ export const questions = {
     type: "single",
     options: [
       { value: "buy", label: "Buy a suit", detail: "Yours to keep.", icon: "/icons/mw/shop.png" },
-      { value: "rent", label: "Rent a look", detail: "Suit or tux, shirt, tie, and shoes for one event, starting at $99.99.", icon: "/icons/mw/suits-bundle.png" },
+      { value: "rent", label: "Rent a look", detail: "Suit or tux for one event.", icon: "/icons/mw/suits-bundle.png" },
     ],
   },
   occasion: {
     id: "occasion",
-    title: "What's the moment?",
-    help: "The occasion tells us how formal to go.",
+    title: "What's the occasion?",
+    help: "Knowing the details will help us find you the perfect suit to meet the moment.",
     type: "occasionPlus",
-    rentHelp: "The occasion tells us whether a suit or a tuxedo fits the room.",
+    skippable: true,
+    rentHelp: "Knowing the occasion tells us whether you need a suit or a tuxedo.",
     rentOptions: [
-      { value: "wedding", label: "A wedding", detail: "Groom, wedding party, or guest.", icon: "/icons/mw/wedding.png" },
-      { value: "formal", label: "A black-tie or formal evening", detail: "Galas, formal dinners, and black-tie invitations.", icon: "/icons/mw/special-event.png" },
-      { value: "prom", label: "Prom or homecoming", detail: "A night to stand out.", icon: "/icons/mw/school-event.png" },
-      { value: "special", label: "Another special event", detail: "A quinceañera, anniversary, or celebration.", icon: "/icons/mw/quinceanera.png" },
+      { value: "wedding", label: "Wedding", detail: "For your big day, or theirs.", icon: "/icons/mw/wedding.png" },
+      { value: "formal", label: "Black tie", detail: "Galas, formal dinners, and black-tie invitations.", icon: "/icons/mw/special-event.png" },
+      { value: "prom", label: "Prom", detail: "For prom, homecoming, and being the life of the party.", icon: "/icons/mw/school-event.png" },
+      { value: "special", label: "Special event", detail: "A quinceañera, anniversary, or other celebration.", icon: "/icons/mw/quinceanera.png" },
     ],
     options: [
-      { value: "wedding", label: "A wedding", detail: "Guest, wedding party, or groom.", icon: "/icons/mw/wedding.png" },
-      { value: "work", label: "Work or an interview", detail: "The office, a new job, or a professional event.", icon: "/icons/mw/suits-bundle.png" },
-      { value: "versatile", label: "A go-to suit for whatever comes up", detail: "Work, dinners, and everyday, when the dress code isn't clear.", icon: "/icons/mw/travel.png" },
-      { value: "formal", label: "A black-tie or formal evening", detail: "Galas, formal dinners, and black-tie invitations.", icon: "/icons/mw/special-event.png" },
-      { value: "milestone", label: "A graduation, prom, or milestone", icon: "/icons/mw/school-event.png" },
-      { value: "funeral", label: "A funeral or memorial", detail: "Respectful and quiet.", icon: "/icons/mw/invitation.png" },
+      { value: "business", label: "Business", detail: "For the office, client dinners, and important meetings.", icon: "/icons/mw/suits-bundle.png" },
+      { value: "wedding", label: "Wedding", detail: "For your big day, or a wedding you're a guest at.", icon: "/icons/mw/wedding.png" },
+      { value: "travel", label: "Travel", detail: "For trips: packs well, stays comfortable, and looks sharp when you land.", icon: "/icons/mw/travel.png" },
+      { value: "prom", label: "Graduation, prom, or milestone", detail: "For graduation, prom, homecoming, or another milestone.", icon: "/icons/mw/school-event.png" },
+      { value: "mixed", label: "Mixed use", detail: "One versatile suit for a little bit of everything.", icon: "/icons/mw/special-event.png" },
     ],
   },
   feel: {
@@ -56,35 +59,44 @@ export const questions = {
   colors: {
     id: "colors",
     title: "Any colors in mind?",
-    help: "Pick shades you like, shades to skip, or leave this blank.",
+    help: "Pick a palette you like, or leave it blank to see every color.",
     type: "colors",
+    skippable: true,
     options: [
-      { value: "navy", label: "Navy" },
-      { value: "blue", label: "Blue" },
-      { value: "gray", label: "Gray" },
-      { value: "black", label: "Black" },
-      { value: "brown", label: "Brown" },
-      { value: "tan", label: "Tan" },
-      { value: "burgundy", label: "Burgundy" },
-      { value: "green", label: "Green" },
-      { value: "white", label: "White or ivory", modes: ["rent"] },
+      {
+        value: "darks",
+        label: "Classic darks",
+        detail: "Navy, blue, gray, and black. Right for work, weddings, and evenings.",
+        colors: ["navy", "blue", "gray", "black"],
+      },
+      {
+        value: "warm",
+        label: "Warm and earthy",
+        detail: "Lighter and richer shades that stand out at daytime events.",
+        colors: ["tan", "brown", "burgundy", "green"],
+      },
+      {
+        value: "light",
+        label: "White and ivory",
+        detail: "Dinner jackets and white suits for formal or summer events.",
+        colors: ["white"],
+      },
     ],
   },
   measurementKnowledge: {
     id: "measurementKnowledge",
     title: "Do you know your measurements?",
-    help: "Either answer works. No jacket handy? Choose \"help me estimate\" and use your usual shirt and pants sizes.",
+    help: "Share the sizes you know. If you don't, we'll estimate from how your clothes usually fit.",
     type: "single",
     options: [
-      { value: "yes", label: "Yes, I know my jacket size and waist", detail: "The number on the jacket tag and your pants waist are enough." },
-      { value: "some", label: "I know one or two numbers", detail: "A jacket size, a chest, or a waist. Leave the rest blank." },
-      { value: "no", label: "No, help me estimate", detail: "We'll use how your clothes usually fit. A lot of people start here." },
+      { value: "some", label: "I know some of my sizes", detail: "Jacket, chest, waist, or any mix of them. Leave the rest blank." },
+      { value: "no", label: "No, help me estimate", detail: "We'll use your shirt size, your pants size, and how suits usually fit." },
     ],
   },
   measurements: {
     id: "measurements",
-    title: "Share what you already know",
-    help: "Any number helps. Leave the rest blank, and we'll flag where a store measurement matters.",
+    title: "Share the sizes you know",
+    help: "Fill in any you know and leave the rest. Jacket size is the number and letter on the tag, like 42R.",
     type: "measurements",
   },
   fitIssues: {
@@ -139,14 +151,8 @@ export const questions = {
   height: {
     id: "height",
     title: "About how tall are you?",
-    help: "A range is enough. It puts jacket and pant proportions in the right neighborhood.",
-    type: "single",
-    options: [
-      { value: "short", label: "Under 5′7″" },
-      { value: "regular", label: "5′7″ to 6′0″" },
-      { value: "tall", label: "6′1″ to 6′3″" },
-      { value: "extra-tall", label: "6′4″ or taller" },
-    ],
+    help: "Drag the slider, or type feet and inches. Either one updates the other.",
+    type: "height",
   },
   everydaySizes: {
     id: "everydaySizes",
@@ -212,7 +218,7 @@ export function getQuestionFlow(answers) {
     : ["mode", "occasion", "feel", "colors", "measurementKnowledge"];
   const end = renting ? ["rentalBudget"] : ["tailoring", "budget"];
   if (answers.measurementKnowledge === "yes" || answers.measurementKnowledge === "some") {
-    return [...start, "measurements", ...end];
+    return [...start, "measurements", "fitIssues", ...end];
   }
   if (answers.measurementKnowledge === "no") {
     return [...start, "everydaySizes", "fitIssues", "height", ...end];
@@ -222,4 +228,38 @@ export function getQuestionFlow(answers) {
 
 export function occasionOptions(question, answers) {
   return answers.mode === "rent" ? question.rentOptions : question.options;
+}
+
+const BUY_OCCASION = {
+  business: "work",
+  travel: "versatile",
+  prom: "milestone",
+  mixed: "versatile",
+};
+
+export function resolvedOccasion(answers) {
+  const value = answers.occasion;
+  if (!value) return null;
+  if (answers.mode === "rent") return value;
+  return BUY_OCCASION[value] ?? value;
+}
+
+export function colorsIn(values) {
+  const palettes = new Map(questions.colors.options.map((option) => [option.value, option.colors]));
+  return [...new Set((Array.isArray(values) ? values : []).flatMap((value) => palettes.get(value) ?? [value]))];
+}
+
+function catalogColors(mode) {
+  const items = mode === "rent" ? rentals : products.flatMap((product) => [product, ...(product.variants ?? [])]);
+  return new Set(items.map((item) => item.colorKey));
+}
+
+export function colorThemes(mode) {
+  const available = catalogColors(mode);
+  return questions.colors.options
+    .map((option) => {
+      const colors = option.colors.filter((key) => available.has(key));
+      return { ...option, colors, swatches: colors.map((key) => ({ key, hex: SWATCH_HEX[key] })) };
+    })
+    .filter((option) => option.colors.length > 0);
 }
