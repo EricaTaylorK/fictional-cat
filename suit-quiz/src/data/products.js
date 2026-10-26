@@ -45,6 +45,34 @@ export const TAILORING_TURNAROUND = {
   custom: 10,
 };
 
+// Prices from the Men's Wearhouse "Tailored for You" in-store alteration sheet.
+const ALTERATIONS = {
+  hem: { label: "Hem the pants (plain or cuff)", price: 20, icon: "/icons/mw/tailor-leg-hem.png" },
+  sleeves: { label: "Shorten or lengthen both sleeves", price: 35, icon: "/icons/mw/tailor-coat-sleeves.png" },
+  waistSeat: { label: "Take in or let out the waist and seat", price: 25, icon: "/icons/mw/tailor-waist-seat.png" },
+  jacketSides: { label: "Shape the jacket through both sides", price: 35, icon: "/icons/mw/tailor-coat-other.png" },
+  taperLeg: { label: "Taper the leg", price: 32, icon: "/icons/mw/tailor-pants-other.png" },
+  centerSeam: { label: "Shape the center back seam", price: 20, icon: "/icons/mw/tailor-coat-other.png" },
+  collar: { label: "Lower the collar so it sits flat", price: 32, icon: "/icons/mw/tailor-collar-shoulders.png" },
+};
+
+function tier(id, name, plain, icon, detail, alterationIds) {
+  const items = alterationIds.map((key) => ({ id: key, ...ALTERATIONS[key] }));
+  return { id, name, plain, icon, detail, items, price: items.reduce((sum, item) => sum + item.price, 0) };
+}
+
+export const TAILORING_TIERS = [
+  tier("essentials", "Fit Essentials", "Hem and sleeves", "/icons/mw/hemming.png",
+    "The two adjustments almost every suit needs.", ["hem", "sleeves"]),
+  tier("signature", "Signature Fit", "Jacket and waist", "/icons/mw/measurement.png",
+    "Everything in Essentials, plus shaping the jacket and pants to your build.", ["hem", "sleeves", "waistSeat", "jacketSides"]),
+  tier("custom", "Custom-Level Fit", "A full reshape", "/icons/mw/tailor-collar-shoulders.png",
+    "Everything in Signature, plus the leg, back, and collar for a made-for-you shape.",
+    ["hem", "sleeves", "waistSeat", "jacketSides", "taperLeg", "centerSeam", "collar"]),
+];
+
+export const TAILORING_PERKS = "Every alteration includes a free seam re-alteration and free lifetime pressing.";
+
 export const OUTFIT_PAIRINGS = {
   navy: { shirt: "White or light blue shirt", tie: "Burgundy, silver, or navy tie" },
   blue: { shirt: "White or pale pink shirt", tie: "Navy, burgundy, or silver tie" },

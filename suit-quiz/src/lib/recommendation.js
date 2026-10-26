@@ -1,4 +1,11 @@
 import { products, TAILORING_ESTIMATE } from "../data/products.js";
+import {
+  RENTAL_MIN_LEAD_DAYS,
+  RENTAL_PIECES,
+  RENTAL_READY_DAYS,
+  RENTAL_TYPE_NAMES,
+  rentals,
+} from "../data/rentals.js";
 
 const occasionLabels = {
   wedding: "a wedding",
@@ -7,6 +14,8 @@ const occasionLabels = {
   formal: "a black-tie or formal evening",
   milestone: "a graduation, prom, or milestone",
   versatile: "whatever comes up",
+  prom: "prom or homecoming",
+  special: "a special event",
 };
 
 const fitLabels = {
@@ -26,6 +35,10 @@ const budgetPhrases = {
   "250-400": "in the $250–$400 range",
   "400-600": "in the $400–$600 range",
   "over-600": "at $600 or more",
+  "under-150": "under $150",
+  "150-200": "in the $150–$200 range",
+  "200-250": "in the $200–$250 range",
+  "over-250": "at $250 or more",
 };
 
 export function getBudgetRange(budget) {
@@ -34,6 +47,10 @@ export function getBudgetRange(budget) {
     "250-400": [250, 400],
     "400-600": [401, 600],
     "over-600": [601, Infinity],
+    "under-150": [0, 149.99],
+    "150-200": [150, 200],
+    "200-250": [200.01, 250],
+    "over-250": [250.01, Infinity],
     flexible: [0, Infinity],
   };
   return ranges[budget] ?? [0, Infinity];
@@ -274,6 +291,10 @@ const budgetLabels = {
   "250-400": "$250–$400 budget",
   "400-600": "$400–$600 budget",
   "over-600": "$600+ budget",
+  "under-150": "under-$150 budget",
+  "150-200": "$150–$200 budget",
+  "200-250": "$200–$250 budget",
+  "over-250": "$250+ budget",
 };
 
 const priceFormat = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" });
@@ -410,10 +431,10 @@ function scoreProduct(product, answers, index) {
   };
 }
 
-function budgetMissLabel(budget, count) {
+function budgetMissLabel(budget, count, item = "suit") {
   const phrase = budgetPhrases[budget] ?? "in your budget";
   if (count === 0) return `Nothing ${phrase} matched. Closest options:`;
-  const noun = count === 1 ? "suit" : "suits";
+  const noun = count === 1 ? item : `${item}s`;
   return `Only ${count} ${noun} ${phrase} matched. Closest options:`;
 }
 
@@ -557,9 +578,202 @@ export function quizListingFilters(answers) {
   return filters;
 }
 
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+function parseIsoDate(value) {
+  const match = String(value ?? "").match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (!match) return null;
+  return new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3]));
+}
+
+function startOfDay(date) {
+  return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+}
+
+function addDays(date, days) {
+  return new Date(date.getFullYear(), date.getMonth(), date.getDate() + days);
+}
+
+const dateFormat = new Intl.DateTimeFormat("en-US", { weekday: "short", month: "short", day: "numeric" });
+
+export function formatDate(date) {
+  return date ? dateFormat.format(date) : "";
+}
+
+export function rentalDates(eventDate, today = new Date()) {
+  const event = parseIsoDate(eventDate);
+  if (!event) return null;
+  const daysAway = Math.round((event - startOfDay(today)) / DAY_MS);
+  return {
+    event,
+    ready: addDays(event, -RENTAL_READY_DAYS),
+    returnBy: addDays(event, 1),
+    daysAway,
+    past: daysAway < 0,
+    tooSoon: daysAway >= 0 && daysAway < RENTAL_MIN_LEAD_DAYS,
+  };
+}
+
+export function rentalPieces(answers) {
+  const ids = new Set(answers.pieces ?? []);
+  return RENTAL_PIECES.filter((piece) => ids.has(piece.id));
+}
+
+export function rentalTotal(look, pieces) {
+  return Math.round((look.price + pieces.reduce((sum, piece) => sum + piece.price, 0)) * 100) / 100;
+}
+
+const RENTAL_TYPE_SCORES = {
+  formal: { tux: 16, dinner: 12, tailcoat: 14, suit: -12 },
+  wedding: { tux: 6, dinner: 4, tailcoat: 0, suit: 6 },
+  prom: { tux: 8, dinner: 10, tailcoat: -20, suit: 2 },
+  special: { tux: 4, dinner: 6, tailcoat: -20, suit: 6 },
+};
+
+const RENTAL_TYPE_NOTES = {
+  formal: {
+    tux: "A true tuxedo, with the satin details black tie calls for.",
+    dinner: "A dinner jacket reads as black tie, with more personality.",
+    tailcoat: "A full-dress tailcoat, for the most formal invitations.",
+  },
+  wedding: {
+    tux: "A tuxedo looks right for the groom, the wedding party, or an evening wedding.",
+    suit: "A suit fits most ceremonies, from daytime to evening.",
+    dinner: "A dinner jacket stands out at an evening reception.",
+    tailcoat: "A tailcoat suits the most formal ceremonies.",
+  },
+  prom: {
+    tux: "A tuxedo is the classic prom pick.",
+    dinner: "A dinner jacket stands out in photos.",
+    suit: "A suit keeps it sharp and simple.",
+  },
+  special: {
+    tux: "A tuxedo dresses up any celebration.",
+    dinner: "A dinner jacket feels festive without going overboard.",
+    suit: "A suit is easy to wear at most celebrations.",
+  },
+};
+
+function scoreRental(look, answers, pieces, index) {
+  let score = 0;
+  const evidence = [];
+  const [budgetMin, budgetMax] = getBudgetRange(answers.rentalBudget);
+  const prefer = answers.colors?.prefer ?? [];
+  const total = rentalTotal(look, pieces);
+
+  if (answers.occasion && look.formality.includes(answers.occasion)) {
+    score += 32;
+    const note = RENTAL_TYPE_NOTES[answers.occasion]?.[look.type];
+    if (note) evidence.push(note);
+  } else if (answers.occasion) {
+    score -= 18;
+  }
+  score += RENTAL_TYPE_SCORES[answers.occasion]?.[look.type] ?? 0;
+
+  const inBudget = total >= budgetMin && total <= budgetMax;
+  if (inBudget) {
+    score += 18;
+    if (budgetLabels[answers.rentalBudget]) {
+      evidence.push(`${formatPrice(total)} with your pieces, inside your ${budgetLabels[answers.rentalBudget]}.`);
+    }
+  } else if (answers.rentalBudget && answers.rentalBudget !== "flexible") {
+    const edge = Math.min(Math.max(total, budgetMin), budgetMax);
+    score -= Math.min(18, Math.ceil(Math.abs(total - edge) / 10));
+  }
+
+  if (prefer.includes(look.colorKey)) {
+    score += 20;
+    evidence.push(`In ${look.color.toLowerCase()}, a color you picked.`);
+  }
+
+  if (look.rating != null && look.reviews >= 20) {
+    score += Math.max(0, Math.round((look.rating - 4) * 10));
+    if (look.rating >= 4.3) {
+      evidence.push(`Rated ${look.rating.toFixed(1)} out of 5 by ${look.reviews.toLocaleString("en-US")} renters.`);
+    }
+  }
+
+  return {
+    ...look,
+    score,
+    total,
+    evidence: evidence.slice(0, 4),
+    inBudget: !answers.rentalBudget || answers.rentalBudget === "flexible" || inBudget,
+    originalIndex: index,
+  };
+}
+
+function rentalTradeoffs(look, answers, forcedAvoid) {
+  const notes = [];
+  const [budgetMin, budgetMax] = getBudgetRange(answers.rentalBudget);
+  if (answers.occasion && !look.formality.includes(answers.occasion)) {
+    notes.push(`Not the usual choice for ${occasionLabels[answers.occasion]}.`);
+  } else if (answers.occasion === "formal" && look.type === "suit") {
+    notes.push("A suit, not a tuxedo. Some black-tie invitations expect a tux.");
+  }
+  if (answers.rentalBudget && answers.rentalBudget !== "flexible" && !look.inBudget) {
+    if (look.total > budgetMax) notes.push(`Over your budget by ${formatPrice(look.total - budgetMax)}.`);
+    else if (look.total < budgetMin) notes.push(`Below your ${budgetLabels[answers.rentalBudget]}.`);
+  }
+  const prefer = answers.colors?.prefer ?? [];
+  if (forcedAvoid) notes.push(`You asked to skip ${look.color.toLowerCase()}.`);
+  else if (prefer.length && !prefer.includes(look.colorKey)) notes.push(`${look.color} wasn't a color you picked.`);
+  if (look.reviews < 20) notes.push(look.reviews ? `Only ${look.reviews} reviews so far.` : "No reviews yet.");
+  return notes;
+}
+
+function maxRentalScore(answers, pieces) {
+  const [budgetMin, budgetMax] = getBudgetRange(answers.rentalBudget);
+  const pieceTotal = pieces.reduce((sum, piece) => sum + piece.price, 0);
+  const price = (budgetMax === Infinity ? Math.max(budgetMin, 300) : (budgetMin + budgetMax) / 2) - pieceTotal;
+  let best = 0;
+  for (const type of Object.keys(RENTAL_TYPE_NAMES)) {
+    const candidate = {
+      type,
+      price,
+      colorKey: answers.colors?.prefer?.[0],
+      color: "Black",
+      rating: 5,
+      reviews: 1000,
+      formality: answers.occasion ? [answers.occasion] : [],
+    };
+    best = Math.max(best, scoreRental(candidate, answers, pieces, 0).score);
+  }
+  return best || 1;
+}
+
+export function getRentalRecommendations(answers, assortment = rentals) {
+  const pieces = rentalPieces(answers);
+  const scored = assortment.map((look, index) => scoreRental(look, answers, pieces, index));
+  const avoid = new Set(answers.colors?.avoid ?? []);
+  let pool = scored.filter((look) => !avoid.has(look.colorKey));
+  const forcedAvoid = pool.length === 0;
+  if (forcedAvoid) pool = scored;
+
+  const byScore = (a, b) => b.score - a.score || a.originalIndex - b.originalIndex;
+  const inBudget = pool.filter((look) => look.inBudget).sort(byScore);
+  const overBudget = pool.filter((look) => !look.inBudget).sort(byScore);
+  const maxScore = maxRentalScore(answers, pieces);
+  const limitedBudget = answers.rentalBudget && answers.rentalBudget !== "flexible";
+  const budgetMiss = limitedBudget && inBudget.length < 3
+    ? { label: budgetMissLabel(answers.rentalBudget, inBudget.length, "look"), count: inBudget.length }
+    : null;
+
+  const result = [...inBudget, ...overBudget].map((look) => ({
+    ...look,
+    matchPercent: honestPercent(look.score, maxScore),
+    tradeoffs: rentalTradeoffs(look, answers, forcedAvoid),
+  }));
+  result.budgetMiss = budgetMiss;
+  return result;
+}
+
 export function buildResultSummary(answers) {
   const prefer = answers.colors?.prefer ?? [];
   return {
+    mode: answers.mode === "rent" ? "rent" : "buy",
+    dates: rentalDates(answers.eventDate),
+    pieces: rentalPieces(answers),
     occasion: occasionLabels[answers.occasion] ?? "your event",
     fit: fitLabels[answers.feel] ?? "a balanced fit",
     fitName: fitNameLabels[answers.feel] ?? "balanced fit",

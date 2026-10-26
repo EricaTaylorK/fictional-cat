@@ -1,10 +1,15 @@
 import { describe, expect, it } from "vitest";
+import { TAILORING_TIERS } from "../data/products.js";
 import { getQuestionFlow } from "../data/quizConfig.js";
+import { RENTAL_PIECES } from "../data/rentals.js";
 import {
   buildResultSummary,
   describeSize,
   getFitSignals,
   getRecommendations,
+  getRentalRecommendations,
+  rentalDates,
+  rentalTotal,
   getSizeEstimate,
   inferLength,
   inferLikelySize,
@@ -27,6 +32,7 @@ const baseAnswers = {
 describe("quiz routing", () => {
   it("routes known measurements through the short path", () => {
     expect(getQuestionFlow({ measurementKnowledge: "yes" })).toEqual([
+      "mode",
       "occasion",
       "feel",
       "colors",
@@ -42,6 +48,63 @@ describe("quiz routing", () => {
     expect(getQuestionFlow({ measurementKnowledge: "no" })).toContain("height");
     expect(getQuestionFlow({ measurementKnowledge: "no" })).toContain("everydaySizes");
     expect(getQuestionFlow({ measurementKnowledge: "no" })).not.toContain("measurements");
+  });
+
+  it("sends renters through pieces and an event date, without tailoring or a buying budget", () => {
+    const flow = getQuestionFlow({ mode: "rent", measurementKnowledge: "yes" });
+    expect(flow[0]).toBe("mode");
+    expect(flow).toContain("eventDate");
+    expect(flow).toContain("pieces");
+    expect(flow).toContain("rentalBudget");
+    expect(flow).not.toContain("tailoring");
+    expect(flow).not.toContain("budget");
+  });
+});
+
+describe("rentals", () => {
+  const rentAnswers = {
+    mode: "rent",
+    occasion: "formal",
+    feel: "balanced",
+    measurementKnowledge: "yes",
+    measurements: { jacket: "40", waist: "34" },
+    pieces: ["shirt", "neckwear", "shoes"],
+    rentalBudget: "150-200",
+  };
+
+  it("prices each look with the pieces the renter picked", () => {
+    const look = { price: 139.99 };
+    const pieces = RENTAL_PIECES.filter((piece) => rentAnswers.pieces.includes(piece.id));
+    expect(rentalTotal(look, pieces)).toBe(199.99);
+  });
+
+  it("keeps in-budget looks first once pieces are added", () => {
+    const results = getRentalRecommendations(rentAnswers);
+    const firstMiss = results.findIndex((look) => !look.inBudget);
+    expect(results[0].inBudget).toBe(true);
+    expect(results[0].total).toBeLessThanOrEqual(200);
+    if (firstMiss >= 0) expect(results.slice(firstMiss).every((look) => !look.inBudget)).toBe(true);
+  });
+
+  it("favors a tuxedo over a suit for black tie", () => {
+    const [best] = getRentalRecommendations({ ...rentAnswers, rentalBudget: "flexible" });
+    expect(best.type).not.toBe("suit");
+  });
+
+  it("works out ready and return dates, and flags events that are too soon", () => {
+    const today = new Date(2026, 9, 26);
+    const dates = rentalDates("2026-11-14", today);
+    expect(dates.ready).toEqual(new Date(2026, 10, 11));
+    expect(dates.returnBy).toEqual(new Date(2026, 10, 15));
+    expect(dates.tooSoon).toBe(false);
+    expect(rentalDates("2026-10-28", today).tooSoon).toBe(true);
+    expect(rentalDates("2026-10-20", today).past).toBe(true);
+  });
+});
+
+describe("tailoring tiers", () => {
+  it("adds up the real alteration prices", () => {
+    expect(TAILORING_TIERS.map((tier) => tier.price)).toEqual([55, 115, 199]);
   });
 });
 

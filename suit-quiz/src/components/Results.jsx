@@ -1,40 +1,31 @@
 import { Fragment, useMemo, useState } from "react";
-import { FIT_DESCRIPTIONS, OUTFIT_PAIRINGS, SWATCH_HEX, TAILORING_TURNAROUND } from "../data/products.js";
-import { buildResultSummary, describeSize, formatPrice, getRecommendations } from "../lib/recommendation.js";
+import {
+  FIT_DESCRIPTIONS,
+  OUTFIT_PAIRINGS,
+  SWATCH_HEX,
+  TAILORING_PERKS,
+  TAILORING_TIERS,
+  TAILORING_TURNAROUND,
+} from "../data/products.js";
+import { RENTAL_FEE, RENTAL_PIECES, RENTAL_STEPS, RENTAL_TYPE_NAMES } from "../data/rentals.js";
+import {
+  buildResultSummary,
+  describeSize,
+  formatDate,
+  formatPrice,
+  getRecommendations,
+  getRentalRecommendations,
+  rentalTotal,
+} from "../lib/recommendation.js";
 import TextInput from "./TextInput.jsx";
-
-const tailoringPackages = [
-  {
-    id: "essentials",
-    name: "Fit Essentials",
-    plain: "Hem and sleeves",
-    price: 55,
-    icon: "/icons/product_size.svg",
-    detail: "We'll hem the pants and set the sleeve length for a clean, finished look.",
-  },
-  {
-    id: "signature",
-    name: "Signature Fit",
-    plain: "Jacket and waist",
-    price: 100,
-    icon: "/icons/product_modernfit.svg",
-    detail: "Everything in Essentials, plus we shape the jacket and waist so it looks sharper.",
-  },
-  {
-    id: "custom",
-    name: "Custom-Level Fit",
-    plain: "A full reshape",
-    price: 150,
-    icon: "/icons/product_hanger.svg",
-    detail: "Our most complete tailoring: refined lines, cleaner drape, and a made-for-you shape.",
-  },
-];
 
 const outfitOptions = [
   { id: "shirt", summaryLabel: "Dress shirt", name: "Slim Fit White Dress Shirt", price: 59.99, image: "/outfit/white-dress-shirt.jpg" },
   { id: "tie", summaryLabel: "Tie", name: "Solid Navy Textured Tie", price: 49.99, image: "/outfit/navy-tie.jpg" },
   { id: "shoes", summaryLabel: "Dress shoes", name: "Black Cap-Toe Oxfords", price: 119.99, image: "/outfit/black-dress-shoes.jpg" },
 ];
+
+const CHECK_PATH = "M6.3 12.2 1.8 7.7l1.2-1.2 3.3 3.3 6.7-6.7 1.2 1.2-7.9 7.9Z";
 
 function variantOptions(product) {
   if (product.variants?.length) return product.variants;
@@ -100,7 +91,8 @@ function matchTone(percent) {
   return percent >= 90 ? "best" : "mid";
 }
 
-function SuitOption({ product, size, selected, onSelect, rank, shown, options, variantIndex, onVariant, avoided }) {
+function SuitOption({ product, size, selected, onSelect, rank, shown, options, variantIndex, onVariant, avoided, rentPrice }) {
+  const renting = rentPrice != null;
   return (
     <label className={`suit-option${selected ? " suit-option-selected" : ""}`}>
       <input
@@ -125,13 +117,27 @@ function SuitOption({ product, size, selected, onSelect, rank, shown, options, v
             <span>{product.rating.toFixed(1)} ({product.reviews.toLocaleString("en-US")})</span>
           </p>
         )}
-        <p className="product-price">
-          <strong>{formatPrice(product.price)}</strong>
-          {product.compareAt && <s>{formatPrice(product.compareAt)}</s>}
-        </p>
-        <p className="product-fit">{product.fitName}. {FIT_DESCRIPTIONS[product.fit]}</p>
-        <p className="product-meta">{[shown.color, product.fabric].filter(Boolean).join(" · ")}</p>
-        {describeSize(size) && <p className="product-meta">{describeSize(size)}</p>}
+        {renting ? (
+          <>
+            <p className="product-price">
+              <strong>{formatPrice(rentPrice)}</strong>
+              <span className="rent-label">to rent</span>
+            </p>
+            <p className="product-meta">+{formatPrice(RENTAL_FEE)} damage and handling fee</p>
+            <p className="product-fit">{RENTAL_TYPE_NAMES[product.type]}. Your sizes are set at the fitting.</p>
+            <p className="product-meta">{shown.color}</p>
+          </>
+        ) : (
+          <>
+            <p className="product-price">
+              <strong>{formatPrice(product.price)}</strong>
+              {product.compareAt && <s>{formatPrice(product.compareAt)}</s>}
+            </p>
+            <p className="product-fit">{product.fitName}. {FIT_DESCRIPTIONS[product.fit]}</p>
+            <p className="product-meta">{[shown.color, product.fabric].filter(Boolean).join(" · ")}</p>
+            {describeSize(size) && <p className="product-meta">{describeSize(size)}</p>}
+          </>
+        )}
         {options.length > 1 && (
           <div className="color-swatches" role="group" aria-label="Other colors">
             {options.map((option, index) => (
@@ -159,7 +165,7 @@ function SuitOption({ product, size, selected, onSelect, rank, shown, options, v
           {product.evidence.slice(0, 3).map((reason) => (
             <li key={reason}>
               <svg className="reason-check" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
-                <path fill="currentColor" d="M6.3 12.2 1.8 7.7l1.2-1.2 3.3 3.3 6.7-6.7 1.2 1.2-7.9 7.9Z" />
+                <path fill="currentColor" d={CHECK_PATH} />
               </svg>
               <span>{reason}</span>
             </li>
@@ -179,30 +185,123 @@ function SuitOption({ product, size, selected, onSelect, rank, shown, options, v
   );
 }
 
-export default function Results({ answers, moreMode = "toggle", onSeeAll, onEditAnswers }) {
-  const recommendations = useMemo(() => getRecommendations(answers), [answers]);
+function EmailResults() {
+  const [open, setOpen] = useState(false);
+  const [email, setEmail] = useState("");
+  const [sent, setSent] = useState(false);
+
+  function handleSubmit(event) {
+    event.preventDefault();
+    if (!email.trim()) return;
+    setSent(true);
+  }
+
+  if (sent) {
+    return <p className="success-note email-sent" role="status">Sent to {email}. Prototype: a real experience would email the results now.</p>;
+  }
+
+  return (
+    <div className="email-results">
+      <button
+        className="button secondary button-block"
+        type="button"
+        aria-expanded={open}
+        onClick={() => setOpen((value) => !value)}
+      >
+        Email me my results
+      </button>
+      {open && (
+        <form className="email-form" onSubmit={handleSubmit}>
+          <p className="summary-note">Your picks, sizes, and prices, for you or someone helping you decide.</p>
+          <TextInput
+            label="Email address"
+            type="email"
+            inputMode="email"
+            autoComplete="email"
+            value={email}
+            onChange={setEmail}
+            required
+          />
+          <button className="button button-block" type="submit">Send</button>
+        </form>
+      )}
+    </div>
+  );
+}
+
+function rentalStepDetail(stepId, dates) {
+  const ready = dates && !dates.past ? formatDate(dates.ready) : null;
+  const event = dates && !dates.past ? formatDate(dates.event) : null;
+  const returnBy = dates && !dates.past ? formatDate(dates.returnBy) : null;
+  switch (stepId) {
+    case "reserve":
+      return event ? `Check out today to hold this look for ${event}.` : "Check out to hold this look for your event.";
+    case "fitted":
+      return "Book a free fitting. We measure you and confirm every size.";
+    case "pickup":
+      return ready ? `Ready ${ready} for pickup in store, or delivered to your door.` : "Ready 3–4 days before your event, in store or delivered.";
+    case "return":
+      return returnBy ? `Return it ${returnBy}, in store or by mail.` : "Return it the day after your event, in store or by mail.";
+    default:
+      return "";
+  }
+}
+
+function HowToRent({ dates }) {
+  return (
+    <ol className="rent-steps">
+      {RENTAL_STEPS.map((step, index) => (
+        <li className="rent-step" key={step.id}>
+          <img src={step.icon} alt="" />
+          <span className="rent-step-number">Step {index + 1}</span>
+          <strong>{step.title}</strong>
+          <span className="rent-step-detail">{rentalStepDetail(step.id, dates)}</span>
+        </li>
+      ))}
+    </ol>
+  );
+}
+
+export default function Results({ answers, moreMode = "toggle", onSeeAll, onEditAnswers, onRetake }) {
+  const renting = answers.mode === "rent";
+  const recommendations = useMemo(
+    () => (renting ? getRentalRecommendations(answers) : getRecommendations(answers)),
+    [answers, renting],
+  );
   const summary = useMemo(() => buildResultSummary(answers), [answers]);
-  const recommendedTailoring = tailoringPackages.find((item) => item.id === summary.tailoring.id);
+  const recommendedTailoring = TAILORING_TIERS.find((item) => item.id === summary.tailoring.id);
   const [selectedId, setSelectedId] = useState(recommendations[0].id);
   const [expanded, setExpanded] = useState(false);
   const [variantIndexes, setVariantIndexes] = useState({});
   const [tailoringId, setTailoringId] = useState(null);
   const [selectedExtras, setSelectedExtras] = useState([]);
+  const [pieceIds, setPieceIds] = useState(answers.pieces ?? []);
   const [handoff, setHandoff] = useState("");
-  const [email, setEmail] = useState("");
-  const [emailSent, setEmailSent] = useState(false);
 
   const selected = recommendations.find((product) => product.id === selectedId);
   const size = summary.sizeEstimate;
-  const tailoring = tailoringPackages.find((item) => item.id === tailoringId);
+  const dates = summary.dates;
+  const pieces = RENTAL_PIECES.filter((piece) => pieceIds.includes(piece.id));
+  const tailoring = TAILORING_TIERS.find((item) => item.id === tailoringId);
   const extras = outfitOptions.filter((item) => selectedExtras.includes(item.id));
-  const savings = selected?.compareAt ? selected.compareAt - selected.price : 0;
-  const subtotal = selected
-    ? (selected.compareAt ?? selected.price) + (tailoring?.price ?? 0) + extras.reduce((sum, item) => sum + item.price, 0)
-    : 0;
+  const savings = !renting && selected?.compareAt ? selected.compareAt - selected.price : 0;
+  const rentSubtotal = renting && selected ? rentalTotal(selected, pieces) : 0;
+  const subtotal = renting
+    ? rentSubtotal + RENTAL_FEE
+    : selected
+      ? (selected.compareAt ?? selected.price) + (tailoring?.price ?? 0) + extras.reduce((sum, item) => sum + item.price, 0)
+      : 0;
   const total = subtotal - savings;
-  const itemCount = selected ? 2 + extras.length + (tailoring ? 1 : 0) : 0;
-  const basedOn = [summary.occasion, summary.fitName, summary.colors?.join(", "), ...summary.fitNotes].filter(Boolean).join(" · ");
+  const itemCount = renting
+    ? 2 + pieces.length
+    : selected ? 2 + extras.length + (tailoring ? 1 : 0) : 0;
+  const basedOn = [
+    summary.occasion,
+    renting && dates && !dates.past ? formatDate(dates.event) : null,
+    summary.fitName,
+    summary.colors?.join(", "),
+    ...summary.fitNotes,
+  ].filter(Boolean).join(" · ");
   const visibleCount = expanded ? Math.min(recommendations.length, 9) : Math.min(3, recommendations.length);
   const shownRecommendations = recommendations.slice(0, visibleCount);
   const missIndex = recommendations.budgetMiss
@@ -212,9 +311,10 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
   const selectedVariant = selected
     ? selectedOptions[variantIndexes[selected.id] ?? defaultVariantIndex(selected, answers)]
     : null;
-  const pairing = selectedVariant ? OUTFIT_PAIRINGS[selectedVariant.colorKey] : null;
-  const suitCount = Math.min(3, recommendations.length);
-  const countLabel = suitCount === 1 ? "One suit" : suitCount === 2 ? "Two suits" : "Three suits";
+  const pairing = !renting && selectedVariant ? OUTFIT_PAIRINGS[selectedVariant.colorKey] : null;
+  const pickCount = Math.min(3, recommendations.length);
+  const noun = renting ? "look" : "suit";
+  const countLabel = `${["One", "Two", "Three"][pickCount - 1]} ${pickCount === 1 ? noun : `${noun}s`}`;
 
   function toggleExtra(id) {
     setSelectedExtras((current) => (current.includes(id)
@@ -222,10 +322,10 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
       : [...current, id]));
   }
 
-  function handleEmail(event) {
-    event.preventDefault();
-    if (!email.trim()) return;
-    setEmailSent(true);
+  function togglePiece(id) {
+    setPieceIds((current) => (current.includes(id)
+      ? current.filter((item) => item !== id)
+      : [...current, id]));
   }
 
   return (
@@ -234,14 +334,15 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
         <div className="results-hero">
           <MatchRing percent={recommendations[0].matchPercent} />
           <div className="results-hero-copy">
-            <h1 id="results-title">We found your suit.</h1>
+            <h1 id="results-title">{renting ? "We found your look." : "We found your suit."}</h1>
             <p className="results-lede">
-              {countLabel} for {summary.occasion}, in a {summary.fitName}. Your best match is selected.
+              {countLabel} to {renting ? "rent" : "buy"} for {summary.occasion}, in a {summary.fitName}. Your best match is selected.
             </p>
-            <p className="based-on">
-              Based on: {basedOn}{" "}
-              <button className="text-link" type="button" onClick={onEditAnswers}>Edit answers</button>
-            </p>
+            <p className="based-on">Based on: {basedOn}</p>
+          </div>
+          <div className="hero-actions">
+            <button className="button secondary retake-button" type="button" onClick={onRetake}>Retake quiz</button>
+            <button className="button secondary" type="button" onClick={onEditAnswers}>Edit answers</button>
           </div>
           <ul className="fit-stats">
             <li className="fit-stat">
@@ -258,20 +359,30 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
               <strong>{size.pants ?? "Measured in store"}</strong>
               {size.pants && <span className="fit-stat-hint">{size.pants.replace(/W$/i, "")}-inch waist</span>}
             </li>
-            <li className="fit-stat">
-              <img src="/icons/product_hanger.svg" alt="" />
-              <span className="fit-stat-label">Suggested tailoring</span>
-              <strong>{recommendedTailoring?.plain}</strong>
-            </li>
+            {renting ? (
+              <li className="fit-stat">
+                <img src="/icons/mw/in-store-pickup.png" alt="" />
+                <span className="fit-stat-label">Ready for pickup</span>
+                <strong>{dates && !dates.past ? formatDate(dates.ready) : "3–4 days before"}</strong>
+                {dates && !dates.past && <span className="fit-stat-hint">Return by {formatDate(dates.returnBy)}</span>}
+              </li>
+            ) : (
+              <li className="fit-stat">
+                <img src={recommendedTailoring?.icon ?? "/icons/product_hanger.svg"} alt="" />
+                <span className="fit-stat-label">Suggested tailoring</span>
+                <strong>{recommendedTailoring?.plain}</strong>
+                {recommendedTailoring && <span className="fit-stat-hint">+{formatPrice(recommendedTailoring.price)}</span>}
+              </li>
+            )}
           </ul>
         </div>
 
         <div className="suit-options" role="radiogroup" aria-labelledby="results-title">
           {shownRecommendations.map((product, index) => {
-            const options = variantOptions(product);
-            const variantIndex = variantIndexes[product.id] ?? defaultVariantIndex(product, answers);
+            const options = renting ? [{ color: product.color, colorKey: product.colorKey, image: product.image }] : variantOptions(product);
+            const variantIndex = renting ? 0 : variantIndexes[product.id] ?? defaultVariantIndex(product, answers);
             const shown = options[variantIndex] ?? options[0];
-            const avoided = (answers.colors?.avoid ?? []).includes(shown.colorKey);
+            const avoided = !renting && (answers.colors?.avoid ?? []).includes(shown.colorKey);
             return (
               <Fragment key={product.id}>
                 {index === missIndex && (
@@ -287,6 +398,7 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
                   options={options}
                   variantIndex={variantIndex}
                   avoided={avoided}
+                  rentPrice={renting ? rentalTotal(product, pieces) : undefined}
                   onVariant={(next) => setVariantIndexes((current) => ({ ...current, [product.id]: next }))}
                 />
               </Fragment>
@@ -298,27 +410,82 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
             {expanded ? "View less" : `View more matches (${Math.min(6, recommendations.length - 3)})`}
           </button>
         )}
-        {moreMode === "link" && (
+        {moreMode === "link" && !renting && (
           <button className="button secondary more-matches" type="button" onClick={onSeeAll}>
             See all quiz matches
           </button>
         )}
 
-        {selected && (
+        {selected && renting && (
+          <div className="results-card">
+            <section className="card-section" aria-labelledby="rent-steps-title">
+              <h2 id="rent-steps-title" className="section-title">How to rent</h2>
+              <HowToRent dates={dates} />
+              {dates?.tooSoon && (
+                <p className="date-warning">
+                  Your event is less than 4 days away. Call or visit a store to make sure this look is ready in time.
+                </p>
+              )}
+            </section>
+
+            <section className="card-section" aria-labelledby="pieces-title">
+              <h2 id="pieces-title" className="section-title">Included in this look</h2>
+              <p className="section-copy">
+                The jacket and pants come with every rental. Add or remove pieces, and the price updates.
+              </p>
+              <div className="piece-list">
+                <label className="piece piece-locked">
+                  <input type="checkbox" checked disabled />
+                  <img src="/icons/mw/suits-bundle.png" alt="" />
+                  <span className="piece-name">Jacket and pants</span>
+                  <span className="piece-price">{formatPrice(selected.price)}</span>
+                </label>
+                {RENTAL_PIECES.map((piece) => (
+                  <label className="piece" key={piece.id}>
+                    <input type="checkbox" checked={pieceIds.includes(piece.id)} onChange={() => togglePiece(piece.id)} />
+                    {piece.icon ? <img src={piece.icon} alt="" /> : <span className="piece-icon-blank" aria-hidden="true" />}
+                    <span className="piece-name">{piece.label}</span>
+                    <span className="piece-price">+{formatPrice(piece.price)}</span>
+                  </label>
+                ))}
+              </div>
+            </section>
+
+            <section className="card-section fitting-section" aria-labelledby="fitting-title">
+              <img className="fitting-icon" src="/icons/mw/measurement.png" alt="" />
+              <div>
+                <h2 id="fitting-title" className="section-title">Book your fitting</h2>
+                <p className="section-copy">
+                  Rentals aren't tailored. Instead, a free fitting confirms your jacket, pants, shirt, and shoe sizes,
+                  so everything fits when you pick it up.
+                </p>
+                <button className="button secondary" type="button" onClick={() => setHandoff("fitting")}>
+                  Book a fitting appointment
+                </button>
+                {handoff === "fitting" && (
+                  <p className="handoff-inline" role="status">Prototype: this would open nearby stores and fitting times.</p>
+                )}
+              </div>
+            </section>
+          </div>
+        )}
+
+        {selected && !renting && (
           <div className="results-card">
             <section className="card-section" aria-labelledby="tailoring-title">
               <h2 id="tailoring-title" className="section-title">
-                <img src="/icons/product_size.svg" alt="" />
+                <img src="/icons/mw/hemming.png" alt="" />
                 Make it a perfect fit
               </h2>
               <p className="section-copy">
                 For the {selected.brand} {selected.name}. {summary.tailoring.because}
               </p>
               <div className="tier-list" role="radiogroup" aria-labelledby="tailoring-title">
-                {[...tailoringPackages, {
+                {[...TAILORING_TIERS, {
                   id: "none",
                   name: "No tailoring for now",
                   price: 0,
+                  items: [],
                   detail: "Take the suit as it is. You can add tailoring in store later.",
                 }].map((option) => (
                   <label className="tier" key={option.id}>
@@ -332,6 +499,7 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
                     />
                     <span className="tier-copy">
                       <span className="tier-name">
+                        {option.icon && <img className="tier-icon" src={option.icon} alt="" />}
                         {option.name}
                         {option.id === summary.tailoring.id && <span className="tier-tag">Our pick for you</span>}
                       </span>
@@ -339,6 +507,17 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
                         {option.detail}
                         {TAILORING_TURNAROUND[option.id] ? ` Ready in about ${TAILORING_TURNAROUND[option.id]} days.` : ""}
                       </span>
+                      {option.items.length > 0 && (
+                        <span className="tier-items">
+                          {option.items.map((item) => (
+                            <span className="tier-item" key={item.id}>
+                              <img src={item.icon} alt="" />
+                              <span className="tier-item-label">{item.label}</span>
+                              <span className="tier-item-price">{formatPrice(item.price)}</span>
+                            </span>
+                          ))}
+                        </span>
+                      )}
                       <span className="tier-total">
                         {option.price
                           ? `${formatPrice(selected.price + option.price)} with this suit`
@@ -349,6 +528,15 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
                   </label>
                 ))}
               </div>
+              <p className="tier-perks">{TAILORING_PERKS}</p>
+              <button className="button secondary" type="button" onClick={() => setHandoff("tailor")}>
+                Book a tailoring appointment
+              </button>
+              {handoff === "tailor" && (
+                <p className="handoff-inline" role="status">
+                  Prototype: this would open nearby stores and times for a tailor to pin your suit.
+                </p>
+              )}
             </section>
 
             <section className="card-section" aria-labelledby="outfit-title">
@@ -381,9 +569,27 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
       </section>
 
       <aside className="order-summary" aria-labelledby="summary-title">
-        <h2 id="summary-title">Order summary</h2>
-        {!selected && <p className="summary-empty">Select a suit to see your total.</p>}
-        {selected && (
+        <h2 id="summary-title">{renting ? "Rental summary" : "Order summary"}</h2>
+        {!selected && <p className="summary-empty">Select a {noun} to see your total.</p>}
+        {selected && renting && (
+          <>
+            <p className="summary-suit">{selected.brand} {selected.name}</p>
+            <ul className="summary-lines">
+              <li><span>Jacket and pants</span><span className="summary-amount">{formatPrice(selected.price)}</span></li>
+              {pieces.map((piece) => (
+                <li key={piece.id}>
+                  <span>{piece.label}</span>
+                  <span className="summary-amount">{formatPrice(piece.price)}</span>
+                </li>
+              ))}
+              <li><span>Damage and handling fee</span><span className="summary-amount">{formatPrice(RENTAL_FEE)}</span></li>
+            </ul>
+            <ul className="summary-lines summary-totals">
+              <li className="summary-grand"><span>Total ({itemCount} pieces)</span><span className="summary-amount">{formatPrice(total)}</span></li>
+            </ul>
+          </>
+        )}
+        {selected && !renting && (
           <>
             {savings > 0 && <p className="promo-strip">Sale price applied: you save {formatPrice(savings)}</p>}
             <p className="summary-suit">{selected.brand} {selected.name}</p>
@@ -424,26 +630,40 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
             </ul>
           </>
         )}
-        <button className="button button-block" type="button" disabled={!selected} onClick={() => setHandoff("checkout")}>
-          Checkout
-        </button>
-        {handoff === "checkout" && (
-          <p className="handoff-inline" role="status">
-            Prototype: this would add the suit in your sizes{tailoring ? ", the tailoring," : ""} and the add-ons to your bag.
+        <div className="summary-actions">
+          <button className="button button-block" type="button" disabled={!selected} onClick={() => setHandoff("checkout")}>
+            {renting ? "Reserve this look" : "Add to cart"}
+          </button>
+          {handoff === "checkout" && (
+            <p className="handoff-inline" role="status">
+              {renting
+                ? "Prototype: this would reserve the look and its pieces for your event date."
+                : `Prototype: this would add the suit in your sizes${tailoring ? ", the tailoring," : ""} and the add-ons to your bag.`}
+            </p>
+          )}
+          <EmailResults />
+        </div>
+        {renting ? (
+          <p className="summary-note">
+            Sizes are confirmed at your fitting.
+            {dates && !dates.past ? ` Ready ${formatDate(dates.ready)}, return by ${formatDate(dates.returnBy)}.` : ""}
           </p>
-        )}
-        <p className="summary-note">Shipping and tax calculated at checkout.</p>
-        {tailoring && <p className="summary-note">Tailoring is finished in store after checkout.</p>}
-        <button className="text-link try-on" type="button" onClick={() => setHandoff("tryon")}>
-          Try it on at a store near you
-        </button>
-        {handoff === "tryon" && (
-          <p className="handoff-inline" role="status">Prototype: this would open nearby stores with this suit in your size.</p>
+        ) : (
+          <>
+            <p className="summary-note">Shipping and tax calculated at checkout.</p>
+            {tailoring && <p className="summary-note">Tailoring is finished in store after checkout.</p>}
+            <button className="text-link try-on" type="button" onClick={() => setHandoff("tryon")}>
+              Try it on at a store near you
+            </button>
+            {handoff === "tryon" && (
+              <p className="handoff-inline" role="status">Prototype: this would open nearby stores with this suit in your size.</p>
+            )}
+          </>
         )}
       </aside>
 
-      <div className="results-extra">
-        {summary.needsMeasurementHelp && (
+      {!renting && summary.needsMeasurementHelp && (
+        <div className="results-extra">
           <aside className="confidence-callout">
             <img src="/icons/content_store.svg" alt="" />
             <div>
@@ -460,29 +680,8 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
               )}
             </div>
           </aside>
-        )}
-
-        <aside className="email-box">
-          <h2>Send these results</h2>
-          <p>Email your suits, sizes, and prices to yourself, or to someone helping you decide.</p>
-          {emailSent ? (
-            <p className="success-note" role="status">Sent to {email}. Prototype: a real experience would email the results now.</p>
-          ) : (
-            <form className="inline-form" onSubmit={handleEmail}>
-              <TextInput
-                label="Email address"
-                type="email"
-                inputMode="email"
-                autoComplete="email"
-                value={email}
-                onChange={setEmail}
-                required
-              />
-              <button className="button button-field" type="submit">Send</button>
-            </form>
-          )}
-        </aside>
-      </div>
+        </div>
+      )}
     </div>
   );
 }

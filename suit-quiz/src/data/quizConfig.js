@@ -1,16 +1,33 @@
 export const questions = {
+  mode: {
+    id: "mode",
+    title: "Are you buying or renting?",
+    help: "Buy a suit to keep and tailor, or rent a complete look for one event.",
+    type: "single",
+    options: [
+      { value: "buy", label: "Buy a suit", detail: "Yours to keep, tailored to fit.", icon: "/icons/mw/shop.png" },
+      { value: "rent", label: "Rent a look", detail: "Suit or tux, shirt, tie, and shoes for one event, starting at $99.99.", icon: "/icons/mw/suits-bundle.png" },
+    ],
+  },
   occasion: {
     id: "occasion",
     title: "What's the moment?",
     help: "We start here. The occasion tells us how formal to go, and how easy it is to misread the room.",
     type: "occasionPlus",
+    rentHelp: "The occasion tells us whether a suit or a tuxedo fits the room.",
+    rentOptions: [
+      { value: "wedding", label: "A wedding", detail: "Groom, wedding party, or guest.", icon: "/icons/mw/wedding.png" },
+      { value: "formal", label: "A black-tie or formal evening", detail: "Galas, formal dinners, and black-tie invitations.", icon: "/icons/mw/special-event.png" },
+      { value: "prom", label: "Prom or homecoming", detail: "A night to stand out.", icon: "/icons/mw/school-event.png" },
+      { value: "special", label: "Another special event", detail: "A quinceañera, anniversary, or celebration.", icon: "/icons/mw/quinceanera.png" },
+    ],
     options: [
-      { value: "wedding", label: "A wedding", detail: "Guest, wedding party, or groom. We'll match the room." },
-      { value: "work", label: "Work or an interview", detail: "The office, a new job, or a professional event. Sharp enough to wear again." },
-      { value: "versatile", label: "A go-to suit for whatever comes up", detail: "Work, dinners, and everyday, when the dress code isn't clear." },
-      { value: "formal", label: "A black-tie or formal evening", detail: "Elevated evening dressing that still feels like you." },
-      { value: "milestone", label: "A graduation, prom, or milestone", detail: "For the person being celebrated." },
-      { value: "funeral", label: "A funeral or memorial", detail: "Respectful and quiet. Nothing that pulls focus." },
+      { value: "wedding", label: "A wedding", detail: "Guest, wedding party, or groom. We'll match the room.", icon: "/icons/mw/wedding.png" },
+      { value: "work", label: "Work or an interview", detail: "The office, a new job, or a professional event. Sharp enough to wear again.", icon: "/icons/mw/suits-bundle.png" },
+      { value: "versatile", label: "A go-to suit for whatever comes up", detail: "Work, dinners, and everyday, when the dress code isn't clear.", icon: "/icons/mw/travel.png" },
+      { value: "formal", label: "A black-tie or formal evening", detail: "Elevated evening dressing that still feels like you.", icon: "/icons/mw/special-event.png" },
+      { value: "milestone", label: "A graduation, prom, or milestone", detail: "For the person being celebrated.", icon: "/icons/mw/school-event.png" },
+      { value: "funeral", label: "A funeral or memorial", detail: "Respectful and quiet. Nothing that pulls focus.", icon: "/icons/mw/invitation.png" },
     ],
     wear: {
       title: "Will you wear it again?",
@@ -28,10 +45,22 @@ export const questions = {
     help: "The name in parentheses is the fit you'll see on the suit.",
     type: "single",
     options: [
-      { value: "close", label: "Close and sharp (Slim fit)", detail: "A trimmer shape, with less room through the body." },
-      { value: "balanced", label: "Polished, with room to move (Modern fit)", detail: "Shape through the shoulders, ease where you need it." },
-      { value: "roomy", label: "Comfortable with room (Classic fit)", detail: "Ease through the chest, seat, and legs, without looking loose." },
+      { value: "close", label: "Close and sharp (Slim fit)", detail: "A trimmer shape, with less room through the body.", icon: "/icons/mw/sharp.png" },
+      { value: "balanced", label: "Polished, with room to move (Modern fit)", detail: "Shape through the shoulders, ease where you need it.", icon: "/icons/mw/balanced.png" },
+      { value: "roomy", label: "Comfortable with room (Classic fit)", detail: "Ease through the chest, seat, and legs, without looking loose.", icon: "/icons/mw/relaxed.png" },
     ],
+  },
+  eventDate: {
+    id: "eventDate",
+    title: "When is the event?",
+    help: "Your look is ready 3 days before, and it goes back the day after.",
+    type: "date",
+  },
+  pieces: {
+    id: "pieces",
+    title: "What should the look include?",
+    help: "The jacket and pants are always included. Add the pieces you need, or rent the full look.",
+    type: "pieces",
   },
   colors: {
     id: "colors",
@@ -47,6 +76,7 @@ export const questions = {
       { value: "tan", label: "Tan" },
       { value: "burgundy", label: "Burgundy" },
       { value: "green", label: "Green" },
+      { value: "white", label: "White or ivory", modes: ["rent"] },
     ],
   },
   measurementKnowledge: {
@@ -74,39 +104,45 @@ export const questions = {
     options: [
       {
         value: "broadShoulders",
+        icon: "/icons/mw/tight-shoulders.png",
         label: "Jackets pull across my shoulders or back",
         detail: "Tight when I reach forward or cross my arms",
       },
       {
         value: "athleticBuild",
+        icon: "/icons/mw/athletic.png",
         label: "Jackets fit my chest, but pants gap at the waist",
         detail: "A broad chest with a trimmer waist",
         excludes: ["fullerMidsection"],
       },
       {
         value: "fullerMidsection",
+        icon: "/icons/mw/tight-button.png",
         label: "Jackets pull at the button, or pants pinch at the waist",
         detail: "I need more room through the middle",
         excludes: ["athleticBuild"],
       },
       {
         value: "seatThighs",
+        icon: "/icons/mw/baggy-pants.png",
         label: "Pants are tight through the seat or thighs",
         detail: "Snug when I sit, take stairs, or crouch",
       },
       {
         value: "runsLong",
+        icon: "/icons/mw/sleeve.png",
         label: "Sleeves and jackets usually run long",
         detail: "Sleeves cover my shirt cuff, or the jacket covers my seat",
         excludes: ["runsShort"],
       },
       {
         value: "runsShort",
+        icon: "/icons/mw/tight-sleeves.png",
         label: "Sleeves and jackets usually run short",
         detail: "My wrists show, or the jacket sits high",
         excludes: ["runsLong"],
       },
-      { value: "none", label: "Standard sizes usually fit me", detail: "Nothing in particular comes up", exclusive: true },
+      { value: "none", label: "Standard sizes usually fit me", detail: "Nothing in particular comes up", exclusive: true, icon: "/icons/mw/straight.png" },
     ],
   },
   height: {
@@ -145,7 +181,7 @@ export const questions = {
     help: "A few adjustments are what make a suit feel like yours. Each option shows what it adds to the price.",
     type: "single",
     options: [
-      { value: "bundle", label: "Include tailoring in my plan", detail: "Adds $55–$150, depending on the work." },
+      { value: "bundle", label: "Include tailoring in my plan", detail: "Adds $55–$199, depending on the work." },
       { value: "consider", label: "I'm open to it", detail: "We'll point out what's worth adjusting, and what it adds." },
       { value: "skip", label: "Suit only for now", detail: "No tailoring added to the price." },
     ],
@@ -163,17 +199,36 @@ export const questions = {
       { value: "flexible", label: "Flexible for the right fit", detail: "Worth it when the suit is right for the moment." },
     ],
   },
+  rentalBudget: {
+    id: "rentalBudget",
+    title: "What feels comfortable for the rental?",
+    help: "This covers the look and the pieces you picked. The $12 damage and handling fee is added at checkout.",
+    type: "single",
+    options: [
+      { value: "under-150", label: "Under $150" },
+      { value: "150-200", label: "$150–$200" },
+      { value: "200-250", label: "$200–$250" },
+      { value: "over-250", label: "$250+" },
+      { value: "flexible", label: "Flexible for the right look" },
+    ],
+  },
 };
 
-const commonEnd = ["tailoring", "budget"];
-
 export function getQuestionFlow(answers) {
-  const start = ["occasion", "feel", "colors", "measurementKnowledge"];
+  const renting = answers.mode === "rent";
+  const start = renting
+    ? ["mode", "occasion", "eventDate", "pieces", "feel", "colors", "measurementKnowledge"]
+    : ["mode", "occasion", "feel", "colors", "measurementKnowledge"];
+  const end = renting ? ["rentalBudget"] : ["tailoring", "budget"];
   if (answers.measurementKnowledge === "yes" || answers.measurementKnowledge === "some") {
-    return [...start, "measurements", ...commonEnd];
+    return [...start, "measurements", ...end];
   }
   if (answers.measurementKnowledge === "no") {
-    return [...start, "everydaySizes", "fitIssues", "height", ...commonEnd];
+    return [...start, "everydaySizes", "fitIssues", "height", ...end];
   }
   return start;
+}
+
+export function occasionOptions(question, answers) {
+  return answers.mode === "rent" ? question.rentOptions : question.options;
 }

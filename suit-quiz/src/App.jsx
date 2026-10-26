@@ -2,8 +2,9 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import ProductGridEntry from "./components/ProductGridEntry.jsx";
 import Results from "./components/Results.jsx";
 import TextInput from "./components/TextInput.jsx";
-import { getQuestionFlow, questions } from "./data/quizConfig.js";
-import { quizCatalogIds, quizListingFilters } from "./lib/recommendation.js";
+import { FULL_LOOK, RENTAL_PIECES } from "./data/rentals.js";
+import { getQuestionFlow, occasionOptions, questions } from "./data/quizConfig.js";
+import { formatDate, formatPrice, quizCatalogIds, quizListingFilters, rentalDates } from "./lib/recommendation.js";
 
 const STORAGE_KEY = "suit-quiz-wireframe-progress";
 
@@ -14,7 +15,7 @@ function loadProgress() {
   } catch {
     // Ignore malformed or unavailable local storage.
   }
-  return { screen: "start", currentId: "occasion", answers: {} };
+  return { screen: "start", currentId: "mode", answers: {} };
 }
 
 function ChoiceQuestion({ question, value, onChange }) {
@@ -41,7 +42,7 @@ function ChoiceQuestion({ question, value, onChange }) {
       {question.options.map((option) => {
         const checked = isMulti ? selectedValues.includes(option.value) : value === option.value;
         return (
-          <label className="choice" key={option.value}>
+          <label className={`choice${option.icon ? " choice-with-icon" : ""}`} key={option.value}>
             <input
               type={isMulti ? "checkbox" : "radio"}
               name={question.id}
@@ -49,6 +50,7 @@ function ChoiceQuestion({ question, value, onChange }) {
               checked={checked}
               onChange={() => isMulti ? toggleMulti(option.value) : onChange(option.value)}
             />
+            {option.icon && <img className="choice-icon" src={option.icon} alt="" />}
             <span className="choice-copy">
               <strong>{option.label}</strong>
               {option.detail && <span>{option.detail}</span>}
@@ -66,10 +68,11 @@ function ChoiceQuestion({ question, value, onChange }) {
 }
 
 function OccasionQuestion({ question, answers, onChange }) {
+  const options = occasionOptions(question, answers);
   return (
     <div className="occasion-groups">
-      <ChoiceQuestion question={question} value={answers.occasion} onChange={(occasion) => onChange({ occasion })} />
-      <fieldset className="size-group wear-group">
+      <ChoiceQuestion question={{ ...question, options }} value={answers.occasion} onChange={(occasion) => onChange({ occasion })} />
+      {answers.mode !== "rent" && <fieldset className="size-group wear-group">
         <legend>{question.wear.title}</legend>
         <p className="helper wear-help">{question.wear.help}</p>
         <ChoiceQuestion
@@ -77,12 +80,13 @@ function OccasionQuestion({ question, answers, onChange }) {
           value={answers.wearIntent}
           onChange={(wearIntent) => onChange({ wearIntent })}
         />
-      </fieldset>
+      </fieldset>}
     </div>
   );
 }
 
-function ColorQuestion({ question, value = { prefer: [], avoid: [] }, onChange }) {
+function ColorQuestion({ question, mode, value = { prefer: [], avoid: [] }, onChange }) {
+  const options = question.options.filter((option) => !option.modes || option.modes.includes(mode));
   const prefer = value.prefer ?? [];
   const avoid = value.avoid ?? [];
   const noPreference = prefer.length === 0 && avoid.length === 0;
@@ -96,7 +100,7 @@ function ColorQuestion({ question, value = { prefer: [], avoid: [] }, onChange }
       <fieldset className="size-group">
         <legend>Colors you like</legend>
         <div className="size-chips">
-          {question.options.map((option) => (
+          {options.map((option) => (
             <label className="size-chip" key={`prefer-${option.value}`}>
               <input
                 type="checkbox"
@@ -116,7 +120,7 @@ function ColorQuestion({ question, value = { prefer: [], avoid: [] }, onChange }
       <fieldset className="size-group">
         <legend>Colors to skip</legend>
         <div className="size-chips">
-          {question.options.map((option) => (
+          {options.map((option) => (
             <label className="size-chip" key={`avoid-${option.value}`}>
               <input
                 type="checkbox"
@@ -141,6 +145,97 @@ function ColorQuestion({ question, value = { prefer: [], avoid: [] }, onChange }
         />
         <span>No preference</span>
       </label>
+    </div>
+  );
+}
+
+function todayIso() {
+  const now = new Date();
+  const pad = (number) => String(number).padStart(2, "0");
+  return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
+}
+
+function DateQuestion({ value, onChange }) {
+  const dates = rentalDates(value);
+  return (
+    <div className="date-question">
+      <label className="date-field">
+        <span className="date-label">Event date</span>
+        <input type="date" min={todayIso()} value={value ?? ""} onChange={(event) => onChange(event.target.value)} />
+      </label>
+      {dates && !dates.past && (
+        <ul className="date-plan">
+          <li>
+            <img src="/icons/mw/in-store-pickup.png" alt="" />
+            <span><strong>Ready {formatDate(dates.ready)}</strong> for pickup, or delivered to you</span>
+          </li>
+          <li>
+            <img src="/icons/mw/special-event.png" alt="" />
+            <span><strong>Event {formatDate(dates.event)}</strong></span>
+          </li>
+          <li>
+            <img src="/icons/mw/shipping.png" alt="" />
+            <span><strong>Return {formatDate(dates.returnBy)}</strong> in store or by mail</span>
+          </li>
+        </ul>
+      )}
+      {dates?.tooSoon && (
+        <p className="date-warning" role="status">
+          That's less than 4 days away. You can still reserve, but call or visit a store to make sure your look is ready in time.
+        </p>
+      )}
+      {dates?.past && <p className="date-warning" role="status">That date has passed. Choose an upcoming date.</p>}
+    </div>
+  );
+}
+
+function PiecesQuestion({ value = [], onChange }) {
+  const fullLook = FULL_LOOK.every((id) => value.includes(id));
+
+  function toggle(id) {
+    onChange(value.includes(id) ? value.filter((item) => item !== id) : [...value, id]);
+  }
+
+  return (
+    <div className="pieces-question">
+      <button
+        className={`button secondary full-look${fullLook ? " is-on" : ""}`}
+        type="button"
+        aria-pressed={fullLook}
+        onClick={() => onChange(fullLook ? [] : [...FULL_LOOK])}
+      >
+        {fullLook ? "Full look selected" : "Rent the full look"}
+      </button>
+      <div className="choice-grid">
+        <label className="choice choice-with-icon choice-locked">
+          <input type="checkbox" checked disabled />
+          <img className="choice-icon" src="/icons/mw/suits-bundle.png" alt="" />
+          <span className="choice-copy">
+            <strong>Jacket and pants</strong>
+            <span>Always included, priced with the look</span>
+          </span>
+          <span className="choice-mark choice-mark-multi" aria-hidden="true">
+            <svg viewBox="0 0 16 16" width="14" height="14">
+              <path fill="currentColor" d="M6.3 12.2 1.8 7.7l1.2-1.2 3.3 3.3 6.7-6.7 1.2 1.2-7.9 7.9Z" />
+            </svg>
+          </span>
+        </label>
+        {RENTAL_PIECES.map((piece) => (
+          <label className={`choice${piece.icon ? " choice-with-icon" : ""}`} key={piece.id}>
+            <input type="checkbox" checked={value.includes(piece.id)} onChange={() => toggle(piece.id)} />
+            {piece.icon && <img className="choice-icon" src={piece.icon} alt="" />}
+            <span className="choice-copy">
+              <strong>{piece.label}</strong>
+              <span>+{formatPrice(piece.price)}</span>
+            </span>
+            <span className="choice-mark choice-mark-multi" aria-hidden="true">
+              <svg viewBox="0 0 16 16" width="14" height="14">
+                <path fill="currentColor" d="M6.3 12.2 1.8 7.7l1.2-1.2 3.3 3.3 6.7-6.7 1.2 1.2-7.9 7.9Z" />
+              </svg>
+            </span>
+          </label>
+        ))}
+      </div>
     </div>
   );
 }
@@ -210,37 +305,48 @@ function SizesQuestion({ question, value = {}, onChange }) {
   );
 }
 
-const MATCHING_STEPS = [
-  "Reading your occasion",
-  "Working out your jacket and pants sizes",
-  "Comparing cuts against how you want it to feel",
-  "Choosing your tailoring",
-];
+const MATCHING_STEPS = {
+  buy: [
+    "Reading your occasion",
+    "Working out your jacket and pants sizes",
+    "Comparing cuts against how you want it to feel",
+    "Choosing your tailoring",
+  ],
+  rent: [
+    "Reading your occasion",
+    "Choosing suits or tuxedos for the room",
+    "Pricing the pieces you picked",
+    "Working out your sizes for the fitting",
+  ],
+};
 const MATCHING_STEP_MS = 750;
 
-function MatchingScreen({ onDone }) {
+function MatchingScreen({ mode, onDone }) {
+  const steps = MATCHING_STEPS[mode] ?? MATCHING_STEPS.buy;
   const [step, setStep] = useState(0);
 
   useEffect(() => {
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const delay = reduceMotion ? 250 : MATCHING_STEP_MS;
-    if (step >= MATCHING_STEPS.length) {
+    if (step >= steps.length) {
       const done = setTimeout(onDone, reduceMotion ? 0 : 400);
       return () => clearTimeout(done);
     }
     const next = setTimeout(() => setStep((current) => current + 1), delay);
     return () => clearTimeout(next);
-  }, [step, onDone]);
+  }, [step, steps.length, onDone]);
 
   return (
     <section className="matching" aria-labelledby="matching-title" aria-live="polite">
       <div className="matching-scan" aria-hidden="true">
-        <img src="/icons/product_hanger.svg" alt="" />
+        <img src="/icons/mw/ai-quiz.png" alt="" />
       </div>
-      <h1 id="matching-title">Finding your best fit</h1>
-      <p className="matching-copy">Checking every suit against your answers.</p>
+      <h1 id="matching-title">{mode === "rent" ? "Finding your look" : "Finding your best fit"}</h1>
+      <p className="matching-copy">
+        {mode === "rent" ? "Checking every rental look against your answers." : "Checking every suit against your answers."}
+      </p>
       <ol className="matching-steps">
-        {MATCHING_STEPS.map((label, index) => {
+        {steps.map((label, index) => {
           const state = index < step ? "done" : index === step ? "active" : "pending";
           return (
             <li className={`matching-step matching-step-${state}`} key={label}>
@@ -265,8 +371,14 @@ function ArrowLeftIcon() {
 
 function isAnswered(question, answers) {
   const answer = answers[question.id];
-  if (question.type === "occasionPlus") return Boolean(answers.occasion && answers.wearIntent);
-  if (question.type === "colors" || question.type === "measurements") return true;
+  if (question.type === "occasionPlus") {
+    return Boolean(answers.occasion && (answers.mode === "rent" || answers.wearIntent));
+  }
+  if (question.type === "colors" || question.type === "measurements" || question.type === "pieces") return true;
+  if (question.type === "date") {
+    const dates = rentalDates(answer);
+    return Boolean(dates && !dates.past);
+  }
   if (question.type === "multi") return Array.isArray(answer) && answer.length > 0;
   if (question.type === "sizes") {
     return question.groups.every((group) => Boolean(answer?.[group.id]));
@@ -280,7 +392,9 @@ export default function App() {
   const flow = useMemo(() => getQuestionFlow(answers), [answers]);
   const currentQuestion = questions[currentId];
   const currentIndex = Math.max(0, flow.indexOf(currentId));
-  const totalQuestions = answers.measurementKnowledge ? flow.length : 9;
+  const totalQuestions = answers.measurementKnowledge
+    ? flow.length
+    : getQuestionFlow({ ...answers, measurementKnowledge: "no" }).length;
   const moreMode = new URLSearchParams(window.location.search).get("more") === "link" ? "link" : "toggle";
   const listingFilters = useMemo(() => quizListingFilters(answers), [answers]);
   const quizMatchIds = useMemo(() => quizCatalogIds(answers), [answers]);
@@ -297,14 +411,16 @@ export default function App() {
   }, [screen]);
 
   function startQuiz() {
-    setState({ screen: "question", currentId: "occasion", answers: {} });
+    setState({ screen: "question", currentId: "mode", answers: {} });
   }
 
   function setAnswer(value) {
-    setState((previous) => ({
-      ...previous,
-      answers: { ...previous.answers, [previous.currentId]: value },
-    }));
+    setState((previous) => {
+      if (previous.currentId === "mode" && previous.answers.mode !== value) {
+        return { ...previous, answers: { mode: value } };
+      }
+      return { ...previous, answers: { ...previous.answers, [previous.currentId]: value } };
+    });
   }
 
   function mergeAnswers(partial) {
@@ -334,7 +450,7 @@ export default function App() {
 
   function restart() {
     localStorage.removeItem(STORAGE_KEY);
-    setState({ screen: "question", currentId: "occasion", answers: {} });
+    setState({ screen: "question", currentId: "mode", answers: {} });
   }
 
   function saveAndExit() {
@@ -389,7 +505,7 @@ export default function App() {
             <button
               className="nav-control"
               type="button"
-              onClick={() => setState((previous) => ({ ...previous, screen: "question", currentId: "occasion" }))}
+              onClick={() => setState((previous) => ({ ...previous, screen: "question", currentId: "mode" }))}
               aria-label="Edit answers"
             >
               <ArrowLeftIcon />
@@ -405,7 +521,7 @@ export default function App() {
             <button className="nav-control" type="button" onClick={saveAndExit}>Save and exit</button>
           )}
           {screen === "results" && (
-            <button className="nav-control" type="button" onClick={restart}>Start over</button>
+            <button className="nav-control nav-control-strong" type="button" onClick={restart}>Retake quiz</button>
           )}
         </div>
       </header>
@@ -421,13 +537,24 @@ export default function App() {
               <span>Question {currentIndex + 1} of {totalQuestions}</span>
               <span className="save-note">Progress saved on this device</span>
             </div>
-            <h2 id="question-title">{currentQuestion.title}</h2>
-            <p className="helper">{currentQuestion.help}</p>
+            <div className="question-head">
+              {currentQuestion.icon && <img className="question-icon" src={currentQuestion.icon} alt="" />}
+              <div>
+                <h2 id="question-title">{currentQuestion.title}</h2>
+                <p className="helper">
+                  {answers.mode === "rent" && currentQuestion.rentHelp ? currentQuestion.rentHelp : currentQuestion.help}
+                </p>
+              </div>
+            </div>
 
             {currentQuestion.type === "occasionPlus" ? (
               <OccasionQuestion question={currentQuestion} answers={answers} onChange={mergeAnswers} />
             ) : currentQuestion.type === "colors" ? (
-              <ColorQuestion question={currentQuestion} value={answers.colors} onChange={setAnswer} />
+              <ColorQuestion question={currentQuestion} mode={answers.mode} value={answers.colors} onChange={setAnswer} />
+            ) : currentQuestion.type === "date" ? (
+              <DateQuestion value={answers.eventDate} onChange={setAnswer} />
+            ) : currentQuestion.type === "pieces" ? (
+              <PiecesQuestion value={answers.pieces} onChange={setAnswer} />
             ) : currentQuestion.type === "measurements" ? (
               <MeasurementsQuestion value={answers[currentId]} onChange={setAnswer} />
             ) : currentQuestion.type === "sizes" ? (
@@ -449,14 +576,15 @@ export default function App() {
           </section>
         )}
 
-        {screen === "matching" && <MatchingScreen onDone={showResults} />}
+        {screen === "matching" && <MatchingScreen mode={answers.mode} onDone={showResults} />}
 
         {screen === "results" && (
           <Results
             answers={answers}
             moreMode={moreMode}
             onSeeAll={() => setState((previous) => ({ ...previous, screen: "matches" }))}
-            onEditAnswers={() => setState((previous) => ({ ...previous, screen: "question", currentId: "occasion" }))}
+            onRetake={restart}
+            onEditAnswers={() => setState((previous) => ({ ...previous, screen: "question", currentId: "mode" }))}
           />
         )}
       </main>
