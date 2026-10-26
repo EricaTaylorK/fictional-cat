@@ -188,9 +188,9 @@ h2 {
 }
 
 .option-cards {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
   gap: var(--spacing-horizontal-md);
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
   margin: var(--spacing-vertical-xl) 0 var(--spacing-vertical-sm);
 }
 
@@ -201,10 +201,11 @@ h2 {
   border-radius: var(--border-radius-lg);
   cursor: pointer;
   display: flex;
-  flex: 1 1 150px;
   flex-direction: column;
   gap: var(--spacing-vertical-sm);
-  min-width: 140px;
+  height: 100%;
+  justify-content: flex-start;
+  min-width: 0;
   padding: var(--spacing-vertical-lg) var(--spacing-horizontal-md);
   text-align: center;
   transition: border-color 150ms ease;
@@ -247,6 +248,7 @@ h2 {
   display: flex;
   flex-direction: column;
   gap: 2px;
+  min-width: 0;
 }
 
 .option-copy strong {
@@ -573,10 +575,15 @@ h2 {
   background: transparent;
   border-color: transparent;
   color: var(--text-link);
+  display: inline-flex;
+  justify-content: flex-start;
+  min-height: 0;
   min-width: 0;
-  padding-inline: 0;
+  padding: 0;
+  text-align: left;
   text-decoration: underline;
   text-transform: none;
+  width: auto;
 }
 
 .button.link:hover:not(:disabled) {
@@ -1517,6 +1524,16 @@ h2 {
   margin-top: 0;
 }
 
+@media (min-width: 900px) {
+  .app-shell:has(.option-card:nth-child(5)) {
+    max-width: 1040px;
+  }
+
+  .option-cards:has(> :nth-child(5)) {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+}
+
 @media (max-width: 900px) {
   .results-layout {
     grid-template-areas:
@@ -1547,12 +1564,17 @@ h2 {
 
 @media (max-width: 640px) {
   .site-header {
-    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
     padding-inline: var(--spacing-horizontal-md);
   }
 
   .logo {
     justify-self: center;
+    max-width: 42vw;
+  }
+
+  .logo img {
+    max-width: 100%;
   }
 
   .app-shell:not(.app-shell-wide) {
@@ -1593,18 +1615,41 @@ h2 {
   }
 
   .option-cards {
-    flex-direction: column;
+    grid-template-columns: 1fr;
   }
 
   .option-card {
     align-items: center;
     flex-direction: row;
+    height: auto;
+    justify-content: flex-start;
     text-align: left;
     width: 100%;
   }
 
+  .option-icon {
+    flex: 0 0 auto;
+  }
+
   .option-copy {
+    flex: 1 1 auto;
     text-align: left;
+  }
+
+  .fit-stats {
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  }
+
+  .fit-stat:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+  }
+
+  .suit-option {
+    grid-template-columns: 20px 72px minmax(0, 1fr);
+  }
+
+  .suit-option .product-image {
+    width: 72px;
   }
 
   .actions {
@@ -1659,6 +1704,10 @@ h2 {
 
   .button {
     width: 100%;
+  }
+
+  .button.link {
+    width: auto;
   }
 }
 
