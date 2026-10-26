@@ -71,18 +71,7 @@ function ChoiceQuestion({ question, value, onChange }) {
 function OccasionQuestion({ question, answers, onChange }) {
   const options = occasionOptions(question, answers);
   return (
-    <div className="occasion-groups">
-      <ChoiceQuestion question={{ ...question, options }} value={answers.occasion} onChange={(occasion) => onChange({ occasion })} />
-      {answers.mode !== "rent" && <fieldset className="size-group wear-group">
-        <legend>{question.wear.title}</legend>
-        <p className="helper wear-help">{question.wear.help}</p>
-        <ChoiceQuestion
-          question={{ ...question, id: "wearIntent", options: question.wear.options }}
-          value={answers.wearIntent}
-          onChange={(wearIntent) => onChange({ wearIntent })}
-        />
-      </fieldset>}
-    </div>
+    <ChoiceQuestion question={{ ...question, options }} value={answers.occasion} onChange={(occasion) => onChange({ occasion })} />
   );
 }
 
@@ -311,7 +300,7 @@ const MATCHING_STEPS = {
     "Reading your occasion",
     "Working out your jacket and pants sizes",
     "Comparing cuts against how you want it to feel",
-    "Choosing your tailoring",
+    "Checking prices against your budget",
   ],
   rent: [
     "Reading your occasion",
@@ -373,7 +362,7 @@ function ArrowLeftIcon() {
 function isAnswered(question, answers) {
   const answer = answers[question.id];
   if (question.type === "occasionPlus") {
-    return Boolean(answers.occasion && (answers.mode === "rent" || answers.wearIntent));
+    return Boolean(answers.occasion);
   }
   if (question.type === "colors" || question.type === "measurements" || question.type === "pieces") return true;
   if (question.type === "date") {

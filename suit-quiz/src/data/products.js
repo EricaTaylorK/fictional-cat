@@ -63,7 +63,7 @@ function tier(id, name, plain, icon, detail, alterationIds) {
 
 export const TAILORING_TIERS = [
   tier("essentials", "Fit Essentials", "Hem and sleeves", "/icons/mw/hemming.png",
-    "The two adjustments almost every suit needs.", ["hem", "sleeves"]),
+    "A hem and sleeves.", ["hem", "sleeves"]),
   tier("signature", "Signature Fit", "Jacket and waist", "/icons/mw/measurement.png",
     "Everything in Essentials, plus shaping the jacket and pants to your build.", ["hem", "sleeves", "waistSeat", "jacketSides"]),
   tier("custom", "Custom-Level Fit", "A full reshape", "/icons/mw/tailor-collar-shoulders.png",

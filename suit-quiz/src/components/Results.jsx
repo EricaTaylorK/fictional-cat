@@ -366,10 +366,17 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
                 <strong>{dates && !dates.past ? formatDate(dates.ready) : "3–4 days before"}</strong>
                 {dates && !dates.past && <span className="fit-stat-hint">Return by {formatDate(dates.returnBy)}</span>}
               </li>
+            ) : answers.tailoring === "skip" ? (
+              <li className="fit-stat">
+                <img src="/icons/product_hanger.svg" alt="" />
+                <span className="fit-stat-label">Tailoring</span>
+                <strong>Not added</strong>
+                <span className="fit-stat-hint">You can add it in store</span>
+              </li>
             ) : (
               <li className="fit-stat">
                 <img src={recommendedTailoring?.icon ?? "/icons/product_hanger.svg"} alt="" />
-                <span className="fit-stat-label">Suggested tailoring</span>
+                <span className="fit-stat-label">If you add tailoring</span>
                 <strong>{recommendedTailoring?.plain}</strong>
                 {recommendedTailoring && <span className="fit-stat-hint">+{formatPrice(recommendedTailoring.price)}</span>}
               </li>
@@ -475,10 +482,12 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
             <section className="card-section" aria-labelledby="tailoring-title">
               <h2 id="tailoring-title" className="section-title">
                 <img src="/icons/mw/hemming.png" alt="" />
-                Make it a perfect fit
+                Tailoring, if you want it
               </h2>
               <p className="section-copy">
-                For the {selected.brand} {selected.name}. {summary.tailoring.because}
+                {answers.tailoring === "skip"
+                  ? `Optional for the ${selected.brand} ${selected.name}. These are the in-store prices if you add it later.`
+                  : `For the ${selected.brand} ${selected.name}. ${summary.tailoring.because}`}
               </p>
               <div className="tier-list" role="radiogroup" aria-labelledby="tailoring-title">
                 {[...TAILORING_TIERS, {
@@ -501,7 +510,7 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
                       <span className="tier-name">
                         {option.icon && <img className="tier-icon" src={option.icon} alt="" />}
                         {option.name}
-                        {option.id === summary.tailoring.id && <span className="tier-tag">Our pick for you</span>}
+                        {option.id === summary.tailoring.id && answers.tailoring !== "skip" && <span className="tier-tag">Our pick for you</span>}
                       </span>
                       <span className="tier-detail">
                         {option.detail}

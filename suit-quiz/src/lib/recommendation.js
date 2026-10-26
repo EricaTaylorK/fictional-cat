@@ -404,13 +404,6 @@ function scoreProduct(product, answers, index) {
     score -= Math.min(18, Math.ceil(Math.abs(product.price - edge) / 20));
   }
 
-  if (answers.wearIntent === "rewear" || answers.wearIntent === "often") {
-    score += (product.versatility ?? 0) * 4;
-    if ((product.versatility ?? 0) >= 4 && product.rewearNote) evidence.push(product.rewearNote);
-  } else if (answers.occasion && formality.includes(answers.occasion)) {
-    score += 8;
-  }
-
   if (answers.feel === "roomy") score += (product.comfort ?? 0) * 2;
   if (answers.tailoring !== "skip") {
     score += (product.tailoringEase ?? 0) * 2;

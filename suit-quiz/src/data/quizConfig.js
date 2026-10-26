@@ -2,17 +2,17 @@ export const questions = {
   mode: {
     id: "mode",
     title: "Are you buying or renting?",
-    help: "Buy a suit to keep and tailor, or rent a complete look for one event.",
+    help: "Buy a suit to keep, or rent a complete look for one event.",
     type: "single",
     options: [
-      { value: "buy", label: "Buy a suit", detail: "Yours to keep, tailored to fit.", icon: "/icons/mw/shop.png" },
+      { value: "buy", label: "Buy a suit", detail: "Yours to keep.", icon: "/icons/mw/shop.png" },
       { value: "rent", label: "Rent a look", detail: "Suit or tux, shirt, tie, and shoes for one event, starting at $99.99.", icon: "/icons/mw/suits-bundle.png" },
     ],
   },
   occasion: {
     id: "occasion",
     title: "What's the moment?",
-    help: "We start here. The occasion tells us how formal to go, and how easy it is to misread the room.",
+    help: "The occasion tells us how formal to go.",
     type: "occasionPlus",
     rentHelp: "The occasion tells us whether a suit or a tuxedo fits the room.",
     rentOptions: [
@@ -22,22 +22,13 @@ export const questions = {
       { value: "special", label: "Another special event", detail: "A quinceañera, anniversary, or celebration.", icon: "/icons/mw/quinceanera.png" },
     ],
     options: [
-      { value: "wedding", label: "A wedding", detail: "Guest, wedding party, or groom. We'll match the room.", icon: "/icons/mw/wedding.png" },
-      { value: "work", label: "Work or an interview", detail: "The office, a new job, or a professional event. Sharp enough to wear again.", icon: "/icons/mw/suits-bundle.png" },
+      { value: "wedding", label: "A wedding", detail: "Guest, wedding party, or groom.", icon: "/icons/mw/wedding.png" },
+      { value: "work", label: "Work or an interview", detail: "The office, a new job, or a professional event.", icon: "/icons/mw/suits-bundle.png" },
       { value: "versatile", label: "A go-to suit for whatever comes up", detail: "Work, dinners, and everyday, when the dress code isn't clear.", icon: "/icons/mw/travel.png" },
-      { value: "formal", label: "A black-tie or formal evening", detail: "Elevated evening dressing that still feels like you.", icon: "/icons/mw/special-event.png" },
-      { value: "milestone", label: "A graduation, prom, or milestone", detail: "For the person being celebrated.", icon: "/icons/mw/school-event.png" },
-      { value: "funeral", label: "A funeral or memorial", detail: "Respectful and quiet. Nothing that pulls focus.", icon: "/icons/mw/invitation.png" },
+      { value: "formal", label: "A black-tie or formal evening", detail: "Galas, formal dinners, and black-tie invitations.", icon: "/icons/mw/special-event.png" },
+      { value: "milestone", label: "A graduation, prom, or milestone", icon: "/icons/mw/school-event.png" },
+      { value: "funeral", label: "A funeral or memorial", detail: "Respectful and quiet.", icon: "/icons/mw/invitation.png" },
     ],
-    wear: {
-      title: "Will you wear it again?",
-      help: "This helps us choose between a suit for one occasion and an all-purpose suit.",
-      options: [
-        { value: "one-event", label: "Mostly for this event", detail: "Every suit we show is built to last. We'll match this occasion closely." },
-        { value: "rewear", label: "I want to wear it again", detail: "A classic you can trust past this event." },
-        { value: "often", label: "I'll wear suits often", detail: "Built for repeat wear and easy tailoring." },
-      ],
-    },
   },
   feel: {
     id: "feel",
@@ -99,7 +90,7 @@ export const questions = {
   fitIssues: {
     id: "fitIssues",
     title: "Where do suits usually feel off?",
-    help: "Select all that apply. Each answer changes the cut, the size, or the tailoring we start you with.",
+    help: "Select all that apply. Each answer changes the cut or the size we start you with.",
     type: "multi",
     options: [
       {
@@ -177,13 +168,13 @@ export const questions = {
   },
   tailoring: {
     id: "tailoring",
-    title: "Want tailoring? (shortening sleeves, hemming pants, shaping the jacket)",
-    help: "A few adjustments are what make a suit feel like yours. Each option shows what it adds to the price.",
+    title: "Want to add tailoring?",
+    help: "Optional. Most people decide in store. Nothing is added to the price unless you choose it.",
     type: "single",
     options: [
-      { value: "bundle", label: "Include tailoring in my plan", detail: "Adds $55–$199, depending on the work." },
-      { value: "consider", label: "I'm open to it", detail: "We'll point out what's worth adjusting, and what it adds." },
-      { value: "skip", label: "Suit only for now", detail: "No tailoring added to the price." },
+      { value: "skip", label: "Just the suit", detail: "You can add tailoring in store later." },
+      { value: "consider", label: "Show me the options", detail: "We'll list what a hem, sleeves, and shaping cost." },
+      { value: "bundle", label: "Include it in the price", detail: "Adds $55–$199, depending on the work." },
     ],
   },
   budget: {
