@@ -1,5 +1,6 @@
-import { useMemo, useState } from "react";
-import { buildResultSummary, formatPrice, getRecommendations } from "../lib/recommendation.js";
+import { Fragment, useMemo, useState } from "react";
+import { FIT_DESCRIPTIONS, OUTFIT_PAIRINGS, SWATCH_HEX, TAILORING_TURNAROUND } from "../data/products.js";
+import { buildResultSummary, describeSize, formatPrice, getRecommendations } from "../lib/recommendation.js";
 import TextInput from "./TextInput.jsx";
 
 const tailoringPackages = [
@@ -35,10 +36,39 @@ const outfitOptions = [
   { id: "shoes", summaryLabel: "Dress shoes", name: "Black Cap-Toe Oxfords", price: 119.99, image: "/outfit/black-dress-shoes.jpg" },
 ];
 
-function cardDetails(product, size) {
-  const jacket = size.jacket ? `Jacket ${size.jacket}` : size.length ? `Jacket ${size.length} (${size.lengthCode})` : null;
-  const pants = size.pants ? `Pants ${size.pants}` : null;
-  return [product.color, jacket, pants, product.fabric].filter(Boolean).join(" · ");
+function variantOptions(product) {
+  if (product.variants?.length) return product.variants;
+  return [{ colorKey: product.colorKey, color: product.color, image: product.image }];
+}
+
+function defaultVariantIndex(product, answers) {
+  const options = variantOptions(product);
+  const prefer = answers.colors?.prefer ?? [];
+  const avoid = new Set(answers.colors?.avoid ?? []);
+  const preferred = options.findIndex((item) => prefer.includes(item.colorKey));
+  if (preferred >= 0) return preferred;
+  const allowed = options.findIndex((item) => !avoid.has(item.colorKey));
+  return Math.max(0, allowed);
+}
+
+function rankLabel(index) {
+  if (index === 0) return "Best match";
+  if (index === 1) return "2nd match";
+  if (index === 2) return "3rd match";
+  return `${index + 1}th match`;
+}
+
+function Stars({ value }) {
+  const rounded = Math.round(value);
+  return (
+    <span className="stars" aria-hidden="true">
+      {[1, 2, 3, 4, 5].map((star) => (
+        <svg key={star} className={star <= rounded ? "star is-on" : "star"} viewBox="0 0 20 20">
+          <path d="M10 1.6 12.5 7l5.9.6-4.4 3.9 1.3 5.8L10 14.6 4.7 17.3 6 11.5 1.6 7.6 7.5 7 10 1.6z" />
+        </svg>
+      ))}
+    </span>
+  );
 }
 
 const RING_RADIUS = 34;
@@ -70,7 +100,7 @@ function matchTone(percent) {
   return percent >= 90 ? "best" : "mid";
 }
 
-function SuitOption({ product, size, selected, onSelect }) {
+function SuitOption({ product, size, selected, onSelect, rank, shown, options, variantIndex, onVariant, avoided }) {
   return (
     <label className={`suit-option${selected ? " suit-option-selected" : ""}`}>
       <input
@@ -82,17 +112,46 @@ function SuitOption({ product, size, selected, onSelect }) {
         onChange={() => onSelect(product.id)}
       />
       <div className="product-image">
-        <img src={product.image} alt="" />
+        <img src={shown.image} alt="" />
       </div>
       <div className="suit-option-body">
+        <p className="rank-label">{rankLabel(rank)}</p>
         <span className={`match-score match-score-${matchTone(product.matchPercent)}`}>{product.matchPercent}% match</span>
         <p className="product-brand">{product.brand}</p>
         <h3 className="product-title">{product.name}</h3>
+        {product.rating != null && (
+          <p className="product-rating">
+            <Stars value={product.rating} />
+            <span>{product.rating.toFixed(1)} ({product.reviews.toLocaleString("en-US")})</span>
+          </p>
+        )}
         <p className="product-price">
           <strong>{formatPrice(product.price)}</strong>
           {product.compareAt && <s>{formatPrice(product.compareAt)}</s>}
         </p>
-        <p className="product-meta">{cardDetails(product, size)}</p>
+        <p className="product-fit">{product.fitName}. {FIT_DESCRIPTIONS[product.fit]}</p>
+        <p className="product-meta">{[shown.color, product.fabric].filter(Boolean).join(" · ")}</p>
+        {describeSize(size) && <p className="product-meta">{describeSize(size)}</p>}
+        {options.length > 1 && (
+          <div className="color-swatches" role="group" aria-label="Other colors">
+            {options.map((option, index) => (
+              <button
+                key={option.color}
+                type="button"
+                className={index === variantIndex ? "color-swatch is-selected" : "color-swatch"}
+                aria-label={option.color}
+                aria-pressed={index === variantIndex}
+                onClick={(event) => {
+                  event.preventDefault();
+                  event.stopPropagation();
+                  onVariant(index);
+                }}
+              >
+                <span style={{ background: SWATCH_HEX[option.colorKey] ?? "#888" }} />
+              </button>
+            ))}
+          </div>
+        )}
       </div>
       <div className="suit-panel">
         <h4 className="reason-title">Why it's a strong pick</h4>
@@ -106,16 +165,27 @@ function SuitOption({ product, size, selected, onSelect }) {
             </li>
           ))}
         </ul>
+        {(product.tradeoffs?.length > 0 || avoided) && (
+          <>
+            <h4 className="reason-title tradeoff-title">Trade-offs</h4>
+            <ul className="tradeoff-list">
+              {product.tradeoffs?.map((note) => <li key={note}>{note}</li>)}
+              {avoided && <li>You asked to skip {shown.color.toLowerCase()}.</li>}
+            </ul>
+          </>
+        )}
       </div>
     </label>
   );
 }
 
-export default function Results({ answers, onEditAnswers }) {
+export default function Results({ answers, moreMode = "toggle", onSeeAll, onEditAnswers }) {
   const recommendations = useMemo(() => getRecommendations(answers), [answers]);
   const summary = useMemo(() => buildResultSummary(answers), [answers]);
   const recommendedTailoring = tailoringPackages.find((item) => item.id === summary.tailoring.id);
   const [selectedId, setSelectedId] = useState(recommendations[0].id);
+  const [expanded, setExpanded] = useState(false);
+  const [variantIndexes, setVariantIndexes] = useState({});
   const [tailoringId, setTailoringId] = useState(null);
   const [selectedExtras, setSelectedExtras] = useState([]);
   const [handoff, setHandoff] = useState("");
@@ -132,7 +202,19 @@ export default function Results({ answers, onEditAnswers }) {
     : 0;
   const total = subtotal - savings;
   const itemCount = selected ? 2 + extras.length + (tailoring ? 1 : 0) : 0;
-  const basedOn = [summary.occasion, summary.fit, ...summary.fitNotes].join(" · ");
+  const basedOn = [summary.occasion, summary.fitName, summary.colors?.join(", "), ...summary.fitNotes].filter(Boolean).join(" · ");
+  const visibleCount = expanded ? Math.min(recommendations.length, 9) : Math.min(3, recommendations.length);
+  const shownRecommendations = recommendations.slice(0, visibleCount);
+  const missIndex = recommendations.budgetMiss
+    ? shownRecommendations.findIndex((product) => !product.inBudget)
+    : -1;
+  const selectedOptions = selected ? variantOptions(selected) : [];
+  const selectedVariant = selected
+    ? selectedOptions[variantIndexes[selected.id] ?? defaultVariantIndex(selected, answers)]
+    : null;
+  const pairing = selectedVariant ? OUTFIT_PAIRINGS[selectedVariant.colorKey] : null;
+  const suitCount = Math.min(3, recommendations.length);
+  const countLabel = suitCount === 1 ? "One suit" : suitCount === 2 ? "Two suits" : "Three suits";
 
   function toggleExtra(id) {
     setSelectedExtras((current) => (current.includes(id)
@@ -154,8 +236,7 @@ export default function Results({ answers, onEditAnswers }) {
           <div className="results-hero-copy">
             <h1 id="results-title">We found your suit.</h1>
             <p className="results-lede">
-              Three suits for {summary.occasion}, in a fit that feels {summary.fit}. Your best match
-              is selected.
+              {countLabel} for {summary.occasion}, in a {summary.fitName}. Your best match is selected.
             </p>
             <p className="based-on">
               Based on: {basedOn}{" "}
@@ -167,11 +248,15 @@ export default function Results({ answers, onEditAnswers }) {
               <img src="/icons/product_modernfit.svg" alt="" />
               <span className="fit-stat-label">Jacket</span>
               <strong>{size.jacket ?? `${size.length} (${size.lengthCode})`}</strong>
+              {size.jacket && (
+                <span className="fit-stat-hint">{size.jacket.replace(/[SRL]$/i, "")} chest, {size.length.toLowerCase()} length</span>
+              )}
             </li>
             <li className="fit-stat">
               <img src="/icons/product_size.svg" alt="" />
               <span className="fit-stat-label">Pants</span>
               <strong>{size.pants ?? "Measured in store"}</strong>
+              {size.pants && <span className="fit-stat-hint">{size.pants.replace(/W$/i, "")}-inch waist</span>}
             </li>
             <li className="fit-stat">
               <img src="/icons/product_hanger.svg" alt="" />
@@ -182,16 +267,42 @@ export default function Results({ answers, onEditAnswers }) {
         </div>
 
         <div className="suit-options" role="radiogroup" aria-labelledby="results-title">
-          {recommendations.map((product) => (
-            <SuitOption
-              key={product.id}
-              product={product}
-              size={size}
-              selected={product.id === selectedId}
-              onSelect={setSelectedId}
-            />
-          ))}
+          {shownRecommendations.map((product, index) => {
+            const options = variantOptions(product);
+            const variantIndex = variantIndexes[product.id] ?? defaultVariantIndex(product, answers);
+            const shown = options[variantIndex] ?? options[0];
+            const avoided = (answers.colors?.avoid ?? []).includes(shown.colorKey);
+            return (
+              <Fragment key={product.id}>
+                {index === missIndex && (
+                  <p className="budget-miss">{recommendations.budgetMiss.label}</p>
+                )}
+                <SuitOption
+                  product={product}
+                  size={size}
+                  selected={product.id === selectedId}
+                  onSelect={setSelectedId}
+                  rank={index}
+                  shown={shown}
+                  options={options}
+                  variantIndex={variantIndex}
+                  avoided={avoided}
+                  onVariant={(next) => setVariantIndexes((current) => ({ ...current, [product.id]: next }))}
+                />
+              </Fragment>
+            );
+          })}
         </div>
+        {moreMode === "toggle" && recommendations.length > 3 && (
+          <button className="button secondary more-matches" type="button" onClick={() => setExpanded((value) => !value)}>
+            {expanded ? "View less" : `View more matches (${Math.min(6, recommendations.length - 3)})`}
+          </button>
+        )}
+        {moreMode === "link" && (
+          <button className="button secondary more-matches" type="button" onClick={onSeeAll}>
+            See all quiz matches
+          </button>
+        )}
 
         {selected && (
           <div className="results-card">
@@ -224,7 +335,10 @@ export default function Results({ answers, onEditAnswers }) {
                         {option.name}
                         {option.id === summary.tailoring.id && <span className="tier-tag">Our pick for you</span>}
                       </span>
-                      <span className="tier-detail">{option.detail}</span>
+                      <span className="tier-detail">
+                        {option.detail}
+                        {TAILORING_TURNAROUND[option.id] ? ` Ready in about ${TAILORING_TURNAROUND[option.id]} days.` : ""}
+                      </span>
                       <span className="tier-total">
                         {option.price
                           ? `${formatPrice(selected.price + option.price)} with this suit`
@@ -238,8 +352,13 @@ export default function Results({ answers, onEditAnswers }) {
             </section>
 
             <section className="card-section" aria-labelledby="outfit-title">
-              <h2 id="outfit-title" className="section-title">Wear the suit with these</h2>
-              <p className="section-copy">Optional. Each piece is picked to match this suit and the occasion.</p>
+              <h2 id="outfit-title" className="section-title">What to wear with it</h2>
+              {pairing && (
+                <p className="section-copy">
+                  With this {selectedVariant.color.toLowerCase()} suit: a {pairing.shirt.toLowerCase()}, and a {pairing.tie.toLowerCase()}.
+                </p>
+              )}
+              <p className="section-copy">Optional pieces, picked to match this suit and the occasion.</p>
               <div className="outfit-grid">
                 {outfitOptions.map((item) => (
                   <label className="outfit-item" key={item.id}>
@@ -313,7 +432,14 @@ export default function Results({ answers, onEditAnswers }) {
             Prototype: this would add the suit in your sizes{tailoring ? ", the tailoring," : ""} and the add-ons to your bag.
           </p>
         )}
+        <p className="summary-note">Shipping and tax calculated at checkout.</p>
         {tailoring && <p className="summary-note">Tailoring is finished in store after checkout.</p>}
+        <button className="text-link try-on" type="button" onClick={() => setHandoff("tryon")}>
+          Try it on at a store near you
+        </button>
+        {handoff === "tryon" && (
+          <p className="handoff-inline" role="status">Prototype: this would open nearby stores with this suit in your size.</p>
+        )}
       </aside>
 
       <div className="results-extra">

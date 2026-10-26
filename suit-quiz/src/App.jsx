@@ -3,6 +3,7 @@ import ProductGridEntry from "./components/ProductGridEntry.jsx";
 import Results from "./components/Results.jsx";
 import TextInput from "./components/TextInput.jsx";
 import { getQuestionFlow, questions } from "./data/quizConfig.js";
+import { quizCatalogIds, quizListingFilters } from "./lib/recommendation.js";
 
 const STORAGE_KEY = "suit-quiz-wireframe-progress";
 
@@ -64,6 +65,86 @@ function ChoiceQuestion({ question, value, onChange }) {
   );
 }
 
+function OccasionQuestion({ question, answers, onChange }) {
+  return (
+    <div className="occasion-groups">
+      <ChoiceQuestion question={question} value={answers.occasion} onChange={(occasion) => onChange({ occasion })} />
+      <fieldset className="size-group wear-group">
+        <legend>{question.wear.title}</legend>
+        <p className="helper wear-help">{question.wear.help}</p>
+        <ChoiceQuestion
+          question={{ ...question, id: "wearIntent", options: question.wear.options }}
+          value={answers.wearIntent}
+          onChange={(wearIntent) => onChange({ wearIntent })}
+        />
+      </fieldset>
+    </div>
+  );
+}
+
+function ColorQuestion({ question, value = { prefer: [], avoid: [] }, onChange }) {
+  const prefer = value.prefer ?? [];
+  const avoid = value.avoid ?? [];
+  const noPreference = prefer.length === 0 && avoid.length === 0;
+
+  function toggle(list, color) {
+    return list.includes(color) ? list.filter((item) => item !== color) : [...list, color];
+  }
+
+  return (
+    <div className="size-groups">
+      <fieldset className="size-group">
+        <legend>Colors you like</legend>
+        <div className="size-chips">
+          {question.options.map((option) => (
+            <label className="size-chip" key={`prefer-${option.value}`}>
+              <input
+                type="checkbox"
+                name="colors-prefer"
+                value={option.value}
+                checked={prefer.includes(option.value)}
+                onChange={() => onChange({
+                  prefer: toggle(prefer, option.value),
+                  avoid: avoid.filter((item) => item !== option.value),
+                })}
+              />
+              <span>{option.label}</span>
+            </label>
+          ))}
+        </div>
+      </fieldset>
+      <fieldset className="size-group">
+        <legend>Colors to skip</legend>
+        <div className="size-chips">
+          {question.options.map((option) => (
+            <label className="size-chip" key={`avoid-${option.value}`}>
+              <input
+                type="checkbox"
+                name="colors-avoid"
+                value={option.value}
+                checked={avoid.includes(option.value)}
+                onChange={() => onChange({
+                  avoid: toggle(avoid, option.value),
+                  prefer: prefer.filter((item) => item !== option.value),
+                })}
+              />
+              <span>{option.label}</span>
+            </label>
+          ))}
+        </div>
+      </fieldset>
+      <label className="size-chip">
+        <input
+          type="checkbox"
+          checked={noPreference}
+          onChange={() => onChange({ prefer: [], avoid: [] })}
+        />
+        <span>No preference</span>
+      </label>
+    </div>
+  );
+}
+
 function MeasurementsQuestion({ value = {}, onChange }) {
   function update(field, nextValue) {
     onChange({ ...value, [field]: nextValue });
@@ -75,7 +156,9 @@ function MeasurementsQuestion({ value = {}, onChange }) {
         label="Jacket size"
         value={value.jacket}
         onChange={(next) => update("jacket", next)}
-        helperText="The number on the tag before S, R, or L, like 40"
+        inputMode="text"
+        autoComplete="off"
+        helperText="A number like 40, or with a length like 44L. S = short, R = regular, L = long."
       />
       <TextInput
         label="Chest (inches)"
@@ -89,19 +172,14 @@ function MeasurementsQuestion({ value = {}, onChange }) {
         onChange={(next) => update("waist", next)}
         helperText="Where your dress pants usually sit"
       />
-      <fieldset className="field-pair">
-        <legend className="visually-hidden">Height</legend>
-        <TextInput
-          label="Height (ft)"
-          value={value.heightFeet}
-          onChange={(next) => update("heightFeet", next)}
-        />
-        <TextInput
-          label="Height (in)"
-          value={value.heightInches}
-          onChange={(next) => update("heightInches", next)}
-        />
-      </fieldset>
+      <TextInput
+        label="Height"
+        value={value.height}
+        onChange={(next) => update("height", next)}
+        inputMode="text"
+        autoComplete="off"
+        helperText="Feet and inches, like 6'5&quot;, or total inches, like 77."
+      />
     </div>
   );
 }
@@ -185,11 +263,11 @@ function ArrowLeftIcon() {
   );
 }
 
-function isAnswered(question, answer) {
+function isAnswered(question, answers) {
+  const answer = answers[question.id];
+  if (question.type === "occasionPlus") return Boolean(answers.occasion && answers.wearIntent);
+  if (question.type === "colors" || question.type === "measurements") return true;
   if (question.type === "multi") return Array.isArray(answer) && answer.length > 0;
-  if (question.type === "measurements") {
-    return Boolean(answer?.jacket || answer?.chest || answer?.waist);
-  }
   if (question.type === "sizes") {
     return question.groups.every((group) => Boolean(answer?.[group.id]));
   }
@@ -202,7 +280,10 @@ export default function App() {
   const flow = useMemo(() => getQuestionFlow(answers), [answers]);
   const currentQuestion = questions[currentId];
   const currentIndex = Math.max(0, flow.indexOf(currentId));
-  const totalQuestions = answers.measurementKnowledge ? flow.length : 8;
+  const totalQuestions = answers.measurementKnowledge ? flow.length : 9;
+  const moreMode = new URLSearchParams(window.location.search).get("more") === "link" ? "link" : "toggle";
+  const listingFilters = useMemo(() => quizListingFilters(answers), [answers]);
+  const quizMatchIds = useMemo(() => quizCatalogIds(answers), [answers]);
 
   useEffect(() => {
     if (screen === "start") return;
@@ -223,6 +304,13 @@ export default function App() {
     setState((previous) => ({
       ...previous,
       answers: { ...previous.answers, [previous.currentId]: value },
+    }));
+  }
+
+  function mergeAnswers(partial) {
+    setState((previous) => ({
+      ...previous,
+      answers: { ...previous.answers, ...partial },
     }));
   }
 
@@ -264,8 +352,20 @@ export default function App() {
 
   const hasSavedProgress = Object.keys(answers).length > 0;
 
-  if (screen === "start") {
-    return <ProductGridEntry onTakeQuiz={hasSavedProgress ? resumeQuiz : startQuiz} />;
+  if (screen === "start" || screen === "matches") {
+    return (
+      <ProductGridEntry
+        key={screen}
+        title={screen === "matches" ? "Quiz matches" : "All Suits"}
+        crumb={screen === "matches" ? "Quiz matches" : "Suits"}
+        initialFilters={screen === "matches" ? listingFilters : undefined}
+        quizMatchIds={screen === "matches" ? quizMatchIds : undefined}
+        onTakeQuiz={hasSavedProgress ? resumeQuiz : startQuiz}
+        onBackToQuiz={screen === "matches"
+          ? () => setState((previous) => ({ ...previous, screen: "results" }))
+          : undefined}
+      />
+    );
   }
 
   return (
@@ -324,7 +424,11 @@ export default function App() {
             <h2 id="question-title">{currentQuestion.title}</h2>
             <p className="helper">{currentQuestion.help}</p>
 
-            {currentQuestion.type === "measurements" ? (
+            {currentQuestion.type === "occasionPlus" ? (
+              <OccasionQuestion question={currentQuestion} answers={answers} onChange={mergeAnswers} />
+            ) : currentQuestion.type === "colors" ? (
+              <ColorQuestion question={currentQuestion} value={answers.colors} onChange={setAnswer} />
+            ) : currentQuestion.type === "measurements" ? (
               <MeasurementsQuestion value={answers[currentId]} onChange={setAnswer} />
             ) : currentQuestion.type === "sizes" ? (
               <SizesQuestion question={currentQuestion} value={answers[currentId]} onChange={setAnswer} />
@@ -336,7 +440,7 @@ export default function App() {
               <button
                 className="button"
                 type="button"
-                disabled={!isAnswered(currentQuestion, answers[currentId])}
+                disabled={!isAnswered(currentQuestion, answers)}
                 onClick={continueQuiz}
               >
                 {currentIndex === flow.length - 1 ? "See my results" : "Continue"}
@@ -350,7 +454,10 @@ export default function App() {
         {screen === "results" && (
           <Results
             answers={answers}
-            onEditAnswers={() => setState((previous) => ({ ...previous, screen: "question", currentId: "occasion" }))}          />
+            moreMode={moreMode}
+            onSeeAll={() => setState((previous) => ({ ...previous, screen: "matches" }))}
+            onEditAnswers={() => setState((previous) => ({ ...previous, screen: "question", currentId: "occasion" }))}
+          />
         )}
       </main>
     </>

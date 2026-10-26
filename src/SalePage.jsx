@@ -15,20 +15,33 @@ import SiteFooter from "./components/SiteFooter.jsx";
 import SiteHeader from "./components/SiteHeader.jsx";
 import useDesktop from "./hooks/useDesktop.js";
 
-export default function SalePage({ onNavigate, onTakeQuiz, title = "Men's Clothing Sale", crumb = "Sale" }) {
+export default function SalePage({
+  onNavigate,
+  onTakeQuiz,
+  onBackToQuiz,
+  initialFilters,
+  quizMatchIds,
+  title = "Men's Clothing Sale",
+  crumb = "Sale",
+}) {
   const desktop = useDesktop();
   const variant = priceVariant();
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState("featured");
-  const [applied, setApplied] = useState(emptyFilters);
+  const [applied, setApplied] = useState(initialFilters ?? emptyFilters);
   const [draft, setDraft] = useState(emptyFilters);
   const [sheetOpen, setSheetOpen] = useState(false);
   const [openFacet, setOpenFacet] = useState(null);
 
-  const visible = useMemo(
-    () => sortProducts(matchingProducts(PRODUCTS, applied, search), sort),
-    [applied, search, sort]
-  );
+  const visible = useMemo(() => {
+    const matched = sortProducts(matchingProducts(PRODUCTS, applied, search), sort);
+    if (!quizMatchIds?.length) return matched;
+    const pinned = quizMatchIds
+      .map((id) => PRODUCTS.find((product) => product.id === id))
+      .filter(Boolean);
+    const rest = matched.filter((product) => !quizMatchIds.includes(product.id));
+    return [...pinned, ...rest];
+  }, [applied, quizMatchIds, search, sort]);
 
   function openSheet(facetId) {
     setDraft(cloneFilters(applied));
@@ -75,6 +88,12 @@ export default function SalePage({ onNavigate, onTakeQuiz, title = "Men's Clothi
           </h1>
         </div>
         {onTakeQuiz && <QuizBanner onTakeQuiz={onTakeQuiz} />}
+        {onBackToQuiz && (
+          <div className="quiz-matches-bar">
+            <p>Showing suits that match your quiz. Your matches are marked.</p>
+            <button type="button" onClick={onBackToQuiz}>Back to your results</button>
+          </div>
+        )}
         <FilterBar
           applied={applied}
           sheetOpen={sheetOpen}
@@ -85,7 +104,7 @@ export default function SalePage({ onNavigate, onTakeQuiz, title = "Men's Clothi
           sort={sort}
           onSort={setSort}
         />
-        <ProductGrid products={visible} onClear={clearApplied} />
+        <ProductGrid products={visible} quizMatchIds={quizMatchIds} onClear={clearApplied} />
       </main>
       <SiteFooter />
       {sheetOpen && (
@@ -108,26 +127,14 @@ export default function SalePage({ onNavigate, onTakeQuiz, title = "Men's Clothi
 }
 
 function QuizBanner({ onTakeQuiz }) {
-  const photos = PRODUCTS.slice(0, 3);
-
   return (
     <div className="quiz-banner">
-      <div className="quiz-banner-photos" aria-hidden="true">
-        {photos.map((product, index) => (
-          <img
-            key={product.id}
-            src={product.imageUrl}
-            alt=""
-            className={index === 1 ? "is-selected" : undefined}
-          />
-        ))}
-      </div>
       <div>
-        <p className="quiz-banner-kicker">Want help choosing a suit?</p>
-        <p className="quiz-banner-title">Get personalized recommendations in less than a minute.</p>
+        <p className="quiz-banner-kicker">Suit Finder</p>
+        <p className="quiz-banner-title">Not sure which suit? Answer a few questions and get 3 suit picks in under a minute.</p>
       </div>
       <button className="quiz-banner-button" type="button" onClick={onTakeQuiz}>
-        Take the Quiz
+        Take the quiz
       </button>
     </div>
   );

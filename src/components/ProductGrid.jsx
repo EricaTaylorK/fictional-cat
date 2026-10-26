@@ -1,7 +1,7 @@
 import { COLORS, PROMO_BADGES, SUIT_IMAGES } from "../data/catalog.js";
 import { money } from "../filters.js";
 
-export default function ProductGrid({ products, onClear }) {
+export default function ProductGrid({ products, onClear, quizMatchIds = [] }) {
   if (products.length === 0) {
     return (
       <div className="empty">
@@ -25,6 +25,7 @@ export default function ProductGrid({ products, onClear }) {
                 loading="lazy"
               />
               {product.promos[0] && <span className="badge">{PROMO_BADGES[product.promos[0]]}</span>}
+              {quizMatchIds.includes(product.id) && <span className="badge badge-quiz">Quiz match</span>}
             </div>
             <div className="card-copy">
               <p className="price-line">

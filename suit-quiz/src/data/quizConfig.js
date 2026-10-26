@@ -3,35 +3,60 @@ export const questions = {
     id: "occasion",
     title: "What's the moment?",
     help: "We start here. The occasion tells us how formal to go, and how easy it is to misread the room.",
-    type: "single",
+    type: "occasionPlus",
     options: [
       { value: "wedding", label: "A wedding", detail: "Guest, wedding party, or groom. We'll match the room." },
       { value: "work", label: "Work or an interview", detail: "The office, a new job, or a professional event. Sharp enough to wear again." },
-      { value: "versatile", label: "A go-to suit for whatever comes up", detail: "A classic suit you can trust when the dress code is unclear." },
+      { value: "versatile", label: "A go-to suit for whatever comes up", detail: "Work, dinners, and everyday, when the dress code isn't clear." },
       { value: "formal", label: "A black-tie or formal evening", detail: "Elevated evening dressing that still feels like you." },
-      { value: "milestone", label: "A graduation, prom, or milestone", detail: "A big day that deserves to look the part." },
+      { value: "milestone", label: "A graduation, prom, or milestone", detail: "For the person being celebrated." },
       { value: "funeral", label: "A funeral or memorial", detail: "Respectful and quiet. Nothing that pulls focus." },
     ],
+    wear: {
+      title: "Will you wear it again?",
+      help: "This helps us choose between a suit for one occasion and an all-purpose suit.",
+      options: [
+        { value: "one-event", label: "Mostly for this event", detail: "Every suit we show is built to last. We'll match this occasion closely." },
+        { value: "rewear", label: "I want to wear it again", detail: "A classic you can trust past this event." },
+        { value: "often", label: "I'll wear suits often", detail: "Built for repeat wear and easy tailoring." },
+      ],
+    },
   },
   feel: {
     id: "feel",
-    title: "How should it feel?",
-    help: "Skip the suit jargon. Tell us the feeling you want once it's on.",
+    title: "How do you like a suit to fit?",
+    help: "The name in parentheses is the fit you'll see on the suit.",
     type: "single",
     options: [
-      { value: "close", label: "Close and sharp", detail: "A trimmer shape, with less room through the body." },
-      { value: "balanced", label: "Polished, with room to move", detail: "Shape through the shoulders, ease where you need it." },
-      { value: "roomy", label: "Comfortable with room", detail: "Ease through the chest, seat, and legs." },
+      { value: "close", label: "Close and sharp (Slim fit)", detail: "A trimmer shape, with less room through the body." },
+      { value: "balanced", label: "Polished, with room to move (Modern fit)", detail: "Shape through the shoulders, ease where you need it." },
+      { value: "roomy", label: "Comfortable with room (Classic fit)", detail: "Ease through the chest, seat, and legs, without looking loose." },
+    ],
+  },
+  colors: {
+    id: "colors",
+    title: "Any colors in mind?",
+    help: "Pick shades you like, shades to skip, or leave this blank.",
+    type: "colors",
+    options: [
+      { value: "navy", label: "Navy" },
+      { value: "blue", label: "Blue" },
+      { value: "gray", label: "Gray" },
+      { value: "black", label: "Black" },
+      { value: "brown", label: "Brown" },
+      { value: "tan", label: "Tan" },
+      { value: "burgundy", label: "Burgundy" },
+      { value: "green", label: "Green" },
     ],
   },
   measurementKnowledge: {
     id: "measurementKnowledge",
     title: "Do you know your measurements?",
-    help: "Either answer works. If you're unsure, we'll estimate and show you where a fitting makes the difference.",
+    help: "Either answer works. No jacket handy? Choose \"help me estimate\" and use your usual shirt and pants sizes.",
     type: "single",
     options: [
-      { value: "yes", label: "Yes, I know them", detail: "Jacket, chest, or waist is enough to start." },
-      { value: "some", label: "I know some of them", detail: "One useful number still helps." },
+      { value: "yes", label: "Yes, I know my jacket size and waist", detail: "The number on the jacket tag and your pants waist are enough." },
+      { value: "some", label: "I know one or two numbers", detail: "A jacket size, a chest, or a waist. Leave the rest blank." },
       { value: "no", label: "No, help me estimate", detail: "We'll use how your clothes usually fit. A lot of people start here." },
     ],
   },
@@ -105,35 +130,24 @@ export const questions = {
       {
         id: "shirt",
         label: "T-shirt or casual shirt",
-        options: ["S", "M", "L", "XL", "XXL"].map((value) => ({ value, label: value })),
+        options: ["XS", "S", "M", "L", "XL", "XXL", "3XL"].map((value) => ({ value, label: value })),
       },
       {
         id: "waist",
         label: "Jeans or pants waist",
-        options: [28, 29, 30, 31, 32, 33, 34, 36, 38, 40, 42, 44].map((value) => ({ value: String(value), label: String(value) })),
+        options: [28, 29, 30, 31, 32, 33, 34, 36, 38, 40, 42, 44, 46, 48].map((value) => ({ value: String(value), label: String(value) })),
       },
-    ],
-  },
-  wearIntent: {
-    id: "wearIntent",
-    title: "Is this for one moment, or more?",
-    help: "Some suits are for the day. Others earn a place in the closet.",
-    type: "single",
-    options: [
-      { value: "one-event", label: "This moment comes first", detail: "We'll match the occasion closely." },
-      { value: "rewear", label: "I want to wear it again", detail: "A classic you can trust past this event." },
-      { value: "often", label: "I'll wear suits often", detail: "Built for repeat wear and easy tailoring." },
     ],
   },
   tailoring: {
     id: "tailoring",
-    title: "How far do you want to take the fit?",
-    help: "A few adjustments are what make a suit feel like yours. You choose how far to go.",
+    title: "Want tailoring? (shortening sleeves, hemming pants, shaping the jacket)",
+    help: "A few adjustments are what make a suit feel like yours. Each option shows what it adds to the price.",
     type: "single",
     options: [
-      { value: "bundle", label: "Include tailoring in my plan", detail: "Suit and tailoring, shown together." },
-      { value: "consider", label: "I'm open to it", detail: "We'll point out what's worth adjusting." },
-      { value: "skip", label: "Suit only for now", detail: "The recommendation stays on the suit itself." },
+      { value: "bundle", label: "Include tailoring in my plan", detail: "Adds $55–$150, depending on the work." },
+      { value: "consider", label: "I'm open to it", detail: "We'll point out what's worth adjusting, and what it adds." },
+      { value: "skip", label: "Suit only for now", detail: "No tailoring added to the price." },
     ],
   },
   budget: {
@@ -151,10 +165,10 @@ export const questions = {
   },
 };
 
-const commonEnd = ["wearIntent", "tailoring", "budget"];
+const commonEnd = ["tailoring", "budget"];
 
 export function getQuestionFlow(answers) {
-  const start = ["occasion", "feel", "measurementKnowledge"];
+  const start = ["occasion", "feel", "colors", "measurementKnowledge"];
   if (answers.measurementKnowledge === "yes" || answers.measurementKnowledge === "some") {
     return [...start, "measurements", ...commonEnd];
   }

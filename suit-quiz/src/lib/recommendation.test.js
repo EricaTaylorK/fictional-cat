@@ -2,12 +2,15 @@ import { describe, expect, it } from "vitest";
 import { getQuestionFlow } from "../data/quizConfig.js";
 import {
   buildResultSummary,
+  describeSize,
   getFitSignals,
   getRecommendations,
   getSizeEstimate,
   inferLength,
   inferLikelySize,
   isLowConfidence,
+  parseHeight,
+  parseJacket,
   recommendTailoring,
 } from "./recommendation.js";
 
@@ -26,9 +29,9 @@ describe("quiz routing", () => {
     expect(getQuestionFlow({ measurementKnowledge: "yes" })).toEqual([
       "occasion",
       "feel",
+      "colors",
       "measurementKnowledge",
       "measurements",
-      "wearIntent",
       "tailoring",
       "budget",
     ]);
@@ -173,5 +176,111 @@ describe("recommendations", () => {
       size: "40R jacket, 34 waist pants",
       needsMeasurementHelp: false,
     });
+  });
+
+  it("reads a jacket length and a height written the way people say it", () => {
+    expect(parseJacket("44L")).toEqual({ chest: 44, length: "L" });
+    expect(parseJacket("44 long")).toEqual({ chest: 44, length: "L" });
+    expect(parseHeight("6'5\"")).toEqual({ feet: 6, inches: 5, total: 77 });
+    expect(parseHeight("6 5")).toEqual({ feet: 6, inches: 5, total: 77 });
+    expect(parseHeight("6ft 5")).toEqual({ feet: 6, inches: 5, total: 77 });
+    expect(parseHeight("77")).toEqual({ feet: 6, inches: 5, total: 77 });
+    expect(getSizeEstimate({ measurements: { jacket: "44L", height: "6'5\"" } })).toMatchObject({
+      jacket: "44L",
+      lengthCode: "L",
+      length: "Long",
+    });
+    expect(describeSize(getSizeEstimate(baseAnswers))).toBe(
+      "Jacket 40R (40 chest, regular length) · Pants 34W (34-inch waist)",
+    );
+  });
+
+  it("keeps skipped colors out unless nothing else qualifies", () => {
+    const navy = {
+      id: "navy",
+      fit: "balanced",
+      fitName: "Modern fit",
+      color: "Navy",
+      colorKey: "navy",
+      price: 300,
+      formality: ["wedding"],
+      versatility: 4,
+      comfort: 4,
+      tailoringEase: 4,
+    };
+    const black = { ...navy, id: "black", color: "Black", colorKey: "black" };
+    const skipped = getRecommendations(
+      { ...baseAnswers, colors: { prefer: ["navy"], avoid: ["black"] } },
+      [black, navy],
+    );
+    expect(skipped.map((product) => product.id)).toEqual(["navy"]);
+    expect(skipped[0].evidence.join(" ")).toMatch(/navy/i);
+
+    const onlySkipped = getRecommendations(
+      { ...baseAnswers, colors: { prefer: [], avoid: ["black"] } },
+      [black],
+    );
+    expect(onlySkipped[0].id).toBe("black");
+    expect(onlySkipped[0].tradeoffs.join(" ")).toMatch(/skip/i);
+  });
+
+  it("puts in-budget suits first and says when the budget misses", () => {
+    const suit = {
+      fit: "balanced",
+      fitName: "Modern fit",
+      color: "Navy",
+      colorKey: "navy",
+      formality: ["wedding"],
+      versatility: 4,
+      comfort: 4,
+      tailoringEase: 4,
+    };
+    const ranked = getRecommendations(
+      { ...baseAnswers, budget: "under-250" },
+      [
+        { ...suit, id: "over", price: 400 },
+        { ...suit, id: "under", price: 180 },
+      ],
+    );
+    expect(ranked.map((product) => product.id)).toEqual(["under", "over"]);
+    expect(ranked.budgetMiss.label).toBe("Only 1 suit under $250 matched. Closest options:");
+    expect(ranked[1].tradeoffs.join(" ")).toMatch(/Over your budget/);
+
+    const none = getRecommendations(
+      { ...baseAnswers, budget: "under-250" },
+      [{ ...suit, id: "over", price: 400 }],
+    );
+    expect(none.budgetMiss.label).toBe("Nothing under $250 matched. Closest options:");
+  });
+
+  it("lets a weak match fall below 72 and explains why", () => {
+    const strong = {
+      id: "strong",
+      fit: "balanced",
+      fitName: "Modern fit",
+      color: "Navy",
+      colorKey: "navy",
+      price: 300,
+      formality: ["wedding"],
+      versatility: 5,
+      comfort: 4,
+      tailoringEase: 5,
+    };
+    const weak = {
+      id: "weak",
+      fit: "roomy",
+      fitName: "Classic fit",
+      color: "Tan",
+      colorKey: "tan",
+      price: 900,
+      formality: ["formal"],
+      versatility: 1,
+      comfort: 1,
+      tailoringEase: 1,
+    };
+    const ranked = getRecommendations(baseAnswers, [strong, weak]);
+    expect(ranked[0].id).toBe("strong");
+    expect(ranked[1].matchPercent).toBeLessThan(72);
+    expect(ranked[1].tradeoffs.length).toBeGreaterThan(0);
   });
 });
