@@ -1751,6 +1751,209 @@ h2 {
   margin-top: var(--spacing-vertical-md);
 }
 
+/* Intro modal over the suits grid */
+
+.intro-backdrop {
+  align-items: flex-start;
+  animation: intro-fade 200ms ease-out both;
+  background: rgba(255, 255, 255, 0.72);
+  display: flex;
+  inset: 0;
+  justify-content: center;
+  overflow-y: auto;
+  padding: clamp(24px, 8.5vh, 96px) clamp(16px, 8vw, 140px) clamp(24px, 6vh, 64px);
+  position: fixed;
+  z-index: 100;
+}
+
+.intro-modal {
+  animation: intro-rise 260ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  background:
+    radial-gradient(ellipse 60% 45% at 72% 12%, rgba(255, 255, 255, 0.95), transparent 70%),
+    radial-gradient(ellipse 70% 60% at 8% 100%, #e4eefc, transparent 70%),
+    linear-gradient(165deg, #edebe8 0%, #f6f5f3 45%, #eef3fb 100%);
+  border-radius: 16px;
+  box-shadow: 0 24px 64px rgba(0, 20, 60, 0.16), 0 2px 8px rgba(0, 20, 60, 0.06);
+  color: var(--color-font-black);
+  display: flex;
+  flex-direction: column;
+  max-width: 1100px;
+  min-height: min(720px, 100%);
+  overflow: hidden;
+  width: 100%;
+}
+
+.intro-header {
+  align-items: center;
+  background: rgba(255, 255, 255, 0.85);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  display: grid;
+  grid-template-columns: 44px 1fr 44px;
+  min-height: 64px;
+  padding: 0 var(--spacing-horizontal-md);
+}
+
+.intro-brand {
+  align-items: center;
+  display: flex;
+  gap: 16px;
+  grid-column: 2;
+  justify-content: center;
+}
+
+.intro-badge {
+  align-items: center;
+  background: #1b1c20;
+  border-radius: 50%;
+  color: #fff;
+  display: inline-flex;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 10px;
+  height: 30px;
+  justify-content: center;
+  letter-spacing: 0.04em;
+  width: 30px;
+}
+
+.intro-header-title {
+  border-left: 1px solid var(--color-divider-light-gray);
+  font-size: var(--font-size-16);
+  line-height: var(--line-height-24);
+  padding-left: 16px;
+}
+
+.intro-close {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  border-radius: 50%;
+  color: var(--color-font-black);
+  display: inline-flex;
+  grid-column: 3;
+  height: 44px;
+  justify-content: center;
+  width: 44px;
+}
+
+.intro-close:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.intro-body {
+  align-items: center;
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  padding: clamp(40px, 9vh, 88px) var(--spacing-horizontal-xl) var(--spacing-vertical-xxl);
+  text-align: center;
+}
+
+.intro-illustration {
+  height: auto;
+  margin-bottom: 32px;
+  width: 190px;
+}
+
+.intro-title {
+  font-family: var(--font-family-roboto);
+  font-size: 32px;
+  font-weight: var(--font-weight-medium);
+  letter-spacing: 0;
+  line-height: 40px;
+  margin: 0 0 16px;
+  max-width: none;
+}
+
+.intro-copy {
+  color: var(--color-font-dark-gray);
+  font-size: 18px;
+  line-height: 28px;
+  margin: 0 0 32px;
+  max-width: 40ch;
+  text-wrap: pretty;
+}
+
+.intro-start {
+  align-items: center;
+  background: #1f5be6;
+  border: 0;
+  border-radius: 6px;
+  color: #fff;
+  display: inline-flex;
+  font-size: var(--font-size-16);
+  font-weight: var(--font-weight-medium);
+  gap: 8px;
+  justify-content: center;
+  min-height: 56px;
+  min-width: 190px;
+  padding: 0 32px;
+  transition: background 150ms ease, transform 150ms ease;
+}
+
+.intro-start:hover {
+  background: #1648c4;
+}
+
+.intro-start:active {
+  transform: translateY(1px);
+}
+
+.intro-note {
+  color: var(--color-font-medium-gray);
+  font-size: var(--font-size-12);
+  font-style: italic;
+  font-synthesis: style;
+  margin: 12px 0 0;
+}
+
+.intro-resume {
+  margin-top: var(--spacing-vertical-md);
+}
+
+@keyframes intro-fade {
+  from { opacity: 0; }
+}
+
+@keyframes intro-rise {
+  from { opacity: 0; transform: translateY(12px) scale(0.98); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .intro-backdrop,
+  .intro-modal {
+    animation: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .intro-backdrop {
+    padding: 0;
+  }
+
+  .intro-modal {
+    border-radius: 0;
+    min-height: 100%;
+  }
+
+  .intro-header-title {
+    font-size: var(--font-size-14);
+  }
+
+  .intro-title {
+    font-size: 26px;
+    line-height: 32px;
+  }
+
+  .intro-copy {
+    font-size: var(--font-size-16);
+    line-height: var(--line-height-24);
+  }
+
+  .intro-start {
+    width: 100%;
+  }
+}
+
 /* Icons in answers */
 
 .choice-icon {

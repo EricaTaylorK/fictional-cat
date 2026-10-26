@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
+import IntroModal from "./components/IntroModal.jsx";
 import ProductGridEntry from "./components/ProductGridEntry.jsx";
 import Results from "./components/Results.jsx";
 import TextInput from "./components/TextInput.jsx";
@@ -400,7 +401,7 @@ export default function App() {
   const quizMatchIds = useMemo(() => quizCatalogIds(answers), [answers]);
 
   useEffect(() => {
-    if (screen === "start") return;
+    if (screen === "start" || screen === "intro") return;
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
   }, [state, screen]);
 
@@ -468,19 +469,36 @@ export default function App() {
 
   const hasSavedProgress = Object.keys(answers).length > 0;
 
-  if (screen === "start" || screen === "matches") {
+  function openIntro() {
+    setState((previous) => ({ ...previous, screen: "intro" }));
+  }
+
+  const closeIntro = useCallback(() => {
+    setState((previous) => ({ ...previous, screen: "start" }));
+  }, []);
+
+  if (screen === "start" || screen === "intro" || screen === "matches") {
     return (
-      <ProductGridEntry
-        key={screen}
-        title={screen === "matches" ? "Quiz matches" : "All Suits"}
-        crumb={screen === "matches" ? "Quiz matches" : "Suits"}
-        initialFilters={screen === "matches" ? listingFilters : undefined}
-        quizMatchIds={screen === "matches" ? quizMatchIds : undefined}
-        onTakeQuiz={hasSavedProgress ? resumeQuiz : startQuiz}
-        onBackToQuiz={screen === "matches"
-          ? () => setState((previous) => ({ ...previous, screen: "results" }))
-          : undefined}
-      />
+      <>
+        <ProductGridEntry
+          key={screen === "matches" ? "matches" : "start"}
+          title={screen === "matches" ? "Quiz matches" : "All Suits"}
+          crumb={screen === "matches" ? "Quiz matches" : "Suits"}
+          initialFilters={screen === "matches" ? listingFilters : undefined}
+          quizMatchIds={screen === "matches" ? quizMatchIds : undefined}
+          onTakeQuiz={openIntro}
+          onBackToQuiz={screen === "matches"
+            ? () => setState((previous) => ({ ...previous, screen: "results" }))
+            : undefined}
+        />
+        {screen === "intro" && (
+          <IntroModal
+            onStart={startQuiz}
+            onResume={hasSavedProgress ? resumeQuiz : undefined}
+            onClose={closeIntro}
+          />
+        )}
+      </>
     );
   }
 
