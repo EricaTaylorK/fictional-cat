@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { products, SWATCH_HEX, TAILORING_TIERS } from "../data/products.js";
-import { colorThemes, getQuestionFlow } from "../data/quizConfig.js";
+import { colorThemes, colorsIn, getQuestionFlow } from "../data/quizConfig.js";
 import { RENTAL_PIECES, rentals } from "../data/rentals.js";
 import {
   buildResultSummary,
@@ -44,19 +44,29 @@ describe("quiz routing", () => {
     ]);
   });
 
-  it("asks where suits feel off on both measurement paths, and height only once", () => {
+  it("asks where suits feel off on both measurement paths, and never a separate height step", () => {
     const some = getQuestionFlow({ measurementKnowledge: "some" });
     expect(some.indexOf("fitIssues")).toBe(some.indexOf("measurements") + 1);
     expect(some).not.toContain("height");
     const estimate = getQuestionFlow({ measurementKnowledge: "no" });
-    expect(estimate.filter((id) => id === "height")).toHaveLength(1);
+    expect(estimate).not.toContain("height");
+    expect(estimate.indexOf("fitIssues")).toBe(estimate.indexOf("everydaySizes") + 1);
+    expect(getQuestionFlow({ mode: "rent", measurementKnowledge: "no" })).not.toContain("height");
+    expect(getQuestionFlow({ mode: "rent", measurementKnowledge: "yes" })).not.toContain("height");
   });
 
-  it("routes unknown measurements through fit issues and height", () => {
-    expect(getQuestionFlow({ measurementKnowledge: "no" })).toContain("fitIssues");
-    expect(getQuestionFlow({ measurementKnowledge: "no" })).toContain("height");
-    expect(getQuestionFlow({ measurementKnowledge: "no" })).toContain("everydaySizes");
-    expect(getQuestionFlow({ measurementKnowledge: "no" })).not.toContain("measurements");
+  it("routes unknown measurements through everyday sizes and fit issues", () => {
+    expect(getQuestionFlow({ measurementKnowledge: "no" })).toEqual([
+      "mode",
+      "occasion",
+      "feel",
+      "colors",
+      "measurementKnowledge",
+      "everydaySizes",
+      "fitIssues",
+      "tailoring",
+      "budget",
+    ]);
   });
 
   it("sends renters through pieces and an event date, without tailoring or a buying budget", () => {
@@ -281,11 +291,16 @@ describe("recommendations", () => {
       tailoringEase: 4,
     };
     const tan = { ...navy, id: "tan", color: "Tan", colorKey: "tan" };
-    const warm = getRecommendations({ ...baseAnswers, colors: { prefer: ["warm"] } }, [navy, tan]);
-    expect(warm.map((product) => product.id)).toEqual(["tan", "navy"]);
-    expect(warm[0].evidence.join(" ")).toMatch(/tan, a color you picked/);
-    expect(warm[1].tradeoffs.join(" ")).toMatch(/wasn't a color you picked/);
+    const brownTan = getRecommendations({ ...baseAnswers, colors: { prefer: ["brownTan"] } }, [navy, tan]);
+    expect(brownTan.map((product) => product.id)).toEqual(["tan", "navy"]);
+    expect(brownTan[0].evidence.join(" ")).toMatch(/tan, a color you picked/);
+    expect(brownTan[1].tradeoffs.join(" ")).toMatch(/wasn't a color you picked/);
 
+    const navyPick = getRecommendations({ ...baseAnswers, colors: { prefer: ["navy"] } }, [tan, navy]);
+    expect(navyPick[0].id).toBe("navy");
+
+    const warm = getRecommendations({ ...baseAnswers, colors: { prefer: ["warm"] } }, [navy, tan]);
+    expect(warm[0].id).toBe("tan");
     const darks = getRecommendations({ ...baseAnswers, colors: { prefer: ["darks"] } }, [tan, navy]);
     expect(darks[0].id).toBe("navy");
   });
@@ -318,10 +333,25 @@ describe("recommendations", () => {
           expect(swatch.hex).toBe(SWATCH_HEX[swatch.key]);
         }
       }
-      expect(new Set(themes.flatMap((theme) => theme.colors))).toEqual(keys);
+      const listed = themes.flatMap((theme) => theme.colors);
+      expect(new Set(listed).size).toBe(listed.length);
+      expect(new Set(listed)).toEqual(keys);
     }
-    expect(colorThemes("buy").map((theme) => theme.value)).not.toContain("light");
-    expect(colorThemes("rent").map((theme) => theme.value)).toContain("light");
+    const buyThemes = colorThemes("buy");
+    const rentThemes = colorThemes("rent");
+    expect(buyThemes.map((theme) => theme.value)).toEqual(["navy", "blue", "gray", "black", "brownTan", "burgundy", "green"]);
+    expect(rentThemes.map((theme) => theme.value)).toEqual(["navy", "blue", "gray", "black", "brownTan", "green", "white"]);
+    expect(buyThemes.map((theme) => theme.value)).not.toContain("white");
+    expect(buyThemes.map((theme) => theme.value)).not.toContain("light");
+    expect(rentThemes.map((theme) => theme.value)).toContain("white");
+    expect(rentThemes.map((theme) => theme.value)).not.toContain("light");
+    expect(buyThemes.find((theme) => theme.value === "brownTan").colors).toEqual(["brown", "tan"]);
+    expect(rentThemes.find((theme) => theme.value === "brownTan").colors).toEqual(["tan"]);
+    expect(rentThemes.find((theme) => theme.value === "brownTan").label).toBe("Tan");
+    expect(colorsIn(["darks"])).toEqual(["navy", "blue", "gray", "black"]);
+    expect(colorsIn(["warm"])).toEqual(["tan", "brown", "burgundy", "green"]);
+    expect(colorsIn(["light"])).toEqual(["white"]);
+    expect(colorsIn(["navy", "brownTan"])).toEqual(["navy", "brown", "tan"]);
   });
 
   it("puts in-budget suits first and says when the budget misses", () => {

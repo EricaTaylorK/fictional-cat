@@ -9,10 +9,21 @@ import { formatDate, formatPrice, quizCatalogIds, quizListingFilters, rentalDate
 
 const STORAGE_KEY = "suit-quiz-wireframe-progress";
 
+function stepAfterRetiredHeight(answers) {
+  const flow = getQuestionFlow(answers ?? {});
+  const fitIndex = flow.indexOf("fitIssues");
+  return (fitIndex >= 0 ? flow[fitIndex + 1] : flow[0]) || "mode";
+}
+
 function loadProgress() {
   try {
     const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
-    if (saved?.screen && saved?.answers) return saved;
+    if (saved?.screen && saved?.answers) {
+      if (saved.currentId === "height") {
+        return { ...saved, currentId: stepAfterRetiredHeight(saved.answers) };
+      }
+      return saved;
+    }
   } catch {
     // Ignore malformed or unavailable local storage.
   }
@@ -136,7 +147,7 @@ function ColorQuestion({ mode, value, onChange }) {
 
   return (
     <OptionCards
-      label="Color palettes"
+      label="Colors"
       options={options}
       isSelected={(theme) => prefer.includes(theme)}
       onPick={(theme) => onChange({
@@ -317,18 +328,18 @@ function formatHeight(total) {
 function HeightQuestion({ value, onChange }) {
   const total = Number(value);
   const set = Number.isFinite(total) && total >= HEIGHT_MIN && total <= HEIGHT_MAX;
-  const shown = set ? total : 70;
-  const feet = Math.floor(shown / 12);
-  const inches = shown % 12;
+  const feet = set ? Math.floor(total / 12) : "";
+  const inches = set ? total % 12 : "";
 
   function setTotal(next) {
-    const clamped = Math.min(HEIGHT_MAX, Math.max(HEIGHT_MIN, next));
+    if (!Number.isFinite(next)) return;
+    const clamped = Math.min(HEIGHT_MAX, Math.max(HEIGHT_MIN, Math.round(next)));
     onChange(clamped);
   }
 
   return (
-    <div className="height-question">
-      <p className="height-readout">{set ? formatHeight(shown) : "Set your height"}</p>
+    <div className={`height-question${set ? "" : " is-unset"}`}>
+      <p className="height-readout">{set ? formatHeight(total) : "Not set"}</p>
       <label className="height-slider">
         <span className="visually-hidden">Height</span>
         <input
@@ -336,11 +347,11 @@ function HeightQuestion({ value, onChange }) {
           min={HEIGHT_MIN}
           max={HEIGHT_MAX}
           step="1"
-          value={shown}
+          value={set ? total : HEIGHT_MIN}
           aria-valuemin={HEIGHT_MIN}
           aria-valuemax={HEIGHT_MAX}
-          aria-valuenow={set ? shown : undefined}
-          aria-valuetext={set ? formatHeight(shown) : "Not set"}
+          aria-valuenow={set ? total : undefined}
+          aria-valuetext={set ? formatHeight(total) : "Not set"}
           onChange={(event) => setTotal(Number(event.target.value))}
         />
       </label>
@@ -356,12 +367,12 @@ function HeightQuestion({ value, onChange }) {
             inputMode="numeric"
             min="4"
             max="7"
-            value={set ? feet : ""}
-            placeholder="5"
+            value={feet}
             onChange={(event) => {
+              if (event.target.value === "") return;
               const nextFeet = Number(event.target.value);
               if (!Number.isFinite(nextFeet)) return;
-              setTotal(nextFeet * 12 + (set ? inches : 0));
+              setTotal(nextFeet * 12 + (set ? total % 12 : 0));
             }}
           />
         </label>
@@ -372,12 +383,12 @@ function HeightQuestion({ value, onChange }) {
             inputMode="numeric"
             min="0"
             max="11"
-            value={set ? inches : ""}
-            placeholder="10"
+            value={inches}
             onChange={(event) => {
+              if (event.target.value === "") return;
               const nextInches = Number(event.target.value);
               if (!Number.isFinite(nextInches)) return;
-              setTotal((set ? feet : 5) * 12 + nextInches);
+              setTotal((set ? Math.floor(total / 12) : 5) * 12 + nextInches);
             }}
           />
         </label>
@@ -386,7 +397,7 @@ function HeightQuestion({ value, onChange }) {
   );
 }
 
-function SizesQuestion({ question, value = {}, onChange }) {
+function SizesQuestion({ question, value = {}, onChange, heightValue, onHeightChange }) {
   return (
     <div className="size-groups">
       {question.groups.map((group) => (
@@ -408,6 +419,10 @@ function SizesQuestion({ question, value = {}, onChange }) {
           </div>
         </fieldset>
       ))}
+      <fieldset className="size-group">
+        <legend>Height</legend>
+        <HeightQuestion value={heightValue} onChange={onHeightChange} />
+      </fieldset>
     </div>
   );
 }
@@ -481,19 +496,12 @@ function isAnswered(question, answers) {
   if (question.type === "occasionPlus") {
     return Boolean(answers.occasion);
   }
-  if (question.type === "colors" || question.type === "measurements" || question.type === "pieces") return true;
-  if (question.type === "height") {
-    const inches = Number(answers.height);
-    return inches >= 58 && inches <= 84;
-  }
+  if (question.type === "colors" || question.type === "measurements" || question.type === "pieces" || question.type === "sizes") return true;
   if (question.type === "date") {
     const dates = rentalDates(answer);
     return Boolean(dates && !dates.past);
   }
   if (question.type === "multi") return Array.isArray(answer) && answer.length > 0;
-  if (question.type === "sizes") {
-    return question.groups.every((group) => Boolean(answer?.[group.id]));
-  }
   return Boolean(answer);
 }
 
@@ -514,6 +522,14 @@ export default function App() {
     if (screen === "start" || screen === "intro") return;
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
   }, [state, screen]);
+
+  useEffect(() => {
+    if (screen !== "question" || currentId !== "height") return;
+    const nextId = stepAfterRetiredHeight(answers);
+    setState((previous) => (
+      previous.currentId === "height" ? { ...previous, currentId: nextId } : previous
+    ));
+  }, [screen, currentId, answers]);
 
   useEffect(() => {
     const lightPage = screen === "start" || screen === "matching" || screen === "results";
@@ -724,10 +740,14 @@ export default function App() {
                   currentId: "everydaySizes",
                 }))}
               />
-            ) : currentQuestion.type === "height" ? (
-              <HeightQuestion value={answers.height} onChange={setAnswer} />
             ) : currentQuestion.type === "sizes" ? (
-              <SizesQuestion question={currentQuestion} value={answers[currentId]} onChange={setAnswer} />
+              <SizesQuestion
+                question={currentQuestion}
+                value={answers[currentId]}
+                onChange={setAnswer}
+                heightValue={answers.height}
+                onHeightChange={(height) => mergeAnswers({ height })}
+              />
             ) : (
               <ChoiceQuestion
                 question={currentQuestion}

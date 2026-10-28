@@ -1529,8 +1529,12 @@ h2 {
     max-width: 1040px;
   }
 
-  .option-cards:has(> :nth-child(5)) {
+  .option-cards:has(> :nth-child(5):last-child) {
     grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+
+  .option-cards:has(> :nth-child(6)) {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 }
 
@@ -2144,7 +2148,7 @@ h2 {
 }
 
 .height-question {
-  margin: var(--spacing-vertical-xl) 0;
+  margin: 0;
   max-width: 440px;
 }
 
@@ -2154,11 +2158,53 @@ h2 {
   margin-bottom: var(--spacing-vertical-md);
 }
 
+.height-question.is-unset .height-readout {
+  color: var(--text-secondary);
+  font-weight: var(--font-weight-regular);
+}
+
 .height-slider input {
   accent-color: var(--color-background-dark-blue);
   height: 44px;
   margin: 0;
   width: 100%;
+}
+
+.height-question.is-unset .height-slider input {
+  accent-color: var(--color-font-medium-gray);
+  appearance: none;
+  background: transparent;
+}
+
+.height-question.is-unset .height-slider input::-webkit-slider-runnable-track {
+  background: var(--color-divider-light-gray);
+  border-radius: 999px;
+  height: 4px;
+}
+
+.height-question.is-unset .height-slider input::-webkit-slider-thumb {
+  appearance: none;
+  background: var(--surface-primary);
+  border: 2px solid var(--color-font-medium-gray);
+  border-radius: 50%;
+  height: 22px;
+  margin-top: -9px;
+  width: 22px;
+}
+
+.height-question.is-unset .height-slider input::-moz-range-track {
+  background: var(--color-divider-light-gray);
+  border: 0;
+  border-radius: 999px;
+  height: 4px;
+}
+
+.height-question.is-unset .height-slider input::-moz-range-thumb {
+  background: var(--surface-primary);
+  border: 2px solid var(--color-font-medium-gray);
+  border-radius: 50%;
+  height: 22px;
+  width: 22px;
 }
 
 .height-scale {

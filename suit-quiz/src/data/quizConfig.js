@@ -59,28 +59,18 @@ export const questions = {
   colors: {
     id: "colors",
     title: "Any colors in mind?",
-    help: "Pick a palette you like, or leave it blank to see every color.",
+    help: "Pick a color, or leave it blank.",
     type: "colors",
     skippable: true,
     options: [
-      {
-        value: "darks",
-        label: "Classic darks",
-        detail: "Navy, blue, gray, and black. Right for work, weddings, and evenings.",
-        colors: ["navy", "blue", "gray", "black"],
-      },
-      {
-        value: "warm",
-        label: "Warm and earthy",
-        detail: "Lighter and richer shades that stand out at daytime events.",
-        colors: ["tan", "brown", "burgundy", "green"],
-      },
-      {
-        value: "light",
-        label: "White and ivory",
-        detail: "Dinner jackets and white suits for formal or summer events.",
-        colors: ["white"],
-      },
+      { value: "navy", label: "Navy", detail: "Navy", colors: ["navy"] },
+      { value: "blue", label: "Blue", detail: "Blue, not navy", colors: ["blue"] },
+      { value: "gray", label: "Gray", detail: "Gray", colors: ["gray"] },
+      { value: "black", label: "Black", detail: "Black", colors: ["black"] },
+      { value: "brownTan", label: "Brown and tan", detail: "Brown and tan", colors: ["brown", "tan"] },
+      { value: "burgundy", label: "Burgundy", detail: "Burgundy", colors: ["burgundy"] },
+      { value: "green", label: "Green", detail: "Green", colors: ["green"] },
+      { value: "white", label: "White", detail: "White and ivory", colors: ["white"] },
     ],
   },
   measurementKnowledge: {
@@ -89,8 +79,8 @@ export const questions = {
     help: "Share the sizes you know. If you don't, we'll estimate from how your clothes usually fit.",
     type: "single",
     options: [
-      { value: "some", label: "I know some of my sizes", detail: "Jacket, chest, waist, or any mix of them. Leave the rest blank." },
-      { value: "no", label: "No, help me estimate", detail: "We'll use your shirt size, your pants size, and how suits usually fit." },
+      { value: "some", label: "I know some of my sizes", detail: "Jacket, chest, waist, height, or any mix. Leave the rest blank." },
+      { value: "no", label: "No, help me estimate", detail: "We'll use your shirt size, pants size, and height if you know them." },
     ],
   },
   measurements: {
@@ -148,16 +138,10 @@ export const questions = {
       { value: "none", label: "Standard sizes usually fit me", detail: "Nothing in particular comes up", exclusive: true, icon: "/icons/mw/straight.png" },
     ],
   },
-  height: {
-    id: "height",
-    title: "About how tall are you?",
-    help: "Drag the slider, or type feet and inches. Either one updates the other.",
-    type: "height",
-  },
   everydaySizes: {
     id: "everydaySizes",
     title: "What sizes do you usually buy?",
-    help: "Your everyday shirt and jeans sizes are enough for us to work out your jacket and pants.",
+    help: "Fill in any you know. Shirt size, jeans waist, and height each help us estimate.",
     type: "sizes",
     groups: [
       {
@@ -221,7 +205,7 @@ export function getQuestionFlow(answers) {
     return [...start, "measurements", "fitIssues", ...end];
   }
   if (answers.measurementKnowledge === "no") {
-    return [...start, "everydaySizes", "fitIssues", "height", ...end];
+    return [...start, "everydaySizes", "fitIssues", ...end];
   }
   return start;
 }
@@ -244,9 +228,42 @@ export function resolvedOccasion(answers) {
   return BUY_OCCASION[value] ?? value;
 }
 
+const LEGACY_COLOR_GROUPS = {
+  darks: ["navy", "blue", "gray", "black"],
+  warm: ["tan", "brown", "burgundy", "green"],
+  light: ["white"],
+};
+
+const COLOR_NAMES = {
+  navy: "Navy",
+  blue: "Blue",
+  gray: "Gray",
+  black: "Black",
+  brown: "Brown",
+  tan: "Tan",
+  burgundy: "Burgundy",
+  green: "Green",
+  white: "White",
+};
+
 export function colorsIn(values) {
-  const palettes = new Map(questions.colors.options.map((option) => [option.value, option.colors]));
+  const palettes = new Map([
+    ...questions.colors.options.map((option) => [option.value, option.colors]),
+    ...Object.entries(LEGACY_COLOR_GROUPS),
+  ]);
   return [...new Set((Array.isArray(values) ? values : []).flatMap((value) => palettes.get(value) ?? [value]))];
+}
+
+function visibleCopy(option, colors) {
+  if (colors.length === option.colors.length) {
+    return { label: option.label, detail: option.detail };
+  }
+  if (colors.length === 1) {
+    const name = COLOR_NAMES[colors[0]] ?? option.label;
+    return { label: name, detail: colors[0] === "white" ? "White and ivory" : name };
+  }
+  const label = colors.map((key) => COLOR_NAMES[key] ?? key).join(" and ");
+  return { label, detail: label };
 }
 
 function catalogColors(mode) {
@@ -259,7 +276,12 @@ export function colorThemes(mode) {
   return questions.colors.options
     .map((option) => {
       const colors = option.colors.filter((key) => available.has(key));
-      return { ...option, colors, swatches: colors.map((key) => ({ key, hex: SWATCH_HEX[key] })) };
+      return {
+        ...option,
+        ...visibleCopy(option, colors),
+        colors,
+        swatches: colors.map((key) => ({ key, hex: SWATCH_HEX[key] })),
+      };
     })
     .filter((option) => option.colors.length > 0);
 }
