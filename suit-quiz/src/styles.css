@@ -633,6 +633,7 @@ h2 {
 .size-group {
   border: 0;
   margin: 0;
+  min-width: 0;
   padding: 0;
 }
 
@@ -2419,14 +2420,42 @@ h2 {
 
 @media (min-width: 641px) {
   .quiz-slide .size-pair {
-    align-items: start;
-    column-gap: 32px;
+    align-items: stretch;
+    column-gap: 48px;
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    position: relative;
+    width: 100%;
   }
 
-  .quiz-slide .size-pair .size-group + .size-group {
-    border-left: 1px solid rgba(0, 0, 0, 0.1);
-    padding-left: 32px;
+  .quiz-slide .size-pair::after {
+    background: rgba(0, 0, 0, 0.1);
+    content: "";
+    height: 100%;
+    left: 50%;
+    position: absolute;
+    top: 0;
+    width: 1px;
+  }
+
+  .quiz-slide .size-pair .size-group {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    text-align: left;
+  }
+
+  .quiz-slide .size-pair .size-group legend {
+    text-align: left;
+  }
+
+  .quiz-slide .size-pair .size-chips {
+    display: grid;
+    flex: 1 0 auto;
+    grid-template-columns: repeat(auto-fill, minmax(52px, 1fr));
+  }
+
+  .quiz-slide .size-pair .size-chip span {
+    width: 100%;
   }
 }
 
@@ -2589,25 +2618,26 @@ h2 {
 }
 
 .unknown-size {
-  background: rgba(255, 255, 255, 0.64);
-  border: 1px solid rgba(0, 0, 0, 0.15);
-  border-radius: 8px;
+  align-items: center;
+  background: #fff;
+  border: 2px solid var(--color-divider-light-gray);
+  border-radius: var(--border-radius-md);
   color: #232323;
   cursor: pointer;
-  display: inline-flex;
+  display: flex;
   font-size: 14px;
   font-weight: 500;
+  justify-content: center;
   margin-top: 16px;
   min-height: 44px;
   padding: 0 16px;
-  text-decoration: none;
+  width: 100%;
 }
 
 .unknown-size.is-on {
-  background: rgba(219, 234, 250, 0.9);
-  border-color: #1d52f5;
+  background: var(--color-info-light-blue);
+  border-color: var(--color-info-blue);
   color: #232323;
-  font-weight: 500;
 }
 
 .unknown-size:hover {
@@ -2616,6 +2646,10 @@ h2 {
 
 .size-estimate {
   margin-top: var(--spacing-vertical-md);
+}
+
+.quiz-slide .height-question {
+  margin: 0 auto;
 }
 
 .height-question {

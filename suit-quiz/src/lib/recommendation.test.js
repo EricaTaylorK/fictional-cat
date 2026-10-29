@@ -48,6 +48,7 @@ describe("quiz routing", () => {
       "colors",
       "measurementKnowledge",
       "measurements",
+      "height",
       "fitIssues",
       "pantsFit",
       "tailoring",
@@ -55,16 +56,16 @@ describe("quiz routing", () => {
     ]);
   });
 
-  it("asks where suits feel off on both measurement paths, and never a separate height step", () => {
+  it("asks height on its own page, then where suits feel off", () => {
     const some = getQuestionFlow({ measurementKnowledge: "some" });
-    expect(some.indexOf("fitIssues")).toBe(some.indexOf("measurements") + 1);
-    expect(some).not.toContain("height");
+    expect(some.indexOf("height")).toBe(some.indexOf("measurements") + 1);
+    expect(some.indexOf("fitIssues")).toBe(some.indexOf("height") + 1);
     const estimate = getQuestionFlow({ measurementKnowledge: "no" });
-    expect(estimate).not.toContain("height");
-    expect(estimate.indexOf("fitIssues")).toBe(estimate.indexOf("everydaySizes") + 1);
+    expect(estimate.indexOf("height")).toBe(estimate.indexOf("everydaySizes") + 1);
+    expect(estimate.indexOf("fitIssues")).toBe(estimate.indexOf("height") + 1);
     expect(estimate.indexOf("pantsFit")).toBe(estimate.indexOf("fitIssues") + 1);
-    expect(getQuestionFlow({ mode: "rent", measurementKnowledge: "no" })).not.toContain("height");
-    expect(getQuestionFlow({ mode: "rent", measurementKnowledge: "yes" })).not.toContain("height");
+    expect(getQuestionFlow({ mode: "rent", measurementKnowledge: "no" })).toContain("height");
+    expect(getQuestionFlow({ mode: "rent", measurementKnowledge: "yes" })).toContain("height");
   });
 
   it("routes unknown measurements through everyday sizes and fit issues", () => {
@@ -75,6 +76,7 @@ describe("quiz routing", () => {
       "colors",
       "measurementKnowledge",
       "everydaySizes",
+      "height",
       "fitIssues",
       "pantsFit",
       "tailoring",
@@ -93,6 +95,7 @@ describe("quiz routing", () => {
       "colors",
       "measurementKnowledge",
       "measurements",
+      "height",
       "fitIssues",
       "pantsFit",
     ]);
@@ -267,7 +270,7 @@ describe("recommendations", () => {
     })).toMatchObject({ jacket: "42L", pants: "36W", length: "Long", lengthCode: "L" });
     expect(getQuestionFlow({ measurementKnowledge: "some" })).not.toContain("everydaySizes");
     expect(getQuestionFlow({ measurementKnowledge: "some", unknownSizes: { chest: true } }).indexOf("everydaySizes"))
-      .toBe(getQuestionFlow({ measurementKnowledge: "some" }).indexOf("measurements") + 1);
+      .toBe(getQuestionFlow({ measurementKnowledge: "some" }).indexOf("height") + 1);
     expect(getQuestionFlow({ measurementKnowledge: "some", unknownSizes: { waist: true } })).toContain("everydaySizes");
     expect(getQuestionFlow({ measurementKnowledge: "no" })).toContain("everydaySizes");
   });

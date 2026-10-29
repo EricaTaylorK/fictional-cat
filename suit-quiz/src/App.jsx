@@ -9,12 +9,6 @@ import { formatDate, quizCatalogIds, quizListingFilters, rentalDates } from "./l
 
 const STORAGE_KEY = "suit-quiz-wireframe-progress";
 
-function stepAfterRetiredHeight(answers) {
-  const flow = getQuestionFlow(answers ?? {});
-  const fitIndex = flow.indexOf("fitIssues");
-  return (fitIndex >= 0 ? flow[fitIndex + 1] : flow[0]) || "mode";
-}
-
 function loadProgress() {
   try {
     const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
@@ -25,9 +19,6 @@ function loadProgress() {
       const place = next.place === "sale" || next.place === "home"
         ? next.place
         : (next.screen === "start" || next.screen === "matches" ? "sale" : "home");
-      if (next.currentId === "height") {
-        return { ...next, place, currentId: stepAfterRetiredHeight(answers) };
-      }
       if (next.currentId === "rentalBudget" && next.screen === "question") {
         return { ...next, place, screen: "matching" };
       }
@@ -264,8 +255,6 @@ function MeasurementsQuestion({
   onEverydaySizes,
   unknownSizes = {},
   onUnknownSizes,
-  heightValue,
-  onHeightChange,
 }) {
   function writeMeasurements(next) {
     const chest = next.chest ? String(next.chest) : "";
@@ -340,10 +329,6 @@ function MeasurementsQuestion({
           );
         })}
       </div>
-      <fieldset className="size-group">
-        <legend>Height</legend>
-        <HeightQuestion value={heightValue} onChange={onHeightChange} />
-      </fieldset>
     </div>
   );
 }
@@ -399,7 +384,7 @@ function HeightQuestion({ value, onChange }) {
   );
 }
 
-function SizesQuestion({ question, value = {}, onChange, heightValue, onHeightChange, showHeight = true }) {
+function SizesQuestion({ question, value = {}, onChange }) {
   return (
     <div className="size-groups">
       {question.groups.map((group) => (
@@ -421,12 +406,6 @@ function SizesQuestion({ question, value = {}, onChange, heightValue, onHeightCh
           </div>
         </fieldset>
       ))}
-      {showHeight && (
-        <fieldset className="size-group">
-          <legend>Height</legend>
-          <HeightQuestion value={heightValue} onChange={onHeightChange} />
-        </fieldset>
-      )}
     </div>
   );
 }
@@ -500,7 +479,7 @@ function isAnswered(question, answers) {
   if (question.type === "occasionPlus") {
     return Boolean(answers.occasion);
   }
-  if (question.type === "colors" || question.type === "measurements" || question.type === "sizes") return true;
+  if (question.type === "colors" || question.type === "measurements" || question.type === "sizes" || question.type === "height") return true;
   if (question.type === "date") {
     const dates = rentalDates(answer);
     return Boolean(dates && !dates.past);
@@ -529,19 +508,12 @@ export default function App() {
 
   useEffect(() => {
     if (screen !== "question") return;
-    if (currentId === "height") {
-      const nextId = stepAfterRetiredHeight(answers);
-      setState((previous) => (
-        previous.currentId === "height" ? { ...previous, currentId: nextId } : previous
-      ));
-      return;
-    }
     if (currentId === "rentalBudget") {
       setState((previous) => (
         previous.currentId === "rentalBudget" ? { ...previous, screen: "matching" } : previous
       ));
     }
-  }, [screen, currentId, answers]);
+  }, [screen, currentId]);
 
   useEffect(() => {
     const lightPage = screen === "start" || screen === "home" || screen === "results";
@@ -663,17 +635,17 @@ export default function App() {
           onEverydaySizes={(everydaySizes) => mergeAnswers({ everydaySizes })}
           unknownSizes={answers.unknownSizes}
           onUnknownSizes={(unknownSizes) => mergeAnswers({ unknownSizes })}
-          heightValue={answers.height}
-          onHeightChange={(height) => mergeAnswers({ height })}
+        />
+      ) : currentQuestion.type === "height" ? (
+        <HeightQuestion
+          value={answers.height}
+          onChange={(height) => mergeAnswers({ height })}
         />
       ) : currentQuestion.type === "sizes" ? (
         <SizesQuestion
           question={{ ...currentQuestion, groups: estimateGroups(answers) }}
           value={answers[currentId]}
           onChange={setAnswer}
-          showHeight={answers.measurementKnowledge === "no"}
-          heightValue={answers.height}
-          onHeightChange={(height) => mergeAnswers({ height })}
         />
       ) : (
         <ChoiceQuestion

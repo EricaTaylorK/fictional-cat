@@ -79,14 +79,14 @@ export const questions = {
     help: "Share the sizes you know. If you don't, we'll estimate from how your clothes usually fit.",
     type: "single",
     options: [
-      { value: "some", label: "I know some of my sizes", detail: "Jacket, chest, waist, height, or any mix. Leave the rest blank." },
-      { value: "no", label: "No, help me estimate", detail: "We'll use your shirt size, pants size, and height if you know them." },
+      { value: "some", label: "I know some of my sizes", detail: "Jacket or pant size. Leave either one blank." },
+      { value: "no", label: "No, help me estimate", detail: "We'll use your shirt size and jeans waist." },
     ],
   },
   measurements: {
     id: "measurements",
     title: "Share the sizes you know",
-    help: "Fill in the ones you know. Mark any you don't, and we'll estimate those on the next step.",
+    help: "Jacket and pant size. Mark either one you don't know.",
     type: "measurements",
   },
   fitIssues: {
@@ -148,7 +148,7 @@ export const questions = {
   everydaySizes: {
     id: "everydaySizes",
     title: "What sizes do you usually buy?",
-    help: "Fill in any you know. Shirt size, jeans waist, and height each help us estimate.",
+    help: "Fill in any you know. A shirt size estimates the jacket, and a jeans waist estimates the pants.",
     type: "sizes",
     groups: [
       {
@@ -162,6 +162,12 @@ export const questions = {
         options: [28, 29, 30, 31, 32, 33, 34, 36, 38, 40, 42, 44, 46, 48].map((value) => ({ value: String(value), label: String(value) })),
       },
     ],
+  },
+  height: {
+    id: "height",
+    title: "How tall are you?",
+    help: "Height sets the length. Under 5'7\" we start with Short, over 6'0\" with Long, and the heights in between with Regular.",
+    type: "height",
   },
   tailoring: {
     id: "tailoring",
@@ -197,10 +203,10 @@ export function getQuestionFlow(answers) {
   const unknown = answers.unknownSizes ?? {};
   const estimate = unknown.chest || unknown.waist ? ["everydaySizes"] : [];
   if (answers.measurementKnowledge === "yes" || answers.measurementKnowledge === "some") {
-    return [...start, "measurements", ...estimate, "fitIssues", "pantsFit", ...end];
+    return [...start, "measurements", "height", ...estimate, "fitIssues", "pantsFit", ...end];
   }
   if (answers.measurementKnowledge === "no") {
-    return [...start, "everydaySizes", "fitIssues", "pantsFit", ...end];
+    return [...start, "everydaySizes", "height", "fitIssues", "pantsFit", ...end];
   }
   return start;
 }
