@@ -1844,7 +1844,7 @@ h2 {
 
 .intro-modal {
   animation: intro-rise 260ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
-  background: linear-gradient(0deg, rgba(255, 255, 255, 0.88), rgba(255, 255, 255, 0.88)), url("/quiz/quiz-fabric.png") center / cover no-repeat, #ffffff;
+  background: linear-gradient(0deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.1)), url("/quiz/quiz-fabric.png") center / cover no-repeat, #ffffff;
   border-radius: 16px;
   box-shadow: 0 24px 64px rgba(0, 20, 60, 0.16), 0 2px 8px rgba(0, 20, 60, 0.06);
   color: var(--color-font-black);
@@ -2067,7 +2067,7 @@ h2 {
   }
 
   .intro-modal {
-    background: linear-gradient(0deg, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.8)), url("/quiz/quiz-fabric.png") center / cover no-repeat, #f7f9fd;
+    background: linear-gradient(0deg, rgba(255, 255, 255, 0.25), rgba(255, 255, 255, 0.25)), url("/quiz/quiz-fabric.png") center / cover no-repeat, #f7f9fd;
     border-radius: 0;
     min-height: 100%;
   }
