@@ -113,6 +113,41 @@ button.logo {
   color: var(--color-primary-blue);
 }
 
+.mobile-nav button.is-sale { color: #c41230; }
+
+.mobile-nav .nav-feature {
+  display: grid;
+  grid-template-columns: 96px 1fr;
+  gap: 12px;
+  width: calc(100% - 32px);
+  margin: 4px 16px 12px;
+  padding: 0;
+  background: #f4f7fb;
+  text-align: left;
+}
+
+.mobile-suits-wrap > button { width: 100%; }
+
+.mobile-suits {
+  display: grid;
+  gap: 12px;
+  padding: 0 20px 12px 32px;
+}
+
+.mobile-suits p {
+  margin: 8px 0 4px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.mobile-suits button {
+  padding: 6px 0;
+  font-size: 14px;
+  font-weight: 400;
+}
+
 .header-bar-mobile {
   display: flex;
   align-items: center;
@@ -364,6 +399,44 @@ main { padding: 0 0 48px; }
   font-size: 14px;
   font-weight: 500;
   text-align: left;
+}
+
+.nav-feature img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 88px;
+  object-fit: cover;
+  object-position: center 18%;
+}
+
+.nav-feature-copy {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  padding: 12px 14px 14px;
+}
+
+.nav-feature-kicker {
+  color: var(--color-primary-blue);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.nav-feature strong {
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.nav-feature-link {
+  color: var(--color-neutral-black);
+  font-size: 14px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
 .dept-tile img {
@@ -1926,28 +1999,101 @@ h1 {
   .text-link svg { width: 18px; height: 18px; }
 
   .primary-nav {
+    position: relative;
     display: flex;
     justify-content: safe center;
     gap: clamp(0px, 0.4vw, 4px);
     max-width: 1280px;
     margin: 0 auto;
-    padding: 0 16px 12px;
-    overflow-x: auto;
-    scrollbar-width: none;
+    padding: 0 16px 0;
+    overflow: visible;
   }
 
-  .primary-nav button {
+  .primary-nav > button,
+  .nav-suits > button {
     border: 0;
     background: transparent;
-    padding: 8px clamp(6px, 0.9vw, 12px);
+    padding: 8px clamp(6px, 0.9vw, 12px) 14px;
     font-size: clamp(13px, 1.1vw, 14px);
     font-weight: 500;
     color: var(--color-neutral-black);
     white-space: nowrap;
   }
 
-  .primary-nav button.is-current {
+  .primary-nav > button.is-current,
+  .nav-suits > button.is-current {
     box-shadow: inset 0 -2px 0 var(--color-primary-blue);
+  }
+
+  .primary-nav > button.is-sale { color: #c41230; }
+
+  .nav-suits { position: static; }
+
+  .mega-menu {
+    position: absolute;
+    top: 100%;
+    left: 16px;
+    right: 16px;
+    z-index: 30;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 280px;
+    background: var(--color-neutral-white);
+    border: 1px solid #e6e6e6;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.12);
+  }
+
+  .mega-columns {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px 24px;
+    padding: 22px 24px 16px;
+  }
+
+  .mega-columns p {
+    margin: 0 0 8px;
+    font-size: 14px;
+    font-weight: 700;
+  }
+
+  .mega-columns button {
+    display: block;
+    width: 100%;
+    border: 0;
+    background: transparent;
+    padding: 4px 0;
+    color: var(--color-neutral-black);
+    font-size: 14px;
+    font-weight: 400;
+    text-align: left;
+    white-space: normal;
+  }
+
+  .mega-columns button:hover,
+  .mega-all:hover { text-decoration: underline; }
+
+  .mega-all {
+    grid-column: 1 / -1;
+    margin-top: 8px;
+    padding-top: 14px;
+    border-top: 1px solid #ececec;
+    font-weight: 600;
+  }
+
+  .mega-menu .nav-feature {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    margin: 16px 16px 16px 0;
+    padding: 0;
+    border: 0;
+    background: #f6f8fb;
+    color: var(--color-neutral-black);
+    text-align: left;
+    white-space: normal;
+  }
+
+  .mega-menu .nav-feature img {
+    height: 168px;
   }
 
   .listing-head,
