@@ -60,10 +60,15 @@ export function getBudgetRange(budget) {
   return ranges[budget] ?? [0, Infinity];
 }
 
+// Fit issues are asked on two screens (jackets, then pants). Both feed the same signals.
+function fitIssueValues(answers) {
+  return [...(answers.fitIssues ?? []), ...(answers.pantsFit ?? [])].filter((issue) => issue !== "none");
+}
+
 export function isLowConfidence(answers) {
   const measurements = answers.measurements ?? {};
   const knownNumbers = [measurements.jacket, measurements.chest, measurements.waist].filter(Boolean);
-  const issues = (answers.fitIssues ?? []).filter((issue) => issue !== "none");
+  const issues = fitIssueValues(answers);
 
   if (answers.measurementKnowledge === "yes" || answers.measurementKnowledge === "some") {
     return knownNumbers.length === 0;
@@ -148,7 +153,7 @@ export function parseHeight(raw) {
 }
 
 export function getFitSignals(answers) {
-  const signals = new Set((answers.fitIssues ?? []).filter((issue) => issue !== "none"));
+  const signals = new Set(fitIssueValues(answers));
   const chest = parseJacket(answers.measurements?.jacket)?.chest || Number(answers.measurements?.chest);
   const waist = Number(answers.measurements?.waist);
   if (chest && waist) {

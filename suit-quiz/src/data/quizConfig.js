@@ -91,7 +91,7 @@ export const questions = {
   },
   fitIssues: {
     id: "fitIssues",
-    title: "Where do suits usually feel off?",
+    title: "Where do jackets usually feel off?",
     help: "Select all that apply. Each answer changes the cut or the size we start you with.",
     type: "multi",
     skippable: true,
@@ -103,24 +103,10 @@ export const questions = {
         detail: "Tight when I reach forward or cross my arms",
       },
       {
-        value: "athleticBuild",
-        icon: "/icons/mw/athletic.png",
-        label: "Jackets fit my chest, but pants gap at the waist",
-        detail: "A broad chest with a trimmer waist",
-        excludes: ["fullerMidsection"],
-      },
-      {
         value: "fullerMidsection",
         icon: "/icons/mw/tight-button.png",
         label: "Jackets pull at the button, or pants pinch at the waist",
         detail: "I need more room through the middle",
-        excludes: ["athleticBuild"],
-      },
-      {
-        value: "seatThighs",
-        icon: "/icons/mw/baggy-pants.png",
-        label: "Pants are tight through the seat or thighs",
-        detail: "Snug when I sit, take stairs, or crouch",
       },
       {
         value: "runsLong",
@@ -136,7 +122,27 @@ export const questions = {
         detail: "My wrists show, or the jacket sits high",
         excludes: ["runsLong"],
       },
-      { value: "none", label: "Standard sizes usually fit me", detail: "Nothing in particular comes up", exclusive: true, icon: "/icons/mw/straight.png" },
+    ],
+  },
+  pantsFit: {
+    id: "pantsFit",
+    title: "Where do pants usually feel off?",
+    help: "Select all that apply. Each answer changes the cut or the size we start you with.",
+    type: "multi",
+    skippable: true,
+    options: [
+      {
+        value: "athleticBuild",
+        icon: "/icons/mw/athletic.png",
+        label: "Jackets fit my chest, but pants gap at the waist",
+        detail: "A broad chest with a trimmer waist",
+      },
+      {
+        value: "seatThighs",
+        icon: "/icons/mw/baggy-pants.png",
+        label: "Pants are tight through the seat or thighs",
+        detail: "Snug when I sit, take stairs, or crouch",
+      },
     ],
   },
   everydaySizes: {
@@ -203,10 +209,10 @@ export function getQuestionFlow(answers) {
     : ["mode", "occasion", "feel", "colors", "measurementKnowledge"];
   const end = renting ? ["rentalBudget"] : ["tailoring", "budget"];
   if (answers.measurementKnowledge === "yes" || answers.measurementKnowledge === "some") {
-    return [...start, "measurements", "fitIssues", ...end];
+    return [...start, "measurements", "fitIssues", "pantsFit", ...end];
   }
   if (answers.measurementKnowledge === "no") {
-    return [...start, "everydaySizes", "fitIssues", ...end];
+    return [...start, "everydaySizes", "fitIssues", "pantsFit", ...end];
   }
   return start;
 }

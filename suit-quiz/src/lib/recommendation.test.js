@@ -29,6 +29,15 @@ const baseAnswers = {
   budget: "250-400",
 };
 
+describe("fit issue screens", () => {
+  it("counts pants answers alongside jacket answers", () => {
+    const signals = getFitSignals({ fitIssues: ["runsLong"], pantsFit: ["seatThighs", "none"] });
+    expect(signals.has("runsLong")).toBe(true);
+    expect(signals.has("seatThighs")).toBe(true);
+    expect(signals.has("none")).toBe(false);
+  });
+});
+
 describe("quiz routing", () => {
   it("routes known measurements through the short path", () => {
     expect(getQuestionFlow({ measurementKnowledge: "yes" })).toEqual([
@@ -39,6 +48,7 @@ describe("quiz routing", () => {
       "measurementKnowledge",
       "measurements",
       "fitIssues",
+      "pantsFit",
       "tailoring",
       "budget",
     ]);
@@ -51,6 +61,7 @@ describe("quiz routing", () => {
     const estimate = getQuestionFlow({ measurementKnowledge: "no" });
     expect(estimate).not.toContain("height");
     expect(estimate.indexOf("fitIssues")).toBe(estimate.indexOf("everydaySizes") + 1);
+    expect(estimate.indexOf("pantsFit")).toBe(estimate.indexOf("fitIssues") + 1);
     expect(getQuestionFlow({ mode: "rent", measurementKnowledge: "no" })).not.toContain("height");
     expect(getQuestionFlow({ mode: "rent", measurementKnowledge: "yes" })).not.toContain("height");
   });
@@ -64,6 +75,7 @@ describe("quiz routing", () => {
       "measurementKnowledge",
       "everydaySizes",
       "fitIssues",
+      "pantsFit",
       "tailoring",
       "budget",
     ]);
