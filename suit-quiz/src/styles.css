@@ -1844,10 +1844,7 @@ h2 {
 
 .intro-modal {
   animation: intro-rise 260ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
-  background:
-    radial-gradient(ellipse 60% 45% at 72% 12%, rgba(255, 255, 255, 0.95), transparent 70%),
-    radial-gradient(ellipse 70% 60% at 8% 100%, #e4eefc, transparent 70%),
-    linear-gradient(165deg, #edebe8 0%, #f6f5f3 45%, #eef3fb 100%);
+  background: linear-gradient(0deg, rgba(255, 255, 255, 0.88), rgba(255, 255, 255, 0.88)), url("/quiz/quiz-fabric.png") center / cover no-repeat, #ffffff;
   border-radius: 16px;
   box-shadow: 0 24px 64px rgba(0, 20, 60, 0.16), 0 2px 8px rgba(0, 20, 60, 0.06);
   color: var(--color-font-black);
@@ -1927,7 +1924,6 @@ h2 {
 }
 
 .intro-modal:has(.quiz-slide) {
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.96) 0%, rgba(238, 243, 251, 0.94) 100%);
   max-height: calc(100vh - 48px);
   max-width: 1728px;
 }
@@ -2071,12 +2067,9 @@ h2 {
   }
 
   .intro-modal {
+    background: linear-gradient(0deg, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.8)), url("/quiz/quiz-fabric.png") center / cover no-repeat, #f7f9fd;
     border-radius: 0;
     min-height: 100%;
-  }
-
-  .intro-backdrop:has(.quiz-slide) {
-    background: linear-gradient(0deg, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.8)), #f7f9fd;
   }
 
   .quiz-slide {
