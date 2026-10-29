@@ -716,21 +716,17 @@ export default function App() {
             ? () => setState((previous) => ({ ...previous, screen: "results" }))
             : undefined}
         />
-        {screen === "intro" && (
+        {(screen === "intro" || screen === "question") && (
           <IntroModal
+            key="quiz-modal"
             onStart={startQuiz}
-            onResume={hasSavedProgress ? resumeQuiz : undefined}
-            onClose={closeIntro}
-          />
-        )}
-        {screen === "question" && (
-          <IntroModal
-            onBack={goBack}
-            onClose={saveAndExit}
-            progress={totalQuestions > 0 ? (currentIndex + 1) / totalQuestions : 0}
-            labelledBy="question-title"
+            onResume={screen === "intro" && hasSavedProgress ? resumeQuiz : undefined}
+            onBack={screen === "question" ? goBack : undefined}
+            onClose={screen === "question" ? saveAndExit : closeIntro}
+            progress={screen === "question" && totalQuestions > 0 ? (currentIndex + 1) / totalQuestions : undefined}
+            labelledBy={screen === "question" ? "question-title" : "intro-title"}
           >
-            {questionSlide}
+            {screen === "question" ? questionSlide : undefined}
           </IntroModal>
         )}
       </>

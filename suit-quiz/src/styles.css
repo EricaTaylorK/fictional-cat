@@ -1919,8 +1919,8 @@ h2 {
   width: 100%;
 }
 
-.intro-backdrop:has(.quiz-slide) {
-  background: rgba(255, 255, 255, 0.88);
+.intro-modal:focus {
+  outline: none;
 }
 
 .intro-modal:has(.quiz-slide) {

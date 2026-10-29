@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useLayoutEffect, useRef } from "react";
 
 const INK = "#1b1c20";
 const SOFT = "#c9d9f2";
@@ -79,20 +79,32 @@ function SparkleIcon() {
 export default function IntroModal({ onStart, onResume, onClose, onBack, progress, children, labelledBy = "intro-title" }) {
   const dialogRef = useRef(null);
   const startRef = useRef(null);
+  const onCloseRef = useRef(onClose);
+  onCloseRef.current = onClose;
+  const showingQuestion = Boolean(children);
+
+  useLayoutEffect(() => {
+    if (showingQuestion) {
+      dialogRef.current?.focus({ preventScroll: true });
+      return;
+    }
+    startRef.current?.focus({ preventScroll: true });
+  }, [showingQuestion]);
 
   useEffect(() => {
-    if (!children) startRef.current?.focus();
     const { overflow } = document.body.style;
     document.body.style.overflow = "hidden";
 
     function handleKey(event) {
-      if (event.key === "Escape") onClose();
+      if (event.key === "Escape") onCloseRef.current();
       if (event.key !== "Tab") return;
-      const focusable = dialogRef.current?.querySelectorAll("button, input, select, textarea");
-      if (!focusable?.length) return;
+      const dialog = dialogRef.current;
+      const focusable = dialog?.querySelectorAll("button, input, select, textarea");
+      if (!dialog || !focusable?.length) return;
       const first = focusable[0];
       const last = focusable[focusable.length - 1];
-      if (event.shiftKey && document.activeElement === first) {
+      const atStart = document.activeElement === first || document.activeElement === dialog;
+      if (event.shiftKey && atStart) {
         event.preventDefault();
         last.focus();
       } else if (!event.shiftKey && document.activeElement === last) {
@@ -106,11 +118,11 @@ export default function IntroModal({ onStart, onResume, onClose, onBack, progres
       document.body.style.overflow = overflow;
       document.removeEventListener("keydown", handleKey);
     };
-  }, [onClose, children]);
+  }, []);
 
   return (
     <div className="intro-backdrop" onClick={(event) => event.target === event.currentTarget && onClose()}>
-      <div className="intro-modal" role="dialog" aria-modal="true" aria-labelledby={labelledBy} ref={dialogRef}>
+      <div className="intro-modal" role="dialog" aria-modal="true" aria-labelledby={labelledBy} tabIndex={-1} ref={dialogRef}>
         <header className="intro-header">
           {onBack ? (
             <button className="intro-back" type="button" onClick={onBack}>
