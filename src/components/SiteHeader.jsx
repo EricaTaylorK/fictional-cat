@@ -2,6 +2,7 @@ import { useState } from "react";
 
 const NAV = [
   "Suits",
+  "Suit Finder",
   "Sport Coats",
   "Dress Shirts",
   "Casual Tops & Jackets",
@@ -13,25 +14,43 @@ const NAV = [
   "Rental",
 ];
 
-export default function SiteHeader({ search, onSearch, onNavigate }) {
+export default function SiteHeader({ search, onSearch, onNavigate, onTakeQuiz, current }) {
   const [searchOpen, setSearchOpen] = useState(Boolean(search));
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  function choose(item) {
+    setMenuOpen(false);
+    if (item === "Suit Finder") {
+      onTakeQuiz?.();
+      return;
+    }
+    if (item === "Suits" || item === "Sale") onNavigate?.("sale");
+    if (item === "Rental") onNavigate?.("look");
+  }
 
   return (
     <header className="site-header">
       <div className="promo">
         <p>
           New markdowns — clearance up to 70% off original prices |{" "}
-          <a href="#sale">Shop now &gt;</a>
+          <button type="button" className="promo-link" onClick={() => onNavigate?.("sale")}>Shop now &gt;</button>
         </p>
       </div>
 
       <div className="header-bar header-bar-mobile">
-        <button type="button" className="icon-btn" aria-label="Open menu">
+        <button
+          type="button"
+          className="icon-btn"
+          aria-label={menuOpen ? "Close menu" : "Open menu"}
+          aria-expanded={menuOpen}
+          aria-controls="site-menu"
+          onClick={() => setMenuOpen((open) => !open)}
+        >
           <MenuIcon />
         </button>
-        <a className="logo" href="#sale" aria-label="Men's Wearhouse">
+        <button className="logo" type="button" aria-label="Men's Wearhouse home" onClick={() => { setMenuOpen(false); onNavigate?.("home"); }}>
           <img src="/mw-logo.svg" alt="" />
-        </a>
+        </button>
         <div className="header-icons">
           <button
             type="button"
@@ -48,11 +67,26 @@ export default function SiteHeader({ search, onSearch, onNavigate }) {
         </div>
       </div>
 
+      {menuOpen && (
+        <nav className="mobile-nav" id="site-menu" aria-label="Departments">
+          {NAV.map((item) => (
+            <button
+              key={item}
+              type="button"
+              className={item === current ? "is-current" : undefined}
+              onClick={() => choose(item)}
+            >
+              {item}
+            </button>
+          ))}
+        </nav>
+      )}
+
       <div className="header-desktop">
         <div className="header-utility">
-          <a className="logo" href="#sale" aria-label="Men's Wearhouse">
+          <button className="logo" type="button" aria-label="Men's Wearhouse home" onClick={() => onNavigate?.("home")}>
             <img src="/mw-logo.svg" alt="" />
-          </a>
+          </button>
           <form className="header-search" role="search" onSubmit={(event) => event.preventDefault()}>
             <SearchIcon />
             <input
@@ -82,11 +116,8 @@ export default function SiteHeader({ search, onSearch, onNavigate }) {
             <button
               key={item}
               type="button"
-              className={item === "Sale" ? "is-current" : undefined}
-              onClick={() => {
-                if (item === "Rental") onNavigate?.("look");
-                if (item === "Sale") onNavigate?.("sale");
-              }}
+              className={item === current ? "is-current" : undefined}
+              onClick={() => choose(item)}
             >
               {item}
             </button>

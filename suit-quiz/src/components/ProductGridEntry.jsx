@@ -4,8 +4,10 @@ import SalePage from "../../../src/SalePage.jsx";
 import pgpCss from "../../../src/style.css?inline";
 
 export default function ProductGridEntry({
+  view = "sale",
   onTakeQuiz,
   onBackToQuiz,
+  onNavigate,
   initialFilters,
   quizMatchIds,
   title = "All Suits",
@@ -15,8 +17,10 @@ export default function ProductGridEntry({
   const rootRef = useRef(null);
   const onTakeQuizRef = useRef(onTakeQuiz);
   const onBackRef = useRef(onBackToQuiz);
+  const onNavigateRef = useRef(onNavigate);
   onTakeQuizRef.current = onTakeQuiz;
   onBackRef.current = onBackToQuiz;
+  onNavigateRef.current = onNavigate;
 
   useEffect(() => {
     const host = hostRef.current;
@@ -39,16 +43,17 @@ export default function ProductGridEntry({
   useEffect(() => {
     rootRef.current?.render(
       <SalePage
+        view={view}
         title={title}
         crumb={crumb}
         initialFilters={initialFilters}
         quizMatchIds={quizMatchIds}
-        onNavigate={() => {}}
+        onNavigate={(next) => onNavigateRef.current?.(next)}
         onTakeQuiz={() => onTakeQuizRef.current()}
         onBackToQuiz={onBackRef.current ? () => onBackRef.current() : undefined}
       />
     );
-  }, [title, crumb, initialFilters, quizMatchIds]);
+  }, [view, title, crumb, initialFilters, quizMatchIds]);
 
   return <div className="pgp-host" ref={hostRef} />;
 }

@@ -22,18 +22,25 @@ function loadProgress() {
       const answers = { ...saved.answers };
       delete answers.rentalBudget;
       const next = { ...saved, answers };
+      const place = next.place === "sale" || next.place === "home"
+        ? next.place
+        : (next.screen === "start" || next.screen === "matches" ? "sale" : "home");
       if (next.currentId === "height") {
-        return { ...next, currentId: stepAfterRetiredHeight(answers) };
+        return { ...next, place, currentId: stepAfterRetiredHeight(answers) };
       }
       if (next.currentId === "rentalBudget" && next.screen === "question") {
-        return { ...next, screen: "matching" };
+        return { ...next, place, screen: "matching" };
       }
-      return next;
+      return { ...next, place };
     }
   } catch {
     // Ignore malformed or unavailable local storage.
   }
-  return { screen: "start", currentId: "mode", answers: {} };
+  return { screen: "home", currentId: "mode", answers: {}, place: "home" };
+}
+
+function leaveQuiz(previous) {
+  return { ...previous, screen: previous.place === "sale" ? "start" : "home" };
 }
 
 function OptionCards({ options, isSelected, onPick, label, compact = false, className = "" }) {
@@ -580,13 +587,13 @@ export default function App() {
   }, [screen, currentId, answers]);
 
   useEffect(() => {
-    const lightPage = screen === "start" || screen === "results";
+    const lightPage = screen === "start" || screen === "home" || screen === "results";
     document.documentElement.classList.toggle("page-white", lightPage);
     return () => document.documentElement.classList.remove("page-white");
   }, [screen]);
 
   function startQuiz() {
-    setState({ screen: "question", currentId: "mode", answers: {} });
+    setState((previous) => ({ ...previous, screen: "question", currentId: "mode", answers: {} }));
   }
 
   function setAnswer(value) {
@@ -617,7 +624,7 @@ export default function App() {
 
   function goBack() {
     if (currentIndex <= 0) {
-      setState((previous) => ({ ...previous, screen: "start" }));
+      setState(leaveQuiz);
       return;
     }
     setState((previous) => ({ ...previous, currentId: flow[currentIndex - 1] }));
@@ -625,12 +632,12 @@ export default function App() {
 
   function restart() {
     localStorage.removeItem(STORAGE_KEY);
-    setState({ screen: "question", currentId: "mode", answers: {} });
+    setState((previous) => ({ screen: "question", currentId: "mode", answers: {}, place: previous.place }));
   }
 
   function saveAndExit() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-    setState((previous) => ({ ...previous, screen: "start" }));
+    setState(leaveQuiz);
   }
 
   function resumeQuiz() {
@@ -648,8 +655,16 @@ export default function App() {
   }
 
   const closeIntro = useCallback(() => {
-    setState((previous) => ({ ...previous, screen: "start" }));
+    setState(leaveQuiz);
   }, []);
+
+  function goHome() {
+    setState((previous) => ({ ...previous, screen: "home", place: "home" }));
+  }
+
+  function goSale() {
+    setState((previous) => ({ ...previous, screen: "start", place: "sale" }));
+  }
 
   const questionSlide = currentQuestion && (
     <section className="quiz-slide" aria-labelledby="question-title">
@@ -730,16 +745,27 @@ export default function App() {
     </section>
   );
 
-  if (screen === "start" || screen === "intro" || screen === "matches" || screen === "question" || screen === "matching") {
+  const view = screen === "home"
+    ? "home"
+    : (screen === "start" || screen === "matches" || state.place === "sale")
+      ? "sale"
+      : "home";
+
+  if (screen === "home" || screen === "start" || screen === "intro" || screen === "matches" || screen === "question" || screen === "matching") {
     return (
       <>
         <ProductGridEntry
-          key={screen === "matches" ? "matches" : "start"}
+          key={screen === "matches" ? "matches" : view}
+          view={view}
           title={screen === "matches" ? "Quiz matches" : "All Suits"}
           crumb={screen === "matches" ? "Quiz matches" : "Suits"}
           initialFilters={screen === "matches" ? listingFilters : undefined}
           quizMatchIds={screen === "matches" ? quizMatchIds : undefined}
           onTakeQuiz={openIntro}
+          onNavigate={(next) => {
+            if (next === "home") goHome();
+            else if (next === "sale" || next === "look") goSale();
+          }}
           onBackToQuiz={screen === "matches"
             ? () => setState((previous) => ({ ...previous, screen: "results" }))
             : undefined}
