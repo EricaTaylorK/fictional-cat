@@ -1031,6 +1031,52 @@ h2 {
   margin-top: var(--spacing-vertical-sm);
 }
 
+.match-why {
+  margin-top: var(--spacing-vertical-md);
+}
+
+.match-percent {
+  color: var(--color-font-black);
+  font-size: var(--font-size-14);
+  font-weight: var(--font-weight-medium);
+  margin: 0;
+}
+
+.why-label {
+  color: var(--text-secondary);
+  font-size: var(--font-size-12);
+  font-weight: var(--font-weight-medium);
+  margin: var(--spacing-vertical-sm) 0 0;
+}
+
+.why-list {
+  list-style: none;
+  margin: var(--spacing-vertical-xs) 0 0;
+  padding: 0;
+}
+
+.why-list li {
+  color: var(--text-secondary);
+  font-size: var(--font-size-14);
+  line-height: var(--line-height-20);
+  padding-left: 18px;
+  position: relative;
+}
+
+.why-list li::before {
+  color: var(--color-background-dark-blue);
+  content: "✓";
+  left: 0;
+  position: absolute;
+}
+
+.match-reason {
+  color: var(--text-secondary);
+  font-size: var(--font-size-14);
+  line-height: var(--line-height-20);
+  margin: var(--spacing-vertical-sm) 0 0;
+}
+
 .option-actions {
   margin-top: var(--spacing-vertical-sm);
 }
@@ -2057,6 +2103,21 @@ h2 {
   width: min(800px, 100%);
 }
 
+.color-picks {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  width: min(1004px, 100%);
+}
+
+.color-pick-label {
+  color: #232323;
+  font-size: 16px;
+  font-weight: 500;
+  margin: 0 0 12px;
+  text-align: center;
+}
+
 .quiz-slide .actions-pair {
   align-items: center;
   display: flex;
@@ -2249,8 +2310,13 @@ h2 {
   .quiz-slide .question-head .helper,
   .quiz-slide .option-copy,
   .quiz-slide .option-copy strong,
-  .quiz-slide .option-copy span {
+  .quiz-slide .option-copy span,
+  .color-pick-label {
     text-align: left;
+  }
+
+  .color-picks {
+    width: 100%;
   }
 
   .quiz-slide .option-cards {

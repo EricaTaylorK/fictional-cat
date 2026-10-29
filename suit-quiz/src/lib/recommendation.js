@@ -377,6 +377,16 @@ function isAdjacentFit(fit, feel) {
   return fit === "balanced" || feel === "balanced";
 }
 
+function colorKeysFor(product) {
+  return [...new Set([product.colorKey, ...(product.variants ?? []).map((item) => item.colorKey)].filter(Boolean))];
+}
+
+function everyColorAvoided(product, avoid) {
+  if (!avoid.length) return false;
+  const keys = colorKeysFor(product);
+  return keys.length > 0 && keys.every((key) => avoid.includes(key));
+}
+
 function matchedColor(product, prefer) {
   if (!prefer.length) return null;
   if (prefer.includes(product.colorKey)) return product.color;
@@ -431,9 +441,12 @@ function scoreProduct(product, answers, index) {
   }
 
   const colorName = matchedColor(product, prefer);
+  const avoid = colorsIn(answers.colors?.avoid);
   if (colorName) {
     score += 20;
     evidence.push(`In ${colorName.toLowerCase()}, a color you picked.`);
+  } else if (everyColorAvoided(product, avoid)) {
+    score -= 20;
   }
 
   return {
@@ -472,6 +485,10 @@ function buildTradeoffs(product, answers) {
   const prefer = colorsIn(answers.colors?.prefer);
   if (prefer.length && !matchedColor(product, prefer)) {
     notes.push(`${product.color} wasn't a color you picked.`);
+  }
+  const avoid = colorsIn(answers.colors?.avoid);
+  if (everyColorAvoided(product, avoid)) {
+    notes.push(`${product.color} is a color you wanted to avoid.`);
   }
   return notes;
 }
@@ -680,9 +697,12 @@ function scoreRental(look, answers, pieces, index) {
     score -= Math.min(18, Math.ceil(Math.abs(total - edge) / 10));
   }
 
+  const avoid = colorsIn(answers.colors?.avoid);
   if (prefer.includes(look.colorKey)) {
     score += 20;
     evidence.push(`In ${look.color.toLowerCase()}, a color you picked.`);
+  } else if (avoid.includes(look.colorKey)) {
+    score -= 20;
   }
 
   if (look.rating != null && look.reviews >= 20) {
@@ -711,7 +731,9 @@ function rentalTradeoffs(look, answers) {
     notes.push("A suit, not a tuxedo. Some black-tie invitations expect a tux.");
   }
   const prefer = colorsIn(answers.colors?.prefer);
+  const avoid = colorsIn(answers.colors?.avoid);
   if (prefer.length && !prefer.includes(look.colorKey)) notes.push(`${look.color} wasn't a color you picked.`);
+  if (avoid.includes(look.colorKey)) notes.push(`${look.color} is a color you wanted to avoid.`);
   if (look.reviews < 20) notes.push(look.reviews ? `Only ${look.reviews} reviews so far.` : "No reviews yet.");
   return notes;
 }

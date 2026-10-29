@@ -129,17 +129,45 @@ function OccasionQuestion({ question, answers, onChange }) {
 
 function ColorQuestion({ mode, value, onChange }) {
   const options = colorThemes(mode);
-  const prefer = (value?.prefer ?? []).filter((item) => options.some((option) => option.value === item));
+  const known = new Set(options.map((option) => option.value));
+  const prefer = (value?.prefer ?? []).filter((item) => known.has(item));
+  const avoid = (value?.avoid ?? []).filter((item) => known.has(item));
 
   return (
-    <OptionCards
-      label="Colors"
-      options={options}
-      isSelected={(theme) => prefer.includes(theme)}
-      onPick={(theme) => onChange({
-        prefer: prefer.includes(theme) ? prefer.filter((item) => item !== theme) : [...prefer, theme],
-      })}
-    />
+    <div className="color-picks">
+      <div className="color-pick-group">
+        <p className="color-pick-label" id="colors-prefer">Colors you'd wear</p>
+        <OptionCards
+          label="Colors you'd wear"
+          options={options}
+          isSelected={(theme) => prefer.includes(theme)}
+          onPick={(theme) => onChange((current) => {
+            const wearing = current?.prefer ?? [];
+            const skipping = (current?.avoid ?? []).filter((item) => item !== theme);
+            return {
+              prefer: wearing.includes(theme) ? wearing.filter((item) => item !== theme) : [...wearing, theme],
+              avoid: skipping,
+            };
+          })}
+        />
+      </div>
+      <div className="color-pick-group">
+        <p className="color-pick-label" id="colors-avoid">Colors to avoid</p>
+        <OptionCards
+          label="Colors to avoid"
+          options={options}
+          isSelected={(theme) => avoid.includes(theme)}
+          onPick={(theme) => onChange((current) => {
+            const wearing = (current?.prefer ?? []).filter((item) => item !== theme);
+            const skipping = current?.avoid ?? [];
+            return {
+              prefer: wearing,
+              avoid: skipping.includes(theme) ? skipping.filter((item) => item !== theme) : [...skipping, theme],
+            };
+          })}
+        />
+      </div>
+    </div>
   );
 }
 
@@ -642,7 +670,17 @@ export default function App() {
           onChange={mergeAnswers}
         />
       ) : currentQuestion.type === "colors" ? (
-        <ColorQuestion mode={answers.mode} value={answers.colors} onChange={setAnswer} />
+        <ColorQuestion
+          mode={answers.mode}
+          value={answers.colors}
+          onChange={(updater) => setState((previous) => ({
+            ...previous,
+            answers: {
+              ...previous.answers,
+              colors: typeof updater === "function" ? updater(previous.answers.colors) : updater,
+            },
+          }))}
+        />
       ) : currentQuestion.type === "date" ? (
         <DateQuestion value={answers.eventDate} onChange={setAnswer} />
       ) : currentQuestion.type === "pieces" ? (

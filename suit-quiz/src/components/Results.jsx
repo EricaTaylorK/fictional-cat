@@ -28,8 +28,11 @@ function variantOptions(product) {
 function defaultVariantIndex(product, answers) {
   const options = variantOptions(product);
   const prefer = colorsIn(answers.colors?.prefer ?? []);
+  const avoid = colorsIn(answers.colors?.avoid ?? []);
   const preferred = options.findIndex((item) => prefer.includes(item.colorKey));
-  return Math.max(0, preferred);
+  if (preferred >= 0) return preferred;
+  const open = options.findIndex((item) => !avoid.includes(item.colorKey));
+  return Math.max(0, open);
 }
 
 function Stars({ value }) {
@@ -100,6 +103,28 @@ function SuitOption({ product, size, isBest, selected, onSelect, shown, options,
             ))}
           </div>
         )}
+        <div className="match-why">
+          {product.matchPercent != null && (
+            <p className="match-percent">{product.matchPercent}% match</p>
+          )}
+          {product.evidence?.length > 0 && (
+            <>
+              <p className="why-label">{renting ? "Why this look" : "Why this suit"}</p>
+              <ul className="why-list">
+                {product.evidence.map((line) => (
+                  <li key={line}>{line}</li>
+                ))}
+              </ul>
+            </>
+          )}
+          {product.matchPercent != null && product.matchPercent < 80 && (
+            <p className="match-reason">
+              {product.tradeoffs?.length
+                ? product.tradeoffs.join(" ")
+                : "A partial match. It lines up on some of your answers, not every one."}
+            </p>
+          )}
+        </div>
         <div className="option-actions">
           <button
             className="button link"

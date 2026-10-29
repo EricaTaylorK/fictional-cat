@@ -361,7 +361,7 @@ describe("recommendations", () => {
     expect(darks[0].id).toBe("navy");
   });
 
-  it("ignores colors to skip from older saved answers", () => {
+  it("ranks a color to avoid below one that was not ruled out", () => {
     const black = {
       id: "black",
       fit: "balanced",
@@ -371,9 +371,11 @@ describe("recommendations", () => {
       price: 300,
       formality: ["wedding"],
     };
-    const ranked = getRecommendations({ ...baseAnswers, colors: { prefer: [], avoid: ["black"] } }, [black]);
-    expect(ranked[0].id).toBe("black");
-    expect(ranked[0].tradeoffs.join(" ")).not.toMatch(/skip/i);
+    const navy = { ...black, id: "navy", color: "Navy", colorKey: "navy" };
+    const ranked = getRecommendations({ ...baseAnswers, colors: { prefer: [], avoid: ["black"] } }, [black, navy]);
+    expect(ranked.map((product) => product.id)).toEqual(["navy", "black"]);
+    expect(ranked[1].tradeoffs.join(" ")).toMatch(/color you wanted to avoid/);
+    expect(ranked[1].matchPercent).toBeLessThan(ranked[0].matchPercent);
     expect(getRentalRecommendations({ mode: "rent", colors: { avoid: ["darks"] } }).length).toBe(rentals.length);
   });
 

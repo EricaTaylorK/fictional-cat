@@ -59,7 +59,7 @@ export const questions = {
   colors: {
     id: "colors",
     title: "Any colors in mind?",
-    help: "Pick a color, or leave it blank.",
+    help: "Pick colors you'd wear, and any you'd rather skip. Leave either blank.",
     type: "colors",
     skippable: true,
     options: [
