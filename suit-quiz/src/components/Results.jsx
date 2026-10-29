@@ -9,7 +9,7 @@ import {
   TAILORING_TURNAROUND,
 } from "../data/products.js";
 import { colorsIn, resolvedOccasion } from "../data/quizConfig.js";
-import { RENTAL_FEE, RENTAL_PIECES, RENTAL_STEPS, RENTAL_TYPE_NAMES } from "../data/rentals.js";
+import { RENTAL_FEE, RENTAL_PACKAGES, RENTAL_STEPS, RENTAL_TYPE_NAMES } from "../data/rentals.js";
 import {
   buildResultSummary,
   describeSize,
@@ -255,13 +255,13 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll }) {
   const [expanded, setExpanded] = useState(false);
   const [variantIndexes, setVariantIndexes] = useState({});
   const [tailoringId, setTailoringId] = useState(null);
-  const [pieceIds, setPieceIds] = useState(answers.pieces ?? []);
   const [handoff, setHandoff] = useState("");
 
   const selected = recommendations.find((product) => product.id === selectedId);
   const size = summary.sizeEstimate;
   const dates = summary.dates;
-  const pieces = RENTAL_PIECES.filter((piece) => pieceIds.includes(piece.id));
+  const pack = RENTAL_PACKAGES.find((item) => item.id === Number(answers.pieces));
+  const pieces = summary.pieces;
   const tailoring = TAILORING_TIERS.find((item) => item.id === tailoringId);
   const savings = !renting && selected?.compareAt ? selected.compareAt - selected.price : 0;
   const rentSubtotal = renting && selected ? rentalTotal(selected, pieces) : 0;
@@ -289,12 +289,6 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll }) {
     ? `A ${RENTAL_TYPE_NAMES[recommendations[0].type].toLowerCase()} for ${summary.occasion}`
     : `A ${summary.fitName} for ${summary.occasion}`;
   const lede = recommendations[0]?.evidence?.[0];
-
-  function togglePiece(id) {
-    setPieceIds((current) => (current.includes(id)
-      ? current.filter((item) => item !== id)
-      : [...current, id]));
-  }
 
   function tryOnSuit() {
     setHandoff("tryon");
@@ -408,22 +402,24 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll }) {
             <section className="card-section" aria-labelledby="pieces-title">
               <h2 id="pieces-title" className="section-title">Included in this look</h2>
               <p className="section-copy">
-                The jacket and pants come with every rental. Add or remove pieces, and the price updates.
+                {pack
+                  ? `Your ${pack.label} includes these pieces.`
+                  : "The jacket and pants come with every rental."}
               </p>
               <div className="piece-list">
-                <label className="piece piece-locked">
+                <div className="piece piece-locked">
                   <input type="checkbox" checked disabled />
                   <img src="/icons/mw/suits-bundle.png" alt="" />
                   <span className="piece-name">Jacket and pants</span>
                   <span className="piece-price">{formatPrice(selected.price)}</span>
-                </label>
-                {RENTAL_PIECES.map((piece) => (
-                  <label className="piece" key={piece.id}>
-                    <input type="checkbox" checked={pieceIds.includes(piece.id)} onChange={() => togglePiece(piece.id)} />
+                </div>
+                {pieces.map((piece) => (
+                  <div className="piece piece-locked" key={piece.id}>
+                    <input type="checkbox" checked disabled />
                     {piece.icon ? <img src={piece.icon} alt="" /> : <span className="piece-icon-blank" aria-hidden="true" />}
                     <span className="piece-name">{piece.label}</span>
-                    <span className="piece-price">+{formatPrice(piece.price)}</span>
-                  </label>
+                    <span className="piece-price">{formatPrice(piece.price)}</span>
+                  </div>
                 ))}
               </div>
             </section>
