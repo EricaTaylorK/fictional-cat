@@ -234,34 +234,27 @@ const WAIST_SIZES = [28, 29, 30, 31, 32, 33, 34, 36, 38, 40, 42, 44, 46, 48];
 const HEIGHT_MIN = 58;
 const HEIGHT_MAX = 84;
 
-function SizeChips({ label, name, options, value, onChange }) {
-  return (
-    <fieldset className="size-group">
-      <legend>{label}</legend>
-      <div className="size-chips">
-        {options.map((option) => (
-          <label className="size-chip" key={option.value}>
-            <input
-              type="radio"
-              name={name}
-              value={option.value}
-              checked={value === option.value}
-              onClick={() => {
-                if (value === option.value) onChange("");
-              }}
-              onChange={() => onChange(option.value)}
-            />
-            <span>{option.label}</span>
-          </label>
-        ))}
-      </div>
-    </fieldset>
-  );
+function estimateGroups(answers) {
+  if (answers.measurementKnowledge === "no") return questions.everydaySizes.groups;
+  const unknown = answers.unknownSizes ?? {};
+  return questions.everydaySizes.groups.filter((group) => (
+    (group.id === "shirt" && unknown.chest) || (group.id === "waist" && unknown.waist)
+  ));
+}
+
+function questionHelp(question, answers) {
+  if (question.id === "everydaySizes" && answers.measurementKnowledge !== "no") {
+    const unknown = answers.unknownSizes ?? {};
+    if (unknown.chest && !unknown.waist) return "You left the jacket blank. A shirt size is enough to estimate the chest.";
+    if (unknown.waist && !unknown.chest) return "You left the pants blank. A jeans waist is enough to estimate them.";
+    return "You left these blank. A shirt size estimates the jacket, and a jeans waist estimates the pants.";
+  }
+  return answers.mode === "rent" && question.rentHelp ? question.rentHelp : question.help;
 }
 
 const MEASUREMENT_FIELDS = [
-  { id: "chest", label: "Jacket chest", sizes: CHEST_SIZES, estimateId: "shirt" },
-  { id: "waist", label: "Pants waist", sizes: WAIST_SIZES, estimateId: "waist" },
+  { id: "chest", label: "Jacket size", sizes: CHEST_SIZES, estimateId: "shirt" },
+  { id: "waist", label: "Pant size", sizes: WAIST_SIZES, estimateId: "waist" },
 ];
 
 function MeasurementsQuestion({
@@ -274,10 +267,6 @@ function MeasurementsQuestion({
   heightValue,
   onHeightChange,
 }) {
-  const estimateGroups = Object.fromEntries(
-    questions.everydaySizes.groups.map((group) => [group.id, group]),
-  );
-
   function writeMeasurements(next) {
     const chest = next.chest ? String(next.chest) : "";
     onChange({
@@ -311,57 +300,46 @@ function MeasurementsQuestion({
 
   return (
     <div className="size-groups">
-      {MEASUREMENT_FIELDS.map((field) => {
-        const unknown = Boolean(unknownSizes[field.id]);
-        const estimate = estimateGroups[field.estimateId];
-        const known = value[field.id] ? String(value[field.id]) : "";
-        return (
-          <fieldset className="size-group" key={field.id}>
-            <legend>{field.label}</legend>
-            <div className="size-chips">
-              {field.sizes.map((size) => {
-                const sizeValue = String(size);
-                const selected = known === sizeValue;
-                return (
-                  <label className="size-chip" key={sizeValue}>
-                    <input
-                      type="radio"
-                      name={field.id}
-                      value={sizeValue}
-                      checked={selected}
-                      onClick={() => {
-                        if (selected) selectKnown(field.id, "");
-                      }}
-                      onChange={() => selectKnown(field.id, sizeValue)}
-                    />
-                    <span>{sizeValue}</span>
-                  </label>
-                );
-              })}
-            </div>
-            <button
-              className={`unknown-size${unknown ? " is-on" : ""}`}
-              type="button"
-              aria-expanded={unknown}
-              aria-controls={`${field.id}-estimate`}
-              onClick={() => toggleUnknown(field.id)}
-            >
-              I don't know this
-            </button>
-            {unknown && (
-              <div className="size-estimate" id={`${field.id}-estimate`}>
-                <SizeChips
-                  label={estimate.label}
-                  name={`estimate-${field.estimateId}`}
-                  value={everydaySizes[field.estimateId] ? String(everydaySizes[field.estimateId]) : ""}
-                  options={estimate.options}
-                  onChange={(next) => onEverydaySizes({ ...everydaySizes, [field.estimateId]: next })}
-                />
+      <div className="size-pair">
+        {MEASUREMENT_FIELDS.map((field) => {
+          const unknown = Boolean(unknownSizes[field.id]);
+          const known = value[field.id] ? String(value[field.id]) : "";
+          return (
+            <fieldset className="size-group" key={field.id}>
+              <legend>{field.label}</legend>
+              <div className="size-chips">
+                {field.sizes.map((size) => {
+                  const sizeValue = String(size);
+                  const selected = known === sizeValue;
+                  return (
+                    <label className="size-chip" key={sizeValue}>
+                      <input
+                        type="radio"
+                        name={field.id}
+                        value={sizeValue}
+                        checked={selected}
+                        onClick={() => {
+                          if (selected) selectKnown(field.id, "");
+                        }}
+                        onChange={() => selectKnown(field.id, sizeValue)}
+                      />
+                      <span>{sizeValue}</span>
+                    </label>
+                  );
+                })}
               </div>
-            )}
-          </fieldset>
-        );
-      })}
+              <button
+                className={`unknown-size${unknown ? " is-on" : ""}`}
+                type="button"
+                aria-pressed={unknown}
+                onClick={() => toggleUnknown(field.id)}
+              >
+                I don't know this
+              </button>
+            </fieldset>
+          );
+        })}
+      </div>
       <fieldset className="size-group">
         <legend>Height</legend>
         <HeightQuestion value={heightValue} onChange={onHeightChange} />
@@ -421,7 +399,7 @@ function HeightQuestion({ value, onChange }) {
   );
 }
 
-function SizesQuestion({ question, value = {}, onChange, heightValue, onHeightChange }) {
+function SizesQuestion({ question, value = {}, onChange, heightValue, onHeightChange, showHeight = true }) {
   return (
     <div className="size-groups">
       {question.groups.map((group) => (
@@ -443,10 +421,12 @@ function SizesQuestion({ question, value = {}, onChange, heightValue, onHeightCh
           </div>
         </fieldset>
       ))}
-      <fieldset className="size-group">
-        <legend>Height</legend>
-        <HeightQuestion value={heightValue} onChange={onHeightChange} />
-      </fieldset>
+      {showHeight && (
+        <fieldset className="size-group">
+          <legend>Height</legend>
+          <HeightQuestion value={heightValue} onChange={onHeightChange} />
+        </fieldset>
+      )}
     </div>
   );
 }
@@ -649,9 +629,7 @@ export default function App() {
         {currentQuestion.icon && <img className="question-icon" src={currentQuestion.icon} alt="" />}
         <div>
           <h2 id="question-title">{currentQuestion.title}</h2>
-          <p className="helper">
-            {answers.mode === "rent" && currentQuestion.rentHelp ? currentQuestion.rentHelp : currentQuestion.help}
-          </p>
+          <p className="helper">{questionHelp(currentQuestion, answers)}</p>
         </div>
       </div>
 
@@ -690,9 +668,10 @@ export default function App() {
         />
       ) : currentQuestion.type === "sizes" ? (
         <SizesQuestion
-          question={currentQuestion}
+          question={{ ...currentQuestion, groups: estimateGroups(answers) }}
           value={answers[currentId]}
           onChange={setAnswer}
+          showHeight={answers.measurementKnowledge === "no"}
           heightValue={answers.height}
           onHeightChange={(height) => mergeAnswers({ height })}
         />

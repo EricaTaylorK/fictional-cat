@@ -266,6 +266,9 @@ describe("recommendations", () => {
       everydaySizes: { shirt: "L" },
     })).toMatchObject({ jacket: "42L", pants: "36W", length: "Long", lengthCode: "L" });
     expect(getQuestionFlow({ measurementKnowledge: "some" })).not.toContain("everydaySizes");
+    expect(getQuestionFlow({ measurementKnowledge: "some", unknownSizes: { chest: true } }).indexOf("everydaySizes"))
+      .toBe(getQuestionFlow({ measurementKnowledge: "some" }).indexOf("measurements") + 1);
+    expect(getQuestionFlow({ measurementKnowledge: "some", unknownSizes: { waist: true } })).toContain("everydaySizes");
     expect(getQuestionFlow({ measurementKnowledge: "no" })).toContain("everydaySizes");
   });
 

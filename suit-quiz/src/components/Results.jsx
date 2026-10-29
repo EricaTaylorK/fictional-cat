@@ -462,8 +462,8 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll }) {
               </h2>
               <p className="section-copy">
                 {answers.tailoring === "skip"
-                  ? `Optional for the ${selected.brand} ${selected.name}. These are the in-store prices if you add it later.`
-                  : `For the ${selected.brand} ${selected.name}. ${summary.tailoring.because}`}
+                  ? `You asked for the ${selected.brand} ${selected.name} on its own. These are the in-store prices if you add it later.`
+                  : `${summary.tailoring.because} You can take it off before checkout.`}
               </p>
               <div className="tier-list" role="radiogroup" aria-labelledby="tailoring-title">
                 {[...TAILORING_TIERS, {

@@ -86,7 +86,7 @@ export const questions = {
   measurements: {
     id: "measurements",
     title: "Share the sizes you know",
-    help: "Fill in any you know. If you don't know a chest or waist size, estimate that one here.",
+    help: "Fill in the ones you know. Mark any you don't, and we'll estimate those on the next step.",
     type: "measurements",
   },
   fitIssues: {
@@ -165,13 +165,12 @@ export const questions = {
   },
   tailoring: {
     id: "tailoring",
-    title: "Want to add tailoring?",
-    help: "Optional. Most people decide in store. Nothing is added to the price unless you choose it.",
+    title: "Should we tailor it to you?",
+    help: "Most men tailor their suit. We'll suggest what yours needs, and you can remove it before checkout.",
     type: "single",
     options: [
-      { value: "skip", label: "Just the suit", detail: "You can add tailoring in store later." },
-      { value: "consider", label: "Show me the options", detail: "We'll list what a hem, sleeves, and shaping cost." },
-      { value: "bundle", label: "Include it in the price", detail: "Adds $55–$199, depending on the work." },
+      { value: "skip", label: "No, just the suit" },
+      { value: "consider", label: "Tell me what you'd suggest" },
     ],
   },
   budget: {
@@ -195,8 +194,10 @@ export function getQuestionFlow(answers) {
     ? ["mode", "occasion", "eventDate", "pieces", "feel", "colors", "measurementKnowledge"]
     : ["mode", "occasion", "feel", "colors", "measurementKnowledge"];
   const end = renting ? [] : ["tailoring", "budget"];
+  const unknown = answers.unknownSizes ?? {};
+  const estimate = unknown.chest || unknown.waist ? ["everydaySizes"] : [];
   if (answers.measurementKnowledge === "yes" || answers.measurementKnowledge === "some") {
-    return [...start, "measurements", "fitIssues", "pantsFit", ...end];
+    return [...start, "measurements", ...estimate, "fitIssues", "pantsFit", ...end];
   }
   if (answers.measurementKnowledge === "no") {
     return [...start, "everydaySizes", "fitIssues", "pantsFit", ...end];
