@@ -2003,12 +2003,25 @@ h2 {
   width: 100%;
 }
 
+.quiz-slide .option-card:not(:has(.option-art)) {
+  justify-content: flex-start;
+}
+
+.quiz-slide .option-card:not(:has(.option-art)) .option-copy {
+  justify-content: flex-start;
+}
+
 .quiz-slide .option-copy strong {
   color: #3a3a3a;
   font-size: 16px;
   font-weight: 500;
   line-height: 1.2;
   text-align: center;
+}
+
+.quiz-slide .option-card:not(:has(.option-art)) .option-copy strong {
+  text-wrap: balance;
+  width: 100%;
 }
 
 .quiz-slide .option-card[aria-pressed="true"] .option-copy strong {
