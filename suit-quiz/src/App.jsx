@@ -151,20 +151,38 @@ function DateQuestion({ value, onChange }) {
         <input type="date" min={todayIso()} value={value ?? ""} onChange={(event) => onChange(event.target.value)} />
       </label>
       {dates && !dates.past && (
-        <ul className="date-plan">
-          <li>
-            <img src="/icons/mw/in-store-pickup.png" alt="" />
-            <span><strong>Ready {formatDate(dates.ready)}</strong> for pickup, or delivered to you</span>
-          </li>
-          <li>
-            <img src="/icons/mw/special-event.png" alt="" />
-            <span><strong>Event {formatDate(dates.event)}</strong></span>
-          </li>
-          <li>
-            <img src="/icons/mw/shipping.png" alt="" />
-            <span><strong>Return {formatDate(dates.returnBy)}</strong> in store or by mail</span>
-          </li>
-        </ul>
+        <div className="date-plan">
+          <p className="date-plan-lead">This date sets the timing: when your look is ready, and when it has to be back.</p>
+          <ol>
+            <li>
+              <span className="date-plan-mark">
+                <img src="/icons/mw/in-store-pickup.png" alt="" />
+              </span>
+              <span className="date-plan-copy">
+                <strong>Ready {formatDate(dates.ready)}</strong>
+                <span>Your look is ready before the event, for pickup or delivered to you.</span>
+              </span>
+            </li>
+            <li>
+              <span className="date-plan-mark">
+                <img src="/icons/mw/special-event.png" alt="" />
+              </span>
+              <span className="date-plan-copy">
+                <strong>Event {formatDate(dates.event)}</strong>
+                <span>The day you wear it.</span>
+              </span>
+            </li>
+            <li>
+              <span className="date-plan-mark">
+                <img src="/icons/mw/shipping.png" alt="" />
+              </span>
+              <span className="date-plan-copy">
+                <strong>Return {formatDate(dates.returnBy)}</strong>
+                <span>It comes back the day after, in store or by mail.</span>
+              </span>
+            </li>
+          </ol>
+        </div>
       )}
       {dates?.tooSoon && (
         <p className="date-warning" role="status">

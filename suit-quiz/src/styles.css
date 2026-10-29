@@ -2346,10 +2346,16 @@ h2 {
   margin: var(--spacing-vertical-xl) 0 var(--spacing-vertical-xl);
 }
 
+.quiz-slide .date-question {
+  justify-items: center;
+  width: min(716px, 100%);
+}
+
 .date-field {
   display: grid;
   gap: var(--spacing-vertical-xs);
   max-width: 320px;
+  width: 100%;
 }
 
 .date-label {
@@ -2370,23 +2376,76 @@ h2 {
   border-radius: var(--border-radius-lg);
   display: grid;
   gap: var(--spacing-vertical-md);
-  list-style: none;
   margin: 0;
   padding: var(--spacing-vertical-lg);
+  text-align: left;
+  width: 100%;
+}
+
+.date-plan-lead {
+  color: var(--color-font-dark-gray);
+  font-size: var(--font-size-14);
+  line-height: var(--line-height-20);
+  margin: 0;
+}
+
+.date-plan ol {
+  display: grid;
+  list-style: none;
+  margin: 0;
+  padding: 0;
 }
 
 .date-plan li {
+  display: grid;
+  gap: var(--spacing-horizontal-md);
+  grid-template-columns: 40px minmax(0, 1fr);
+}
+
+.date-plan-mark {
   align-items: center;
   display: flex;
-  font-size: var(--font-size-14);
-  gap: var(--spacing-horizontal-md);
-  line-height: var(--line-height-20);
+  flex-direction: column;
+}
+
+.date-plan-mark::after {
+  background: var(--color-divider-light-gray);
+  content: "";
+  flex: 1 1 auto;
+  min-height: 16px;
+  width: 2px;
+}
+
+.date-plan li:last-child .date-plan-mark::after {
+  content: none;
 }
 
 .date-plan img {
   flex: 0 0 auto;
   height: 40px;
   width: 40px;
+}
+
+.date-plan-copy {
+  display: grid;
+  gap: 2px;
+  padding: 8px 0 var(--spacing-vertical-md);
+}
+
+.date-plan li:last-child .date-plan-copy {
+  padding-bottom: 0;
+}
+
+.date-plan-copy strong {
+  font-size: var(--font-size-14);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-20);
+}
+
+.date-plan-copy span {
+  color: var(--color-font-dark-gray);
+  font-size: var(--font-size-14);
+  line-height: var(--line-height-20);
 }
 
 .date-warning {
@@ -2400,6 +2459,8 @@ h2 {
 
 .date-question .date-warning {
   margin: 0;
+  text-align: left;
+  width: 100%;
 }
 
 /* Rental pieces */
@@ -2720,5 +2781,14 @@ h2 {
   .fitting-icon {
     height: 48px;
     width: 48px;
+  }
+
+  .quiz-slide .date-question {
+    justify-items: stretch;
+    width: 100%;
+  }
+
+  .date-field {
+    max-width: none;
   }
 }
