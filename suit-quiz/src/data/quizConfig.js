@@ -63,14 +63,14 @@ export const questions = {
     type: "colors",
     skippable: true,
     options: [
-      { value: "navy", label: "Navy", detail: "Navy", colors: ["navy"] },
-      { value: "blue", label: "Blue", detail: "Blue, not navy", colors: ["blue"] },
-      { value: "gray", label: "Gray", detail: "Gray", colors: ["gray"] },
-      { value: "black", label: "Black", detail: "Black", colors: ["black"] },
-      { value: "brownTan", label: "Brown and tan", detail: "Brown and tan", colors: ["brown", "tan"] },
-      { value: "burgundy", label: "Burgundy", detail: "Burgundy", colors: ["burgundy"] },
-      { value: "green", label: "Green", detail: "Green", colors: ["green"] },
-      { value: "white", label: "White", detail: "White and ivory", colors: ["white"] },
+      { value: "navy", label: "Navy", colors: ["navy"] },
+      { value: "blue", label: "Blue", colors: ["blue"] },
+      { value: "gray", label: "Gray", colors: ["gray"] },
+      { value: "black", label: "Black", colors: ["black"] },
+      { value: "brownTan", label: "Brown and tan", colors: ["brown", "tan"] },
+      { value: "burgundy", label: "Burgundy", colors: ["burgundy"] },
+      { value: "green", label: "Green", colors: ["green"] },
+      { value: "white", label: "White", colors: ["white"] },
     ],
   },
   measurementKnowledge: {
@@ -255,15 +255,9 @@ export function colorsIn(values) {
 }
 
 function visibleCopy(option, colors) {
-  if (colors.length === option.colors.length) {
-    return { label: option.label, detail: option.detail };
-  }
-  if (colors.length === 1) {
-    const name = COLOR_NAMES[colors[0]] ?? option.label;
-    return { label: name, detail: colors[0] === "white" ? "White and ivory" : name };
-  }
-  const label = colors.map((key) => COLOR_NAMES[key] ?? key).join(" and ");
-  return { label, detail: label };
+  if (colors.length === option.colors.length) return { label: option.label };
+  if (colors.length === 1) return { label: COLOR_NAMES[colors[0]] ?? option.label };
+  return { label: colors.map((key) => COLOR_NAMES[key] ?? key).join(" and ") };
 }
 
 function catalogColors(mode) {
