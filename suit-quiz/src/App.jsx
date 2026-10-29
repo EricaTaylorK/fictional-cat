@@ -41,15 +41,19 @@ function OptionCards({ options, isSelected, onPick, label }) {
           aria-pressed={isSelected(option.value)}
           onClick={() => onPick(option.value)}
         >
-          {option.swatches ? (
-            <span className="option-palette" aria-hidden="true">
-              {option.swatches.map((swatch) => (
-                <span className={`option-swatch option-swatch-${swatch.key}`} key={swatch.key} style={{ background: swatch.hex }} />
-              ))}
+          {(option.swatches || option.icon) && (
+            <span className="option-art">
+              {option.swatches ? (
+                <span className="option-palette" aria-hidden="true">
+                  {option.swatches.map((swatch) => (
+                    <span className={`option-swatch option-swatch-${swatch.key}`} key={swatch.key} style={{ background: swatch.hex }} />
+                  ))}
+                </span>
+              ) : (
+                <img className="option-icon" src={option.icon} alt="" />
+              )}
             </span>
-          ) : option.icon ? (
-            <img className="option-icon" src={option.icon} alt="" />
-          ) : null}
+          )}
           <span className="option-copy">
             <strong>{option.label}</strong>
             {option.detail && <span>{option.detail}</span>}
