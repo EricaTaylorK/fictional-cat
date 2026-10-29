@@ -11,13 +11,34 @@ export const RENTAL_READY_DAYS = 3;
 export const RENTAL_MIN_LEAD_DAYS = 4;
 
 export const RENTAL_PIECES = [
-  { id: "shirt", label: "Shirt", price: 20, icon: "/icons/mw/tailor-shirt-fit.png" },
+  { id: "shirt", label: "Dress shirt", price: 20, icon: "/icons/mw/tailor-shirt-fit.png" },
   { id: "neckwear", label: "Tie or bow tie", price: 10, icon: "/icons/mw/collar.png" },
   { id: "vest", label: "Vest", price: 30, icon: "/icons/mw/vest.png" },
   { id: "shoes", label: "Shoes", price: 30 },
   { id: "pocketsilk", label: "Pocket square", price: 10 },
   { id: "cufflinks", label: "Cufflinks and studs", price: 8 },
   { id: "suspenders", label: "Suspenders", price: 2.5 },
+];
+
+function packageDetail(pieceIds) {
+  const labels = [
+    "Jacket",
+    "Pants",
+    ...pieceIds.map((id) => RENTAL_PIECES.find((piece) => piece.id === id)?.label).filter(Boolean),
+  ];
+  const words = labels.map((label, index) => (index === 0 ? label : label.toLowerCase()));
+  if (words.length < 2) return words[0] ? `${words[0]}.` : "";
+  if (words.length === 2) return `${words[0]} and ${words[1]}.`;
+  return `${words.slice(0, -1).join(", ")}, and ${words[words.length - 1]}.`;
+}
+
+const SIX_PIECE = ["shirt", "neckwear", "vest", "shoes"];
+const NINE_PIECE = ["shirt", "neckwear", "vest", "shoes", "pocketsilk", "cufflinks", "suspenders"];
+
+export const RENTAL_PACKAGES = [
+  { id: 2, label: "2-piece rental", pieces: [], detail: packageDetail([]) },
+  { id: 6, label: "6-piece rental", pieces: SIX_PIECE, detail: packageDetail(SIX_PIECE) },
+  { id: 9, label: "9-piece rental", pieces: NINE_PIECE, detail: packageDetail(NINE_PIECE) },
 ];
 
 export const FULL_LOOK = ["shirt", "neckwear", "vest", "shoes", "pocketsilk", "cufflinks"];

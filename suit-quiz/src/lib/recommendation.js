@@ -2,6 +2,7 @@ import { colorsIn, questions, resolvedOccasion } from "../data/quizConfig.js";
 import { products, TAILORING_ESTIMATE } from "../data/products.js";
 import {
   RENTAL_MIN_LEAD_DAYS,
+  RENTAL_PACKAGES,
   RENTAL_PIECES,
   RENTAL_READY_DAYS,
   RENTAL_TYPE_NAMES,
@@ -612,8 +613,11 @@ export function rentalDates(eventDate, today = new Date()) {
 }
 
 export function rentalPieces(answers) {
-  const ids = new Set(answers.pieces ?? []);
-  return RENTAL_PIECES.filter((piece) => ids.has(piece.id));
+  const pack = RENTAL_PACKAGES.find((item) => item.id === Number(answers.pieces));
+  if (!pack) return [];
+  return pack.pieces
+    .map((id) => RENTAL_PIECES.find((piece) => piece.id === id))
+    .filter(Boolean);
 }
 
 export function rentalTotal(look, pieces) {

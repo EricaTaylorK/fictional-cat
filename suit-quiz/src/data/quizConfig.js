@@ -53,7 +53,7 @@ export const questions = {
   pieces: {
     id: "pieces",
     title: "What should the look include?",
-    help: "The jacket and pants are always included. Add the pieces you need, or rent the full look.",
+    help: "The rental package decides what's included. A 2-piece is the jacket and pants. A 6-piece and a 9-piece add the dress shirt, shoes, and the other pieces.",
     type: "pieces",
   },
   colors: {
@@ -86,7 +86,7 @@ export const questions = {
   measurements: {
     id: "measurements",
     title: "Share the sizes you know",
-    help: "Fill in any you know and leave the rest. Jacket size is the number and letter on the tag, like 42R.",
+    help: "Fill in any you know. If you don't know a chest or waist size, estimate that one here.",
     type: "measurements",
   },
   fitIssues: {
@@ -190,7 +190,7 @@ export const questions = {
   rentalBudget: {
     id: "rentalBudget",
     title: "What feels comfortable for the rental?",
-    help: "This covers the look and the pieces you picked. The $12 damage and handling fee is added at checkout.",
+    help: "This covers the look and the rental package you picked. The $12 damage and handling fee is added at checkout.",
     type: "single",
     options: [
       { value: "under-150", label: "Under $150" },

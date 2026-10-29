@@ -3,9 +3,9 @@ import IntroModal from "./components/IntroModal.jsx";
 import ProductGridEntry from "./components/ProductGridEntry.jsx";
 import Results from "./components/Results.jsx";
 import TextInput from "./components/TextInput.jsx";
-import { FULL_LOOK, RENTAL_PIECES } from "./data/rentals.js";
+import { RENTAL_PACKAGES } from "./data/rentals.js";
 import { colorThemes, getQuestionFlow, occasionOptions, questions } from "./data/quizConfig.js";
-import { formatDate, formatPrice, quizCatalogIds, quizListingFilters, rentalDates } from "./lib/recommendation.js";
+import { formatDate, quizCatalogIds, quizListingFilters, rentalDates } from "./lib/recommendation.js";
 
 const STORAGE_KEY = "suit-quiz-wireframe-progress";
 
@@ -30,16 +30,21 @@ function loadProgress() {
   return { screen: "start", currentId: "mode", answers: {} };
 }
 
-function OptionCards({ options, isSelected, onPick, label, compact = false }) {
+function OptionCards({ options, isSelected, onPick, label, compact = false, className = "" }) {
+  const classes = ["option-cards", compact && "option-cards-compact", className].filter(Boolean).join(" ");
   return (
-    <div className={`option-cards${compact ? " option-cards-compact" : ""}`} role="group" aria-label={label}>
+    <div className={classes} role="group" aria-label={label}>
       {options.map((option) => (
         <button
           className="option-card"
           type="button"
           key={option.value}
-          aria-pressed={isSelected(option.value)}
-          onClick={() => onPick(option.value)}
+          aria-pressed={option.locked ? true : isSelected(option.value)}
+          aria-disabled={option.locked || undefined}
+          onClick={() => {
+            if (option.locked) return;
+            onPick(option.value);
+          }}
         >
           {(option.swatches || option.icon) && (
             <span className="option-art">
@@ -64,7 +69,7 @@ function OptionCards({ options, isSelected, onPick, label, compact = false }) {
   );
 }
 
-function ChoiceQuestion({ question, value, onChange, onCommit }) {
+function ChoiceQuestion({ question, value, onChange }) {
   const isMulti = question.type === "multi";
   const selectedValues = isMulti ? value ?? [] : [];
 
@@ -74,10 +79,7 @@ function ChoiceQuestion({ question, value, onChange, onCommit }) {
         label={question.title}
         options={question.options}
         isSelected={(optionValue) => value === optionValue}
-        onPick={(optionValue) => {
-          onChange(optionValue);
-          onCommit?.(optionValue);
-        }}
+        onPick={onChange}
       />
     );
   }
@@ -108,14 +110,13 @@ function ChoiceQuestion({ question, value, onChange, onCommit }) {
   );
 }
 
-function OccasionQuestion({ question, answers, onChange, onCommit }) {
+function OccasionQuestion({ question, answers, onChange }) {
   const options = occasionOptions(question, answers);
   return (
     <ChoiceQuestion
       question={{ ...question, options }}
       value={answers.occasion}
       onChange={(occasion) => onChange({ occasion })}
-      onCommit={(occasion) => onCommit?.({ occasion })}
     />
   );
 }
@@ -194,54 +195,19 @@ function DateQuestion({ value, onChange }) {
   );
 }
 
-function PiecesQuestion({ value = [], onChange }) {
-  const fullLook = FULL_LOOK.every((id) => value.includes(id));
-
-  function toggle(id) {
-    onChange(value.includes(id) ? value.filter((item) => item !== id) : [...value, id]);
-  }
-
+function PiecesQuestion({ value, onChange }) {
   return (
-    <div className="pieces-question">
-      <button
-        className={`button secondary full-look${fullLook ? " is-on" : ""}`}
-        type="button"
-        aria-pressed={fullLook}
-        onClick={() => onChange(fullLook ? [] : [...FULL_LOOK])}
-      >
-        {fullLook ? "Full look selected" : "Rent the full look"}
-      </button>
-      <div className="choice-grid">
-        <label className="choice choice-with-icon choice-locked">
-          <input type="checkbox" checked disabled />
-          <img className="choice-icon" src="/icons/mw/suits-bundle.png" alt="" />
-          <span className="choice-copy">
-            <strong>Jacket and pants</strong>
-            <span>Always included, priced with the look</span>
-          </span>
-          <span className="choice-mark choice-mark-multi" aria-hidden="true">
-            <svg viewBox="0 0 16 16" width="14" height="14">
-              <path fill="currentColor" d="M6.3 12.2 1.8 7.7l1.2-1.2 3.3 3.3 6.7-6.7 1.2 1.2-7.9 7.9Z" />
-            </svg>
-          </span>
-        </label>
-        {RENTAL_PIECES.map((piece) => (
-          <label className={`choice${piece.icon ? " choice-with-icon" : ""}`} key={piece.id}>
-            <input type="checkbox" checked={value.includes(piece.id)} onChange={() => toggle(piece.id)} />
-            {piece.icon && <img className="choice-icon" src={piece.icon} alt="" />}
-            <span className="choice-copy">
-              <strong>{piece.label}</strong>
-              <span>+{formatPrice(piece.price)}</span>
-            </span>
-            <span className="choice-mark choice-mark-multi" aria-hidden="true">
-              <svg viewBox="0 0 16 16" width="14" height="14">
-                <path fill="currentColor" d="M6.3 12.2 1.8 7.7l1.2-1.2 3.3 3.3 6.7-6.7 1.2 1.2-7.9 7.9Z" />
-              </svg>
-            </span>
-          </label>
-        ))}
-      </div>
-    </div>
+    <OptionCards
+      label="What should the look include?"
+      options={RENTAL_PACKAGES.map((pack) => ({
+        value: pack.id,
+        label: pack.label,
+        detail: pack.detail,
+        icon: "/icons/mw/suits-bundle.png",
+      }))}
+      isSelected={(id) => Number(value) === id}
+      onPick={onChange}
+    />
   );
 }
 
@@ -275,87 +241,140 @@ function SizeChips({ label, name, options, value, onChange }) {
   );
 }
 
-function MeasurementsQuestion({ value = {}, onChange, onEstimate, heightValue, onHeightChange }) {
-  const chest = value.chest ? String(value.chest) : "";
-  const waist = value.waist ? String(value.waist) : "";
+const MEASUREMENT_FIELDS = [
+  { id: "chest", label: "Jacket chest", sizes: CHEST_SIZES, estimateId: "shirt" },
+  { id: "waist", label: "Pants waist", sizes: WAIST_SIZES, estimateId: "waist" },
+];
 
-  function update(partial) {
-    const next = { ...value, ...partial };
-    const nextChest = next.chest ? String(next.chest) : "";
+function MeasurementsQuestion({
+  value = {},
+  onChange,
+  everydaySizes = {},
+  onEverydaySizes,
+  unknownSizes = {},
+  onUnknownSizes,
+  heightValue,
+  onHeightChange,
+}) {
+  const estimateGroups = Object.fromEntries(
+    questions.everydaySizes.groups.map((group) => [group.id, group]),
+  );
+
+  function writeMeasurements(next) {
+    const chest = next.chest ? String(next.chest) : "";
     onChange({
-      chest: nextChest,
+      chest,
       waist: next.waist ? String(next.waist) : "",
-      jacket: nextChest,
+      jacket: chest,
     });
+  }
+
+  function selectKnown(id, nextValue) {
+    const field = MEASUREMENT_FIELDS.find((item) => item.id === id);
+    writeMeasurements({ ...value, [id]: nextValue });
+    if (unknownSizes[id]) onUnknownSizes({ ...unknownSizes, [id]: false });
+    if (everydaySizes[field.estimateId]) {
+      onEverydaySizes({ ...everydaySizes, [field.estimateId]: "" });
+    }
+  }
+
+  function toggleUnknown(id) {
+    const field = MEASUREMENT_FIELDS.find((item) => item.id === id);
+    const nextUnknown = !unknownSizes[id];
+    onUnknownSizes({ ...unknownSizes, [id]: nextUnknown });
+    if (nextUnknown) {
+      writeMeasurements({ ...value, [id]: "" });
+      return;
+    }
+    if (everydaySizes[field.estimateId]) {
+      onEverydaySizes({ ...everydaySizes, [field.estimateId]: "" });
+    }
   }
 
   return (
     <div className="size-groups">
-      <SizeChips
-        label="Jacket chest"
-        name="jacket-chest"
-        value={chest}
-        options={CHEST_SIZES.map((size) => ({ value: String(size), label: String(size) }))}
-        onChange={(next) => update({ chest: next })}
-      />
-      <SizeChips
-        label="Pants waist"
-        name="pants-waist"
-        value={waist}
-        options={WAIST_SIZES.map((size) => ({ value: String(size), label: String(size) }))}
-        onChange={(next) => update({ waist: next })}
-      />
+      {MEASUREMENT_FIELDS.map((field) => {
+        const unknown = Boolean(unknownSizes[field.id]);
+        const estimate = estimateGroups[field.estimateId];
+        const known = value[field.id] ? String(value[field.id]) : "";
+        return (
+          <fieldset className="size-group" key={field.id}>
+            <legend>{field.label}</legend>
+            <div className="size-chips">
+              {field.sizes.map((size) => {
+                const sizeValue = String(size);
+                const selected = known === sizeValue;
+                return (
+                  <label className="size-chip" key={sizeValue}>
+                    <input
+                      type="radio"
+                      name={field.id}
+                      value={sizeValue}
+                      checked={selected}
+                      onClick={() => {
+                        if (selected) selectKnown(field.id, "");
+                      }}
+                      onChange={() => selectKnown(field.id, sizeValue)}
+                    />
+                    <span>{sizeValue}</span>
+                  </label>
+                );
+              })}
+            </div>
+            <button
+              className={`unknown-size${unknown ? " is-on" : ""}`}
+              type="button"
+              aria-expanded={unknown}
+              aria-controls={`${field.id}-estimate`}
+              onClick={() => toggleUnknown(field.id)}
+            >
+              I don't know this
+            </button>
+            {unknown && (
+              <div className="size-estimate" id={`${field.id}-estimate`}>
+                <SizeChips
+                  label={estimate.label}
+                  name={`estimate-${field.estimateId}`}
+                  value={everydaySizes[field.estimateId] ? String(everydaySizes[field.estimateId]) : ""}
+                  options={estimate.options}
+                  onChange={(next) => onEverydaySizes({ ...everydaySizes, [field.estimateId]: next })}
+                />
+              </div>
+            )}
+          </fieldset>
+        );
+      })}
       <fieldset className="size-group">
         <legend>Height</legend>
         <HeightQuestion value={heightValue} onChange={onHeightChange} />
       </fieldset>
-      <button className="text-link estimate-link" type="button" onClick={onEstimate}>
-        I don't know these. Help me estimate.
-      </button>
     </div>
   );
 }
 
-function formatHeight(total) {
-  const feet = Math.floor(total / 12);
-  const inches = total % 12;
-  return `${feet}′ ${inches}″`;
-}
-
 function HeightQuestion({ value, onChange }) {
   const total = Number(value);
-  const set = Number.isFinite(total) && total >= HEIGHT_MIN && total <= HEIGHT_MAX;
-  const feet = set ? Math.floor(total / 12) : "";
-  const inches = set ? total % 12 : "";
+  const valid = Number.isFinite(total) && total >= HEIGHT_MIN && total <= HEIGHT_MAX;
+  const [feet, setFeet] = useState(valid ? String(Math.floor(total / 12)) : "");
+  const [inches, setInches] = useState(valid ? String(total % 12) : "");
 
-  function setTotal(next) {
-    if (!Number.isFinite(next)) return;
-    const clamped = Math.min(HEIGHT_MAX, Math.max(HEIGHT_MIN, Math.round(next)));
-    onChange(clamped);
+  function commit(nextFeet, nextInches) {
+    setFeet(nextFeet);
+    setInches(nextInches);
+    if (nextFeet === "" || nextInches === "") {
+      if (value !== "" && value != null) onChange("");
+      return;
+    }
+    const combined = Number(nextFeet) * 12 + Number(nextInches);
+    if (!Number.isInteger(combined) || combined < HEIGHT_MIN || combined > HEIGHT_MAX) {
+      if (value !== "" && value != null) onChange("");
+      return;
+    }
+    if (combined !== total) onChange(combined);
   }
 
   return (
-    <div className={`height-question${set ? "" : " is-unset"}`}>
-      <p className="height-readout">{set ? formatHeight(total) : "Not set"}</p>
-      <label className="height-slider">
-        <span className="visually-hidden">Height</span>
-        <input
-          type="range"
-          min={HEIGHT_MIN}
-          max={HEIGHT_MAX}
-          step="1"
-          value={set ? total : HEIGHT_MIN}
-          aria-valuemin={HEIGHT_MIN}
-          aria-valuemax={HEIGHT_MAX}
-          aria-valuenow={set ? total : undefined}
-          aria-valuetext={set ? formatHeight(total) : "Not set"}
-          onChange={(event) => setTotal(Number(event.target.value))}
-        />
-      </label>
-      <div className="height-scale" aria-hidden="true">
-        <span>4′ 10″</span>
-        <span>7′ 0″</span>
-      </div>
+    <div className="height-question">
       <div className="height-inputs">
         <label>
           <span>Feet</span>
@@ -365,12 +384,7 @@ function HeightQuestion({ value, onChange }) {
             min="4"
             max="7"
             value={feet}
-            onChange={(event) => {
-              if (event.target.value === "") return;
-              const nextFeet = Number(event.target.value);
-              if (!Number.isFinite(nextFeet)) return;
-              setTotal(nextFeet * 12 + (set ? total % 12 : 0));
-            }}
+            onChange={(event) => commit(event.target.value, inches)}
           />
         </label>
         <label>
@@ -381,12 +395,7 @@ function HeightQuestion({ value, onChange }) {
             min="0"
             max="11"
             value={inches}
-            onChange={(event) => {
-              if (event.target.value === "") return;
-              const nextInches = Number(event.target.value);
-              if (!Number.isFinite(nextInches)) return;
-              setTotal((set ? Math.floor(total / 12) : 5) * 12 + nextInches);
-            }}
+            onChange={(event) => commit(feet, event.target.value)}
           />
         </label>
       </div>
@@ -434,7 +443,7 @@ const MATCHING_STEPS = {
   rent: [
     "Reading your occasion",
     "Choosing suits or tuxedos for the room",
-    "Pricing the pieces you picked",
+    "Pricing your rental package",
     "Working out your sizes for the fitting",
   ],
 };
@@ -493,7 +502,7 @@ function isAnswered(question, answers) {
   if (question.type === "occasionPlus") {
     return Boolean(answers.occasion);
   }
-  if (question.type === "colors" || question.type === "measurements" || question.type === "pieces" || question.type === "sizes") return true;
+  if (question.type === "colors" || question.type === "measurements" || question.type === "sizes") return true;
   if (question.type === "date") {
     const dates = rentalDates(answer);
     return Boolean(dates && !dates.past);
@@ -529,7 +538,7 @@ export default function App() {
   }, [screen, currentId, answers]);
 
   useEffect(() => {
-    const lightPage = screen === "start" || screen === "matching" || screen === "results";
+    const lightPage = screen === "start" || screen === "results";
     document.documentElement.classList.toggle("page-white", lightPage);
     return () => document.documentElement.classList.remove("page-white");
   }, [screen]);
@@ -554,31 +563,7 @@ export default function App() {
     }));
   }
 
-  function advanceWithAnswer(key, value) {
-    setState((previous) => {
-      const nextAnswers = key === "mode" && previous.answers.mode !== value
-        ? { mode: value }
-        : { ...previous.answers, [key]: value };
-      const nextFlow = getQuestionFlow(nextAnswers);
-      const index = nextFlow.indexOf(previous.currentId);
-      if (index === nextFlow.length - 1) {
-        return { ...previous, answers: nextAnswers, screen: "matching" };
-      }
-      return { ...previous, answers: nextAnswers, currentId: nextFlow[index + 1] };
-    });
-  }
-
   function continueQuiz() {
-    const measurements = answers.measurements ?? {};
-    const hasSize = Boolean(measurements.chest || measurements.waist || measurements.jacket);
-    if (currentId === "measurements" && !hasSize) {
-      setState((previous) => ({
-        ...previous,
-        answers: { ...previous.answers, measurementKnowledge: "no" },
-        currentId: "everydaySizes",
-      }));
-      return;
-    }
     const nextFlow = getQuestionFlow(answers);
     const index = nextFlow.indexOf(currentId);
     if (index === nextFlow.length - 1) {
@@ -641,7 +626,6 @@ export default function App() {
           question={currentQuestion}
           answers={answers}
           onChange={mergeAnswers}
-          onCommit={(partial) => advanceWithAnswer("occasion", partial.occasion)}
         />
       ) : currentQuestion.type === "colors" ? (
         <ColorQuestion mode={answers.mode} value={answers.colors} onChange={setAnswer} />
@@ -653,13 +637,12 @@ export default function App() {
         <MeasurementsQuestion
           value={answers[currentId]}
           onChange={setAnswer}
+          everydaySizes={answers.everydaySizes}
+          onEverydaySizes={(everydaySizes) => mergeAnswers({ everydaySizes })}
+          unknownSizes={answers.unknownSizes}
+          onUnknownSizes={(unknownSizes) => mergeAnswers({ unknownSizes })}
           heightValue={answers.height}
           onHeightChange={(height) => mergeAnswers({ height })}
-          onEstimate={() => setState((previous) => ({
-            ...previous,
-            answers: { ...previous.answers, measurementKnowledge: "no" },
-            currentId: "everydaySizes",
-          }))}
         />
       ) : currentQuestion.type === "sizes" ? (
         <SizesQuestion
@@ -674,37 +657,28 @@ export default function App() {
           question={currentQuestion}
           value={answers[currentId]}
           onChange={setAnswer}
-          onCommit={(value) => advanceWithAnswer(currentId, value)}
         />
       )}
 
-      {currentQuestion.type !== "single" && currentQuestion.type !== "occasionPlus" ? (
-        <div className="actions actions-pair">
-          {currentQuestion.skippable && (
-            <button className="button secondary skip-button" type="button" onClick={continueQuiz}>
-              I'm Not Sure, Skip It
-            </button>
-          )}
-          <button
-            className="button"
-            type="button"
-            disabled={!isAnswered(currentQuestion, answers)}
-            onClick={continueQuiz}
-          >
-            {currentIndex === flow.length - 1 ? "See my results" : "Continue"}
-          </button>
-        </div>
-      ) : (
-        currentQuestion.skippable && (
+      <div className="actions actions-pair">
+        {currentQuestion.skippable && (
           <button className="button secondary skip-button" type="button" onClick={continueQuiz}>
             I'm Not Sure, Skip It
           </button>
-        )
-      )}
+        )}
+        <button
+          className="button"
+          type="button"
+          disabled={!isAnswered(currentQuestion, answers)}
+          onClick={continueQuiz}
+        >
+          {currentIndex === flow.length - 1 ? "See my results" : "Continue"}
+        </button>
+      </div>
     </section>
   );
 
-  if (screen === "start" || screen === "intro" || screen === "matches" || screen === "question") {
+  if (screen === "start" || screen === "intro" || screen === "matches" || screen === "question" || screen === "matching") {
     return (
       <>
         <ProductGridEntry
@@ -718,17 +692,19 @@ export default function App() {
             ? () => setState((previous) => ({ ...previous, screen: "results" }))
             : undefined}
         />
-        {(screen === "intro" || screen === "question") && (
+        {(screen === "intro" || screen === "question" || screen === "matching") && (
           <IntroModal
             key="quiz-modal"
             onStart={startQuiz}
             onResume={screen === "intro" && hasSavedProgress ? resumeQuiz : undefined}
             onBack={screen === "question" ? goBack : undefined}
-            onClose={screen === "question" ? saveAndExit : closeIntro}
-            progress={screen === "question" && totalQuestions > 0 ? (currentIndex + 1) / totalQuestions : undefined}
-            labelledBy={screen === "question" ? "question-title" : "intro-title"}
+            onClose={screen === "question" || screen === "matching" ? saveAndExit : closeIntro}
+            progress={screen === "matching" ? 1 : screen === "question" && totalQuestions > 0 ? (currentIndex + 1) / totalQuestions : undefined}
+            labelledBy={screen === "matching" ? "matching-title" : screen === "question" ? "question-title" : "intro-title"}
           >
-            {screen === "question" ? questionSlide : undefined}
+            {screen === "matching" ? (
+              <MatchingScreen mode={answers.mode} onDone={showResults} />
+            ) : screen === "question" ? questionSlide : undefined}
           </IntroModal>
         )}
       </>
@@ -768,8 +744,6 @@ export default function App() {
         </div>
       </header>
       <main className={`app-shell${screen === "results" ? " app-shell-wide" : ""}`}>
-        {screen === "matching" && <MatchingScreen mode={answers.mode} onDone={showResults} />}
-
         {screen === "results" && (
           <Results
             answers={answers}

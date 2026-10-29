@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { products, SWATCH_HEX, TAILORING_TIERS } from "../data/products.js";
 import { colorThemes, colorsIn, getQuestionFlow } from "../data/quizConfig.js";
-import { RENTAL_PIECES, rentals } from "../data/rentals.js";
+import { rentals } from "../data/rentals.js";
 import {
   buildResultSummary,
   describeSize,
@@ -9,6 +9,7 @@ import {
   getRecommendations,
   getRentalRecommendations,
   rentalDates,
+  rentalPieces,
   rentalTotal,
   getSizeEstimate,
   inferLength,
@@ -99,14 +100,19 @@ describe("rentals", () => {
     feel: "balanced",
     measurementKnowledge: "yes",
     measurements: { jacket: "40", waist: "34" },
-    pieces: ["shirt", "neckwear", "shoes"],
+    pieces: 6,
     rentalBudget: "150-200",
   };
 
-  it("prices each look with the pieces the renter picked", () => {
+  it("prices each look with the pieces in the rental package", () => {
     const look = { price: 139.99 };
-    const pieces = RENTAL_PIECES.filter((piece) => rentAnswers.pieces.includes(piece.id));
-    expect(rentalTotal(look, pieces)).toBe(199.99);
+    const pieces = rentalPieces(rentAnswers);
+    expect(pieces.map((piece) => piece.id)).toEqual(["shirt", "neckwear", "vest", "shoes"]);
+    expect(rentalTotal(look, pieces)).toBe(229.99);
+    expect(rentalPieces({ pieces: 2 })).toEqual([]);
+    expect(rentalPieces({ pieces: 9 }).map((piece) => piece.id)).toEqual([
+      "shirt", "neckwear", "vest", "shoes", "pocketsilk", "cufflinks", "suspenders",
+    ]);
   });
 
   it("keeps in-budget looks first once pieces are added", () => {
@@ -223,6 +229,23 @@ describe("recommendations", () => {
 
   it("splits the size into jacket and pants for the product card", () => {
     expect(getSizeEstimate(baseAnswers)).toEqual({ jacket: "40R", pants: "34W", length: "Regular", lengthCode: "R" });
+  });
+
+  it("keeps jacket and pant length when height is entered in inches", () => {
+    expect(inferLength({ height: 66, measurements: { jacket: "40", waist: "34" } })).toBe("S");
+    expect(getSizeEstimate({
+      measurementKnowledge: "some",
+      height: 70,
+      measurements: { chest: "40", jacket: "40" },
+      everydaySizes: { waist: "32" },
+    })).toMatchObject({ jacket: "40R", pants: "32W", length: "Regular", lengthCode: "R" });
+    expect(getSizeEstimate({
+      measurementKnowledge: "some",
+      height: 74,
+      everydaySizes: { shirt: "L" },
+    })).toMatchObject({ jacket: "42L", pants: "36W", length: "Long", lengthCode: "L" });
+    expect(getQuestionFlow({ measurementKnowledge: "some" })).not.toContain("everydaySizes");
+    expect(getQuestionFlow({ measurementKnowledge: "no" })).toContain("everydaySizes");
   });
 
   it("always gives a jacket and a pants size from everyday sizes", () => {
