@@ -675,9 +675,6 @@ function scoreRental(look, answers, pieces, index) {
   const inBudget = total >= budgetMin && total <= budgetMax;
   if (inBudget) {
     score += 18;
-    if (budgetLabels[answers.rentalBudget]) {
-      evidence.push(`${formatPrice(total)} with your pieces, inside your ${budgetLabels[answers.rentalBudget]}.`);
-    }
   } else if (answers.rentalBudget && answers.rentalBudget !== "flexible") {
     const edge = Math.min(Math.max(total, budgetMin), budgetMax);
     score -= Math.min(18, Math.ceil(Math.abs(total - edge) / 10));
@@ -707,16 +704,11 @@ function scoreRental(look, answers, pieces, index) {
 
 function rentalTradeoffs(look, answers) {
   const notes = [];
-  const [budgetMin, budgetMax] = getBudgetRange(answers.rentalBudget);
   const occasion = resolvedOccasion(answers);
   if (occasion && !look.formality.includes(occasion)) {
     notes.push(`Not the usual choice for ${occasionLabels[answers.occasion]}.`);
   } else if (occasion === "formal" && look.type === "suit") {
     notes.push("A suit, not a tuxedo. Some black-tie invitations expect a tux.");
-  }
-  if (answers.rentalBudget && answers.rentalBudget !== "flexible" && !look.inBudget) {
-    if (look.total > budgetMax) notes.push(`Over your budget by ${formatPrice(look.total - budgetMax)}.`);
-    else if (look.total < budgetMin) notes.push(`Below your ${budgetLabels[answers.rentalBudget]}.`);
   }
   const prefer = colorsIn(answers.colors?.prefer);
   if (prefer.length && !prefer.includes(look.colorKey)) notes.push(`${look.color} wasn't a color you picked.`);
@@ -752,17 +744,13 @@ export function getRentalRecommendations(answers, assortment = rentals) {
   const inBudget = pool.filter((look) => look.inBudget).sort(byScore);
   const overBudget = pool.filter((look) => !look.inBudget).sort(byScore);
   const maxScore = maxRentalScore(answers, pieces);
-  const limitedBudget = answers.rentalBudget && answers.rentalBudget !== "flexible";
-  const budgetMiss = limitedBudget && inBudget.length < 3
-    ? { label: budgetMissLabel(answers.rentalBudget, inBudget.length, "look"), count: inBudget.length }
-    : null;
 
   const result = [...inBudget, ...overBudget].map((look) => ({
     ...look,
     matchPercent: honestPercent(look.score, maxScore),
     tradeoffs: rentalTradeoffs(look, answers),
   }));
-  result.budgetMiss = budgetMiss;
+  result.budgetMiss = null;
   return result;
 }
 

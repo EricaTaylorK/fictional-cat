@@ -187,19 +187,6 @@ export const questions = {
       { value: "flexible", label: "Flexible for the right fit", detail: "Worth it when the suit is right for the moment." },
     ],
   },
-  rentalBudget: {
-    id: "rentalBudget",
-    title: "What feels comfortable for the rental?",
-    help: "This covers the look and the rental package you picked. The $12 damage and handling fee is added at checkout.",
-    type: "single",
-    options: [
-      { value: "under-150", label: "Under $150" },
-      { value: "150-200", label: "$150–$200" },
-      { value: "200-250", label: "$200–$250" },
-      { value: "over-250", label: "$250+" },
-      { value: "flexible", label: "Flexible for the right look" },
-    ],
-  },
 };
 
 export function getQuestionFlow(answers) {
@@ -207,7 +194,7 @@ export function getQuestionFlow(answers) {
   const start = renting
     ? ["mode", "occasion", "eventDate", "pieces", "feel", "colors", "measurementKnowledge"]
     : ["mode", "occasion", "feel", "colors", "measurementKnowledge"];
-  const end = renting ? ["rentalBudget"] : ["tailoring", "budget"];
+  const end = renting ? [] : ["tailoring", "budget"];
   if (answers.measurementKnowledge === "yes" || answers.measurementKnowledge === "some") {
     return [...start, "measurements", "fitIssues", "pantsFit", ...end];
   }

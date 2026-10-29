@@ -82,14 +82,26 @@ describe("quiz routing", () => {
     ]);
   });
 
-  it("sends renters through pieces and an event date, without tailoring or a buying budget", () => {
-    const flow = getQuestionFlow({ mode: "rent", measurementKnowledge: "yes" });
-    expect(flow[0]).toBe("mode");
-    expect(flow).toContain("eventDate");
-    expect(flow).toContain("pieces");
-    expect(flow).toContain("rentalBudget");
-    expect(flow).not.toContain("tailoring");
-    expect(flow).not.toContain("budget");
+  it("sends renters through pieces and an event date, without a rental price or a buying budget", () => {
+    const known = getQuestionFlow({ mode: "rent", measurementKnowledge: "yes" });
+    expect(known).toEqual([
+      "mode",
+      "occasion",
+      "eventDate",
+      "pieces",
+      "feel",
+      "colors",
+      "measurementKnowledge",
+      "measurements",
+      "fitIssues",
+      "pantsFit",
+    ]);
+    const estimate = getQuestionFlow({ mode: "rent", measurementKnowledge: "no" });
+    expect(estimate).not.toContain("rentalBudget");
+    expect(estimate.at(-1)).toBe("pantsFit");
+    expect(estimate).not.toContain("tailoring");
+    expect(estimate).not.toContain("budget");
+    expect(getQuestionFlow({ measurementKnowledge: "yes" })).toContain("budget");
   });
 });
 
@@ -126,6 +138,15 @@ describe("rentals", () => {
   it("favors a tuxedo over a suit for black tie", () => {
     const [best] = getRentalRecommendations({ ...rentAnswers, rentalBudget: "flexible" });
     expect(best.type).not.toBe("suit");
+  });
+
+  it("does not explain a rental match with a budget the shopper picked", () => {
+    const results = getRentalRecommendations(rentAnswers);
+    expect(results.budgetMiss).toBeNull();
+    for (const look of results) {
+      expect(look.evidence.join(" ")).not.toMatch(/budget/i);
+      expect(look.tradeoffs.join(" ")).not.toMatch(/budget/i);
+    }
   });
 
   it("works out ready and return dates, and flags events that are too soon", () => {

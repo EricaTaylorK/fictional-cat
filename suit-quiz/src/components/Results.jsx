@@ -9,7 +9,7 @@ import {
   TAILORING_TURNAROUND,
 } from "../data/products.js";
 import { colorsIn, resolvedOccasion } from "../data/quizConfig.js";
-import { RENTAL_FEE, RENTAL_PACKAGES, RENTAL_STEPS, RENTAL_TYPE_NAMES } from "../data/rentals.js";
+import { RENTAL_PACKAGES, RENTAL_STEPS, RENTAL_TYPE_NAMES } from "../data/rentals.js";
 import {
   buildResultSummary,
   describeSize,
@@ -17,7 +17,6 @@ import {
   formatPrice,
   getRecommendations,
   getRentalRecommendations,
-  rentalTotal,
 } from "../lib/recommendation.js";
 import TextInput from "./TextInput.jsx";
 
@@ -46,8 +45,7 @@ function Stars({ value }) {
   );
 }
 
-function SuitOption({ product, size, isBest, selected, onSelect, shown, options, variantIndex, onVariant, rentPrice, onTryOn }) {
-  const renting = rentPrice != null;
+function SuitOption({ product, size, isBest, selected, onSelect, shown, options, variantIndex, onVariant, renting = false, onTryOn }) {
   return (
     <label className={`suit-option${selected ? " suit-option-selected" : ""}`}>
       <input
@@ -72,13 +70,7 @@ function SuitOption({ product, size, isBest, selected, onSelect, shown, options,
           </p>
         )}
         {renting ? (
-          <>
-            <p className="product-price">
-              <strong>{formatPrice(rentPrice)}</strong>
-              <span className="rent-label">to rent</span>
-            </p>
-            <p className="product-meta">{RENTAL_TYPE_NAMES[product.type]} · Sizes confirmed at your fitting</p>
-          </>
+          <p className="product-meta">{RENTAL_TYPE_NAMES[product.type]} · Sizes confirmed at your fitting</p>
         ) : (
           <>
             <p className="product-price">
@@ -264,16 +256,11 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll }) {
   const pieces = summary.pieces;
   const tailoring = TAILORING_TIERS.find((item) => item.id === tailoringId);
   const savings = !renting && selected?.compareAt ? selected.compareAt - selected.price : 0;
-  const rentSubtotal = renting && selected ? rentalTotal(selected, pieces) : 0;
-  const subtotal = renting
-    ? rentSubtotal + RENTAL_FEE
-    : selected
-      ? (selected.compareAt ?? selected.price) + (tailoring?.price ?? 0)
-      : 0;
+  const subtotal = !renting && selected
+    ? (selected.compareAt ?? selected.price) + (tailoring?.price ?? 0)
+    : 0;
   const total = subtotal - savings;
-  const itemCount = renting
-    ? 2 + pieces.length
-    : selected ? 2 + (tailoring ? 1 : 0) : 0;
+  const itemCount = !renting && selected ? 2 + (tailoring ? 1 : 0) : 0;
   const visibleCount = expanded ? Math.min(recommendations.length, 9) : Math.min(3, recommendations.length);
   const shownRecommendations = recommendations.slice(0, visibleCount);
   const missIndex = recommendations.budgetMiss
@@ -361,7 +348,7 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll }) {
                   shown={shown}
                   options={options}
                   variantIndex={variantIndex}
-                  rentPrice={renting ? rentalTotal(product, pieces) : undefined}
+                  renting={renting}
                   onVariant={(next) => setVariantIndexes((current) => ({ ...current, [product.id]: next }))}
                   onTryOn={tryOnSuit}
                 />
@@ -411,14 +398,12 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll }) {
                   <input type="checkbox" checked disabled />
                   <img src="/icons/mw/suits-bundle.png" alt="" />
                   <span className="piece-name">Jacket and pants</span>
-                  <span className="piece-price">{formatPrice(selected.price)}</span>
                 </div>
                 {pieces.map((piece) => (
                   <div className="piece piece-locked" key={piece.id}>
                     <input type="checkbox" checked disabled />
                     {piece.icon ? <img src={piece.icon} alt="" /> : <span className="piece-icon-blank" aria-hidden="true" />}
                     <span className="piece-name">{piece.label}</span>
-                    <span className="piece-price">{formatPrice(piece.price)}</span>
                   </div>
                 ))}
               </div>
@@ -519,22 +504,21 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll }) {
 
       <aside className="order-summary" aria-labelledby="summary-title">
         <h2 id="summary-title">{renting ? "Rental summary" : "Order summary"}</h2>
-        {!selected && <p className="summary-empty">Select a {noun} to see your total.</p>}
+        {!selected && (
+          <p className="summary-empty">
+            {renting ? "Select a look to see what's included." : `Select a ${noun} to see your total.`}
+          </p>
+        )}
         {selected && renting && (
           <>
             <p className="summary-suit">{selected.brand} {selected.name}</p>
             <ul className="summary-lines">
-              <li><span>Jacket and pants</span><span className="summary-amount">{formatPrice(selected.price)}</span></li>
+              <li><span>Jacket and pants</span></li>
               {pieces.map((piece) => (
                 <li key={piece.id}>
                   <span>{piece.label}</span>
-                  <span className="summary-amount">{formatPrice(piece.price)}</span>
                 </li>
               ))}
-              <li><span>Damage and handling fee</span><span className="summary-amount">{formatPrice(RENTAL_FEE)}</span></li>
-            </ul>
-            <ul className="summary-lines summary-totals">
-              <li className="summary-grand"><span>Total ({itemCount} pieces)</span><span className="summary-amount">{formatPrice(total)}</span></li>
             </ul>
             <p className="summary-note summary-price-note">
               Sizes are confirmed at your fitting.

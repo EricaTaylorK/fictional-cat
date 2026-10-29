@@ -19,10 +19,16 @@ function loadProgress() {
   try {
     const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
     if (saved?.screen && saved?.answers) {
-      if (saved.currentId === "height") {
-        return { ...saved, currentId: stepAfterRetiredHeight(saved.answers) };
+      const answers = { ...saved.answers };
+      delete answers.rentalBudget;
+      const next = { ...saved, answers };
+      if (next.currentId === "height") {
+        return { ...next, currentId: stepAfterRetiredHeight(answers) };
       }
-      return saved;
+      if (next.currentId === "rentalBudget" && next.screen === "question") {
+        return { ...next, screen: "matching" };
+      }
+      return next;
     }
   } catch {
     // Ignore malformed or unavailable local storage.
@@ -443,7 +449,7 @@ const MATCHING_STEPS = {
   rent: [
     "Reading your occasion",
     "Choosing suits or tuxedos for the room",
-    "Pricing your rental package",
+    "Checking the package you picked",
     "Working out your sizes for the fitting",
   ],
 };
@@ -530,11 +536,19 @@ export default function App() {
   }, [state, screen]);
 
   useEffect(() => {
-    if (screen !== "question" || currentId !== "height") return;
-    const nextId = stepAfterRetiredHeight(answers);
-    setState((previous) => (
-      previous.currentId === "height" ? { ...previous, currentId: nextId } : previous
-    ));
+    if (screen !== "question") return;
+    if (currentId === "height") {
+      const nextId = stepAfterRetiredHeight(answers);
+      setState((previous) => (
+        previous.currentId === "height" ? { ...previous, currentId: nextId } : previous
+      ));
+      return;
+    }
+    if (currentId === "rentalBudget") {
+      setState((previous) => (
+        previous.currentId === "rentalBudget" ? { ...previous, screen: "matching" } : previous
+      ));
+    }
   }, [screen, currentId, answers]);
 
   useEffect(() => {
@@ -715,7 +729,9 @@ export default function App() {
     <>
       <p className="promo-banner">
         {screen === "results"
-          ? "Your sizes and today's prices are in your plan below."
+          ? answers.mode === "rent"
+            ? "Your sizes and event timing are in your plan below."
+            : "Your sizes and today's prices are in your plan below."
           : screen === "start"
             ? "Suits are on sale now."
             : "Suits are on sale now. Finish the quiz to see your size and your price."}
