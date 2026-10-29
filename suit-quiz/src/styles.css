@@ -2042,6 +2042,23 @@ h2 {
   width: 80px;
 }
 
+.quiz-slide .option-palette {
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 50%;
+  gap: 0;
+  height: 80px;
+  overflow: hidden;
+  width: 80px;
+}
+
+.quiz-slide .option-swatch {
+  border: 0;
+  border-radius: 0;
+  flex: 1 1 0;
+  height: 100%;
+  width: auto;
+}
+
 .quiz-slide .option-copy {
   align-items: center;
   flex: 0 0 auto;
@@ -2347,7 +2364,8 @@ h2 {
     min-height: 72px;
   }
 
-  .quiz-slide .option-icon {
+  .quiz-slide .option-icon,
+  .quiz-slide .option-palette {
     height: 64px;
     width: 64px;
   }

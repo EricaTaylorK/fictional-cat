@@ -138,43 +138,20 @@ function ColorQuestion({ mode, value, onChange }) {
   const options = colorThemes(mode);
   const known = new Set(options.map((option) => option.value));
   const prefer = (value?.prefer ?? []).filter((item) => known.has(item));
-  const avoid = (value?.avoid ?? []).filter((item) => known.has(item));
 
   return (
-    <div className="color-picks">
-      <div className="color-pick-group">
-        <p className="color-pick-label" id="colors-prefer">Colors you'd wear</p>
-        <OptionCards
-          label="Colors you'd wear"
-          options={options}
-          isSelected={(theme) => prefer.includes(theme)}
-          onPick={(theme) => onChange((current) => {
-            const wearing = current?.prefer ?? [];
-            const skipping = (current?.avoid ?? []).filter((item) => item !== theme);
-            return {
-              prefer: wearing.includes(theme) ? wearing.filter((item) => item !== theme) : [...wearing, theme],
-              avoid: skipping,
-            };
-          })}
-        />
-      </div>
-      <div className="color-pick-group">
-        <p className="color-pick-label" id="colors-avoid">Colors to avoid</p>
-        <OptionCards
-          label="Colors to avoid"
-          options={options}
-          isSelected={(theme) => avoid.includes(theme)}
-          onPick={(theme) => onChange((current) => {
-            const wearing = (current?.prefer ?? []).filter((item) => item !== theme);
-            const skipping = current?.avoid ?? [];
-            return {
-              prefer: wearing,
-              avoid: skipping.includes(theme) ? skipping.filter((item) => item !== theme) : [...skipping, theme],
-            };
-          })}
-        />
-      </div>
-    </div>
+    <OptionCards
+      label="Colors you'd wear"
+      options={options}
+      isSelected={(theme) => prefer.includes(theme)}
+      onPick={(theme) => onChange((current) => {
+        const wearing = current?.prefer ?? [];
+        return {
+          prefer: wearing.includes(theme) ? wearing.filter((item) => item !== theme) : [...wearing, theme],
+          avoid: [],
+        };
+      })}
+    />
   );
 }
 
