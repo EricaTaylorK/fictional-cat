@@ -1945,7 +1945,7 @@ h2 {
 }
 
 .quiz-slide .option-cards {
-  align-items: flex-start;
+  align-items: stretch;
   display: flex;
   flex-flow: row wrap;
   gap: 16px;
@@ -2042,6 +2042,28 @@ h2 {
 
 .quiz-slide .skip-button {
   margin-top: 0;
+}
+
+.quiz-slide .option-cards.option-cards-compact {
+  width: min(800px, 100%);
+}
+
+.quiz-slide .actions-pair {
+  align-items: center;
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  margin: 0;
+  width: 100%;
+}
+
+.quiz-slide .actions-pair .button {
+  min-width: 200px;
+  width: auto;
+}
+
+.quiz-slide .actions-pair .skip-button {
+  margin: 0;
 }
 
 .intro-backdrop:has(.option-cards) {
@@ -2227,7 +2249,10 @@ h2 {
   }
 
   .quiz-slide .option-cards {
-    justify-content: flex-start;
+    display: grid;
+    gap: 12px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    justify-content: stretch;
     width: 100%;
   }
 
@@ -2238,11 +2263,39 @@ h2 {
     height: auto;
     max-width: none;
     min-height: 0;
+    padding: 12px;
     width: 100%;
+  }
+
+  .quiz-slide .option-cards .option-card:only-child,
+  .quiz-slide .option-cards:has(> :last-child:nth-child(odd)) .option-card:last-child {
+    grid-column: 1 / -1;
+  }
+
+  .quiz-slide .option-art {
+    min-height: 72px;
+  }
+
+  .quiz-slide .option-icon {
+    height: 64px;
+    width: 64px;
   }
 
   .quiz-slide .option-copy {
     align-items: flex-start;
+  }
+
+  .quiz-slide .option-cards.option-cards-compact {
+    width: 100%;
+  }
+
+  .quiz-slide .actions-pair {
+    flex-direction: column-reverse;
+    gap: 12px;
+  }
+
+  .quiz-slide .actions-pair .button {
+    width: 100%;
   }
 
   .quiz-slide .skip-button {

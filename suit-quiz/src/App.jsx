@@ -30,9 +30,9 @@ function loadProgress() {
   return { screen: "start", currentId: "mode", answers: {} };
 }
 
-function OptionCards({ options, isSelected, onPick, label }) {
+function OptionCards({ options, isSelected, onPick, label, compact = false }) {
   return (
-    <div className="option-cards" role="group" aria-label={label}>
+    <div className={`option-cards${compact ? " option-cards-compact" : ""}`} role="group" aria-label={label}>
       {options.map((option) => (
         <button
           className="option-card"
@@ -98,38 +98,13 @@ function ChoiceQuestion({ question, value, onChange, onCommit }) {
   }
 
   return (
-    <div className={`choice-grid choice-cards${question.options.length <= 3 ? " choice-cards-few" : ""}`}>
-      {question.options.map((option) => {
-        const checked = isMulti ? selectedValues.includes(option.value) : value === option.value;
-        return (
-          <label className={`choice${option.icon ? " choice-with-icon" : ""}`} key={option.value}>
-            <input
-              type={isMulti ? "checkbox" : "radio"}
-              name={question.id}
-              value={option.value}
-              checked={checked}
-              onChange={() => {
-                if (isMulti) toggleMulti(option.value);
-                else {
-                  onChange(option.value);
-                  onCommit?.(option.value);
-                }
-              }}
-            />
-            {option.icon && <img className="choice-icon" src={option.icon} alt="" />}
-            <span className="choice-copy">
-              <strong>{option.label}</strong>
-              {option.detail && <span>{option.detail}</span>}
-            </span>
-            <span className={`choice-mark${isMulti ? " choice-mark-multi" : ""}`} aria-hidden="true">
-              <svg viewBox="0 0 16 16" width="14" height="14">
-                <path fill="currentColor" d="M6.3 12.2 1.8 7.7l1.2-1.2 3.3 3.3 6.7-6.7 1.2 1.2-7.9 7.9Z" />
-              </svg>
-            </span>
-          </label>
-        );
-      })}
-    </div>
+    <OptionCards
+      label={question.title}
+      compact
+      options={question.options}
+      isSelected={(optionValue) => selectedValues.includes(optionValue)}
+      onPick={toggleMulti}
+    />
   );
 }
 
@@ -685,14 +660,13 @@ export default function App() {
         />
       )}
 
-      {currentQuestion.skippable && (
-        <button className="button secondary skip-button" type="button" onClick={continueQuiz}>
-          I'm Not Sure, Skip It
-        </button>
-      )}
-
-      {currentQuestion.type !== "single" && currentQuestion.type !== "occasionPlus" && (
-        <div className="actions actions-end">
+      {currentQuestion.type !== "single" && currentQuestion.type !== "occasionPlus" ? (
+        <div className="actions actions-pair">
+          {currentQuestion.skippable && (
+            <button className="button secondary skip-button" type="button" onClick={continueQuiz}>
+              I'm Not Sure, Skip It
+            </button>
+          )}
           <button
             className="button"
             type="button"
@@ -702,6 +676,12 @@ export default function App() {
             {currentIndex === flow.length - 1 ? "See my results" : "Continue"}
           </button>
         </div>
+      ) : (
+        currentQuestion.skippable && (
+          <button className="button secondary skip-button" type="button" onClick={continueQuiz}>
+            I'm Not Sure, Skip It
+          </button>
+        )
       )}
     </section>
   );

@@ -94,6 +94,7 @@ export const questions = {
     title: "Where do suits usually feel off?",
     help: "Select all that apply. Each answer changes the cut or the size we start you with.",
     type: "multi",
+    skippable: true,
     options: [
       {
         value: "broadShoulders",
