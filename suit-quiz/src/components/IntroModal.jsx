@@ -76,7 +76,7 @@ function SparkleIcon() {
   );
 }
 
-export default function IntroModal({ onStart, onResume, onClose, onBack, progress, children }) {
+export default function IntroModal({ onStart, onResume, onClose, onBack, progress, children, labelledBy = "intro-title" }) {
   const dialogRef = useRef(null);
   const startRef = useRef(null);
 
@@ -110,7 +110,7 @@ export default function IntroModal({ onStart, onResume, onClose, onBack, progres
 
   return (
     <div className="intro-backdrop" onClick={(event) => event.target === event.currentTarget && onClose()}>
-      <div className="intro-modal" role="dialog" aria-modal="true" aria-labelledby="intro-title" ref={dialogRef}>
+      <div className="intro-modal" role="dialog" aria-modal="true" aria-labelledby={labelledBy} ref={dialogRef}>
         <header className="intro-header">
           {onBack ? (
             <button className="intro-back" type="button" onClick={onBack}>

@@ -627,7 +627,82 @@ export default function App() {
     setState((previous) => ({ ...previous, screen: "start" }));
   }, []);
 
-  if (screen === "start" || screen === "intro" || screen === "matches") {
+  const questionSlide = currentQuestion && (
+    <section className="quiz-slide" aria-labelledby="question-title">
+      <div className="question-head">
+        {currentQuestion.icon && <img className="question-icon" src={currentQuestion.icon} alt="" />}
+        <div>
+          <h2 id="question-title">{currentQuestion.title}</h2>
+          <p className="helper">
+            {answers.mode === "rent" && currentQuestion.rentHelp ? currentQuestion.rentHelp : currentQuestion.help}
+          </p>
+        </div>
+      </div>
+
+      {currentQuestion.type === "occasionPlus" ? (
+        <OccasionQuestion
+          question={currentQuestion}
+          answers={answers}
+          onChange={mergeAnswers}
+          onCommit={(partial) => advanceWithAnswer("occasion", partial.occasion)}
+        />
+      ) : currentQuestion.type === "colors" ? (
+        <ColorQuestion mode={answers.mode} value={answers.colors} onChange={setAnswer} />
+      ) : currentQuestion.type === "date" ? (
+        <DateQuestion value={answers.eventDate} onChange={setAnswer} />
+      ) : currentQuestion.type === "pieces" ? (
+        <PiecesQuestion value={answers.pieces} onChange={setAnswer} />
+      ) : currentQuestion.type === "measurements" ? (
+        <MeasurementsQuestion
+          value={answers[currentId]}
+          onChange={setAnswer}
+          heightValue={answers.height}
+          onHeightChange={(height) => mergeAnswers({ height })}
+          onEstimate={() => setState((previous) => ({
+            ...previous,
+            answers: { ...previous.answers, measurementKnowledge: "no" },
+            currentId: "everydaySizes",
+          }))}
+        />
+      ) : currentQuestion.type === "sizes" ? (
+        <SizesQuestion
+          question={currentQuestion}
+          value={answers[currentId]}
+          onChange={setAnswer}
+          heightValue={answers.height}
+          onHeightChange={(height) => mergeAnswers({ height })}
+        />
+      ) : (
+        <ChoiceQuestion
+          question={currentQuestion}
+          value={answers[currentId]}
+          onChange={setAnswer}
+          onCommit={(value) => advanceWithAnswer(currentId, value)}
+        />
+      )}
+
+      {currentQuestion.skippable && (
+        <button className="button secondary skip-button" type="button" onClick={continueQuiz}>
+          I'm Not Sure, Skip It
+        </button>
+      )}
+
+      {currentQuestion.type !== "single" && currentQuestion.type !== "occasionPlus" && (
+        <div className="actions actions-end">
+          <button
+            className="button"
+            type="button"
+            disabled={!isAnswered(currentQuestion, answers)}
+            onClick={continueQuiz}
+          >
+            {currentIndex === flow.length - 1 ? "See my results" : "Continue"}
+          </button>
+        </div>
+      )}
+    </section>
+  );
+
+  if (screen === "start" || screen === "intro" || screen === "matches" || screen === "question") {
     return (
       <>
         <ProductGridEntry
@@ -648,6 +723,16 @@ export default function App() {
             onClose={closeIntro}
           />
         )}
+        {screen === "question" && (
+          <IntroModal
+            onBack={goBack}
+            onClose={saveAndExit}
+            progress={totalQuestions > 0 ? (currentIndex + 1) / totalQuestions : 0}
+            labelledBy="question-title"
+          >
+            {questionSlide}
+          </IntroModal>
+        )}
       </>
     );
   }
@@ -663,12 +748,6 @@ export default function App() {
       </p>
       <header className="site-header">
         <div className="header-slot header-slot-start">
-          {screen === "question" && (
-            <button className="nav-control" type="button" onClick={goBack} aria-label="Back">
-              <ArrowLeftIcon />
-              <span className="nav-label">Back</span>
-            </button>
-          )}
           {screen === "results" && (
             <button
               className="nav-control"
@@ -685,99 +764,12 @@ export default function App() {
           <img src="/mw-logo.svg" alt="" />
         </a>
         <div className="header-slot header-slot-end">
-          {screen === "question" && (
-            <button className="nav-control" type="button" onClick={saveAndExit}>Save and exit</button>
-          )}
           {screen === "results" && (
             <button className="nav-control" type="button" onClick={restart}>Retake quiz</button>
           )}
         </div>
       </header>
       <main className={`app-shell${screen === "results" ? " app-shell-wide" : ""}`}>
-        {screen === "question" && currentQuestion && (
-          <section className="wire-panel" aria-labelledby="question-title">
-            <ol className="quiz-steps" aria-hidden="true">
-              {Array.from({ length: totalQuestions }, (_, index) => (
-                <li className={index <= currentIndex ? "quiz-step-done" : undefined} key={index} />
-              ))}
-            </ol>
-            <div className="progress-row">
-              <span>Question {currentIndex + 1} of {totalQuestions}</span>
-              <span className="save-note">Progress saved on this device</span>
-            </div>
-            <div className="question-head">
-              {currentQuestion.icon && <img className="question-icon" src={currentQuestion.icon} alt="" />}
-              <div>
-                <h2 id="question-title">{currentQuestion.title}</h2>
-                <p className="helper">
-                  {answers.mode === "rent" && currentQuestion.rentHelp ? currentQuestion.rentHelp : currentQuestion.help}
-                </p>
-              </div>
-            </div>
-
-            {currentQuestion.type === "occasionPlus" ? (
-              <OccasionQuestion
-                question={currentQuestion}
-                answers={answers}
-                onChange={mergeAnswers}
-                onCommit={(partial) => advanceWithAnswer("occasion", partial.occasion)}
-              />
-            ) : currentQuestion.type === "colors" ? (
-              <ColorQuestion mode={answers.mode} value={answers.colors} onChange={setAnswer} />
-            ) : currentQuestion.type === "date" ? (
-              <DateQuestion value={answers.eventDate} onChange={setAnswer} />
-            ) : currentQuestion.type === "pieces" ? (
-              <PiecesQuestion value={answers.pieces} onChange={setAnswer} />
-            ) : currentQuestion.type === "measurements" ? (
-              <MeasurementsQuestion
-                value={answers[currentId]}
-                onChange={setAnswer}
-                heightValue={answers.height}
-                onHeightChange={(height) => mergeAnswers({ height })}
-                onEstimate={() => setState((previous) => ({
-                  ...previous,
-                  answers: { ...previous.answers, measurementKnowledge: "no" },
-                  currentId: "everydaySizes",
-                }))}
-              />
-            ) : currentQuestion.type === "sizes" ? (
-              <SizesQuestion
-                question={currentQuestion}
-                value={answers[currentId]}
-                onChange={setAnswer}
-                heightValue={answers.height}
-                onHeightChange={(height) => mergeAnswers({ height })}
-              />
-            ) : (
-              <ChoiceQuestion
-                question={currentQuestion}
-                value={answers[currentId]}
-                onChange={setAnswer}
-                onCommit={(value) => advanceWithAnswer(currentId, value)}
-              />
-            )}
-
-            {currentQuestion.skippable && (
-              <button className="button secondary skip-button" type="button" onClick={continueQuiz}>
-                I'm Not Sure, Skip It
-              </button>
-            )}
-
-            {currentQuestion.type !== "single" && currentQuestion.type !== "occasionPlus" && (
-              <div className="actions actions-end">
-                <button
-                  className="button"
-                  type="button"
-                  disabled={!isAnswered(currentQuestion, answers)}
-                  onClick={continueQuiz}
-                >
-                  {currentIndex === flow.length - 1 ? "See my results" : "Continue"}
-                </button>
-              </div>
-            )}
-          </section>
-        )}
-
         {screen === "matching" && <MatchingScreen mode={answers.mode} onDone={showResults} />}
 
         {screen === "results" && (
