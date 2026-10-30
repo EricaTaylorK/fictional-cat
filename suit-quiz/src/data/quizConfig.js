@@ -183,14 +183,14 @@ export const questions = {
   budget: {
     id: "budget",
     title: "What do you want to spend?",
-    help: "We ask so we can show suits in this range first, and tailoring stays separate if you add it.",
+    help: "We ask so we can show suits in this range first.",
     type: "single",
     options: [
       { value: "under-250", label: "Under $250" },
       { value: "250-400", label: "$250–$400" },
       { value: "400-600", label: "$400–$600" },
       { value: "over-600", label: "$600+" },
-      { value: "flexible", label: "Flexible for the right fit", detail: "I'm willing to spend more if the suit fits." },
+      { value: "flexible", label: "Flexible for the right fit" },
     ],
   },
 };
