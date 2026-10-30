@@ -236,9 +236,9 @@ function estimateGroups(answers) {
 function questionHelp(question, answers) {
   if (question.id === "everydaySizes" && answers.measurementKnowledge !== "no") {
     const unknown = answers.unknownSizes ?? {};
-    if (unknown.chest && !unknown.waist) return "You left the jacket blank. A shirt size is enough to estimate the chest.";
-    if (unknown.waist && !unknown.chest) return "You left the pants blank. A jeans waist is enough to estimate them.";
-    return "You left these blank. A shirt size estimates the jacket, and a jeans waist estimates the pants.";
+    if (unknown.chest && !unknown.waist) return "You left the jacket blank, so a shirt size is enough to estimate the chest.";
+    if (unknown.waist && !unknown.chest) return "You left the pants blank, so a jeans waist is enough to estimate those pants.";
+    return "You left these blank, so a shirt size estimates the jacket and a jeans waist estimates the pants.";
   }
   return answers.mode === "rent" && question.rentHelp ? question.rentHelp : question.help;
 }

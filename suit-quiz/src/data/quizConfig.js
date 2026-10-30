@@ -5,38 +5,38 @@ export const questions = {
   mode: {
     id: "mode",
     title: "Are you buying or renting?",
-    help: "Buying is a suit you keep. Renting is a full look for one event.",
+    help: "Buying is a suit you keep, and renting is a full look for one event.",
     type: "single",
     options: [
-      { value: "buy", label: "Buy a suit", detail: "Yours to keep.", icon: "/icons/mw/shop.png" },
-      { value: "rent", label: "Rent a look", detail: "Suit or tux for one event.", icon: "/icons/mw/suits-bundle.png" },
+      { value: "buy", label: "Buy a suit", detail: "A suit that is yours to keep.", icon: "/icons/mw/shop.png" },
+      { value: "rent", label: "Rent a look", detail: "A suit or tux for one event.", icon: "/icons/mw/suits-bundle.png" },
     ],
   },
   occasion: {
     id: "occasion",
     title: "What's the occasion?",
-    help: "The event is why you're shopping. We'll use it so the suit looks right for the room, not overdone. Every option is a suit you can keep wearing.",
+    help: "We ask so the suit looks right for the room, not overdone, and you can keep wearing it.",
     type: "occasionPlus",
     skippable: true,
-    rentHelp: "This tells us whether you need a suit or a tuxedo.",
+    rentHelp: "We ask because the event decides whether you need a suit or a tuxedo.",
     rentOptions: [
-      { value: "wedding", label: "Wedding", detail: "Your wedding, or someone else's.", icon: "/icons/mw/wedding.png" },
+      { value: "wedding", label: "Wedding", detail: "For you, or for someone you're with.", icon: "/icons/mw/wedding.png" },
       { value: "formal", label: "Black tie", detail: "Galas, formal dinners, and black-tie invitations.", icon: "/icons/mw/special-event.png" },
-      { value: "prom", label: "Prom", detail: "For you, or for someone you're taking. Prom, homecoming, or a school formal.", icon: "/icons/mw/school-event.png" },
+      { value: "prom", label: "Prom", detail: "For you, or for someone you're taking.", icon: "/icons/mw/school-event.png" },
       { value: "special", label: "Special event", detail: "A quinceañera, anniversary, or other celebration.", icon: "/icons/mw/quinceanera.png" },
     ],
     options: [
       { value: "business", label: "Work", detail: "The office, and the meetings that matter.", icon: "/icons/mw/suits-bundle.png" },
-      { value: "wedding", label: "Wedding", detail: "Your wedding, or someone else's.", icon: "/icons/mw/wedding.png" },
-      { value: "funeral", label: "Funeral", detail: "A funeral or memorial. Quiet and appropriate.", icon: "/icons/mw/invitation.png" },
-      { value: "prom", label: "Prom", detail: "For you, or for someone you're taking. Prom, homecoming, or a school formal.", icon: "/icons/mw/school-event.png" },
+      { value: "wedding", label: "Wedding", detail: "For you, or for someone you're with.", icon: "/icons/mw/wedding.png" },
+      { value: "funeral", label: "Funeral", detail: "A quiet funeral or memorial service.", icon: "/icons/mw/invitation.png" },
+      { value: "prom", label: "Prom", detail: "For you, or for someone you're taking.", icon: "/icons/mw/school-event.png" },
       { value: "mixed", label: "More than one event", detail: "Work, a wedding, and other events.", icon: "/icons/mw/special-event.png" },
     ],
   },
   feel: {
     id: "feel",
     title: "How do you like a suit to fit?",
-    help: "This is the cut, not the fabric. The name in parentheses is the fit on the suit, so you can match it on the product page.",
+    help: "We ask about the cut, not the fabric, and the name in parentheses matches the fit on the suit.",
     type: "single",
     options: [
       { value: "close", label: "Close and sharp (Slim fit)", detail: "A trimmer shape, with less room through the body.", icon: "/icons/mw/sharp.png" },
@@ -53,13 +53,13 @@ export const questions = {
   pieces: {
     id: "pieces",
     title: "What should the look include?",
-    help: "A 2-piece is the jacket and pants. A 6-piece and a 9-piece add the shirt, shoes, and the rest.",
+    help: "We ask because a 2-piece is the jacket and pants, while a 6-piece or 9-piece adds the shirt and shoes.",
     type: "pieces",
   },
   colors: {
     id: "colors",
     title: "Any colors in mind?",
-    help: "Pick any you'd wear. Skip this if you're open.",
+    help: "We ask so we can favor the colors you'd wear, and you can skip this if you're open.",
     type: "colors",
     skippable: true,
     options: [
@@ -76,23 +76,23 @@ export const questions = {
   measurementKnowledge: {
     id: "measurementKnowledge",
     title: "Do you know your suit size?",
-    help: "No jacket handy? Choose 'help me estimate' and use your usual shirt and pants sizes. You don't need exact numbers.",
+    help: "We ask so you can share a suit size, or choose help me estimate if no jacket is handy.",
     type: "single",
     options: [
-      { value: "some", label: "I know some of my sizes", detail: "Jacket or pant size. Leave either one blank." },
+      { value: "some", label: "I know some of my sizes", detail: "Jacket or pant size, and either one can be blank." },
       { value: "no", label: "No, help me estimate", detail: "We'll use your shirt size and jeans waist." },
     ],
   },
   measurements: {
     id: "measurements",
     title: "Share the sizes you know",
-    help: "Jacket and pant size, if you know them. Use 'I don't know this' for either one. Short, Regular, or Long comes from your height on the next step.",
+    help: "We ask for the jacket and pant sizes you know, and you can mark either one as I don't know this.",
     type: "measurements",
   },
   fitIssues: {
     id: "fitIssues",
-    title: "Where do jackets usually feel tight or long?",
-    help: "Choose any that apply, or skip this if they usually feel fine. We'll use it to adjust the cut or the starting size.",
+    title: "Where do jackets feel tight or long?",
+    help: "Choose any tight or long spots so we can adjust the cut or starting size, or skip if it feels fine.",
     type: "multi",
     skippable: true,
     options: [
@@ -112,7 +112,7 @@ export const questions = {
         value: "runsLong",
         icon: "/icons/mw/sleeve.png",
         label: "Sleeves and jackets usually run long",
-        detail: "Sleeves cover my shirt cuff, or the jacket covers my seat",
+        detail: "Sleeves cover the cuff, or the jacket covers the seat",
         excludes: ["runsShort"],
       },
       {
@@ -126,8 +126,8 @@ export const questions = {
   },
   pantsFit: {
     id: "pantsFit",
-    title: "Where do pants usually feel tight or loose?",
-    help: "Choose any that apply, or skip this if they usually feel fine. We'll use it to adjust the cut or the starting size.",
+    title: "Where do pants feel tight or loose?",
+    help: "Choose any tight or loose spots so we can adjust the cut or starting size, or skip if it feels fine.",
     type: "multi",
     skippable: true,
     options: [
@@ -148,7 +148,7 @@ export const questions = {
   everydaySizes: {
     id: "everydaySizes",
     title: "What sizes do you usually buy?",
-    help: "Fill in any you know. A shirt size estimates the jacket, and a jeans waist estimates the pants.",
+    help: "We ask for everyday sizes because a shirt size estimates the jacket and a jeans waist estimates the pants.",
     type: "sizes",
     groups: [
       {
@@ -166,14 +166,14 @@ export const questions = {
   height: {
     id: "height",
     title: "How tall are you?",
-    help: "We use height for the length. Under 5'7\" starts at Short, over 6'0\" at Long, and the heights in between at Regular.",
+    help: "We ask for height because it sets the length: under 5'7\" is Short, over 6'0\" is Long, and in between is Regular.",
     type: "height",
     skippable: true,
   },
   tailoring: {
     id: "tailoring",
     title: "Want this suit tailored?",
-    help: "This means hemming the pants or shortening the sleeves, not a shirt or tie. We'll suggest it from your size and fit, and you'll see the price before checkout. You can take it off then.",
+    help: "It's hemming pants or shortening sleeves, not a shirt or tie, and you see the price before checkout and can remove it.",
     type: "single",
     options: [
       { value: "skip", label: "No, just the suit" },
@@ -183,7 +183,7 @@ export const questions = {
   budget: {
     id: "budget",
     title: "What do you want to spend?",
-    help: "This is the suit. Tailoring, if you add it, is separate, and you can remove it before checkout. We'll show this range first.",
+    help: "We ask so we can show suits in this range first, and tailoring stays separate if you add it.",
     type: "single",
     options: [
       { value: "under-250", label: "Under $250" },
