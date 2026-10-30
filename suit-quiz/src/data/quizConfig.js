@@ -204,10 +204,10 @@ export function getQuestionFlow(answers) {
   const unknown = answers.unknownSizes ?? {};
   const estimate = unknown.chest || unknown.waist ? ["everydaySizes"] : [];
   if (answers.measurementKnowledge === "yes" || answers.measurementKnowledge === "some") {
-    return [...start, "measurements", "height", ...estimate, "fitIssues", "pantsFit", ...end];
+    return [...start, "height", "measurements", ...estimate, "fitIssues", "pantsFit", ...end];
   }
   if (answers.measurementKnowledge === "no") {
-    return [...start, "everydaySizes", "height", "fitIssues", "pantsFit", ...end];
+    return [...start, "height", "everydaySizes", "fitIssues", "pantsFit", ...end];
   }
   return start;
 }
