@@ -466,14 +466,6 @@ function MatchingScreen({ mode, onDone }) {
   );
 }
 
-function ArrowLeftIcon() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true">
-      <path fill="currentColor" fillRule="evenodd" d="M9.5 5.5 3 12l6.5 6.5.707-.707L4.914 12.5H21v-1H4.913l5.294-5.293L9.5 5.5Z" clipRule="evenodd" />
-    </svg>
-  );
-}
-
 function isAnswered(question, answers) {
   const answer = answers[question.id];
   if (question.type === "occasionPlus") {
@@ -562,6 +554,14 @@ export default function App() {
   function restart() {
     localStorage.removeItem(STORAGE_KEY);
     setState((previous) => ({ screen: "question", currentId: "mode", answers: {}, place: previous.place }));
+  }
+
+  function editAnswers(questionId) {
+    setState((previous) => {
+      const nextFlow = getQuestionFlow(previous.answers);
+      const currentId = typeof questionId === "string" && nextFlow.includes(questionId) ? questionId : "mode";
+      return { ...previous, screen: "question", currentId };
+    });
   }
 
   function saveAndExit() {
@@ -732,33 +732,19 @@ export default function App() {
             : "Suits are on sale now. Finish the quiz to see your size and your price."}
       </p>
       <header className="site-header">
-        <div className="header-slot header-slot-start">
-          {screen === "results" && (
-            <button
-              className="nav-control"
-              type="button"
-              onClick={() => setState((previous) => ({ ...previous, screen: "question", currentId: "mode" }))}
-              aria-label="Edit answers"
-            >
-              <ArrowLeftIcon />
-              <span className="nav-label">Edit answers</span>
-            </button>
-          )}
-        </div>
+        <div className="header-slot header-slot-start" />
         <a className="logo" href="/" aria-label="Men's Wearhouse">
           <img src="/mw-logo.svg" alt="" />
         </a>
-        <div className="header-slot header-slot-end">
-          {screen === "results" && (
-            <button className="nav-control" type="button" onClick={restart}>Retake quiz</button>
-          )}
-        </div>
+        <div className="header-slot header-slot-end" />
       </header>
       <main className={`app-shell${screen === "results" ? " app-shell-wide" : ""}`}>
         {screen === "results" && (
           <Results
             answers={answers}
             moreMode={moreMode}
+            onEditAnswers={editAnswers}
+            onRestart={restart}
             onSeeAll={() => setState((previous) => ({ ...previous, screen: "matches" }))}
           />
         )}
