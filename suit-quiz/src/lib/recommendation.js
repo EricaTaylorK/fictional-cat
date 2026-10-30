@@ -16,10 +16,10 @@ const occasionLabels = {
   business: "business",
   formal: "a black-tie evening",
   milestone: "a graduation or prom",
-  versatile: "more than one event",
+  versatile: "all-purpose events",
   travel: "travel",
   prom: "prom",
-  mixed: "more than one event",
+  mixed: "all-purpose events",
   special: "a special event",
 };
 

@@ -30,7 +30,7 @@ export const questions = {
       { value: "wedding", label: "Wedding", detail: "For you, or for someone you're with.", icon: "/icons/mw/wedding.png" },
       { value: "funeral", label: "Funeral", detail: "A quiet funeral or memorial service.", icon: "/icons/mw/invitation.png" },
       { value: "prom", label: "Prom", detail: "For you, or for someone you're taking.", icon: "/icons/mw/school-event.png" },
-      { value: "mixed", label: "More than one event", detail: "Work, a wedding, and other events.", icon: "/icons/mw/special-event.png" },
+      { value: "mixed", label: "All-purpose suit", detail: "Work, a wedding, and other events.", icon: "/icons/mw/special-event.png" },
     ],
   },
   feel: {
