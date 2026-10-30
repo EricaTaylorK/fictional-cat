@@ -76,7 +76,7 @@ export const questions = {
   measurementKnowledge: {
     id: "measurementKnowledge",
     title: "Do you know your suit size?",
-    help: "We ask so you can share a suit size, or choose help me estimate if no jacket is handy.",
+    help: "Your suit size, or the shirt and pants you usually buy.",
     type: "single",
     options: [
       { value: "some", label: "I know some of my sizes", detail: "Jacket or pant size, and either one can be blank." },
@@ -86,7 +86,7 @@ export const questions = {
   measurements: {
     id: "measurements",
     title: "Share the sizes you know",
-    help: "We ask for the jacket and pant sizes you know, and you can mark either one as I don't know this.",
+    help: "The jacket and pant sizes you know.",
     type: "measurements",
   },
   fitIssues: {
@@ -148,7 +148,7 @@ export const questions = {
   everydaySizes: {
     id: "everydaySizes",
     title: "What sizes do you usually buy?",
-    help: "We ask for everyday sizes because a shirt size estimates the jacket and a jeans waist estimates the pants.",
+    help: "These stand in for a jacket and pant size.",
     type: "sizes",
     groups: [
       {
