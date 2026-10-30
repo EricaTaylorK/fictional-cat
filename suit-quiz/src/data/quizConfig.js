@@ -173,7 +173,7 @@ export const questions = {
   tailoring: {
     id: "tailoring",
     title: "Want this suit tailored?",
-    help: "It's hemming pants or shortening sleeves, not a shirt or tie, and you see the price before checkout and can remove it.",
+    help: "Most suits look best with some tailoring, and there are plenty of options. We'll suggest what's right for you. The price shows before checkout, and you can remove it.",
     type: "single",
     options: [
       { value: "skip", label: "No, just the suit" },

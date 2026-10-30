@@ -627,7 +627,7 @@ h2 {
 
 .size-pair {
   display: grid;
-  gap: 28px;
+  gap: 16px;
 }
 
 .size-group {
@@ -1956,7 +1956,7 @@ h2 {
   gap: 40px;
   min-height: 0;
   overflow-y: auto;
-  padding: 96px 52px;
+  padding: 96px 48px;
   text-align: center;
   width: 100%;
 }
@@ -1964,7 +1964,7 @@ h2 {
 .quiz-slide .question-head {
   gap: 0;
   margin: 0;
-  width: min(716px, 100%);
+  width: min(720px, 100%);
 }
 
 .quiz-slide .question-head > div {
@@ -2003,7 +2003,7 @@ h2 {
   gap: 16px;
   justify-content: center;
   margin: 0;
-  width: min(1004px, 100%);
+  width: min(1024px, 100%);
 }
 
 .quiz-slide .option-card {
@@ -2013,17 +2013,16 @@ h2 {
   border: 1px solid rgba(0, 0, 0, 0.1);
   border-radius: 8px;
   box-sizing: border-box;
-  flex: 0 0 188px;
+  flex: 1 1 160px;
   gap: 16px;
   height: auto;
   justify-content: center;
+  max-width: 192px;
+  min-height: 208px;
+  min-width: 160px;
   padding: 16px;
   text-align: center;
-  width: 188px;
-}
-
-.quiz-slide .option-card:has(.option-art) {
-  min-height: 208px;
+  width: auto;
 }
 
 .quiz-slide .option-card:hover {
@@ -2041,11 +2040,16 @@ h2 {
   align-self: center;
   display: flex;
   flex: 0 0 auto;
+  height: 80px;
   justify-content: center;
   min-height: 80px;
+  width: 80px;
 }
 
-.quiz-slide .option-icon {
+.quiz-slide .option-icon,
+.quiz-slide .option-icon-slot {
+  display: block;
+  flex: 0 0 auto;
   height: 80px;
   object-fit: contain;
   width: 80px;
@@ -2071,7 +2075,7 @@ h2 {
 .quiz-slide .option-copy {
   align-items: center;
   flex: 0 0 auto;
-  gap: 4px;
+  gap: 8px;
   justify-content: center;
   text-align: center;
   width: 100%;
@@ -2108,6 +2112,10 @@ h2 {
 .quiz-slide .size-groups,
 .quiz-slide .date-question,
 .quiz-slide .pieces-question,
+.quiz-slide .height-question {
+  width: min(1024px, 100%);
+}
+
 .quiz-slide .actions,
 .quiz-slide .skip-button {
   width: 100%;
@@ -2118,21 +2126,21 @@ h2 {
 }
 
 .quiz-slide .option-cards.option-cards-compact {
-  width: min(800px, 100%);
+  width: min(1024px, 100%);
 }
 
 .color-picks {
   display: flex;
   flex-direction: column;
-  gap: 28px;
-  width: min(1004px, 100%);
+  gap: 16px;
+  width: min(1024px, 100%);
 }
 
 .color-pick-label {
   color: #232323;
   font-size: 16px;
   font-weight: 500;
-  margin: 0 0 12px;
+  margin: 0;
   text-align: center;
 }
 
@@ -2159,10 +2167,40 @@ h2 {
 }
 
 .intro-modal .matching {
+  align-items: center;
   background: transparent;
   flex: 1 1 auto;
+  flex-direction: column;
+  gap: 0;
+  justify-content: center;
   min-height: 0;
+  padding: 96px 48px;
   width: 100%;
+}
+
+.intro-modal .matching h1,
+.intro-modal .matching-copy {
+  margin: 0;
+  max-width: 720px;
+  width: min(720px, 100%);
+}
+
+.intro-modal .matching h1 {
+  margin-top: 16px;
+}
+
+.intro-modal .matching-copy {
+  margin-top: 8px;
+}
+
+.intro-modal .matching-scan {
+  margin: 0;
+}
+
+.intro-modal .matching-steps {
+  margin: 40px 0 0;
+  max-width: 720px;
+  width: min(720px, 100%);
 }
 
 .intro-brand {
@@ -2197,7 +2235,7 @@ h2 {
 .intro-header-end {
   align-items: center;
   display: flex;
-  gap: 12px;
+  gap: 16px;
   grid-column: 3;
   justify-self: end;
 }
@@ -2216,9 +2254,9 @@ h2 {
   border-radius: 50%;
   color: var(--color-font-black);
   display: inline-flex;
-  height: 44px;
+  height: 48px;
   justify-content: center;
-  width: 44px;
+  width: 48px;
 }
 
 .intro-close:hover {
@@ -2232,14 +2270,14 @@ h2 {
   flex-direction: column;
   justify-content: center;
   min-height: 0;
-  padding: clamp(40px, 9vh, 88px) var(--spacing-horizontal-xl) var(--spacing-vertical-xxl);
+  padding: 64px 48px 48px;
   text-align: center;
 }
 
 .intro-illustration {
   height: auto;
   margin-bottom: 32px;
-  width: 190px;
+  width: 192px;
 }
 
 .intro-title {
@@ -2256,7 +2294,7 @@ h2 {
   color: var(--color-font-dark-gray);
   font-size: 18px;
   line-height: 28px;
-  margin: 0 0 32px;
+  margin: 0 0 40px;
   max-width: 40ch;
   text-wrap: pretty;
 }
@@ -2273,7 +2311,7 @@ h2 {
   gap: 8px;
   justify-content: center;
   min-height: 56px;
-  min-width: 190px;
+  min-width: 192px;
   padding: 0 32px;
   transition: background 150ms ease, transform 150ms ease;
 }
@@ -2291,11 +2329,11 @@ h2 {
   font-size: var(--font-size-12);
   font-style: italic;
   font-synthesis: style;
-  margin: 12px 0 0;
+  margin: 8px 0 0;
 }
 
 .intro-resume {
-  margin-top: var(--spacing-vertical-md);
+  margin-top: 16px;
 }
 
 @keyframes intro-fade {
@@ -2327,6 +2365,7 @@ h2 {
 
   .quiz-slide {
     align-items: flex-start;
+    gap: 32px;
     padding: 64px 16px 32px;
     text-align: left;
   }
@@ -2355,36 +2394,34 @@ h2 {
 
   .quiz-slide .option-cards {
     display: grid;
-    gap: 12px;
+    gap: 16px;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     justify-content: stretch;
     width: 100%;
   }
 
-  .quiz-slide .option-card,
-  .quiz-slide .option-card:has(.option-art) {
+  .quiz-slide .option-card {
     align-items: center;
     flex-basis: auto;
     flex-direction: column;
     height: auto;
     justify-content: center;
     max-width: none;
-    min-height: 0;
-    padding: 12px;
+    min-height: 208px;
+    min-width: 0;
+    padding: 16px;
     text-align: center;
     width: 100%;
   }
 
-  .quiz-slide .option-cards .option-card:only-child,
-  .quiz-slide .option-cards:has(> :last-child:nth-child(odd)) .option-card:last-child {
-    grid-column: 1 / -1;
-  }
-
   .quiz-slide .option-art {
-    min-height: 72px;
+    height: 64px;
+    min-height: 64px;
+    width: 64px;
   }
 
   .quiz-slide .option-icon,
+  .quiz-slide .option-icon-slot,
   .quiz-slide .option-palette {
     height: 64px;
     width: 64px;
@@ -2401,7 +2438,24 @@ h2 {
 
   .quiz-slide .actions-pair {
     flex-direction: column-reverse;
-    gap: 12px;
+    gap: 16px;
+  }
+
+  .intro-modal .matching {
+    align-items: flex-start;
+    padding: 64px 16px 32px;
+    text-align: left;
+  }
+
+  .intro-modal .matching h1,
+  .intro-modal .matching-copy,
+  .intro-modal .matching-steps {
+    text-align: left;
+    width: 100%;
+  }
+
+  .intro-modal .matching-steps {
+    margin-top: 32px;
   }
 
   .quiz-slide .actions-pair .button {
@@ -2464,7 +2518,7 @@ h2 {
   .quiz-slide .size-pair .size-chips {
     display: grid;
     flex: 1 0 auto;
-    grid-template-columns: repeat(auto-fill, minmax(52px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(56px, 1fr));
   }
 
   .quiz-slide .size-pair .size-chip span {
@@ -2498,8 +2552,33 @@ h2 {
 }
 
 .quiz-slide .date-question {
-  justify-items: center;
-  width: min(716px, 100%);
+  gap: 16px;
+  justify-items: start;
+  margin: 0;
+  text-align: left;
+  width: min(1024px, 100%);
+}
+
+.quiz-slide .date-field {
+  gap: 8px;
+}
+
+.quiz-slide .date-field input {
+  padding: 16px;
+}
+
+.quiz-slide .date-plan {
+  gap: 16px;
+  padding: 16px;
+}
+
+.quiz-slide .date-plan li {
+  gap: 16px;
+}
+
+.quiz-slide .date-plan-copy {
+  gap: 8px;
+  padding: 8px 0 16px;
 }
 
 .date-field {
@@ -2641,8 +2720,8 @@ h2 {
   font-size: 14px;
   font-weight: 500;
   justify-content: center;
-  margin-top: 16px;
-  min-height: 44px;
+  margin-top: 0;
+  min-height: 48px;
   padding: 0 16px;
   width: 100%;
 }
@@ -2662,23 +2741,51 @@ h2 {
 }
 
 .quiz-slide .height-question {
-  margin: 0 auto;
+  display: flex;
+  justify-content: center;
+  margin: 0;
+  width: min(1024px, 100%);
+}
+
+.quiz-slide .size-groups {
+  gap: 16px;
+}
+
+.quiz-slide .size-group {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  text-align: left;
+}
+
+.quiz-slide .size-group legend {
+  margin-bottom: 0;
+  text-align: left;
+}
+
+.quiz-slide .size-chips {
+  gap: 16px;
+}
+
+.quiz-slide .size-chip span {
+  height: 48px;
 }
 
 .height-question {
   margin: 0 auto;
-  width: fit-content;
+  width: min(1024px, 100%);
 }
 
 .height-inputs {
   display: flex;
-  gap: var(--spacing-horizontal-md);
+  gap: 16px;
   justify-content: center;
+  width: 100%;
 }
 
 .height-inputs label {
   display: grid;
-  gap: 6px;
+  gap: 8px;
   font-size: var(--font-size-14);
 }
 
@@ -2687,7 +2794,7 @@ h2 {
   border-radius: var(--border-radius-md);
   font-size: 16px;
   height: 48px;
-  padding: 0 var(--spacing-horizontal-md);
+  padding: 0 16px;
   width: 96px;
 }
 
