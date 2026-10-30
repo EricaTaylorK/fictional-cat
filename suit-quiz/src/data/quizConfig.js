@@ -36,7 +36,7 @@ export const questions = {
   feel: {
     id: "feel",
     title: "How do you like a suit to fit?",
-    help: "We ask about the cut, and the name in parentheses matches the fit on the product page.",
+    help: "The name in parentheses is the fit name on the suit.",
     type: "single",
     options: [
       { value: "close", label: "Close and sharp (Slim fit)", detail: "A trimmer shape, with less room through the body.", icon: "/icons/mw/sharp.png" },
