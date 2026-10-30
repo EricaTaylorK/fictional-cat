@@ -2516,9 +2516,15 @@ h2 {
   }
 
   .quiz-slide .size-pair .size-chips {
+    align-content: start;
     display: grid;
-    flex: 1 0 auto;
+    flex: 0 0 auto;
     grid-template-columns: repeat(auto-fill, minmax(56px, 1fr));
+    margin-bottom: 16px;
+  }
+
+  .quiz-slide .size-pair .unknown-size {
+    margin-top: auto;
   }
 
   .quiz-slide .size-pair .size-chip span {
@@ -2759,7 +2765,7 @@ h2 {
 }
 
 .quiz-slide .size-group legend {
-  margin-bottom: 0;
+  margin-bottom: 16px;
   text-align: left;
 }
 
