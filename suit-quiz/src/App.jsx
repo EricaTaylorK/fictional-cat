@@ -601,7 +601,9 @@ export default function App() {
         {currentQuestion.icon && <img className="question-icon" src={currentQuestion.icon} alt="" />}
         <div>
           <h2 id="question-title">{currentQuestion.title}</h2>
-          <p className="helper">{questionHelp(currentQuestion, answers)}</p>
+          {questionHelp(currentQuestion, answers) && (
+            <p className="helper">{questionHelp(currentQuestion, answers)}</p>
+          )}
         </div>
       </div>
 

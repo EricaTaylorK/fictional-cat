@@ -76,7 +76,6 @@ export const questions = {
   measurementKnowledge: {
     id: "measurementKnowledge",
     title: "Do you know your suit size?",
-    help: "Your suit size, or the shirt and pants you usually buy.",
     type: "single",
     options: [
       { value: "some", label: "I know some of my sizes", detail: "Jacket or pant size, and either one can be blank." },
