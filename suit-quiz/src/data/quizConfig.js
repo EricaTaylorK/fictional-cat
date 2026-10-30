@@ -95,7 +95,7 @@ export const questions = {
     help: "Choose any that apply, and we'll adjust the cut or the starting size.",
     type: "multi",
     skippable: true,
-    skipLabel: "I don't have any of these",
+    skipLabel: "They usually feel fine",
     options: [
       {
         value: "broadShoulders",
@@ -131,7 +131,7 @@ export const questions = {
     help: "Choose any that apply, and we'll adjust the cut or the starting size.",
     type: "multi",
     skippable: true,
-    skipLabel: "I don't have any of these",
+    skipLabel: "They usually feel fine",
     options: [
       {
         value: "athleticBuild",
