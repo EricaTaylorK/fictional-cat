@@ -15,7 +15,7 @@ export const questions = {
   occasion: {
     id: "occasion",
     title: "What's the occasion?",
-    help: "We ask so the suit looks right for the room, not overdone, and you can keep wearing it.",
+    help: "The event sets how dressed up the suit should be, and every option is one you can keep.",
     type: "occasionPlus",
     skippable: true,
     rentHelp: "We ask because the event decides whether you need a suit or a tuxedo.",
