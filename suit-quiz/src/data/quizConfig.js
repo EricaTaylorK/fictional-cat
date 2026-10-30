@@ -92,9 +92,10 @@ export const questions = {
   fitIssues: {
     id: "fitIssues",
     title: "Where do jackets feel tight or long?",
-    help: "Choose any tight or long spots so we can adjust the cut or starting size, or skip if it feels fine.",
+    help: "Choose any that apply, and we'll adjust the cut or the starting size.",
     type: "multi",
     skippable: true,
+    skipLabel: "I don't have any of these",
     options: [
       {
         value: "broadShoulders",
@@ -127,9 +128,10 @@ export const questions = {
   pantsFit: {
     id: "pantsFit",
     title: "Where do pants feel tight or loose?",
-    help: "Choose any tight or loose spots so we can adjust the cut or starting size, or skip if it feels fine.",
+    help: "Choose any that apply, and we'll adjust the cut or the starting size.",
     type: "multi",
     skippable: true,
+    skipLabel: "I don't have any of these",
     options: [
       {
         value: "athleticBuild",

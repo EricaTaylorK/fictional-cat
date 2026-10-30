@@ -660,7 +660,7 @@ export default function App() {
       <div className="actions actions-pair">
         {currentQuestion.skippable && (
           <button className="button secondary skip-button" type="button" onClick={continueQuiz}>
-            Skip
+            {currentQuestion.skipLabel ?? "Skip"}
           </button>
         )}
         <button
