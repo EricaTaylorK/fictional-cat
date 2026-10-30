@@ -48,6 +48,10 @@ function Stars({ value }) {
   );
 }
 
+function matchTone(percent) {
+  return percent >= 90 ? "best" : "mid";
+}
+
 function SuitOption({ product, size, isBest, selected, onSelect, shown, options, variantIndex, onVariant, renting = false, onTryOn }) {
   return (
     <label className={`suit-option${selected ? " suit-option-selected" : ""}`}>
@@ -64,6 +68,11 @@ function SuitOption({ product, size, isBest, selected, onSelect, shown, options,
       </div>
       <div className="suit-option-body">
         {isBest && <span className="match-tag">Best match</span>}
+        {product.matchPercent != null && (
+          <span className={`match-score match-score-${matchTone(product.matchPercent)}`}>
+            {product.matchPercent}% match
+          </span>
+        )}
         <p className="product-brand">{product.brand}</p>
         <h3 className="product-title">{product.name}</h3>
         {product.rating != null && (
@@ -104,9 +113,6 @@ function SuitOption({ product, size, isBest, selected, onSelect, shown, options,
           </div>
         )}
         <div className="match-why">
-          {product.matchPercent != null && (
-            <p className="match-percent">{product.matchPercent}% match</p>
-          )}
           {product.evidence?.length > 0 && (
             <>
               <p className="why-label">{renting ? "Why this look" : "Why this suit"}</p>

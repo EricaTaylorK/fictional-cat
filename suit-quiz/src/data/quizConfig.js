@@ -168,7 +168,7 @@ export const questions = {
   height: {
     id: "height",
     title: "How tall are you?",
-    help: "We ask for height because it sets the length: under 5'7\" is Short, over 6'0\" is Long, and in between is Regular.",
+    help: "Your height helps us recommend the right length, so the suits we show you fit you better.",
     type: "height",
     skippable: true,
   },
