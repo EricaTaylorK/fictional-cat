@@ -5,7 +5,7 @@ export const questions = {
   mode: {
     id: "mode",
     title: "Are you buying or renting?",
-    help: "Buy a suit to keep, or rent a complete look for one event.",
+    help: "Buying is a suit you keep. Renting is a full look for one event.",
     type: "single",
     options: [
       { value: "buy", label: "Buy a suit", detail: "Yours to keep.", icon: "/icons/mw/shop.png" },
@@ -15,51 +15,51 @@ export const questions = {
   occasion: {
     id: "occasion",
     title: "What's the occasion?",
-    help: "Knowing the details will help us find you the perfect suit to meet the moment.",
+    help: "The event is why you're shopping. We'll use it so the suit looks right for the room, not overdone. Every option is a suit you can keep wearing.",
     type: "occasionPlus",
     skippable: true,
-    rentHelp: "Knowing the occasion tells us whether you need a suit or a tuxedo.",
+    rentHelp: "This tells us whether you need a suit or a tuxedo.",
     rentOptions: [
-      { value: "wedding", label: "Wedding", detail: "For your big day, or theirs.", icon: "/icons/mw/wedding.png" },
+      { value: "wedding", label: "Wedding", detail: "Your wedding, or someone else's.", icon: "/icons/mw/wedding.png" },
       { value: "formal", label: "Black tie", detail: "Galas, formal dinners, and black-tie invitations.", icon: "/icons/mw/special-event.png" },
-      { value: "prom", label: "Prom", detail: "For prom, homecoming, and being the life of the party.", icon: "/icons/mw/school-event.png" },
+      { value: "prom", label: "Prom", detail: "For you, or for someone you're taking. Prom, homecoming, or a school formal.", icon: "/icons/mw/school-event.png" },
       { value: "special", label: "Special event", detail: "A quinceañera, anniversary, or other celebration.", icon: "/icons/mw/quinceanera.png" },
     ],
     options: [
-      { value: "business", label: "Business", detail: "For daily office attire & those important meetings.", icon: "/icons/mw/suits-bundle.png" },
-      { value: "wedding", label: "Wedding", detail: "For your big day or theirs, you want to look your best.", icon: "/icons/mw/wedding.png" },
-      { value: "travel", label: "Travel", detail: "For long hour days when comfort matters most.", icon: "/icons/mw/travel.png" },
-      { value: "prom", label: "Prom", detail: "For photos, dancing and being the life of the party.", icon: "/icons/mw/school-event.png" },
-      { value: "mixed", label: "Mixed use", detail: "One versatile suit for a little bit of everything.", icon: "/icons/mw/special-event.png" },
+      { value: "business", label: "Work", detail: "The office, and the meetings that matter.", icon: "/icons/mw/suits-bundle.png" },
+      { value: "wedding", label: "Wedding", detail: "Your wedding, or someone else's.", icon: "/icons/mw/wedding.png" },
+      { value: "funeral", label: "Funeral", detail: "A funeral or memorial. Quiet and appropriate.", icon: "/icons/mw/invitation.png" },
+      { value: "prom", label: "Prom", detail: "For you, or for someone you're taking. Prom, homecoming, or a school formal.", icon: "/icons/mw/school-event.png" },
+      { value: "mixed", label: "More than one event", detail: "Work, a wedding, and other events.", icon: "/icons/mw/special-event.png" },
     ],
   },
   feel: {
     id: "feel",
     title: "How do you like a suit to fit?",
-    help: "The name in parentheses is the fit you'll see on the suit.",
+    help: "This is the cut, not the fabric. The name in parentheses is the fit on the suit, so you can match it on the product page.",
     type: "single",
     options: [
       { value: "close", label: "Close and sharp (Slim fit)", detail: "A trimmer shape, with less room through the body.", icon: "/icons/mw/sharp.png" },
-      { value: "balanced", label: "Polished, with room to move (Modern fit)", detail: "Shape through the shoulders, ease where you need it.", icon: "/icons/mw/balanced.png" },
-      { value: "roomy", label: "Comfortable with room (Classic fit)", detail: "Ease through the chest, seat, and legs, without looking loose.", icon: "/icons/mw/relaxed.png" },
+      { value: "balanced", label: "Polished, with room to move (Modern fit)", detail: "Shaped at the shoulder, with room through the middle.", icon: "/icons/mw/balanced.png" },
+      { value: "roomy", label: "Comfortable with room (Classic fit)", detail: "Room through the chest, seat, and legs, without looking loose.", icon: "/icons/mw/relaxed.png" },
     ],
   },
   eventDate: {
     id: "eventDate",
     title: "When is the event?",
-    help: "Your look is ready 3 days before, and it goes back the day after.",
+    help: "The look is ready 3 days before the event and goes back the day after.",
     type: "date",
   },
   pieces: {
     id: "pieces",
     title: "What should the look include?",
-    help: "The rental package decides what's included. A 2-piece is the jacket and pants. A 6-piece and a 9-piece add the dress shirt, shoes, and the other pieces.",
+    help: "A 2-piece is the jacket and pants. A 6-piece and a 9-piece add the shirt, shoes, and the rest.",
     type: "pieces",
   },
   colors: {
     id: "colors",
     title: "Any colors in mind?",
-    help: "Pick any you'd wear. Leave it blank if you're open.",
+    help: "Pick any you'd wear. Skip this if you're open.",
     type: "colors",
     skippable: true,
     options: [
@@ -75,8 +75,8 @@ export const questions = {
   },
   measurementKnowledge: {
     id: "measurementKnowledge",
-    title: "Do you know your measurements?",
-    help: "Share the sizes you know. If you don't, we'll estimate from how your clothes usually fit.",
+    title: "Do you know your suit size?",
+    help: "No jacket handy? Choose 'help me estimate' and use your usual shirt and pants sizes. You don't need exact numbers.",
     type: "single",
     options: [
       { value: "some", label: "I know some of my sizes", detail: "Jacket or pant size. Leave either one blank." },
@@ -86,13 +86,13 @@ export const questions = {
   measurements: {
     id: "measurements",
     title: "Share the sizes you know",
-    help: "Jacket and pant size. Mark either one you don't know.",
+    help: "Jacket and pant size, if you know them. Use 'I don't know this' for either one. Short, Regular, or Long comes from your height on the next step.",
     type: "measurements",
   },
   fitIssues: {
     id: "fitIssues",
-    title: "Where do jackets usually feel off?",
-    help: "Select all that apply. Each answer changes the cut or the size we start you with.",
+    title: "Where do jackets usually feel tight or long?",
+    help: "Choose any that apply, or skip this if they usually feel fine. We'll use it to adjust the cut or the starting size.",
     type: "multi",
     skippable: true,
     options: [
@@ -126,8 +126,8 @@ export const questions = {
   },
   pantsFit: {
     id: "pantsFit",
-    title: "Where do pants usually feel off?",
-    help: "Select all that apply. Each answer changes the cut or the size we start you with.",
+    title: "Where do pants usually feel tight or loose?",
+    help: "Choose any that apply, or skip this if they usually feel fine. We'll use it to adjust the cut or the starting size.",
     type: "multi",
     skippable: true,
     options: [
@@ -166,13 +166,14 @@ export const questions = {
   height: {
     id: "height",
     title: "How tall are you?",
-    help: "Height sets the length. Under 5'7\" we start with Short, over 6'0\" with Long, and the heights in between with Regular.",
+    help: "We use height for the length. Under 5'7\" starts at Short, over 6'0\" at Long, and the heights in between at Regular.",
     type: "height",
+    skippable: true,
   },
   tailoring: {
     id: "tailoring",
-    title: "Should we tailor it to you?",
-    help: "Most men tailor their suit. We'll suggest what yours needs, and you can remove it before checkout.",
+    title: "Want this suit tailored?",
+    help: "This means hemming the pants or shortening the sleeves, not a shirt or tie. We'll suggest it from your size and fit, and you'll see the price before checkout. You can take it off then.",
     type: "single",
     options: [
       { value: "skip", label: "No, just the suit" },
@@ -181,15 +182,15 @@ export const questions = {
   },
   budget: {
     id: "budget",
-    title: "What feels comfortable to spend?",
-    help: "Fit and occasion come first. Budget narrows the field after that.",
+    title: "What do you want to spend?",
+    help: "This is the suit. Tailoring, if you add it, is separate, and you can remove it before checkout. We'll show this range first.",
     type: "single",
     options: [
       { value: "under-250", label: "Under $250" },
       { value: "250-400", label: "$250–$400" },
       { value: "400-600", label: "$400–$600" },
       { value: "over-600", label: "$600+" },
-      { value: "flexible", label: "Flexible for the right fit", detail: "Worth it when the suit is right for the moment." },
+      { value: "flexible", label: "Flexible for the right fit", detail: "I'm willing to spend more if the suit fits." },
     ],
   },
 };
@@ -217,7 +218,6 @@ export function occasionOptions(question, answers) {
 
 const BUY_OCCASION = {
   business: "work",
-  travel: "versatile",
   prom: "milestone",
   mixed: "versatile",
 };

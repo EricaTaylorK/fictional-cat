@@ -297,9 +297,9 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll }) {
     : null;
   const occasion = resolvedOccasion(answers);
   const noun = renting ? "look" : "suit";
-  const headline = renting
-    ? `A ${RENTAL_TYPE_NAMES[recommendations[0].type].toLowerCase()} for ${summary.occasion}`
-    : `A ${summary.fitName} for ${summary.occasion}`;
+  const headline = answers.feel
+    ? `Recommended for ${summary.occasion}, in a ${summary.fitName}`
+    : `Recommended for ${summary.occasion}`;
   const lede = recommendations[0]?.evidence?.[0];
 
   function tryOnSuit() {
@@ -318,7 +318,7 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll }) {
             <li className="fit-stat">
               <img src="/icons/product_modernfit.svg" alt="" />
               <span className="fit-stat-label">Jacket</span>
-              <strong>{size.jacket ?? `${size.length} (${size.lengthCode})`}</strong>
+              <strong>{size.jacket ? `${String(size.jacket).replace(/[SRL]$/i, "")} ${(size.length || "Regular").toLowerCase()}` : size.length}</strong>
               {size.jacket && (
                 <span className="fit-stat-hint">{size.jacket.replace(/[SRL]$/i, "")} chest, {size.length.toLowerCase()} length</span>
               )}
@@ -326,7 +326,7 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll }) {
             <li className="fit-stat">
               <img src="/icons/product_size.svg" alt="" />
               <span className="fit-stat-label">Pants</span>
-              <strong>{size.pants ?? "Measured in store"}</strong>
+              <strong>{size.pants ? `${String(size.pants).replace(/W$/i, "")}-inch waist` : "Measured in store"}</strong>
               {size.pants && <span className="fit-stat-hint">{size.pants.replace(/W$/i, "")}-inch waist</span>}
             </li>
             {renting ? (
@@ -486,7 +486,7 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll }) {
                       <span className="tier-name">
                         {option.icon && <img className="tier-icon" src={option.icon} alt="" />}
                         {option.name}
-                        {option.id === summary.tailoring.id && answers.tailoring !== "skip" && <span className="tier-tag">Our pick for you</span>}
+                        {option.id === summary.tailoring.id && answers.tailoring !== "skip" && <span className="tier-tag">Suggested for you</span>}
                       </span>
                       <span className="tier-detail">
                         {option.detail}
@@ -557,14 +557,14 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll }) {
             <p className="summary-suit">{selected.brand} {selected.name}</p>
             <ul className="summary-lines">
               <li>
-                <span>Jacket{size.jacket ? ` · ${size.jacket}` : size.length ? ` · ${size.length} (${size.lengthCode})` : ""}</span>
+                <span>Jacket{size.jacket ? ` · ${String(size.jacket).replace(/[SRL]$/i, "")} ${(size.length || "Regular").toLowerCase()}` : size.length ? ` · ${size.length.toLowerCase()} length` : ""}</span>
                 <span className="summary-amount">
                   {selected.jacket.compareAt && <s>{formatPrice(selected.jacket.compareAt)}</s>}
                   {formatPrice(selected.jacket.price)}
                 </span>
               </li>
               <li>
-                <span>Pants{size.pants ? ` · ${size.pants}` : ""}</span>
+                <span>Pants{size.pants ? ` · ${String(size.pants).replace(/W$/i, "")}-inch waist` : ""}</span>
                 <span className="summary-amount">
                   {selected.pants.compareAt && <s>{formatPrice(selected.pants.compareAt)}</s>}
                   {formatPrice(selected.pants.price)}

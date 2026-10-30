@@ -658,7 +658,7 @@ export default function App() {
       <div className="actions actions-pair">
         {currentQuestion.skippable && (
           <button className="button secondary skip-button" type="button" onClick={continueQuiz}>
-            I'm Not Sure, Skip It
+            Skip
           </button>
         )}
         <button
@@ -667,7 +667,7 @@ export default function App() {
           disabled={!isAnswered(currentQuestion, answers)}
           onClick={continueQuiz}
         >
-          {currentIndex === flow.length - 1 ? "See my results" : "Continue"}
+          {currentIndex === flow.length - 1 ? "See recommendations" : "Next"}
         </button>
       </div>
     </section>
@@ -706,6 +706,7 @@ export default function App() {
             onBack={screen === "question" ? goBack : undefined}
             onClose={screen === "question" || screen === "matching" ? saveAndExit : closeIntro}
             progress={screen === "matching" ? 1 : screen === "question" && totalQuestions > 0 ? (currentIndex + 1) / totalQuestions : undefined}
+            stepLabel={screen === "question" && totalQuestions > 0 ? `Step ${currentIndex + 1} of ${totalQuestions}` : undefined}
             labelledBy={screen === "matching" ? "matching-title" : screen === "question" ? "question-title" : "intro-title"}
           >
             {screen === "matching" ? (

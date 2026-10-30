@@ -220,7 +220,7 @@ function HomeScreen({ onTakeQuiz, onNavigate }) {
             AI Style Expert
           </p>
           <h2 id="finder-title">What&apos;s the occasion? We&apos;ll find the suit.</h2>
-          <p>Answer a few quick questions and see your best matches. Under a minute.</p>
+          <p>Answer a few questions and get suit picks in under a minute.</p>
           <button className="finder-hero-button" type="button" onClick={onTakeQuiz}>
             <SparkleIcon />
             Take the suit quiz

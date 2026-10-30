@@ -76,7 +76,7 @@ function SparkleIcon() {
   );
 }
 
-export default function IntroModal({ onStart, onResume, onClose, onBack, progress, children, labelledBy = "intro-title" }) {
+export default function IntroModal({ onStart, onResume, onClose, onBack, progress, stepLabel, children, labelledBy = "intro-title" }) {
   const dialogRef = useRef(null);
   const startRef = useRef(null);
   const onCloseRef = useRef(onClose);
@@ -136,11 +136,14 @@ export default function IntroModal({ onStart, onResume, onClose, onBack, progres
             <span className="intro-badge" aria-hidden="true">MW</span>
             <span className="intro-header-title">Find the Right Suit for You</span>
           </span>
+          <span className="intro-header-end">
+            {stepLabel && <span className="intro-step">{stepLabel}</span>}
           <button className="intro-close" type="button" aria-label="Close" onClick={onClose}>
             <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
               <path d="m3 3 10 10M13 3 3 13" stroke="currentColor" strokeLinecap="round" strokeWidth="1.5" />
             </svg>
           </button>
+          </span>
           {progress != null && (
             <span className="intro-progress" aria-hidden="true">
               <span style={{ width: `${Math.round(progress * 100)}%` }} />
@@ -150,15 +153,15 @@ export default function IntroModal({ onStart, onResume, onClose, onBack, progres
         {children ?? (
         <div className="intro-body">
           <IntroIllustration />
-          <h1 id="intro-title" className="intro-title">Let’s Find Your Suit</h1>
+          <h1 id="intro-title" className="intro-title">Find a suit for the occasion</h1>
           <p className="intro-copy">
-            Tell us about the moment and how you like to wear your clothes and we’ll match you with the right one.
+            A few questions about the event, how the suit should feel, and your size. We’ll narrow the options.
           </p>
           <button className="intro-start" type="button" ref={startRef} onClick={onStart}>
             <SparkleIcon />
-            Let’s Go
+            Start
           </button>
-          <p className="intro-note">Takes less than 1 minute</p>
+          <p className="intro-note">About a minute. Skip anything you’re not sure about.</p>
           {onResume && (
             <button className="text-link intro-resume" type="button" onClick={onResume}>
               Or pick up where you left off

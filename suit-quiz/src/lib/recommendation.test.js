@@ -335,7 +335,7 @@ describe("recommendations", () => {
       length: "Long",
     });
     expect(describeSize(getSizeEstimate(baseAnswers))).toBe(
-      "Jacket 40R (40 chest, regular length) · Pants 34W (34-inch waist)",
+      "40 regular jacket, 34-inch waist",
     );
   });
 

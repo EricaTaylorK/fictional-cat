@@ -16,10 +16,10 @@ const occasionLabels = {
   business: "business",
   formal: "a black-tie evening",
   milestone: "a graduation or prom",
-  versatile: "a bit of everything",
+  versatile: "more than one event",
   travel: "travel",
   prom: "prom",
-  mixed: "a bit of everything",
+  mixed: "more than one event",
   special: "a special event",
 };
 
@@ -247,16 +247,16 @@ export function describeSize(size) {
   const parts = [];
   if (size?.jacket) {
     const chest = String(size.jacket).replace(/[SRL]$/i, "");
-    const length = (size.length || "regular").toLowerCase();
-    parts.push(`Jacket ${size.jacket} (${chest} chest, ${length} length)`);
+    const length = (size.length || "Regular").toLowerCase();
+    parts.push(`${chest} ${length} jacket`);
   } else if (size?.length) {
-    parts.push(`Jacket ${size.length} (${size.lengthCode})`);
+    parts.push(`${size.length.toLowerCase()} length jacket`);
   }
   if (size?.pants) {
     const waist = String(size.pants).replace(/W$/i, "");
-    parts.push(`Pants ${size.pants} (${waist}-inch waist)`);
+    parts.push(`${waist}-inch waist`);
   }
-  return parts.join(" · ");
+  return parts.join(", ");
 }
 
 export function inferLikelySize(answers) {
@@ -403,7 +403,7 @@ function scoreProduct(product, answers, index) {
 
   if (occasion && formality.includes(occasion)) {
     score += 32;
-    evidence.push(product.occasionNotes?.[occasion] ?? `It reads correctly for ${occasionLabels[answers.occasion] ?? occasionLabels[occasion]}.`);
+    evidence.push(product.occasionNotes?.[occasion] ?? `A straightforward choice for ${occasionLabels[answers.occasion] ?? occasionLabels[occasion]}.`);
   } else if (occasion) {
     score -= 18;
   }
@@ -428,11 +428,6 @@ function scoreProduct(product, answers, index) {
   } else if (answers.budget && answers.budget !== "flexible") {
     const edge = Math.min(Math.max(product.price, budgetMin), budgetMax);
     score -= Math.min(18, Math.ceil(Math.abs(product.price - edge) / 20));
-  }
-
-  if (answers.occasion === "travel") {
-    score += (product.comfort ?? 0) * 3;
-    if (product.stretch) score += 6;
   }
 
   if (answers.feel === "roomy") score += (product.comfort ?? 0) * 2;
@@ -785,7 +780,7 @@ export function buildResultSummary(answers) {
     mode: answers.mode === "rent" ? "rent" : "buy",
     dates: rentalDates(answers.eventDate),
     pieces: rentalPieces(answers),
-    occasion: occasionLabels[answers.occasion] ?? "your event",
+    occasion: occasionLabels[resolvedOccasion(answers)] ?? occasionLabels[answers.occasion] ?? "your event",
     fit: fitLabels[answers.feel] ?? "a balanced fit",
     fitName: fitNameLabels[answers.feel] ?? "balanced fit",
     size: inferLikelySize(answers),

@@ -2194,6 +2194,21 @@ h2 {
   padding-left: 16px;
 }
 
+.intro-header-end {
+  align-items: center;
+  display: flex;
+  gap: 12px;
+  grid-column: 3;
+  justify-self: end;
+}
+
+.intro-step {
+  color: #3a3a3a;
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
 .intro-close {
   align-items: center;
   background: transparent;
@@ -2201,10 +2216,8 @@ h2 {
   border-radius: 50%;
   color: var(--color-font-black);
   display: inline-flex;
-  grid-column: 3;
   height: 44px;
   justify-content: center;
-  justify-self: end;
   width: 44px;
 }
 
