@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import IntroModal from "./components/IntroModal.jsx";
 import ProductGridEntry from "./components/ProductGridEntry.jsx";
+import ProductDetail from "./components/ProductDetail.jsx";
 import Results from "./components/Results.jsx";
 import TextInput from "./components/TextInput.jsx";
 import { RENTAL_PACKAGES } from "./data/rentals.js";
@@ -508,7 +509,7 @@ export default function App() {
   }, [screen, currentId]);
 
   useEffect(() => {
-    const lightPage = screen === "start" || screen === "home" || screen === "results";
+    const lightPage = screen === "start" || screen === "home" || screen === "results" || screen === "product";
     document.documentElement.classList.toggle("page-white", lightPage);
     return () => document.documentElement.classList.remove("page-white");
   }, [screen]);
@@ -576,6 +577,19 @@ export default function App() {
   const showResults = useCallback(() => {
     setState((previous) => ({ ...previous, screen: "results" }));
   }, []);
+
+  function openProduct(productId, colorKey) {
+    setState((previous) => ({
+      ...previous,
+      screen: "product",
+      productId,
+      productColorKey: colorKey ?? null,
+    }));
+  }
+
+  function backToResults() {
+    setState((previous) => ({ ...previous, screen: "results" }));
+  }
 
   const hasSavedProgress = Object.keys(answers).length > 0;
 
@@ -723,7 +737,7 @@ export default function App() {
   return (
     <>
       <p className="promo-banner">
-        {screen === "results"
+        {screen === "results" || screen === "product"
           ? answers.mode === "rent"
             ? "Your sizes and event timing are in your plan below."
             : "Your sizes and today's prices are in your plan below."
@@ -738,13 +752,21 @@ export default function App() {
         </a>
         <div className="header-slot header-slot-end" />
       </header>
-      <main className={`app-shell${screen === "results" ? " app-shell-wide" : ""}`}>
-        {screen === "results" && (
+      <main className={`app-shell${screen === "results" || screen === "product" ? " app-shell-wide" : ""}`}>
+        {screen === "product" ? (
+          <ProductDetail
+            answers={answers}
+            productId={state.productId}
+            colorKey={state.productColorKey}
+            onBack={backToResults}
+          />
+        ) : (
           <Results
             answers={answers}
             moreMode={moreMode}
             onEditAnswers={editAnswers}
             onRestart={restart}
+            onViewDetails={openProduct}
             onSeeAll={() => setState((previous) => ({ ...previous, screen: "matches" }))}
           />
         )}
