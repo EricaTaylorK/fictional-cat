@@ -3196,24 +3196,21 @@ h2 {
 }
 
 .more-matches {
-  align-self: center;
   background: transparent;
   border: 0;
   color: #001e56;
+  display: block;
   font-size: 16px;
   font-weight: 500;
-  grid-column: 1 / -1;
-  grid-row: 2;
-  justify-self: center;
   line-height: 24px;
-  margin: 0;
+  margin: 16px auto 0;
   min-height: 0;
   min-width: 0;
   padding: 0;
   text-align: center;
   text-decoration: underline;
   text-underline-offset: 3px;
-  width: auto;
+  width: fit-content;
 }
 
 .more-matches:hover {
