@@ -22,9 +22,10 @@ import { ItemCard } from "../../../src/components/AddOnItems.jsx";
 const SUIT_ONLY = {
   id: "none",
   name: "Suit only",
-  detail: "The suit as it is.",
+  detail: "The suit as it is, with no tailoring added.",
   price: 0,
   items: [],
+  icon: "/icons/mw/suits-bundle.png",
 };
 
 const BUY_OPTIONS = [SUIT_ONLY, ...TAILORING_TIERS];
@@ -276,17 +277,15 @@ function OptionRow({ label, children }) {
 function BuyOptionCard({
   option,
   group,
-  suitPrice,
   suggested,
   selected,
   detailsOpen,
   onToggleDetails,
   onSelect,
 }) {
-  const total = suitPrice + option.price;
   const days = TAILORING_TURNAROUND[option.id];
   return (
-    <label className={`rate-card${selected ? " is-selected" : ""}`}>
+    <label className={`rate-card rate-choice${selected ? " is-selected" : ""}${suggested ? " is-suggested" : ""}`}>
       <input
         className="visually-hidden"
         type="radio"
@@ -295,39 +294,40 @@ function BuyOptionCard({
         readOnly
         onClick={onSelect}
       />
-      <span className="rate-head">
+      {suggested && <span className="tier-tag">Suggested</span>}
+      <img className="rate-choice-icon" src={option.icon} alt="" />
+      <span className="rate-choice-copy">
         <span className="rate-name">{option.name}</span>
-        <SelectedMark selected={selected} />
-      </span>
-      {suggested && <span className="tier-tag">Suggested for you</span>}
-      <span className="rate-plain">{option.detail}</span>
-      {days ? <span className="rate-turnaround">Ready in about {days} days.</span> : null}
-      {option.items.length > 0 && (
-        <button
-          className="text-link rate-details"
-          type="button"
-          aria-expanded={detailsOpen}
-          onClick={(event) => {
-            event.preventDefault();
-            event.stopPropagation();
-            onToggleDetails();
-          }}
-        >
-          {detailsOpen ? "Hide details" : "Details"}
-        </button>
-      )}
-      {detailsOpen && (
-        <span className="rate-items">
-          {option.items.map((item) => (
-            <span className="rate-item" key={item.id}>
-              <span>{item.label}</span>
-              <span>{formatPrice(item.price)}</span>
-            </span>
-          ))}
+        <span className="rate-plain">
+          {option.detail}
+          {days ? ` Ready in about ${days} days.` : ""}
         </span>
-      )}
-      <span className="rate-addon">{option.price ? `+${formatPrice(option.price)}` : "No tailoring added"}</span>
-      <span className="rate-total">{formatPrice(total)} with this suit</span>
+        {option.items.length > 0 && (
+          <button
+            className="text-link rate-details"
+            type="button"
+            aria-expanded={detailsOpen}
+            onClick={(event) => {
+              event.preventDefault();
+              event.stopPropagation();
+              onToggleDetails();
+            }}
+          >
+            {detailsOpen ? "Hide details" : "Details"}
+          </button>
+        )}
+        {detailsOpen && (
+          <span className="rate-items">
+            {option.items.map((item) => (
+              <span className="rate-item" key={item.id}>
+                <span>{item.label}</span>
+                <span>{formatPrice(item.price)}</span>
+              </span>
+            ))}
+          </span>
+        )}
+      </span>
+      <span className="rate-choice-price">{option.price ? formatPrice(option.price) : "Included"}</span>
     </label>
   );
 }
@@ -656,27 +656,28 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
                     )}
                   </div>
                   <div className="suit-card-copy">
-                    <div className="suit-card-top">
+                    {(product.matchPercent != null || index === 0) && (
                       <div className="suit-badges">
-                        {index === 0 && <span className="match-tag">Best match</span>}
-                        {product.matchPercent != null && (
+                        {product.matchPercent != null ? (
                           <span className={`match-score match-score-${matchTone(product.matchPercent)}`}>
                             {product.matchPercent}% match
                           </span>
+                        ) : (
+                          <span className="match-tag">Best match</span>
                         )}
                       </div>
+                    )}
+                    <p className="product-brand">{product.brand}</p>
+                    <h3 className="product-title">
                       <button
-                        className="suit-pick"
+                        className="product-choose"
                         type="button"
                         aria-pressed={isSummarySuit}
-                        aria-label={`${isSummarySuit ? "Selected" : "Select"}: ${product.brand} ${product.name}`}
                         onClick={() => selectSuit(product)}
                       >
-                        <SelectedMark selected={isSummarySuit} idle="Select" />
+                        {product.name}
                       </button>
-                    </div>
-                    <p className="product-brand">{product.brand}</p>
-                    <h3 className="product-title">{product.name}</h3>
+                    </h3>
                     {renting && (
                       <p className="product-meta">{RENTAL_TYPE_NAMES[product.type]} · Sizes confirmed at your fitting</p>
                     )}
@@ -725,7 +726,9 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
                         aria-controls={`options-${product.id}`}
                         onClick={() => toggleOpen(product.id)}
                       >
-                        {isOpen ? "Hide options" : "View options"}
+                        {isOpen
+                          ? (renting ? "Hide package" : "Hide tailoring")
+                          : (renting ? "See package" : "Choose tailoring")}
                       </button>
                     </div>
                   </div>
@@ -773,7 +776,6 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
                                 key={option.id}
                                 option={option}
                                 group={`tailoring-${product.id}`}
-                                suitPrice={product.price}
                                 suggested={suggestTailoring && option.id === summary.tailoring.id}
                                 selected={isSummarySuit && tailoringId === option.id}
                                 detailsOpen={Boolean(detailOpen[`${product.id}:${option.id}`])}

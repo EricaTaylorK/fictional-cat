@@ -2172,6 +2172,8 @@ h2 {
   border: 1px solid var(--border-primary);
   border-radius: 8px;
   box-shadow: 0 8px 16px rgba(0, 30, 86, 0.06);
+  cursor: pointer;
+  position: relative;
 }
 
 .suit-card-main {
@@ -2288,6 +2290,15 @@ h2 {
   margin-bottom: 0;
 }
 
+.product-choose {
+  background: transparent;
+  border: 0;
+  color: inherit;
+  font: inherit;
+  padding: 0;
+  text-align: left;
+}
+
 .try-on-link {
   margin-top: var(--spacing-vertical-sm);
   min-height: 0;
@@ -2332,7 +2343,8 @@ h2 {
 .card-toggle {
   min-height: 48px;
   min-width: 0;
-  padding: var(--spacing-vertical-sm) var(--spacing-horizontal-lg);
+  padding: 0 var(--spacing-horizontal-xl);
+  width: auto;
 }
 
 .suit-card-options {
@@ -2352,25 +2364,63 @@ h2 {
 
 .rate-row {
   display: grid;
-  gap: var(--spacing-horizontal-lg);
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+  grid-template-columns: minmax(0, 1fr);
 }
 
 .rate-row:has(> .rate-card:only-child) {
   grid-template-columns: minmax(0, 1fr);
 }
 
-.rate-card {
-  align-items: flex-start;
-  cursor: pointer;
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-vertical-sm);
+.rate-choice {
+  align-items: center;
+  display: grid;
+  gap: 16px;
+  grid-template-columns: 48px minmax(0, 1fr) auto;
+  padding: 16px;
+}
+
+.rate-choice.is-suggested {
+  margin-top: 8px;
+}
+
+.rate-choice .rate-name {
+  color: var(--color-background-dark-blue);
+}
+
+.rate-choice-icon {
+  height: 48px;
+  object-fit: contain;
+  width: 48px;
+}
+
+.rate-choice-copy {
+  display: grid;
+  gap: 8px;
   min-width: 0;
-  overflow-wrap: break-word;
-  padding: var(--spacing-vertical-lg);
-  position: relative;
-  transition: border-color 150ms ease, background 150ms ease;
+}
+
+.rate-choice-price {
+  font-size: var(--font-size-16);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-24);
+  white-space: nowrap;
+}
+
+.rate-choice .tier-tag {
+  background: #eef0f3;
+  border-radius: 4px;
+  color: var(--color-font-black);
+  font-size: 10px;
+  font-weight: var(--font-weight-bold);
+  left: 16px;
+  letter-spacing: 0.06em;
+  line-height: 16px;
+  padding: 4px 8px;
+  position: absolute;
+  text-transform: uppercase;
+  top: 0;
+  transform: translateY(-50%);
 }
 
 .rate-card:has(input:focus-visible) {
@@ -2402,8 +2452,10 @@ h2 {
   margin: 0;
 }
 
-.rate-details {
+.rate-choice .rate-details {
   font-size: var(--font-size-14);
+  justify-self: start;
+  text-align: left;
 }
 
 .rate-items {
@@ -3734,7 +3786,7 @@ h2 {
   }
 
   .rate-row {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .suit-card-options .item-grid {
@@ -3829,24 +3881,21 @@ h2 {
     grid-template-columns: minmax(0, 1fr);
   }
 
-  .rate-row {
-    grid-auto-columns: 80%;
-    grid-auto-flow: column;
-    grid-template-columns: none;
-    margin: 0 calc(-1 * var(--spacing-horizontal-lg));
-    overflow-x: auto;
-    overscroll-behavior-x: contain;
-    padding: 0 var(--spacing-horizontal-lg) var(--spacing-vertical-sm);
-    scroll-padding: 0 var(--spacing-horizontal-lg);
-    scroll-snap-type: x mandatory;
-  }
-
+  .rate-row,
   .rate-row:has(> .rate-card:only-child) {
-    grid-auto-columns: 100%;
+    grid-auto-flow: row;
+    grid-template-columns: minmax(0, 1fr);
+    margin: 0;
+    overflow: visible;
+    padding: 0;
   }
 
-  .rate-card {
-    scroll-snap-align: start;
+  .rate-choice {
+    grid-template-columns: 40px minmax(0, 1fr);
+  }
+
+  .rate-choice-price {
+    grid-column: 2;
   }
 
   .card-toggle {
