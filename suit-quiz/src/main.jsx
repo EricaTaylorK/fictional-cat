@@ -6,6 +6,7 @@ import "./styles.css";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
+    <p className="version-mark">v2</p>
     <App />
   </React.StrictMode>,
 );
