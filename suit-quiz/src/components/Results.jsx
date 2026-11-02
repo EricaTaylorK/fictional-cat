@@ -225,6 +225,7 @@ function HowToRent({ dates }) {
 function TailoringOptions({ suggestedId, tailoringId, suitOnly, onSelect }) {
   return (
     <div className="rail-block">
+      <h3 className="rail-section-title">Tailoring</h3>
       {suitOnly && (
         <p className="rail-note">Suit only until you choose a tailoring option.</p>
       )}
@@ -532,6 +533,15 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
   const barTotal = selected ? (renting ? selected.price : total) : null;
   const optionsRail = selected ? (
     <aside className="results-rail" aria-label={`Options for ${selected.brand} ${selected.name}`}>
+      <header className="rail-suit">
+        <img className="rail-suit-image" src={selectedVariant?.image || selected.image} alt="" />
+        <div>
+          <p className="rail-kicker">{renting ? "Selected look" : "Selected suit"}</p>
+          <p className="rail-brand">{selected.brand}</p>
+          <h3 className="rail-name">{selected.name}</h3>
+          <p className="rail-price">{formatPrice(selected.price)}</p>
+        </div>
+      </header>
       {renting ? (
         <RentalPackage pack={pack} pieces={pieces} price={selected.price} />
       ) : (
@@ -701,7 +711,7 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
                       </p>
                       {product.compareAt && <p className="suit-clearance">Clearance</p>}
                     </div>
-                    <button className="button suit-options" type="button" onClick={() => selectSuit(product)}>
+                    <button className={`button suit-options${isSummarySuit ? "" : " secondary"}`} type="button" aria-pressed={isSummarySuit} onClick={() => selectSuit(product)}>
                       {renting ? "Choose this look" : "Choose suit options"}
                     </button>
                   </div>
