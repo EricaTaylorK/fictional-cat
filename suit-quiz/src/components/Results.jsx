@@ -189,14 +189,6 @@ function ShareIcon() {
   );
 }
 
-function RestartIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true">
-      <path fill="currentColor" d="M12 5V2L7 7l5 5V8c2.76 0 5 2.24 5 5a5 5 0 0 1-8.9 3.1l-1.46 1.46A7 7 0 0 0 19 13c0-3.87-3.13-7-7-7Z" />
-    </svg>
-  );
-}
-
 function rentalStepDetail(stepId, dates) {
   const ready = dates && !dates.past ? formatDate(dates.ready) : null;
   const event = dates && !dates.past ? formatDate(dates.event) : null;
@@ -822,10 +814,6 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
               <button className="results-hero-action" type="button">
                 <ShareIcon />
                 Share results
-              </button>
-              <button className="results-hero-action" type="button" onClick={() => onRestart?.()}>
-                <RestartIcon />
-                Restart quiz
               </button>
             </div>
           </div>
