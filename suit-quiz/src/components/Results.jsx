@@ -2,7 +2,6 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import {
   lookForColor,
   SWATCH_HEX,
-  TAILORING_PERKS,
   TAILORING_TIERS,
 } from "../data/products.js";
 import { colorsIn, resolvedOccasion } from "../data/quizConfig.js";
@@ -248,7 +247,6 @@ function TailoringOptions({ suggestedId, tailoringId, onSelect }) {
           );
         })}
       </div>
-      <p className="tier-perks">{TAILORING_PERKS}</p>
     </div>
   );
 }
@@ -336,7 +334,7 @@ function QuickView({ item, initial, onConfirm, onClose }) {
         onClick={(event) => event.stopPropagation()}
       >
         <div className="quick-view-media">
-          {item.icon ? <img src={item.icon} alt="" /> : <span className="quick-view-media-empty" aria-hidden="true" />}
+          {item.image || item.icon ? <img src={item.image || item.icon} alt="" /> : <span className="quick-view-media-empty" aria-hidden="true" />}
         </div>
         <div className="quick-view-info">
           {item.brand ? <p className="quick-view-brand">{item.brand}</p> : null}
@@ -485,8 +483,8 @@ function CompleteLook({ id, look, suitColor, suitName, addedLooks, onOpen, onRem
                   onOpen(item, event);
                 }}
               >
-                {item.icon ? (
-                  <img className="look-thumb" src={item.icon} alt="" />
+                {item.image || item.icon ? (
+                  <img className="look-thumb" src={item.image || item.icon} alt="" />
                 ) : (
                   <span className="look-thumb look-thumb-blank" aria-hidden="true" />
                 )}
@@ -536,7 +534,7 @@ function CompleteLook({ id, look, suitColor, suitName, addedLooks, onOpen, onRem
   );
 }
 
-function FitProfile({ answers, renting, size, fitName, onRestart, onAccount, accountStatus }) {
+function FitProfile({ answers, renting, size, fitName, onEditAnswers, onAccount, accountStatus }) {
   const height = heightLabel(answers.height);
   const everyday = answers.everydaySizes ?? {};
   const jacketValue = size?.jacket ? jacketFact(size, renting) : null;
@@ -583,8 +581,8 @@ function FitProfile({ answers, renting, size, fitName, onRestart, onAccount, acc
             <p className="fit-group-line">{row.value}</p>
           </div>
         ))}
-        {onRestart && (
-          <button className="fit-retake" type="button" onClick={onRestart}>Retake the quiz</button>
+        {onEditAnswers && (
+          <button className="fit-retake" type="button" onClick={() => onEditAnswers()}>Edit My Answers</button>
         )}
       </div>
       <div className="fit-save">
@@ -795,9 +793,9 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
               <span className="results-expert-label">AI Style Expert</span>
             </div>
             <div className="results-hero-actions">
-              <button className="results-hero-action" type="button" onClick={() => onEditAnswers?.()}>
+              <button className="results-hero-action" type="button" onClick={() => onRestart?.()}>
                 <PencilIcon />
-                Edit answers
+                Retake the quiz
               </button>
               <button className="results-hero-action" type="button">
                 <ShareIcon />
@@ -994,7 +992,7 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
           renting={renting}
           size={size}
           fitName={summary.fitName}
-          onRestart={onRestart}
+          onEditAnswers={onEditAnswers}
           onAccount={setHandoff}
           accountStatus={
             handoff === "create-account"

@@ -144,56 +144,69 @@ export const SUIT_PAIRINGS = {
   },
 };
 
+// Local product photos already in public/outfit. Every shirt in these looks is white.
+// The repo's tie photograph is the navy silk tie, and the shoe photograph is the black oxford.
+const OUTFIT_PHOTOS = {
+  shirt: "/outfit/white-dress-shirt.jpg",
+  tie: "/outfit/navy-tie.jpg",
+  shoes: "/outfit/black-dress-shoes.jpg",
+};
+
 // Prototype shirt, tie, and shoes for each suit color. Prices are local stand-ins,
 // aligned with the safe colors in SUIT_PAIRINGS. They are not a live catalog.
-function lookItem(id, type, name, colorKey, color, price, icon = null) {
-  return { id, type, name, colorKey, color, price, icon };
+function lookItem(id, type, name, colorKey, color, price) {
+  const image = type === "Shirt"
+    ? OUTFIT_PHOTOS.shirt
+    : type === "Shoes"
+      ? OUTFIT_PHOTOS.shoes
+      : OUTFIT_PHOTOS.tie;
+  return { id, type, name, colorKey, color, price, image };
 }
 
 export const LOOK_PAIRINGS = {
   navy: {
-    shirt: lookItem("look-shirt-navy", "Shirt", "Dress shirt", "white", "White", 49.99, "/icons/mw/tailor-shirt-fit.png"),
-    tie: lookItem("look-tie-navy", "Tie", "Silk tie", "burgundy", "Burgundy", 39.99, "/icons/mw/collar.png"),
+    shirt: lookItem("look-shirt-navy", "Shirt", "Dress shirt", "white", "White", 49.99),
+    tie: lookItem("look-tie-navy", "Tie", "Silk tie", "burgundy", "Burgundy", 39.99),
     shoes: lookItem("look-shoes-navy", "Shoes", "Leather oxfords", "black", "Black", 129.99),
   },
   blue: {
-    shirt: lookItem("look-shirt-blue", "Shirt", "Dress shirt", "white", "White", 49.99, "/icons/mw/tailor-shirt-fit.png"),
-    tie: lookItem("look-tie-blue", "Tie", "Silk tie", "navy", "Navy", 39.99, "/icons/mw/collar.png"),
+    shirt: lookItem("look-shirt-blue", "Shirt", "Dress shirt", "white", "White", 49.99),
+    tie: lookItem("look-tie-blue", "Tie", "Silk tie", "navy", "Navy", 39.99),
     shoes: lookItem("look-shoes-blue", "Shoes", "Leather oxfords", "black", "Black", 129.99),
   },
   gray: {
-    shirt: lookItem("look-shirt-gray", "Shirt", "Dress shirt", "white", "White", 44.99, "/icons/mw/tailor-shirt-fit.png"),
-    tie: lookItem("look-tie-gray", "Tie", "Silk tie", "navy", "Navy", 34.99, "/icons/mw/collar.png"),
+    shirt: lookItem("look-shirt-gray", "Shirt", "Dress shirt", "white", "White", 44.99),
+    tie: lookItem("look-tie-gray", "Tie", "Silk tie", "navy", "Navy", 34.99),
     shoes: lookItem("look-shoes-gray", "Shoes", "Leather oxfords", "black", "Black", 119.99),
   },
   black: {
-    shirt: lookItem("look-shirt-black", "Shirt", "Dress shirt", "white", "White", 54.99, "/icons/mw/tailor-shirt-fit.png"),
-    tie: lookItem("look-tie-black", "Tie", "Silk tie", "black", "Black", 44.99, "/icons/mw/collar.png"),
+    shirt: lookItem("look-shirt-black", "Shirt", "Dress shirt", "white", "White", 54.99),
+    tie: lookItem("look-tie-black", "Tie", "Silk tie", "black", "Black", 44.99),
     shoes: lookItem("look-shoes-black", "Shoes", "Leather oxfords", "black", "Black", 139.99),
   },
   brown: {
-    shirt: lookItem("look-shirt-brown", "Shirt", "Dress shirt", "white", "White", 44.99, "/icons/mw/tailor-shirt-fit.png"),
-    tie: lookItem("look-tie-brown", "Tie", "Silk tie", "navy", "Navy", 34.99, "/icons/mw/collar.png"),
+    shirt: lookItem("look-shirt-brown", "Shirt", "Dress shirt", "white", "White", 44.99),
+    tie: lookItem("look-tie-brown", "Tie", "Silk tie", "navy", "Navy", 34.99),
     shoes: lookItem("look-shoes-brown", "Shoes", "Leather oxfords", "brown", "Brown", 119.99),
   },
   tan: {
-    shirt: lookItem("look-shirt-tan", "Shirt", "Dress shirt", "white", "White", 44.99, "/icons/mw/tailor-shirt-fit.png"),
-    tie: lookItem("look-tie-tan", "Tie", "Silk tie", "navy", "Navy", 34.99, "/icons/mw/collar.png"),
+    shirt: lookItem("look-shirt-tan", "Shirt", "Dress shirt", "white", "White", 44.99),
+    tie: lookItem("look-tie-tan", "Tie", "Silk tie", "navy", "Navy", 34.99),
     shoes: lookItem("look-shoes-tan", "Shoes", "Leather oxfords", "brown", "Brown", 109.99),
   },
   burgundy: {
-    shirt: lookItem("look-shirt-burgundy", "Shirt", "Dress shirt", "white", "White", 49.99, "/icons/mw/tailor-shirt-fit.png"),
-    tie: lookItem("look-tie-burgundy", "Tie", "Silk tie", "navy", "Navy", 39.99, "/icons/mw/collar.png"),
+    shirt: lookItem("look-shirt-burgundy", "Shirt", "Dress shirt", "white", "White", 49.99),
+    tie: lookItem("look-tie-burgundy", "Tie", "Silk tie", "navy", "Navy", 39.99),
     shoes: lookItem("look-shoes-burgundy", "Shoes", "Leather oxfords", "brown", "Brown", 119.99),
   },
   green: {
-    shirt: lookItem("look-shirt-green", "Shirt", "Dress shirt", "white", "White", 44.99, "/icons/mw/tailor-shirt-fit.png"),
-    tie: lookItem("look-tie-green", "Tie", "Silk tie", "navy", "Navy", 34.99, "/icons/mw/collar.png"),
+    shirt: lookItem("look-shirt-green", "Shirt", "Dress shirt", "white", "White", 44.99),
+    tie: lookItem("look-tie-green", "Tie", "Silk tie", "navy", "Navy", 34.99),
     shoes: lookItem("look-shoes-green", "Shoes", "Leather oxfords", "brown", "Brown", 109.99),
   },
   white: {
-    shirt: lookItem("look-shirt-white", "Shirt", "Dress shirt", "white", "White", 59.99, "/icons/mw/tailor-shirt-fit.png"),
-    tie: lookItem("look-tie-white", "Tie", "Bow tie", "black", "Black", 49.99, "/icons/mw/collar.png"),
+    shirt: lookItem("look-shirt-white", "Shirt", "Dress shirt", "white", "White", 59.99),
+    tie: lookItem("look-tie-white", "Tie", "Bow tie", "black", "Black", 49.99),
     shoes: lookItem("look-shoes-white", "Shoes", "Patent oxfords", "black", "Black", 149.99),
   },
 };
