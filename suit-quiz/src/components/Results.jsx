@@ -15,14 +15,15 @@ import {
   getRentalRecommendations,
   parseHeight,
 } from "../lib/recommendation.js";
-const SUIT_ONLY = {
-  id: "none",
-  name: "Suit only",
-  detail: "The suit as it is, with no tailoring added.",
+const NO_HEM = {
+  id: "no-hem",
+  name: "No hemming",
+  detail: "Pants stay the length they are.",
   price: 0,
-  items: [],
   icon: "/icons/mw/suits-bundle.png",
 };
+
+const TAILORING_CHOICES = [NO_HEM, ...TAILORING_TIERS];
 
 const FIT_NOTE_COPY = {
   broadShoulders: "Jackets pull across the shoulders or back",
@@ -218,15 +219,12 @@ function HowToRent({ dates }) {
   );
 }
 
-function TailoringOptions({ suggestedId, tailoringId, suitOnly, onSelect }) {
+function TailoringOptions({ suggestedId, tailoringId, onSelect }) {
   return (
     <div className="rail-block">
       <h3 className="rail-section-title">Tailoring</h3>
-      {suitOnly && (
-        <p className="rail-note">Suit only until you choose a tailoring option.</p>
-      )}
       <div className="rate-row" role="radiogroup" aria-label="Tailoring options">
-        {TAILORING_TIERS.map((option) => {
+        {TAILORING_CHOICES.map((option) => {
           const suggested = option.id === suggestedId;
           const selected = option.id === tailoringId;
           return (
@@ -591,6 +589,9 @@ function FitProfile({ answers, renting, size, fitName, onRestart, onAccount, acc
             <p className="fit-group-line">{row.value}</p>
           </div>
         ))}
+        {onRestart && (
+          <button className="fit-retake" type="button" onClick={onRestart}>Retake the quiz</button>
+        )}
       </div>
       <div className="fit-save">
         <h2 className="fit-save-title">Save your fit profile</h2>
@@ -604,9 +605,6 @@ function FitProfile({ answers, renting, size, fitName, onRestart, onAccount, acc
           <button className="button" type="button" onClick={() => onAccount("create-account")}>Create an account</button>
           <button className="button secondary" type="button" onClick={() => onAccount("sign-in")}>Sign in</button>
         </div>
-        {onRestart && (
-          <button className="fit-retake" type="button" onClick={onRestart}>Retake the quiz</button>
-        )}
         {accountStatus && <p className="handoff-inline" role="status">{accountStatus}</p>}
       </div>
     </section>
@@ -623,12 +621,12 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
   const skipTailoring = answers.tailoring === "skip";
   const suggestedTierId = TAILORING_TIERS.some((tier) => tier.id === summary.tailoring?.id)
     ? summary.tailoring.id
-    : SUIT_ONLY.id;
+    : NO_HEM.id;
   const [selectedId, setSelectedId] = useState(() => recommendations[0]?.id ?? null);
   const [detailsId, setDetailsId] = useState(null);
   const [expanded, setExpanded] = useState(false);
   const [variantIndexes, setVariantIndexes] = useState({});
-  const [tailoringId, setTailoringId] = useState(skipTailoring ? SUIT_ONLY.id : suggestedTierId);
+  const [tailoringId, setTailoringId] = useState(skipTailoring ? NO_HEM.id : suggestedTierId);
   const [addedLooks, setAddedLooks] = useState({});
   const [quickViewId, setQuickViewId] = useState(null);
   const quickViewTrigger = useRef(null);
@@ -650,7 +648,7 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
   const dates = summary.dates;
   const pack = RENTAL_PACKAGES.find((item) => item.id === Number(answers.pieces));
   const pieces = summary.pieces;
-  const tailoring = TAILORING_TIERS.find((item) => item.id === tailoringId);
+  const tailoring = TAILORING_CHOICES.find((item) => item.id === tailoringId);
   const visibleCount = expanded ? Math.min(recommendations.length, 9) : Math.min(3, recommendations.length);
   const visibleRecommendations = recommendations.slice(0, visibleCount);
   const shownRecommendations = selected && !visibleRecommendations.some((product) => product.id === selected.id)
@@ -705,7 +703,7 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
       return;
     }
     setSelectedId(product.id);
-    setTailoringId(skipTailoring ? SUIT_ONLY.id : suggestedTierId);
+    setTailoringId(skipTailoring ? NO_HEM.id : suggestedTierId);
     setAddedLooks({});
     setQuickViewId(null);
   }
@@ -775,7 +773,6 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
           <TailoringOptions
             suggestedId={skipTailoring ? null : suggestedTierId}
             tailoringId={tailoringId}
-            suitOnly={skipTailoring && tailoringId === SUIT_ONLY.id}
             onSelect={setTailoringId}
           />
           {selectedLook && (
@@ -837,9 +834,9 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
                 <p className="hero-fact-value">
                   {renting
                     ? (pack?.label ?? "Rental package")
-                    : (answers.tailoring === "skip"
-                      ? "Suit only"
-                      : (TAILORING_TIERS.find((tier) => tier.id === summary.tailoring?.id)?.plain ?? "Suit only"))}
+                      : (answers.tailoring === "skip"
+                      ? "No hemming"
+                      : (TAILORING_TIERS.find((tier) => tier.id === summary.tailoring?.id)?.plain ?? "No hemming"))}
                 </p>
               </div>
             </div>
@@ -984,19 +981,19 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
             );
           })}
 
+            {moreMode === "toggle" && recommendations.length > 3 && (
+              <button className="more-matches" type="button" onClick={() => setExpanded((value) => !value)}>
+                {expanded ? "View less" : `View more matches (${Math.min(6, recommendations.length - 3)})`}
+              </button>
+            )}
+            {moreMode === "link" && !renting && (
+              <button className="more-matches" type="button" onClick={onSeeAll}>
+                See all quiz matches
+              </button>
+            )}
           </div>
           {!narrow && optionsRail}
         </div>
-        {moreMode === "toggle" && recommendations.length > 3 && (
-          <button className="more-matches" type="button" onClick={() => setExpanded((value) => !value)}>
-            {expanded ? "View less" : `View more matches (${Math.min(6, recommendations.length - 3)})`}
-          </button>
-        )}
-        {moreMode === "link" && !renting && (
-          <button className="more-matches" type="button" onClick={onSeeAll}>
-            See all quiz matches
-          </button>
-        )}
 
         <FitProfile
           answers={answers}

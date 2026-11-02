@@ -2184,7 +2184,7 @@ h2 {
   align-items: start;
   column-gap: 24px;
   display: grid;
-  grid-template-columns: minmax(0, 1.15fr) minmax(360px, 0.9fr);
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   row-gap: 16px;
 }
 
@@ -2208,18 +2208,16 @@ h2 {
 .results-rail {
   align-self: start;
   background: var(--surface-primary);
-  border: 2px solid var(--color-background-dark-blue);
+  border: 1px solid rgba(0, 0, 0, 0.08);
   border-radius: 8px;
   box-shadow: 0 8px 16px rgba(0, 30, 86, 0.06);
   display: grid;
-  gap: 20px;
+  gap: 16px;
   margin-top: 40px;
-  max-height: calc(100vh - 152px);
   min-width: 0;
-  overflow: auto;
+  overflow: visible;
   padding: 16px;
-  position: sticky;
-  top: 24px;
+  position: static;
 }
 
 .rail-suit {
@@ -2873,7 +2871,7 @@ h2 {
 
 .rate-row {
   display: grid;
-  gap: 16px;
+  gap: 8px;
   grid-template-columns: minmax(0, 1fr);
 }
 
@@ -2884,35 +2882,42 @@ h2 {
 .rate-choice {
   align-items: center;
   display: grid;
-  gap: 16px;
-  grid-template-columns: 48px minmax(0, 1fr) auto;
-  padding: 16px;
+  gap: 8px;
+  grid-template-columns: 32px minmax(0, 1fr) auto;
+  padding: 8px 12px;
 }
 
 .rate-choice.is-suggested {
-  margin-top: 8px;
+  margin-top: 12px;
 }
 
 .rate-choice .rate-name {
   color: var(--color-background-dark-blue);
+  font-size: 14px;
+  line-height: 20px;
 }
 
 .rate-choice-icon {
-  height: 48px;
+  height: 32px;
   object-fit: contain;
-  width: 48px;
+  width: 32px;
 }
 
 .rate-choice-copy {
   display: grid;
-  gap: 8px;
+  gap: 0;
   min-width: 0;
 }
 
+.rate-choice .rate-plain {
+  font-size: 12px;
+  line-height: 16px;
+}
+
 .rate-choice-price {
-  font-size: var(--font-size-16);
+  font-size: 14px;
   font-weight: var(--font-weight-medium);
-  line-height: var(--line-height-24);
+  line-height: 20px;
   white-space: nowrap;
 }
 
@@ -3056,19 +3061,41 @@ h2 {
 }
 
 .fit-band {
-  align-items: start;
+  align-items: center;
   display: grid;
   gap: 48px;
   grid-template-columns: minmax(280px, 420px) minmax(0, 1fr);
   margin: 64px 0;
   padding: 0;
+  position: relative;
+}
+
+.fit-band::before {
+  background:
+    radial-gradient(120% 160% at 0% 0%, #f6efe6 0%, rgba(246, 239, 230, 0) 54%),
+    radial-gradient(90% 160% at 100% 0%, #d7e4f6 0%, rgba(215, 228, 246, 0) 58%),
+    #f4f7fb;
+  bottom: 40px;
+  content: "";
+  left: 50%;
+  position: absolute;
+  top: 40px;
+  transform: translateX(-50%);
+  width: 100vw;
+  z-index: 0;
+}
+
+.fit-card,
+.fit-save {
+  position: relative;
+  z-index: 1;
 }
 
 .fit-card {
   background: #ffffff;
-  border: 1px solid rgba(0, 0, 0, 0.08);
+  border: 0;
   border-radius: 4px;
-  box-shadow: none;
+  box-shadow: 0 8px 24px rgba(0, 30, 86, 0.08);
   margin: 0;
   min-width: 0;
   padding: 24px;
@@ -3181,14 +3208,16 @@ h2 {
 .fit-retake {
   background: transparent;
   border: 0;
+  border-top: 1px solid rgba(0, 0, 0, 0.12);
   color: #001e56;
   display: inline-flex;
   font-size: 16px;
   line-height: 24px;
-  margin-top: 16px;
-  padding: 0;
+  margin-top: 8px;
+  padding: 16px 0 0;
   text-decoration: underline;
   text-underline-offset: 3px;
+  width: 100%;
 }
 
 .fit-retake:hover {
@@ -3196,6 +3225,7 @@ h2 {
 }
 
 .more-matches {
+  align-self: center;
   background: transparent;
   border: 0;
   color: #001e56;
@@ -3203,7 +3233,7 @@ h2 {
   font-size: 16px;
   font-weight: 500;
   line-height: 24px;
-  margin: 16px auto 0;
+  margin: 0;
   min-height: 0;
   min-width: 0;
   padding: 0;
@@ -4527,17 +4557,15 @@ h2 {
   }
 
   .more-matches {
+    align-self: center;
     display: block;
-    margin: 16px auto 0;
+    margin: 0;
     text-align: center;
     width: fit-content;
   }
 
   .results-rail {
     margin-top: 0;
-    max-height: none;
-    overflow: visible;
-    position: static;
   }
 }
 
@@ -4641,8 +4669,9 @@ h2 {
   }
 
   .more-matches {
+    align-self: center;
     display: block;
-    margin: 16px auto 0;
+    margin: 0;
     width: fit-content;
   }
 
@@ -4679,8 +4708,8 @@ h2 {
   }
 
   .rate-choice {
-    align-items: start;
-    grid-template-columns: 40px minmax(0, 1fr) auto;
+    align-items: center;
+    grid-template-columns: 32px minmax(0, 1fr) auto;
   }
 
   .rate-choice-price {
@@ -4698,13 +4727,18 @@ h2 {
     margin: 48px 0 32px;
   }
 
+  .fit-band::before {
+    bottom: 16px;
+    top: 16px;
+  }
+
   .fit-card,
   .fit-save {
     margin: 0;
-    padding: 0;
   }
 
   .fit-card {
+    margin: 0;
     padding: var(--spacing-vertical-lg);
   }
 
