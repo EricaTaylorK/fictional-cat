@@ -140,22 +140,18 @@ function serviceLabels(item, ids) {
     .filter(Boolean);
 }
 
-function stylistLookLine(suitColor, note) {
+function joinPhrases(phrases) {
+  if (phrases.length <= 1) return phrases[0] || "";
+  if (phrases.length === 2) return `${phrases[0]} and ${phrases[1]}`;
+  return `${phrases.slice(0, -1).join(", ")}, and ${phrases[phrases.length - 1]}`;
+}
+
+function stylistLookLine(suitColor, suitName, items) {
+  if (!items?.length) return "";
   const color = String(suitColor || "suit").replace(/\s+/g, " ").trim().toLowerCase();
-  const parts = String(note || "")
-    .replace(/\s+/g, " ")
-    .trim()
-    .split(/(?<=[.!?])\s+/)
-    .filter(Boolean)
-    .slice(0, 2);
-  const lead = `The shirt, tie, and shoes that finish this ${color} suit.`;
-  if (parts.length === 0) return lead;
-  const first = parts[0].replace(/[.!?]+$/, "");
-  const second = parts[1]
-    ? parts[1].replace(/[.!?]+$/, "").replace(/^./, (letter) => letter.toLowerCase())
-    : "";
-  const reason = second ? `${first}; ${second}` : first;
-  return `${lead} ${reason.charAt(0).toUpperCase()}${reason.slice(1)}.`;
+  const pieces = joinPhrases(items.map((item) => `${item.color} ${item.name}`.replace(/\s+/g, " ").trim().toLowerCase()));
+  const lead = `Styled to finish this ${color} suit: a ${pieces}.`;
+  return suitName ? `${lead} Chosen for the ${suitName}.` : lead;
 }
 
 function compatibleLookIds(colorKey, ids) {
@@ -467,8 +463,8 @@ function QuickView({ item, initial, onConfirm, onClose }) {
   );
 }
 
-function CompleteLook({ id, look, suitColor, addedLooks, onOpen, onRemove }) {
-  const lede = stylistLookLine(suitColor, look.note);
+function CompleteLook({ id, look, suitColor, suitName, addedLooks, onOpen, onRemove }) {
+  const lede = stylistLookLine(suitColor, suitName, look.items);
   return (
     <section className="complete-look" aria-labelledby={id}>
       <div className="look-head">
@@ -787,6 +783,7 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
               id={`complete-look-${selected.id}`}
               look={selectedLook}
               suitColor={selectedVariant?.color || selected.color}
+              suitName={selected.name}
               addedLooks={addedLooks}
               onOpen={openQuickView}
               onRemove={removeLook}
