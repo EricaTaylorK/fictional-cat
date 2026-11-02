@@ -904,35 +904,34 @@ h2 {
   max-width: 100%;
 }
 
-.email-results {
-  display: contents;
-}
-
-.email-form-banner,
-.email-results .email-sent {
-  flex: 1 0 100%;
-  margin: 0;
-  text-align: right;
-}
-
 .email-form-banner {
-  align-items: flex-end;
+  align-items: stretch;
+  align-self: flex-end;
   display: flex;
-  flex-wrap: wrap;
   gap: 8px;
-  justify-content: flex-end;
+  margin: -16px 0 0;
+  width: min(560px, 100%);
 }
 
 .email-form-banner .text-input {
-  flex: 1 1 240px;
+  flex: 1 1 auto;
   margin: 0;
-  max-width: 320px;
   min-width: 0;
 }
 
-.email-form-banner .button {
-  min-width: 0;
+.email-form-banner .button.email-form-send {
+  flex: 0 0 auto;
+  height: var(--spacing-vertical-xxxxxxl);
+  min-height: 0;
+  min-width: 120px;
+  padding: 0 var(--spacing-horizontal-xl);
   width: auto;
+}
+
+.results-hero .email-sent {
+  align-self: flex-end;
+  margin: -16px 0 0;
+  text-align: right;
 }
 
 .results-hero-action {
@@ -1777,10 +1776,6 @@ h2 {
   font-size: var(--font-size-18);
   line-height: var(--line-height-24);
   margin: 0;
-}
-
-.summary-panel .email-results {
-  margin-top: var(--spacing-vertical-lg);
 }
 
 .promo-strip {

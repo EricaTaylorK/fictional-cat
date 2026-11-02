@@ -193,51 +193,29 @@ function ShareIcon() {
   );
 }
 
-function EmailResults() {
-  const [open, setOpen] = useState(false);
+function EmailForm({ onSent }) {
   const [email, setEmail] = useState("");
-  const [sentTo, setSentTo] = useState("");
 
   function handleSubmit(event) {
     event.preventDefault();
     if (!email.trim()) return;
-    setSentTo(email.trim());
+    onSent(email.trim());
     setEmail("");
-    setOpen(false);
   }
 
   return (
-    <div className="email-results">
-      <button
-        className="results-hero-action"
-        type="button"
-        aria-expanded={open}
-        onClick={() => {
-          setSentTo("");
-          setOpen((value) => !value);
-        }}
-      >
-        <ShareIcon />
-        Share results
-      </button>
-      {sentTo && !open && (
-        <p className="success-note email-sent" role="status">Sent to {sentTo}. Prototype: a real experience would email the results now.</p>
-      )}
-      {open && (
-        <form className="email-form-banner" onSubmit={handleSubmit}>
-          <TextInput
-            label="Email address"
-            type="email"
-            inputMode="email"
-            autoComplete="email"
-            value={email}
-            onChange={setEmail}
-            required
-          />
-          <button className="button secondary" type="submit">Send</button>
-        </form>
-      )}
-    </div>
+    <form className="email-form-banner" onSubmit={handleSubmit}>
+      <TextInput
+        label="Email address"
+        type="email"
+        inputMode="email"
+        autoComplete="email"
+        value={email}
+        onChange={setEmail}
+        required
+      />
+      <button className="button email-form-send" type="submit">Send</button>
+    </form>
   );
 }
 
@@ -473,6 +451,8 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
   const [addedLookIds, setAddedLookIds] = useState([]);
   const [detailOpen, setDetailOpen] = useState({});
   const [handoff, setHandoff] = useState("");
+  const [emailOpen, setEmailOpen] = useState(false);
+  const [sentTo, setSentTo] = useState("");
   const [summaryOpen, setSummaryOpen] = useState(false);
 
   useEffect(() => {
@@ -597,13 +577,37 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
                 <PencilIcon />
                 Edit answers
               </button>
-              <EmailResults />
+              <button
+                className="results-hero-action"
+                type="button"
+                aria-expanded={emailOpen}
+                onClick={() => {
+                  setSentTo("");
+                  setEmailOpen((value) => !value);
+                }}
+              >
+                <ShareIcon />
+                Share results
+              </button>
               <button className="results-hero-action" type="button" onClick={() => onRestart?.()}>
                 <RestartIcon />
                 Restart quiz
               </button>
             </div>
           </div>
+          {emailOpen && (
+            <EmailForm
+              onSent={(address) => {
+                setSentTo(address);
+                setEmailOpen(false);
+              }}
+            />
+          )}
+          {sentTo && !emailOpen && (
+            <p className="success-note email-sent" role="status">
+              Sent to {sentTo}. Prototype: a real experience would email the results now.
+            </p>
+          )}
           <div className="results-hero-copy">
             <h1 id="results-title">{headline}</h1>
             {lede && <p className="results-lede">{lede}</p>}
