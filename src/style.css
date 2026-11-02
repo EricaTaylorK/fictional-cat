@@ -1579,3 +1579,21 @@ h1 {
 @media (prefers-reduced-motion: reduce) {
   .sheet, .chevron { animation: none; transition: none; }
 }
+
+.version-mark {
+  background: #111;
+  border-radius: 999px;
+  bottom: 12px;
+  color: #fff;
+  font-family: Roboto, sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  left: 12px;
+  letter-spacing: 0.04em;
+  line-height: 1;
+  margin: 0;
+  padding: 6px 8px;
+  pointer-events: none;
+  position: fixed;
+  z-index: 10000;
+}
