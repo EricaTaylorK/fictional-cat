@@ -6,7 +6,7 @@ import {
   TAILORING_TIERS,
   TAILORING_TURNAROUND,
 } from "../data/products.js";
-import { colorsIn, getQuestionFlow, questions, resolvedOccasion } from "../data/quizConfig.js";
+import { colorsIn, getQuestionFlow, resolvedOccasion } from "../data/quizConfig.js";
 import { RENTAL_PACKAGES, RENTAL_STEPS, RENTAL_TYPE_NAMES } from "../data/rentals.js";
 import {
   buildResultSummary,
@@ -134,19 +134,27 @@ function defaultVariantIndex(product, answers) {
   return Math.max(0, open);
 }
 
-function titleCase(value) {
+function titleWords(value) {
   if (!value) return "";
-  return value.charAt(0).toUpperCase() + value.slice(1);
+  return value.replace(/\b\w/g, (letter) => letter.toUpperCase());
+}
+
+function jacketFact(size, renting) {
+  if (size?.jacket) {
+    const chest = String(size.jacket).replace(/[SRL]$/i, "");
+    return `${chest} ${titleWords(size.length || "Regular")}`;
+  }
+  if (size?.length) return `${titleWords(size.length)} length`;
+  return renting ? "Confirmed at your fitting" : "Measured in store";
+}
+
+function pantsFact(size, renting) {
+  if (size?.pants) return `${String(size.pants).replace(/W$/i, "")}-inch waist`;
+  return renting ? "Confirmed at your fitting" : "Measured in store";
 }
 
 function jacketWords(size, renting) {
-  if (size?.jacket) {
-    const chest = String(size.jacket).replace(/[SRL]$/i, "");
-    const length = (size.length || "Regular").toLowerCase();
-    return `${chest} ${length}`;
-  }
-  if (size?.length) return `${size.length.toLowerCase()} length`;
-  return renting ? "Confirmed at your fitting" : "Measured in store";
+  return jacketFact(size, renting);
 }
 
 function pantsWords(size, renting) {
@@ -177,10 +185,10 @@ function matchTone(percent) {
   return percent >= 90 ? "best" : "mid";
 }
 
-function EnvelopeIcon() {
+function ShareIcon() {
   return (
-    <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true">
-      <path fill="currentColor" d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2Zm0 4-8 5L4 8V6l8 5 8-5v2Z" />
+    <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true">
+      <path fill="currentColor" d="M12 3.2 6.8 8.4h3.2V15h4V8.4h3.2L12 3.2ZM5 14v6h14v-6h2v8H3v-8h2Z" />
     </svg>
   );
 }
@@ -209,8 +217,8 @@ function EmailResults() {
           setOpen((value) => !value);
         }}
       >
-        <EnvelopeIcon />
-        Email to myself
+        <ShareIcon />
+        Share results
       </button>
       {sentTo && !open && (
         <p className="success-note email-sent" role="status">Sent to {sentTo}. Prototype: a real experience would email the results now.</p>
@@ -489,7 +497,6 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
     : visibleRecommendations;
   const flow = useMemo(() => getQuestionFlow(answers), [answers]);
   const occasion = resolvedOccasion(answers);
-  const budgetText = questions.budget.options.find((option) => option.value === answers.budget)?.label ?? "Not set";
   const suggestTailoring = answers.tailoring !== "skip";
   const headline = answers.feel
     ? `Recommended for ${summary.occasion}, in a ${summary.fitName}.`
@@ -590,28 +597,43 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
                 <PencilIcon />
                 Edit answers
               </button>
+              <EmailResults />
               <button className="results-hero-action" type="button" onClick={() => onRestart?.()}>
                 <RestartIcon />
                 Restart quiz
               </button>
-              <EmailResults />
             </div>
           </div>
           <div className="results-hero-copy">
             <h1 id="results-title">{headline}</h1>
             {lede && <p className="results-lede">{lede}</p>}
           </div>
-          <p className="answer-line">
-            {[
-              titleCase(summary.occasion),
-              titleCase(summary.fitName),
-              jacketWords(size, renting),
-              pantsWords(size, renting),
-              renting ? (pack?.label ?? "Rental") : budgetText,
-            ].filter(Boolean).map((value, index) => (
-              <span key={`${value}-${index}`}>{index > 0 ? " · " : ""}{value}</span>
-            ))}
-          </p>
+          <div className="hero-facts">
+            <div className="hero-fact">
+              <div>
+                <p className="hero-fact-label">Your sizes</p>
+                <p className="hero-fact-value">Jacket: {jacketFact(size, renting)} · Pants: {pantsFact(size, renting)}</p>
+              </div>
+            </div>
+            <div className="hero-fact">
+              <div>
+                <p className="hero-fact-label">Your fit</p>
+                <p className="hero-fact-value">{titleWords(summary.fitName)}</p>
+              </div>
+            </div>
+            <div className="hero-fact">
+              <div>
+                <p className="hero-fact-label">{renting ? "Package" : "Suggested tailoring"}</p>
+                <p className="hero-fact-value">
+                  {renting
+                    ? (pack?.label ?? "Rental package")
+                    : (answers.tailoring === "skip"
+                      ? "Suit only"
+                      : (TAILORING_TIERS.find((tier) => tier.id === summary.tailoring?.id)?.plain ?? "Suit only"))}
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
 
         {recommendations.budgetMiss && (
