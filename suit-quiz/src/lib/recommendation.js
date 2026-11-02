@@ -1,26 +1,12 @@
-import { colorsIn, questions, resolvedOccasion } from "../data/quizConfig.js";
 import { products, TAILORING_ESTIMATE } from "../data/products.js";
-import {
-  RENTAL_MIN_LEAD_DAYS,
-  RENTAL_PACKAGES,
-  RENTAL_PIECES,
-  RENTAL_READY_DAYS,
-  RENTAL_TYPE_NAMES,
-  rentals,
-} from "../data/rentals.js";
 
 const occasionLabels = {
   wedding: "a wedding",
   funeral: "a funeral or memorial",
-  work: "work",
-  business: "business",
-  formal: "a black-tie evening",
-  milestone: "a graduation or prom",
-  versatile: "all-purpose events",
-  travel: "travel",
-  prom: "prom",
-  mixed: "all-purpose events",
-  special: "a special event",
+  work: "work or an interview",
+  formal: "a black-tie or formal evening",
+  milestone: "a graduation, prom, or milestone",
+  versatile: "whatever comes up",
 };
 
 const fitLabels = {
@@ -29,54 +15,24 @@ const fitLabels = {
   roomy: "comfortable with room",
 };
 
-const fitNameLabels = {
-  close: "slim fit",
-  balanced: "modern fit",
-  roomy: "classic fit",
-};
-
-const budgetPhrases = {
-  "under-250": "under $250",
-  "250-400": "in the $250–$400 range",
-  "400-600": "in the $400–$600 range",
-  "over-600": "at $600 or more",
-  "under-150": "under $150",
-  "150-200": "in the $150–$200 range",
-  "200-250": "in the $200–$250 range",
-  "over-250": "at $250 or more",
-};
-
 export function getBudgetRange(budget) {
   const ranges = {
     "under-250": [0, 249],
     "250-400": [250, 400],
     "400-600": [401, 600],
     "over-600": [601, Infinity],
-    "under-150": [0, 149.99],
-    "150-200": [150, 200],
-    "200-250": [200.01, 250],
-    "over-250": [250.01, Infinity],
     flexible: [0, Infinity],
   };
   return ranges[budget] ?? [0, Infinity];
 }
 
-// Fit issues are asked on two screens (jackets, then pants). Both feed the same signals.
-function fitIssueValues(answers) {
-  return [...(answers.fitIssues ?? []), ...(answers.pantsFit ?? [])].filter((issue) => issue !== "none");
-}
-
 export function isLowConfidence(answers) {
   const measurements = answers.measurements ?? {};
   const knownNumbers = [measurements.jacket, measurements.chest, measurements.waist].filter(Boolean);
-  const issues = fitIssueValues(answers);
+  const issues = (answers.fitIssues ?? []).filter((issue) => issue !== "none");
 
-  if (answers.measurementKnowledge === "yes" || answers.measurementKnowledge === "some") {
-    return knownNumbers.length === 0;
-  }
+  if (answers.measurementKnowledge === "some" && knownNumbers.length === 0) return true;
   if (answers.measurementKnowledge !== "no") return false;
-  const inches = Number(answers.height);
-  if (Number.isFinite(inches) && inches >= 48) return inches < 67 || inches > 75;
 
   return (
     issues.length >= 2 ||
@@ -96,66 +52,11 @@ const fitNoteLabels = {
 
 const LENGTHS = ["S", "R", "L"];
 const LENGTH_NAMES = { S: "Short", R: "Regular", L: "Long" };
-const LENGTH_WORDS = { short: "S", regular: "R", long: "L", s: "S", r: "R", l: "L" };
 const STANDARD_DROP = 6;
 
-const FIT_TO_CATALOG = { close: "slim", balanced: "modern", roomy: "classic" };
-
-export function parseJacket(raw) {
-  if (raw == null) return null;
-  const text = String(raw).trim().toLowerCase();
-  if (!text) return null;
-  const match = text.match(/(\d{2,3})(?:\s*(short|regular|long|[srl]))?/);
-  if (!match) return null;
-  const chest = Number(match[1]);
-  if (!chest || chest < 30 || chest > 70) return null;
-  return { chest, length: match[2] ? LENGTH_WORDS[match[2]] : null };
-}
-
-export function parseHeight(raw) {
-  if (raw == null) return null;
-  const text = String(raw)
-    .trim()
-    .toLowerCase()
-    .replace(/[“”″]/g, "\"")
-    .replace(/[‘’′]/g, "'");
-  if (!text) return null;
-
-  let feet;
-  let inches;
-  let match = text.match(/(\d+)\s*(?:ft|feet|')\s*(\d{1,2})?/);
-  if (match) {
-    feet = Number(match[1]);
-    inches = Number(match[2] || 0);
-  } else if ((match = text.match(/^(\d+)\s+(\d{1,2})$/))) {
-    feet = Number(match[1]);
-    inches = Number(match[2]);
-  } else if ((match = text.match(/^(\d+)$/))) {
-    const total = Number(match[1]);
-    if (total >= 48 && total <= 96) {
-      feet = Math.floor(total / 12);
-      inches = total % 12;
-    } else if (total >= 4 && total <= 7) {
-      feet = total;
-      inches = 0;
-    } else {
-      return null;
-    }
-  } else {
-    return null;
-  }
-
-  if (inches >= 12) {
-    feet += Math.floor(inches / 12);
-    inches %= 12;
-  }
-  if (feet < 4 || feet > 8) return null;
-  return { feet, inches, total: feet * 12 + inches };
-}
-
 export function getFitSignals(answers) {
-  const signals = new Set(fitIssueValues(answers));
-  const chest = parseJacket(answers.measurements?.jacket)?.chest || Number(answers.measurements?.chest);
+  const signals = new Set((answers.fitIssues ?? []).filter((issue) => issue !== "none"));
+  const chest = Number(answers.measurements?.jacket || answers.measurements?.chest);
   const waist = Number(answers.measurements?.waist);
   if (chest && waist) {
     const drop = chest - waist;
@@ -165,38 +66,21 @@ export function getFitSignals(answers) {
   return signals;
 }
 
-function heightFromMeasurements(answers) {
-  const parsed = parseHeight(answers.measurements?.height);
-  if (parsed) return parsed;
-  const feet = Number(answers.measurements?.heightFeet);
-  if (!feet) return null;
-  const inches = Number(answers.measurements?.heightInches) || 0;
-  return { feet, inches, total: feet * 12 + inches };
-}
-
 function heightLength(answers) {
   if (answers.height === "short") return "S";
   if (answers.height === "regular") return "R";
   if (answers.height === "tall" || answers.height === "extra-tall") return "L";
-  const inches = Number(answers.height);
-  if (Number.isFinite(inches) && inches >= 48) {
-    if (inches < 67) return "S";
-    if (inches > 72) return "L";
-    return "R";
-  }
 
-  const parsed = heightFromMeasurements(answers);
-  if (!parsed?.total) return null;
-  if (parsed.total < 67) return "S";
-  if (parsed.total > 72) return "L";
+  const feet = Number(answers.measurements?.heightFeet);
+  const inches = Number(answers.measurements?.heightInches);
+  const total = feet * 12 + inches;
+  if (!total) return null;
+  if (total < 67) return "S";
+  if (total > 72) return "L";
   return "R";
 }
 
 export function inferLength(answers) {
-  const fromJacket = parseJacket(answers.measurements?.jacket)?.length
-    || (["S", "R", "L"].includes(answers.measurements?.jacketLength) ? answers.measurements.jacketLength : null);
-  if (fromJacket) return fromJacket;
-
   const base = heightLength(answers);
   if (!base) return null;
   const signals = getFitSignals(answers);
@@ -206,7 +90,7 @@ export function inferLength(answers) {
   return LENGTHS[index];
 }
 
-export const SHIRT_SIZE_CHEST = { XS: 36, S: 38, M: 40, L: 42, XL: 46, XXL: 48, "3XL": 52 };
+export const SHIRT_SIZE_CHEST = { S: 38, M: 40, L: 42, XL: 46, XXL: 48 };
 
 function buildDrop(answers) {
   const signals = getFitSignals(answers);
@@ -216,8 +100,7 @@ function buildDrop(answers) {
 }
 
 function knownChest(answers) {
-  return parseJacket(answers.measurements?.jacket)?.chest
-    || Number(answers.measurements?.chest)
+  return Number(answers.measurements?.jacket || answers.measurements?.chest)
     || SHIRT_SIZE_CHEST[answers.everydaySizes?.shirt]
     || null;
 }
@@ -227,36 +110,19 @@ function knownWaist(answers) {
 }
 
 export function getSizeEstimate(answers) {
-  const parsedJacket = parseJacket(answers.measurements?.jacket);
-  const lengthCode = parsedJacket?.length || inferLength(answers) || "R";
+  const lengthCode = inferLength(answers) ?? "R";
   const chest = knownChest(answers);
   const waist = knownWaist(answers);
   if (!chest && !waist) {
     return { jacket: null, pants: null, length: LENGTH_NAMES[lengthCode], lengthCode };
   }
-  const jacketSize = Math.round((parsedJacket?.chest ?? chest ?? waist + buildDrop(answers)) / 2) * 2;
+  const jacketSize = Math.round((chest ?? waist + buildDrop(answers)) / 2) * 2;
   return {
     jacket: `${jacketSize}${lengthCode}`,
     pants: `${waist ?? jacketSize - buildDrop(answers)}W`,
     length: LENGTH_NAMES[lengthCode],
     lengthCode,
   };
-}
-
-export function describeSize(size) {
-  const parts = [];
-  if (size?.jacket) {
-    const chest = String(size.jacket).replace(/[SRL]$/i, "");
-    const length = (size.length || "Regular").toLowerCase();
-    parts.push(`${chest} ${length} jacket`);
-  } else if (size?.length) {
-    parts.push(`${size.length.toLowerCase()} length jacket`);
-  }
-  if (size?.pants) {
-    const waist = String(size.pants).replace(/W$/i, "");
-    parts.push(`${waist}-inch waist`);
-  }
-  return parts.join(", ");
 }
 
 export function inferLikelySize(answers) {
@@ -310,10 +176,6 @@ const budgetLabels = {
   "250-400": "$250–$400 budget",
   "400-600": "$400–$600 budget",
   "over-600": "$600+ budget",
-  "under-150": "under-$150 budget",
-  "150-200": "$150–$200 budget",
-  "200-250": "$200–$250 budget",
-  "over-250": "$250+ budget",
 };
 
 const priceFormat = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" });
@@ -324,7 +186,6 @@ export function formatPrice(price) {
 
 function scoreFitSignals(product, answers, evidence) {
   const signals = getFitSignals(answers);
-  const fitName = (product.fitName || "This cut").toLowerCase();
   let score = 0;
 
   if (signals.has("broadShoulders")) {
@@ -333,7 +194,7 @@ function scoreFitSignals(product, answers, evidence) {
     if (product.fit === "close") score -= 8;
     if (product.stretch) score += 6;
     if (product.fit !== "close") {
-      evidence.push(`The ${fitName} leaves room through the shoulders and back, which a tailor can't add later.`);
+      evidence.push(`The ${product.fitName.toLowerCase()} leaves room through the shoulders and back, which a tailor can't add later.`);
     } else if (product.stretch) {
       evidence.push("Stretch in the fabric gives across the shoulders and back when you reach.");
     }
@@ -345,7 +206,7 @@ function scoreFitSignals(product, answers, evidence) {
     if (product.fit === "roomy") score -= 10;
     if (product.stretch) score += 4;
     if (product.fit === "close") {
-      evidence.push(`The ${fitName} tapers from a broad chest down to a trimmer waist.`);
+      evidence.push(`The ${product.fitName.toLowerCase()} tapers from a broad chest down to a trimmer waist.`);
     } else if (product.fit === "balanced") {
       evidence.push("Fits a broad chest, and a tailor can take in the jacket and pants waist.");
     }
@@ -355,7 +216,7 @@ function scoreFitSignals(product, answers, evidence) {
     if (product.fit === "roomy") score += 28;
     if (product.fit === "close") score -= 20;
     if (product.fit === "roomy") {
-      evidence.push(`The ${fitName} gives room at the button and waist, so nothing pulls.`);
+      evidence.push(`The ${product.fitName.toLowerCase()} gives room at the button and waist, so nothing pulls.`);
     }
   }
 
@@ -366,7 +227,7 @@ function scoreFitSignals(product, answers, evidence) {
     if (product.stretch) {
       evidence.push("Stretch in the fabric gives through the seat and thighs when you sit or move.");
     } else if (product.fit === "roomy") {
-      evidence.push(`The ${fitName} cuts the pants fuller through the seat and thighs.`);
+      evidence.push(`The ${product.fitName.toLowerCase()} cuts the pants fuller through the seat and thighs.`);
     }
   }
 
@@ -377,34 +238,15 @@ function isAdjacentFit(fit, feel) {
   return fit === "balanced" || feel === "balanced";
 }
 
-function colorKeysFor(product) {
-  return [...new Set([product.colorKey, ...(product.variants ?? []).map((item) => item.colorKey)].filter(Boolean))];
-}
-
-function everyColorAvoided(product, avoid) {
-  if (!avoid.length) return false;
-  const keys = colorKeysFor(product);
-  return keys.length > 0 && keys.every((key) => avoid.includes(key));
-}
-
-function matchedColor(product, prefer) {
-  if (!prefer.length) return null;
-  if (prefer.includes(product.colorKey)) return product.color;
-  return product.variants?.find((item) => prefer.includes(item.colorKey))?.color ?? null;
-}
-
 function scoreProduct(product, answers, index) {
   let score = 0;
   const evidence = [];
   const [budgetMin, budgetMax] = getBudgetRange(answers.budget);
-  const formality = product.formality ?? [];
-  const prefer = colorsIn(answers.colors?.prefer);
-  const occasion = resolvedOccasion(answers);
 
-  if (occasion && formality.includes(occasion)) {
+  if (product.formality.includes(answers.occasion)) {
     score += 32;
-    evidence.push(product.occasionNotes?.[occasion] ?? `A straightforward choice for ${occasionLabels[answers.occasion] ?? occasionLabels[occasion]}.`);
-  } else if (occasion) {
+    evidence.push(product.occasionNotes?.[answers.occasion] ?? `It reads correctly for ${occasionLabels[answers.occasion]}.`);
+  } else {
     score -= 18;
   }
 
@@ -417,377 +259,57 @@ function scoreProduct(product, answers, index) {
     score += 9;
   }
 
-  const inBudget = product.price >= budgetMin && product.price <= budgetMax;
-  if (inBudget) {
+  if (product.price >= budgetMin && product.price <= budgetMax) {
     score += 18;
     if (budgetLabels[answers.budget]) {
       evidence.push(product.compareAt
         ? `On sale at ${formatPrice(product.price)} (was ${formatPrice(product.compareAt)}), inside your ${budgetLabels[answers.budget]}.`
         : `${formatPrice(product.price)}, inside your ${budgetLabels[answers.budget]}.`);
     }
-  } else if (answers.budget && answers.budget !== "flexible") {
-    const edge = Math.min(Math.max(product.price, budgetMin), budgetMax);
-    score -= Math.min(18, Math.ceil(Math.abs(product.price - edge) / 20));
+  } else if (answers.budget !== "flexible") {
+    score -= Math.min(18, Math.ceil(Math.abs(product.price - Math.min(Math.max(product.price, budgetMin), budgetMax)) / 20));
   }
 
-  if (answers.feel === "roomy") score += (product.comfort ?? 0) * 2;
+  if (answers.wearIntent === "rewear" || answers.wearIntent === "often") {
+    score += product.versatility * 4;
+    if (product.versatility >= 4 && product.rewearNote) evidence.push(product.rewearNote);
+  } else if (product.formality.includes(answers.occasion)) {
+    score += 8;
+  }
+
+  if (answers.feel === "roomy") score += product.comfort * 2;
   if (answers.tailoring !== "skip") {
-    score += (product.tailoringEase ?? 0) * 2;
+    score += product.tailoringEase * 2;
   }
-
-  const colorName = matchedColor(product, prefer);
-  const avoid = colorsIn(answers.colors?.avoid);
-  if (colorName) {
-    score += 20;
-    evidence.push(`In ${colorName.toLowerCase()}, a color you picked.`);
-  } else if (everyColorAvoided(product, avoid)) {
-    score -= 20;
-  }
-
   return {
     ...product,
     score,
     evidence: evidence.slice(0, 4),
-    inBudget: !answers.budget || answers.budget === "flexible" || inBudget,
     originalIndex: index,
   };
-}
-
-function budgetMissLabel(budget, count, item = "suit") {
-  const phrase = budgetPhrases[budget] ?? "in your budget";
-  if (count === 0) return `Nothing ${phrase} matched. Closest options:`;
-  const noun = count === 1 ? item : `${item}s`;
-  return `Only ${count} ${noun} ${phrase} matched. Closest options:`;
-}
-
-function buildTradeoffs(product, answers) {
-  const notes = [];
-  const [budgetMin, budgetMax] = getBudgetRange(answers.budget);
-  const occasion = resolvedOccasion(answers);
-  if (occasion && product.formality && !product.formality.includes(occasion)) {
-    notes.push(`Not the usual choice for ${occasionLabels[answers.occasion]}.`);
-  }
-  if (answers.feel && product.fit && product.fit !== answers.feel && product.fitName) {
-    notes.push(`${product.fitName} isn't the ${fitNameLabels[answers.feel]} you asked for.`);
-  }
-  if (answers.budget && answers.budget !== "flexible" && !product.inBudget) {
-    if (product.price > budgetMax) {
-      notes.push(`Over your budget by ${formatPrice(product.price - budgetMax)}.`);
-    } else if (product.price < budgetMin) {
-      notes.push(`Below your ${budgetLabels[answers.budget] ?? "budget"}.`);
-    }
-  }
-  const prefer = colorsIn(answers.colors?.prefer);
-  if (prefer.length && !matchedColor(product, prefer)) {
-    notes.push(`${product.color} wasn't a color you picked.`);
-  }
-  const avoid = colorsIn(answers.colors?.avoid);
-  if (everyColorAvoided(product, avoid)) {
-    notes.push(`${product.color} is a color you wanted to avoid.`);
-  }
-  return notes;
-}
-
-function maxPossibleScore(answers) {
-  const prefer = colorsIn(answers.colors?.prefer)[0];
-  const occasion = resolvedOccasion(answers);
-  const [budgetMin, budgetMax] = getBudgetRange(answers.budget);
-  const price = budgetMax === Infinity ? Math.max(budgetMin, 700) : (budgetMin + budgetMax) / 2;
-  let best = 0;
-  for (const fit of ["close", "balanced", "roomy"]) {
-    for (const stretch of [false, true]) {
-      const candidate = {
-        fit,
-        stretch,
-        fitName: "Suit",
-        formality: occasion ? [occasion] : [],
-        versatility: 5,
-        comfort: 5,
-        tailoringEase: 5,
-        price,
-        colorKey: prefer,
-        color: "Navy",
-        cutNote: "cut",
-        rewearNote: "rewear",
-      };
-      const scored = scoreProduct(candidate, answers, 0);
-      if (scored.score > best) best = scored.score;
-    }
-  }
-  return best || 1;
-}
-
-function honestPercent(score, maxScore) {
-  const percent = Math.round((score / maxScore) * 98);
-  return Math.max(35, Math.min(98, percent));
 }
 
 export function getRecommendations(answers, assortment = products) {
-  const pool = assortment.map((product, index) => scoreProduct(product, answers, index));
-  const byScore = (a, b) => b.score - a.score || a.originalIndex - b.originalIndex;
-  const inBudget = pool.filter((product) => product.inBudget).sort(byScore);
-  const overBudget = pool.filter((product) => !product.inBudget).sort(byScore);
-  const ranked = [...inBudget, ...overBudget];
-  const maxScore = maxPossibleScore(answers);
-  const limitedBudget = answers.budget && answers.budget !== "flexible";
-  const budgetMiss = limitedBudget && inBudget.length < 3
-    ? { label: budgetMissLabel(answers.budget, inBudget.length), count: inBudget.length }
-    : null;
+  const ranked = assortment
+    .map((product, index) => scoreProduct(product, answers, index))
+    .sort((a, b) => b.score - a.score || a.originalIndex - b.originalIndex);
 
-  const result = ranked.map((product) => {
-    const [budgetMin, budgetMax] = getBudgetRange(answers.budget);
-    return {
-      ...product,
-      matchPercent: honestPercent(product.score, maxScore),
-      bundlePrice: product.price + (answers.tailoring === "bundle" ? TAILORING_ESTIMATE : 0),
-      budgetOver: limitedBudget && product.price > budgetMax ? product.price - budgetMax : null,
-      belowBudget: limitedBudget && product.price < budgetMin,
-      tradeoffs: buildTradeoffs(product, answers),
-    };
-  });
-  result.budgetMiss = budgetMiss;
-  return result;
-}
-
-export function quizCatalogIds(answers, limit = 9) {
-  const prefer = new Set(colorsIn(answers.colors?.prefer));
-  const ids = [];
-  for (const product of getRecommendations(answers).slice(0, limit)) {
-    const options = product.variants?.length
-      ? product.variants
-      : [{ colorKey: product.colorKey, catalogId: product.catalogId }];
-    const chosen = options.filter((option) => {
-      if (!option.catalogId) return false;
-      if (prefer.size && !prefer.has(option.colorKey)) return false;
-      return true;
-    });
-    for (const option of (chosen.length ? chosen : options)) {
-      if (option.catalogId) ids.push(option.catalogId);
-    }
-  }
-  return [...new Set(ids)];
-}
-
-export function quizListingFilters(answers) {
-  const selections = {};
-  const prefer = colorsIn(answers.colors?.prefer);
-  if (prefer.length) selections.color = [...prefer];
-  if (FIT_TO_CATALOG[answers.feel]) selections.fit = [FIT_TO_CATALOG[answers.feel]];
-
-  const filters = { selections, priceMin: null, priceMax: null };
-  if (answers.budget === "under-250") filters.priceMax = 250;
-  if (answers.budget === "250-400") {
-    filters.priceMin = 250;
-    filters.priceMax = 400;
-  }
-  if (answers.budget === "400-600") {
-    filters.priceMin = 400;
-    filters.priceMax = 600;
-  }
-  if (answers.budget === "over-600") filters.priceMin = 600;
-  return filters;
-}
-
-const DAY_MS = 24 * 60 * 60 * 1000;
-
-function parseIsoDate(value) {
-  const match = String(value ?? "").match(/^(\d{4})-(\d{2})-(\d{2})$/);
-  if (!match) return null;
-  return new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3]));
-}
-
-function startOfDay(date) {
-  return new Date(date.getFullYear(), date.getMonth(), date.getDate());
-}
-
-function addDays(date, days) {
-  return new Date(date.getFullYear(), date.getMonth(), date.getDate() + days);
-}
-
-const dateFormat = new Intl.DateTimeFormat("en-US", { weekday: "short", month: "short", day: "numeric" });
-
-export function formatDate(date) {
-  return date ? dateFormat.format(date) : "";
-}
-
-export function rentalDates(eventDate, today = new Date()) {
-  const event = parseIsoDate(eventDate);
-  if (!event) return null;
-  const daysAway = Math.round((event - startOfDay(today)) / DAY_MS);
-  return {
-    event,
-    ready: addDays(event, -RENTAL_READY_DAYS),
-    returnBy: addDays(event, 1),
-    daysAway,
-    past: daysAway < 0,
-    tooSoon: daysAway >= 0 && daysAway < RENTAL_MIN_LEAD_DAYS,
-  };
-}
-
-export function rentalPieces(answers) {
-  const pack = RENTAL_PACKAGES.find((item) => item.id === Number(answers.pieces));
-  if (!pack) return [];
-  return pack.pieces
-    .map((id) => RENTAL_PIECES.find((piece) => piece.id === id))
-    .filter(Boolean);
-}
-
-export function rentalTotal(look, pieces) {
-  return Math.round((look.price + pieces.reduce((sum, piece) => sum + piece.price, 0)) * 100) / 100;
-}
-
-const RENTAL_TYPE_SCORES = {
-  formal: { tux: 16, dinner: 12, tailcoat: 14, suit: -12 },
-  wedding: { tux: 6, dinner: 4, tailcoat: 0, suit: 6 },
-  prom: { tux: 8, dinner: 10, tailcoat: -20, suit: 2 },
-  special: { tux: 4, dinner: 6, tailcoat: -20, suit: 6 },
-};
-
-const RENTAL_TYPE_NOTES = {
-  formal: {
-    tux: "A true tuxedo, with the satin details black tie calls for.",
-    dinner: "A dinner jacket reads as black tie, with more personality.",
-    tailcoat: "A full-dress tailcoat, for the most formal invitations.",
-  },
-  wedding: {
-    tux: "A tuxedo looks right for the groom, the wedding party, or an evening wedding.",
-    suit: "A suit fits most ceremonies, from daytime to evening.",
-    dinner: "A dinner jacket stands out at an evening reception.",
-    tailcoat: "A tailcoat suits the most formal ceremonies.",
-  },
-  prom: {
-    tux: "A tuxedo is the classic prom pick.",
-    dinner: "A dinner jacket stands out in photos.",
-    suit: "A suit keeps it sharp and simple.",
-  },
-  special: {
-    tux: "A tuxedo dresses up any celebration.",
-    dinner: "A dinner jacket feels festive without going overboard.",
-    suit: "A suit is easy to wear at most celebrations.",
-  },
-};
-
-function scoreRental(look, answers, pieces, index) {
-  let score = 0;
-  const evidence = [];
-  const [budgetMin, budgetMax] = getBudgetRange(answers.rentalBudget);
-  const prefer = colorsIn(answers.colors?.prefer);
-  const total = rentalTotal(look, pieces);
-  const occasion = resolvedOccasion(answers);
-
-  if (occasion && look.formality.includes(occasion)) {
-    score += 32;
-    const note = RENTAL_TYPE_NOTES[occasion]?.[look.type];
-    if (note) evidence.push(note);
-  } else if (occasion) {
-    score -= 18;
-  }
-  score += RENTAL_TYPE_SCORES[occasion]?.[look.type] ?? 0;
-
-  const inBudget = total >= budgetMin && total <= budgetMax;
-  if (inBudget) {
-    score += 18;
-  } else if (answers.rentalBudget && answers.rentalBudget !== "flexible") {
-    const edge = Math.min(Math.max(total, budgetMin), budgetMax);
-    score -= Math.min(18, Math.ceil(Math.abs(total - edge) / 10));
-  }
-
-  const avoid = colorsIn(answers.colors?.avoid);
-  if (prefer.includes(look.colorKey)) {
-    score += 20;
-    evidence.push(`In ${look.color.toLowerCase()}, a color you picked.`);
-  } else if (avoid.includes(look.colorKey)) {
-    score -= 20;
-  }
-
-  if (look.rating != null && look.reviews >= 20) {
-    score += Math.max(0, Math.round((look.rating - 4) * 10));
-    if (look.rating >= 4.3) {
-      evidence.push(`Rated ${look.rating.toFixed(1)} out of 5 by ${look.reviews.toLocaleString("en-US")} renters.`);
-    }
-  }
-
-  return {
-    ...look,
-    score,
-    total,
-    evidence: evidence.slice(0, 4),
-    inBudget: !answers.rentalBudget || answers.rentalBudget === "flexible" || inBudget,
-    originalIndex: index,
-  };
-}
-
-function rentalTradeoffs(look, answers) {
-  const notes = [];
-  const occasion = resolvedOccasion(answers);
-  if (occasion && !look.formality.includes(occasion)) {
-    notes.push(`Not the usual choice for ${occasionLabels[answers.occasion]}.`);
-  } else if (occasion === "formal" && look.type === "suit") {
-    notes.push("A suit, not a tuxedo. Some black-tie invitations expect a tux.");
-  }
-  const prefer = colorsIn(answers.colors?.prefer);
-  const avoid = colorsIn(answers.colors?.avoid);
-  if (prefer.length && !prefer.includes(look.colorKey)) notes.push(`${look.color} wasn't a color you picked.`);
-  if (avoid.includes(look.colorKey)) notes.push(`${look.color} is a color you wanted to avoid.`);
-  if (look.reviews < 20) notes.push(look.reviews ? `Only ${look.reviews} reviews so far.` : "No reviews yet.");
-  return notes;
-}
-
-function maxRentalScore(answers, pieces) {
-  const [budgetMin, budgetMax] = getBudgetRange(answers.rentalBudget);
-  const pieceTotal = pieces.reduce((sum, piece) => sum + piece.price, 0);
-  const price = (budgetMax === Infinity ? Math.max(budgetMin, 300) : (budgetMin + budgetMax) / 2) - pieceTotal;
-  let best = 0;
-  for (const type of Object.keys(RENTAL_TYPE_NAMES)) {
-    const candidate = {
-      type,
-      price,
-      colorKey: colorsIn(answers.colors?.prefer)[0],
-      color: "Black",
-      rating: 5,
-      reviews: 1000,
-      formality: resolvedOccasion(answers) ? [resolvedOccasion(answers)] : [],
-    };
-    best = Math.max(best, scoreRental(candidate, answers, pieces, 0).score);
-  }
-  return best || 1;
-}
-
-export function getRentalRecommendations(answers, assortment = rentals) {
-  const pieces = rentalPieces(answers);
-  const pool = assortment.map((look, index) => scoreRental(look, answers, pieces, index));
-
-  const byScore = (a, b) => b.score - a.score || a.originalIndex - b.originalIndex;
-  const inBudget = pool.filter((look) => look.inBudget).sort(byScore);
-  const overBudget = pool.filter((look) => !look.inBudget).sort(byScore);
-  const maxScore = maxRentalScore(answers, pieces);
-
-  const result = [...inBudget, ...overBudget].map((look) => ({
-    ...look,
-    matchPercent: honestPercent(look.score, maxScore),
-    tradeoffs: rentalTradeoffs(look, answers),
+  const highest = ranked[0]?.score || 1;
+  return ranked.slice(0, 3).map((product, index) => ({
+    ...product,
+    matchPercent: Math.max(72, Math.min(98, Math.round(98 - (highest - product.score) * 1.25 - index * 2))),
+    bundlePrice: product.price + (answers.tailoring === "bundle" ? TAILORING_ESTIMATE : 0),
   }));
-  result.budgetMiss = null;
-  return result;
 }
 
 export function buildResultSummary(answers) {
-  const prefer = (answers.colors?.prefer ?? []).map((value) => {
-    const palette = questions.colors.options.find((option) => option.value === value);
-    return palette?.label ?? value;
-  });
   return {
-    mode: answers.mode === "rent" ? "rent" : "buy",
-    dates: rentalDates(answers.eventDate),
-    pieces: rentalPieces(answers),
-    occasion: occasionLabels[resolvedOccasion(answers)] ?? occasionLabels[answers.occasion] ?? "your event",
+    occasion: occasionLabels[answers.occasion] ?? "your event",
     fit: fitLabels[answers.feel] ?? "a balanced fit",
-    fitName: fitNameLabels[answers.feel] ?? "balanced fit",
     size: inferLikelySize(answers),
     sizeEstimate: getSizeEstimate(answers),
     tailoring: recommendTailoring(answers),
     fitNotes: [...getFitSignals(answers)].map((signal) => fitNoteLabels[signal]),
-    colors: prefer,
     needsMeasurementHelp: isLowConfidence(answers),
   };
 }

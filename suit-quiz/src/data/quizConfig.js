@@ -1,284 +1,165 @@
-import { products, SWATCH_HEX } from "./products.js";
-import { rentals } from "./rentals.js";
-
 export const questions = {
-  mode: {
-    id: "mode",
-    title: "Are you buying or renting?",
-    help: "Buying is a suit you keep, and renting is a full look for one event.",
-    type: "single",
-    options: [
-      { value: "buy", label: "Buy a suit", detail: "A suit that is yours to keep.", icon: "/icons/mw/shop.png" },
-      { value: "rent", label: "Rent a look", detail: "A suit or tux for one event.", icon: "/icons/mw/suits-bundle.png" },
-    ],
-  },
   occasion: {
     id: "occasion",
-    title: "What's the occasion?",
-    help: "The event sets how dressed up the suit should be.",
-    type: "occasionPlus",
-    skippable: true,
-    rentHelp: "We ask because the event decides whether you need a suit or a tuxedo.",
-    rentOptions: [
-      { value: "wedding", label: "Wedding", detail: "For you, or for someone you're with.", icon: "/icons/mw/wedding.png" },
-      { value: "formal", label: "Black tie", detail: "Galas, formal dinners, and black-tie invitations.", icon: "/icons/mw/special-event.png" },
-      { value: "prom", label: "Prom", detail: "For you, or for someone you're taking.", icon: "/icons/mw/school-event.png" },
-      { value: "special", label: "Special event", detail: "A quinceañera, anniversary, or other celebration.", icon: "/icons/mw/quinceanera.png" },
-    ],
+    title: "What's the moment?",
+    help: "We start here. The occasion tells us how formal to go, and how easy it is to misread the room.",
+    type: "single",
     options: [
-      { value: "business", label: "Work", detail: "The office, and the meetings that matter.", icon: "/icons/mw/suits-bundle.png" },
-      { value: "wedding", label: "Wedding", detail: "For you, or for someone you're with.", icon: "/icons/mw/wedding.png" },
-      { value: "funeral", label: "Funeral", detail: "A quiet funeral or memorial service.", icon: "/icons/mw/invitation.png" },
-      { value: "prom", label: "Prom", detail: "For you, or for someone you're taking.", icon: "/icons/mw/school-event.png" },
-      { value: "mixed", label: "All-purpose suit", detail: "Work, a wedding, and other events.", icon: "/icons/mw/special-event.png" },
+      { value: "wedding", label: "A wedding", detail: "Guest, wedding party, or groom. We'll match the room." },
+      { value: "work", label: "Work or an interview", detail: "The office, a new job, or a professional event. Sharp enough to wear again." },
+      { value: "versatile", label: "A go-to suit for whatever comes up", detail: "A classic suit you can trust when the dress code is unclear." },
+      { value: "formal", label: "A black-tie or formal evening", detail: "Elevated evening dressing that still feels like you." },
+      { value: "milestone", label: "A graduation, prom, or milestone", detail: "A big day that deserves to look the part." },
+      { value: "funeral", label: "A funeral or memorial", detail: "Respectful and quiet. Nothing that pulls focus." },
     ],
   },
   feel: {
     id: "feel",
-    title: "How do you like a suit to fit?",
-    help: "The words in parentheses are the fit: Slim, Modern, or Classic.",
+    title: "How should it feel?",
+    help: "Skip the suit jargon. Tell us the feeling you want once it's on.",
     type: "single",
     options: [
-      { value: "close", label: "Close and sharp (Slim fit)", detail: "A trimmer shape, with less room through the body.", icon: "/icons/mw/sharp.png" },
-      { value: "balanced", label: "Polished, with room to move (Modern fit)", detail: "Shaped at the shoulder, with room through the middle.", icon: "/icons/mw/balanced.png" },
-      { value: "roomy", label: "Comfortable with room (Classic fit)", detail: "Room through the chest, seat, and legs, without looking loose.", icon: "/icons/mw/relaxed.png" },
-    ],
-  },
-  eventDate: {
-    id: "eventDate",
-    title: "When is the event?",
-    help: "The look is ready 3 days before the event and goes back the day after.",
-    type: "date",
-  },
-  pieces: {
-    id: "pieces",
-    title: "What should the look include?",
-    help: "We ask because a 2-piece is the jacket and pants, while a 6-piece or 9-piece adds the shirt and shoes.",
-    type: "pieces",
-  },
-  colors: {
-    id: "colors",
-    title: "Any colors in mind?",
-    help: "We ask so we can favor the colors you'd wear, and you can skip this if you're open.",
-    type: "colors",
-    skippable: true,
-    options: [
-      { value: "navy", label: "Navy", colors: ["navy"] },
-      { value: "blue", label: "Blue", colors: ["blue"] },
-      { value: "gray", label: "Gray", colors: ["gray"] },
-      { value: "black", label: "Black", colors: ["black"] },
-      { value: "brownTan", label: "Brown and tan", colors: ["brown", "tan"] },
-      { value: "burgundy", label: "Burgundy", colors: ["burgundy"] },
-      { value: "green", label: "Green", colors: ["green"] },
-      { value: "white", label: "White", colors: ["white"] },
+      { value: "close", label: "Close and sharp", detail: "A trimmer shape, with less room through the body." },
+      { value: "balanced", label: "Polished, with room to move", detail: "Shape through the shoulders, ease where you need it." },
+      { value: "roomy", label: "Comfortable with room", detail: "Ease through the chest, seat, and legs." },
     ],
   },
   measurementKnowledge: {
     id: "measurementKnowledge",
-    title: "Do you know your suit size?",
-    help: "Jacket size, pant size, or both.",
+    title: "Do you know your measurements?",
+    help: "Either answer works. If you're unsure, we'll estimate and show you where a fitting makes the difference.",
     type: "single",
     options: [
-      { value: "some", label: "I know some of my sizes", detail: "Jacket or pant size, and either one can be blank." },
-      { value: "no", label: "No, help me estimate", detail: "We'll use your shirt size and jeans waist." },
+      { value: "yes", label: "Yes, I know them", detail: "Jacket, chest, or waist is enough to start." },
+      { value: "some", label: "I know some of them", detail: "One useful number still helps." },
+      { value: "no", label: "No, help me estimate", detail: "We'll use how your clothes usually fit. A lot of people start here." },
     ],
   },
   measurements: {
     id: "measurements",
-    title: "Share the sizes you know",
-    help: "The jacket and pant sizes you know.",
+    title: "Share what you already know",
+    help: "Any number helps. Leave the rest blank, and we'll flag where a store measurement matters.",
     type: "measurements",
   },
   fitIssues: {
     id: "fitIssues",
-    title: "Where do jackets feel tight or long?",
-    help: "Choose any that apply, and we'll adjust the cut or the starting size.",
+    title: "Where do suits usually feel off?",
+    help: "Select all that apply. Each answer changes the cut, the size, or the tailoring we start you with.",
     type: "multi",
-    skippable: true,
-    skipLabel: "They usually feel fine",
     options: [
       {
         value: "broadShoulders",
-        icon: "/icons/mw/tight-shoulders.png",
         label: "Jackets pull across my shoulders or back",
         detail: "Tight when I reach forward or cross my arms",
       },
       {
+        value: "athleticBuild",
+        label: "Jackets fit my chest, but pants gap at the waist",
+        detail: "A broad chest with a trimmer waist",
+        excludes: ["fullerMidsection"],
+      },
+      {
         value: "fullerMidsection",
-        icon: "/icons/mw/tight-button.png",
         label: "Jackets pull at the button, or pants pinch at the waist",
         detail: "I need more room through the middle",
+        excludes: ["athleticBuild"],
+      },
+      {
+        value: "seatThighs",
+        label: "Pants are tight through the seat or thighs",
+        detail: "Snug when I sit, take stairs, or crouch",
       },
       {
         value: "runsLong",
-        icon: "/icons/mw/sleeve.png",
         label: "Sleeves and jackets usually run long",
-        detail: "Sleeves cover the cuff, or the jacket covers the seat",
+        detail: "Sleeves cover my shirt cuff, or the jacket covers my seat",
         excludes: ["runsShort"],
       },
       {
         value: "runsShort",
-        icon: "/icons/mw/tight-sleeves.png",
         label: "Sleeves and jackets usually run short",
         detail: "My wrists show, or the jacket sits high",
         excludes: ["runsLong"],
       },
+      { value: "none", label: "Standard sizes usually fit me", detail: "Nothing in particular comes up", exclusive: true },
     ],
   },
-  pantsFit: {
-    id: "pantsFit",
-    title: "Where do pants feel tight or loose?",
-    help: "Choose any that apply, and we'll adjust the cut or the starting size.",
-    type: "multi",
-    skippable: true,
-    skipLabel: "They usually feel fine",
+  height: {
+    id: "height",
+    title: "About how tall are you?",
+    help: "A range is enough. It puts jacket and pant proportions in the right neighborhood.",
+    type: "single",
     options: [
-      {
-        value: "athleticBuild",
-        icon: "/icons/mw/athletic.png",
-        label: "Jackets fit my chest, but pants gap at the waist",
-        detail: "A broad chest with a trimmer waist",
-      },
-      {
-        value: "seatThighs",
-        icon: "/icons/mw/baggy-pants.png",
-        label: "Pants are tight through the seat or thighs",
-        detail: "Snug when I sit, take stairs, or crouch",
-      },
+      { value: "short", label: "Under 5′7″" },
+      { value: "regular", label: "5′7″ to 6′0″" },
+      { value: "tall", label: "6′1″ to 6′3″" },
+      { value: "extra-tall", label: "6′4″ or taller" },
     ],
   },
   everydaySizes: {
     id: "everydaySizes",
     title: "What sizes do you usually buy?",
-    help: "These stand in for a jacket and pant size.",
+    help: "Your everyday shirt and jeans sizes are enough for us to work out your jacket and pants.",
     type: "sizes",
     groups: [
       {
         id: "shirt",
         label: "T-shirt or casual shirt",
-        options: ["XS", "S", "M", "L", "XL", "XXL", "3XL"].map((value) => ({ value, label: value })),
+        options: ["S", "M", "L", "XL", "XXL"].map((value) => ({ value, label: value })),
       },
       {
         id: "waist",
         label: "Jeans or pants waist",
-        options: [28, 29, 30, 31, 32, 33, 34, 36, 38, 40, 42, 44, 46, 48].map((value) => ({ value: String(value), label: String(value) })),
+        options: [28, 29, 30, 31, 32, 33, 34, 36, 38, 40, 42, 44].map((value) => ({ value: String(value), label: String(value) })),
       },
     ],
   },
-  height: {
-    id: "height",
-    title: "How tall are you?",
-    help: "Your height helps us recommend the right length, so the suits we show you fit you better.",
-    type: "height",
-    skippable: true,
+  wearIntent: {
+    id: "wearIntent",
+    title: "Is this for one moment, or more?",
+    help: "Some suits are for the day. Others earn a place in the closet.",
+    type: "single",
+    options: [
+      { value: "one-event", label: "This moment comes first", detail: "We'll match the occasion closely." },
+      { value: "rewear", label: "I want to wear it again", detail: "A classic you can trust past this event." },
+      { value: "often", label: "I'll wear suits often", detail: "Built for repeat wear and easy tailoring." },
+    ],
   },
   tailoring: {
     id: "tailoring",
-    title: "Want this suit tailored?",
-    help: "Most suits look best with some tailoring, and there are plenty of options. We'll suggest what's right for you. The price shows before checkout, and you can remove it.",
+    title: "How far do you want to take the fit?",
+    help: "A few adjustments are what make a suit feel like yours. You choose how far to go.",
     type: "single",
     options: [
-      { value: "skip", label: "No, just the suit" },
-      { value: "consider", label: "Tell me what you'd suggest" },
+      { value: "bundle", label: "Include tailoring in my plan", detail: "Suit and tailoring, shown together." },
+      { value: "consider", label: "I'm open to it", detail: "We'll point out what's worth adjusting." },
+      { value: "skip", label: "Suit only for now", detail: "The recommendation stays on the suit itself." },
     ],
   },
   budget: {
     id: "budget",
-    title: "What do you want to spend?",
-    help: "We ask so we can show suits in this range first.",
+    title: "What feels comfortable to spend?",
+    help: "Fit and occasion come first. Budget narrows the field after that.",
     type: "single",
     options: [
       { value: "under-250", label: "Under $250" },
       { value: "250-400", label: "$250–$400" },
       { value: "400-600", label: "$400–$600" },
       { value: "over-600", label: "$600+" },
-      { value: "flexible", label: "Flexible for the right fit" },
+      { value: "flexible", label: "Flexible for the right fit", detail: "Worth it when the suit is right for the moment." },
     ],
   },
 };
 
+const commonEnd = ["wearIntent", "tailoring", "budget"];
+
 export function getQuestionFlow(answers) {
-  const renting = answers.mode === "rent";
-  const start = renting
-    ? ["mode", "occasion", "eventDate", "pieces", "feel", "colors", "measurementKnowledge"]
-    : ["mode", "occasion", "feel", "colors", "measurementKnowledge"];
-  const end = renting ? [] : ["tailoring", "budget"];
-  const unknown = answers.unknownSizes ?? {};
-  const estimate = unknown.chest || unknown.waist ? ["everydaySizes"] : [];
+  const start = ["occasion", "feel", "measurementKnowledge"];
   if (answers.measurementKnowledge === "yes" || answers.measurementKnowledge === "some") {
-    return [...start, "height", "measurements", ...estimate, "fitIssues", "pantsFit", ...end];
+    return [...start, "measurements", ...commonEnd];
   }
   if (answers.measurementKnowledge === "no") {
-    return [...start, "height", "everydaySizes", "fitIssues", "pantsFit", ...end];
+    return [...start, "everydaySizes", "fitIssues", "height", ...commonEnd];
   }
   return start;
-}
-
-export function occasionOptions(question, answers) {
-  return answers.mode === "rent" ? question.rentOptions : question.options;
-}
-
-const BUY_OCCASION = {
-  business: "work",
-  prom: "milestone",
-  mixed: "versatile",
-};
-
-export function resolvedOccasion(answers) {
-  const value = answers.occasion;
-  if (!value) return null;
-  if (answers.mode === "rent") return value;
-  return BUY_OCCASION[value] ?? value;
-}
-
-const LEGACY_COLOR_GROUPS = {
-  darks: ["navy", "blue", "gray", "black"],
-  warm: ["tan", "brown", "burgundy", "green"],
-  light: ["white"],
-};
-
-const COLOR_NAMES = {
-  navy: "Navy",
-  blue: "Blue",
-  gray: "Gray",
-  black: "Black",
-  brown: "Brown",
-  tan: "Tan",
-  burgundy: "Burgundy",
-  green: "Green",
-  white: "White",
-};
-
-export function colorsIn(values) {
-  const palettes = new Map([
-    ...questions.colors.options.map((option) => [option.value, option.colors]),
-    ...Object.entries(LEGACY_COLOR_GROUPS),
-  ]);
-  return [...new Set((Array.isArray(values) ? values : []).flatMap((value) => palettes.get(value) ?? [value]))];
-}
-
-function visibleCopy(option, colors) {
-  if (colors.length === option.colors.length) return { label: option.label };
-  if (colors.length === 1) return { label: COLOR_NAMES[colors[0]] ?? option.label };
-  return { label: colors.map((key) => COLOR_NAMES[key] ?? key).join(" and ") };
-}
-
-function catalogColors(mode) {
-  const items = mode === "rent" ? rentals : products.flatMap((product) => [product, ...(product.variants ?? [])]);
-  return new Set(items.map((item) => item.colorKey));
-}
-
-export function colorThemes(mode) {
-  const available = catalogColors(mode);
-  return questions.colors.options
-    .map((option) => {
-      const colors = option.colors.filter((key) => available.has(key));
-      return {
-        ...option,
-        ...visibleCopy(option, colors),
-        colors,
-        swatches: colors.map((key) => ({ key, hex: SWATCH_HEX[key] })),
-      };
-    })
-    .filter((option) => option.colors.length > 0);
 }

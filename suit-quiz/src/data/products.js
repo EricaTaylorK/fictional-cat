@@ -4,242 +4,19 @@ function catalogImage(code) {
   return `${IMAGE_BASE}${code}?wid=800&fmt=jpeg&qlt=85`;
 }
 
-function moneyParts(price, compareAt = null) {
-  const part = (total) => {
-    if (total == null) return null;
-    const pants = Math.round(total * 0.3 * 100) / 100;
-    const jacket = Math.round((total - pants) * 100) / 100;
-    return { jacket, pants };
-  };
-  const now = part(price);
-  const was = part(compareAt);
-  return {
-    price,
-    compareAt,
-    jacket: { price: now.jacket, compareAt: was?.jacket ?? null },
-    pants: { price: now.pants, compareAt: was?.pants ?? null },
-  };
-}
-
-export const SWATCH_HEX = {
-  navy: "#1c2c4c",
-  blue: "#3c6494",
-  gray: "#6e6e6e",
-  black: "#161616",
-  brown: "#6d4c35",
-  tan: "#c4a574",
-  burgundy: "#6e2430",
-  green: "#9aaa98",
-  white: "#f2eee4",
-};
-
-// Placeholder days until real tailoring turnaround times are set.
-export const TAILORING_TURNAROUND = {
-  essentials: 5,
-  signature: 7,
-  custom: 10,
-};
-
-// Prices from the Men's Wearhouse "Tailored for You" in-store alteration sheet.
-const ALTERATIONS = {
-  hem: { label: "Hem the pants (plain or cuff)", price: 20, icon: "/icons/mw/tailor-leg-hem.png" },
-  sleeves: { label: "Shorten or lengthen both sleeves", price: 35, icon: "/icons/mw/tailor-coat-sleeves.png" },
-  waistSeat: { label: "Take in or let out the waist and seat", price: 25, icon: "/icons/mw/tailor-waist-seat.png" },
-  jacketSides: { label: "Shape the jacket through both sides", price: 35, icon: "/icons/mw/tailor-coat-other.png" },
-  taperLeg: { label: "Taper the leg", price: 32, icon: "/icons/mw/tailor-pants-other.png" },
-  centerSeam: { label: "Shape the center back seam", price: 20, icon: "/icons/mw/tailor-coat-other.png" },
-  collar: { label: "Lower the collar so it sits flat", price: 32, icon: "/icons/mw/tailor-collar-shoulders.png" },
-};
-
-function tier(id, name, plain, icon, detail, alterationIds) {
-  const items = alterationIds.map((key) => ({ id: key, ...ALTERATIONS[key] }));
-  return { id, name, plain, icon, detail, items, price: items.reduce((sum, item) => sum + item.price, 0) };
-}
-
-export const TAILORING_TIERS = [
-  tier("essentials", "Fit Essentials", "Hem and sleeves", "/icons/mw/hemming.png",
-    "A hem and sleeves.", ["hem", "sleeves"]),
-  tier("signature", "Signature Fit", "Jacket and waist", "/icons/mw/measurement.png",
-    "Everything in Essentials, plus shaping the jacket and pants to your build.", ["hem", "sleeves", "waistSeat", "jacketSides"]),
-  tier("custom", "Custom-Level Fit", "A full reshape", "/icons/mw/tailor-collar-shoulders.png",
-    "Everything in Signature, plus the leg, back, and collar for a made-for-you shape.",
-    ["hem", "sleeves", "waistSeat", "jacketSides", "taperLeg", "centerSeam", "collar"]),
-];
-
-export const TAILORING_PERKS = "Every alteration includes a free seam re-alteration and free lifetime pressing.";
-
-export const PAIRING_HEX = {
-  ...SWATCH_HEX,
-  lightBlue: "#cfe0ee",
-  silver: "#c7c9cc",
-  charcoal: "#4b4b4b",
-};
-
-export const PAIRING_LABELS = {
-  white: "White",
-  lightBlue: "Light blue",
-  navy: "Navy",
-  burgundy: "Burgundy",
-  silver: "Silver",
-  black: "Black",
-  brown: "Brown",
-  tan: "Tan",
-  charcoal: "Charcoal",
-};
-
-export const SUIT_PAIRINGS = {
-  navy: {
-    shirts: ["white", "lightBlue"],
-    ties: ["burgundy", "silver", "navy"],
-    shoes: "Black leather shoes",
-    note: "White or light blue keeps it sharp. A burgundy, silver, or navy tie adds contrast without matching the suit exactly.",
-  },
-  blue: {
-    shirts: ["white", "lightBlue"],
-    ties: ["navy", "burgundy", "silver"],
-    shoes: "Black leather shoes",
-    note: "White or light blue stays classic. Navy, burgundy, or silver ties look dressed up without competing with the blue.",
-  },
-  gray: {
-    shirts: ["white", "lightBlue"],
-    ties: ["navy", "burgundy", "silver"],
-    shoes: "Black leather shoes",
-    note: "White or light blue is the safe pairing. Navy, burgundy, or silver ties stand out against gray.",
-  },
-  black: {
-    shirts: ["white"],
-    ties: ["black", "silver", "burgundy"],
-    shoes: "Black leather shoes",
-    note: "White is the standard shirt with black. A black or silver tie keeps it formal, or burgundy adds a little warmth.",
-  },
-  brown: {
-    shirts: ["white", "lightBlue"],
-    ties: ["navy", "burgundy", "brown"],
-    shoes: "Brown leather shoes",
-    note: "White or light blue keeps brown from feeling heavy. Navy or burgundy ties add contrast.",
-  },
-  tan: {
-    shirts: ["white", "lightBlue"],
-    ties: ["navy", "burgundy", "brown"],
-    shoes: "Brown leather shoes",
-    note: "White or light blue stays light with tan. Navy or burgundy ties ground the look.",
-  },
-  burgundy: {
-    shirts: ["white", "lightBlue"],
-    ties: ["navy", "charcoal"],
-    shoes: "Brown leather shoes",
-    note: "White or light blue lets the burgundy stand out. A navy or charcoal tie keeps it from competing with the plaid.",
-  },
-  green: {
-    shirts: ["white", "lightBlue"],
-    ties: ["navy", "burgundy", "brown"],
-    shoes: "Brown leather shoes",
-    note: "White or light blue keeps sage grounded. Navy, burgundy, or brown ties add depth.",
-  },
-  white: {
-    shirts: ["white"],
-    ties: ["black", "burgundy"],
-    shoes: "Black patent shoes",
-    note: "A white dinner jacket is traditionally worn with a black bow tie and a crisp white shirt.",
-  },
-};
-
-// Local product photos already in public/outfit. Every shirt in these looks is white.
-// The repo's tie photograph is the navy silk tie, and the shoe photograph is the black oxford.
-const OUTFIT_PHOTOS = {
-  shirt: "/outfit/white-dress-shirt.jpg",
-  tie: "/outfit/navy-tie.jpg",
-  shoes: "/outfit/black-dress-shoes.jpg",
-};
-
-// Prototype shirt, tie, and shoes for each suit color. Prices are local stand-ins,
-// aligned with the safe colors in SUIT_PAIRINGS. They are not a live catalog.
-function lookItem(id, type, name, colorKey, color, price) {
-  const image = type === "Shirt"
-    ? OUTFIT_PHOTOS.shirt
-    : type === "Shoes"
-      ? OUTFIT_PHOTOS.shoes
-      : OUTFIT_PHOTOS.tie;
-  return { id, type, name, colorKey, color, price, image };
-}
-
-export const LOOK_PAIRINGS = {
-  navy: {
-    shirt: lookItem("look-shirt-navy", "Shirt", "Dress shirt", "white", "White", 49.99),
-    tie: lookItem("look-tie-navy", "Tie", "Silk tie", "burgundy", "Burgundy", 39.99),
-    shoes: lookItem("look-shoes-navy", "Shoes", "Leather oxfords", "black", "Black", 129.99),
-  },
-  blue: {
-    shirt: lookItem("look-shirt-blue", "Shirt", "Dress shirt", "white", "White", 49.99),
-    tie: lookItem("look-tie-blue", "Tie", "Silk tie", "navy", "Navy", 39.99),
-    shoes: lookItem("look-shoes-blue", "Shoes", "Leather oxfords", "black", "Black", 129.99),
-  },
-  gray: {
-    shirt: lookItem("look-shirt-gray", "Shirt", "Dress shirt", "white", "White", 44.99),
-    tie: lookItem("look-tie-gray", "Tie", "Silk tie", "navy", "Navy", 34.99),
-    shoes: lookItem("look-shoes-gray", "Shoes", "Leather oxfords", "black", "Black", 119.99),
-  },
-  black: {
-    shirt: lookItem("look-shirt-black", "Shirt", "Dress shirt", "white", "White", 54.99),
-    tie: lookItem("look-tie-black", "Tie", "Silk tie", "black", "Black", 44.99),
-    shoes: lookItem("look-shoes-black", "Shoes", "Leather oxfords", "black", "Black", 139.99),
-  },
-  brown: {
-    shirt: lookItem("look-shirt-brown", "Shirt", "Dress shirt", "white", "White", 44.99),
-    tie: lookItem("look-tie-brown", "Tie", "Silk tie", "navy", "Navy", 34.99),
-    shoes: lookItem("look-shoes-brown", "Shoes", "Leather oxfords", "brown", "Brown", 119.99),
-  },
-  tan: {
-    shirt: lookItem("look-shirt-tan", "Shirt", "Dress shirt", "white", "White", 44.99),
-    tie: lookItem("look-tie-tan", "Tie", "Silk tie", "navy", "Navy", 34.99),
-    shoes: lookItem("look-shoes-tan", "Shoes", "Leather oxfords", "brown", "Brown", 109.99),
-  },
-  burgundy: {
-    shirt: lookItem("look-shirt-burgundy", "Shirt", "Dress shirt", "white", "White", 49.99),
-    tie: lookItem("look-tie-burgundy", "Tie", "Silk tie", "navy", "Navy", 39.99),
-    shoes: lookItem("look-shoes-burgundy", "Shoes", "Leather oxfords", "brown", "Brown", 119.99),
-  },
-  green: {
-    shirt: lookItem("look-shirt-green", "Shirt", "Dress shirt", "white", "White", 44.99),
-    tie: lookItem("look-tie-green", "Tie", "Silk tie", "navy", "Navy", 34.99),
-    shoes: lookItem("look-shoes-green", "Shoes", "Leather oxfords", "brown", "Brown", 109.99),
-  },
-  white: {
-    shirt: lookItem("look-shirt-white", "Shirt", "Dress shirt", "white", "White", 59.99),
-    tie: lookItem("look-tie-white", "Tie", "Bow tie", "black", "Black", 49.99),
-    shoes: lookItem("look-shoes-white", "Shoes", "Patent oxfords", "black", "Black", 149.99),
-  },
-};
-
-export function lookForColor(colorKey, occasion) {
-  const guidance = SUIT_PAIRINGS[colorKey];
-  const set = LOOK_PAIRINGS[colorKey];
-  if (!guidance || !set) return null;
-  const note = occasion === "formal" && colorKey === "black"
-    ? `${guidance.note} This is the black-tie pick.`
-    : guidance.note;
-  return { colorKey, note, items: [set.shirt, set.tie, set.shoes] };
-}
-
-export const TAILORING_ESTIMATE = 85;
-
-function variant(colorKey, color, code, catalogId) {
-  return { colorKey, color, image: catalogImage(code), catalogId };
-}
-
 export const products = [
   {
     id: "dkny-modern-navy",
-    catalogId: "modern-fit-suit-16",
     brand: "DKNY",
     name: "Modern Fit Suit",
-    // The catalog photo is navy, but it reads nearly black on screen.
-    color: "Dark navy",
-    colorKey: "navy",
+    color: "Navy",
     fitName: "Modern fit",
     fabric: "Wool blend",
     fit: "balanced",
-    ...moneyParts(395),
+    price: 395,
+    compareAt: null,
+    jacket: { price: 275, compareAt: null },
+    pants: { price: 120, compareAt: null },
     rating: 4.2,
     reviews: 3,
     image: catalogImage("TMW_380U_01_DKNY_2_PIECE_SUITS_NAVY_SOLID_MAIN"),
@@ -248,23 +25,21 @@ export const products = [
     comfort: 4,
     tailoringEase: 5,
     stretch: false,
-    cutNote: "The modern cut follows the chest and waist, then eases off so it never feels tight.",
-    rewearNote: "A dark navy you can wear to work, a wedding, or a dinner.",
+    cutNote: "The modern cut is trim through the chest without pulling, so it looks sharp and still moves with you.",
+    rewearNote: "Solid navy pairs with almost any shirt and tie, so this suit works long after the first wear.",
     occasionNotes: {
-      wedding: "Dark navy is a safe guest color: dressed up, and it won't compete with the wedding party.",
-      funeral: "Dark navy is respectful and quiet when you'd rather not wear black.",
-      work: "Navy is the most trusted color at work. It reads prepared without trying too hard.",
-      versatile: "Navy is the one color that's right at a wedding, a meeting, or a dinner.",
+      wedding: "Solid navy is the safest guest color: dressed up, never competing with the wedding party.",
+      funeral: "Deep navy is respectful and quiet when you'd rather not wear black.",
+      work: "Solid navy is the most trusted color at work. It reads prepared without trying too hard.",
+      versatile: "Solid navy is the one color that's right at a wedding, a meeting, or a dinner.",
       milestone: "Navy photographs well and reads grown-up without looking stiff.",
     },
   },
   {
     id: "joseph-abboud-classic-navy",
-    catalogId: "joseph-abboud-classic-fit-wool-blend-suit",
     brand: "Joseph Abboud",
     name: "Classic Fit Premium Wool Blend Suit",
     color: "Navy",
-    colorKey: "navy",
     fitName: "Classic fit",
     fabric: "Premium wool blend",
     fit: "roomy",
@@ -280,7 +55,7 @@ export const products = [
     comfort: 5,
     tailoringEase: 5,
     stretch: false,
-    cutNote: "The classic cut is the fullest: room through the chest, waist, and seat from the first wear.",
+    cutNote: "The classic cut gives room through the chest, waist, and seat, so it feels settled from the first wear.",
     rewearNote: "A premium wool blend in solid navy holds its shape over years of wear.",
     occasionNotes: {
       wedding: "Solid navy in a premium wool blend looks dressed up in photos and comfortable all day.",
@@ -291,11 +66,9 @@ export const products = [
   },
   {
     id: "kenneth-cole-chillflex-slim",
-    catalogId: "awearness-kenneth-cole-chillflex-slim-fit-suit",
     brand: "Awearness Kenneth Cole",
     name: "CHILLFLEX Slim Fit Premium Wool Blend Suit",
     color: "Blue",
-    colorKey: "blue",
     fitName: "Slim fit",
     fabric: "Premium wool blend with stretch",
     fit: "close",
@@ -322,11 +95,9 @@ export const products = [
   },
   {
     id: "pronto-uomo-platinum-modern-black",
-    catalogId: "pronto-uomo-platinum-modern-fit-wool-blend-suit",
     brand: "Pronto Uomo Platinum",
     name: "Modern Fit Premium Wool Blend Suit",
     color: "Black",
-    colorKey: "black",
     fitName: "Modern fit",
     fabric: "Premium wool blend",
     fit: "balanced",
@@ -342,7 +113,7 @@ export const products = [
     comfort: 3,
     tailoringEase: 5,
     stretch: false,
-    cutNote: "The modern cut sits clean through the chest, with more room than a slim fit and less than a classic.",
+    cutNote: "The modern cut sits clean through the chest and waist, without the snugness of a slim fit.",
     rewearNote: "Black works for evenings, formal events, and memorials.",
     occasionNotes: {
       formal: "Solid black is the right call for a formal evening, and it pairs with a bow tie or a long tie.",
@@ -353,11 +124,9 @@ export const products = [
   },
   {
     id: "wilke-rodriguez-slim-charcoal",
-    catalogId: "wilke-rodriguez-slim-fit-suit",
     brand: "Wilke-Rodriguez",
     name: "Slim Fit Suit",
     color: "Charcoal",
-    colorKey: "gray",
     fitName: "Slim fit",
     fabric: "Wool blend",
     fit: "close",
@@ -384,11 +153,9 @@ export const products = [
   },
   {
     id: "haggar-classic-black",
-    catalogId: "classic-fit-suit",
     brand: "Haggar",
     name: "Classic Fit Suit",
     color: "Black",
-    colorKey: "black",
     fitName: "Classic fit",
     fabric: "Wool blend",
     fit: "roomy",
@@ -404,7 +171,7 @@ export const products = [
     comfort: 5,
     tailoringEase: 5,
     stretch: false,
-    cutNote: "The classic cut is cut full through the chest and seat, so it doesn't pull when you sit or reach.",
+    cutNote: "The classic cut gives room through the chest and seat, so it doesn't pull when you sit or reach.",
     rewearNote: "Solid black works for evenings, formal events, and memorials.",
     occasionNotes: {
       formal: "Solid black is right for a formal evening, with room to stay comfortable all night.",
@@ -415,11 +182,9 @@ export const products = [
   },
   {
     id: "tommy-hilfiger-modern-blue",
-    catalogId: "modern-fit-suit-24",
     brand: "Tommy Hilfiger",
     name: "Modern Fit Suit",
     color: "Blue",
-    colorKey: "blue",
     fitName: "Modern fit",
     fabric: "Wool blend",
     fit: "balanced",
@@ -435,7 +200,7 @@ export const products = [
     comfort: 4,
     tailoringEase: 4,
     stretch: false,
-    cutNote: "The modern cut shapes the shoulder and chest, and leaves enough room to sit through a long event.",
+    cutNote: "The modern cut is trim through the chest without pulling, so it looks sharp and still moves with you.",
     rewearNote: "A rich blue that works for weddings, work, and nights out.",
     occasionNotes: {
       wedding: "A rich blue is warmer than navy, so you look celebratory without upstaging anyone.",
@@ -444,233 +209,6 @@ export const products = [
       versatile: "A rich blue looks good at a wedding, at work, or out to dinner.",
     },
   },
-  {
-    id: "egara-modern-black",
-    catalogId: "egara-modern-fit-suit",
-    brand: "Egara",
-    name: "Modern Fit Suit",
-    color: "Black",
-    colorKey: "black",
-    fitName: "Modern fit",
-    fabric: "Wool blend",
-    fit: "balanced",
-    ...moneyParts(299.99),
-    rating: 4.6,
-    reviews: 183,
-    image: catalogImage("TMW_3BC4_02_EGARA_2_PIECE_SUITS_BLACK_SOLID_MAIN"),
-    variants: [
-      variant("black", "Black", "TMW_3BC4_02_EGARA_2_PIECE_SUITS_BLACK_SOLID_MAIN", "egara-modern-fit-suit"),
-      variant("tan", "Tan", "TMW_3AX2_05_EGARA_2_PIECE_SUITS_TAN_SOLID_MAIN", "modern-fit-suit-4"),
-    ],
-    formality: ["formal", "funeral", "work", "wedding", "versatile"],
-    versatility: 4,
-    comfort: 4,
-    tailoringEase: 4,
-    stretch: false,
-    cutNote: "The modern cut is shaped through the body, closer than a classic fit without the tightness of slim.",
-    rewearNote: "The same cut comes in black or tan, so you can pick the color for the room.",
-    occasionNotes: {
-      formal: "Solid black is the right call for a formal evening.",
-      funeral: "Solid black is the most respectful choice for a funeral or memorial.",
-      work: "A solid black or tan suit is easy to wear to the office.",
-      wedding: "Black is right for an evening wedding. Tan is the warmer option for daytime.",
-      versatile: "A solid color in a modern cut works when the dress code isn't spelled out.",
-    },
-  },
-  {
-    id: "wilke-slim-burgundy-plaid",
-    catalogId: "slim-fit-plaid-suit-9",
-    brand: "Wilke-Rodriguez",
-    name: "Slim Fit Plaid Suit",
-    color: "Burgundy",
-    colorKey: "burgundy",
-    fitName: "Slim fit",
-    fabric: "Wool blend",
-    fit: "close",
-    ...moneyParts(149.99, 202),
-    rating: 4.2,
-    reviews: 63,
-    image: catalogImage("TMW_3EB2_60_WILKERODRIGUEZ_2_PIECE_SUITS_WINE_PLAID_MAIN"),
-    variants: [
-      variant("burgundy", "Burgundy", "TMW_3EB2_60_WILKERODRIGUEZ_2_PIECE_SUITS_WINE_PLAID_MAIN", "slim-fit-plaid-suit-9"),
-      variant("brown", "Brown", "TMW_3EB4_63_WILKERODRIGUEZ_2_PIECE_SUITS_DARK_BROWN_PLAID_MAIN", "slim-fit-plaid-suit"),
-    ],
-    formality: ["wedding", "milestone", "versatile"],
-    versatility: 3,
-    comfort: 3,
-    tailoringEase: 4,
-    stretch: false,
-    cutNote: "The slim cut is close through the chest and the leg, for a sharper line.",
-    rewearNote: "A plaid is best when the event calls for it, and less of an everyday suit.",
-    occasionNotes: {
-      wedding: "Burgundy plaid looks celebratory at a wedding without matching the wedding party.",
-      milestone: "A burgundy plaid looks like the occasion, especially for prom or a party.",
-      versatile: "Plaid is a statement. Choose it when you want the suit to be noticed.",
-    },
-  },
-  {
-    id: "joseph-feiss-modern-linen-blue",
-    catalogId: "modern-fit-linen-blend-suit",
-    brand: "Joseph & Feiss",
-    name: "Modern Fit Linen Blend Suit",
-    color: "Blue",
-    colorKey: "blue",
-    fitName: "Modern fit",
-    fabric: "Linen blend",
-    fit: "balanced",
-    ...moneyParts(129.99, 175),
-    rating: 4.1,
-    reviews: 35,
-    image: catalogImage("TMW_3BR8_15_JOSEPH_FEISS_2_PIECE_SUITS_BLUE_MAIN"),
-    formality: ["wedding", "work", "versatile", "milestone"],
-    versatility: 4,
-    comfort: 5,
-    tailoringEase: 3,
-    stretch: false,
-    cutNote: "The modern cut is light and shaped, with enough ease for a warm day.",
-    rewearNote: "A linen blend in blue works for warm weddings, work, and weekends.",
-    occasionNotes: {
-      wedding: "A lighter blue linen blend is right for a daytime or warm-weather wedding.",
-      work: "Blue is an easy work color, and the linen blend wears lighter than wool.",
-      versatile: "Blue stays useful after the first event, especially in warm months.",
-      milestone: "A bright blue looks confident in photos without the weight of a winter suit.",
-    },
-  },
-  {
-    id: "joseph-abboud-classic-tan",
-    catalogId: "classic-fit-tic-suit",
-    brand: "Joseph Abboud",
-    name: "Classic Fit Premium Wool Blend Suit",
-    color: "Tan",
-    colorKey: "tan",
-    fitName: "Classic fit",
-    fabric: "Premium wool blend",
-    fit: "roomy",
-    ...moneyParts(179.99, 243),
-    rating: 4.5,
-    reviews: 43,
-    image: catalogImage("TMW_3CB2_20_JOSEPH_ABBOUD_2_PIECE_SUITS_TAUPE_TIC_MAIN"),
-    formality: ["work", "wedding", "versatile"],
-    versatility: 4,
-    comfort: 5,
-    tailoringEase: 5,
-    stretch: false,
-    cutNote: "The classic cut leaves the most room through the middle and the seat, and a tailor can still shape it.",
-    rewearNote: "Tan is an easy warm-weather suit for work and daytime events.",
-    occasionNotes: {
-      work: "Tan is a lighter choice for the office when navy feels too serious.",
-      wedding: "Tan is right for a daytime wedding, and quieter than a pattern.",
-      versatile: "A tan classic suit covers daytime events when navy would be too dark.",
-    },
-  },
-  {
-    id: "nautica-modern-blue",
-    catalogId: "nautica-modern-fit-suit",
-    brand: "Nautica",
-    name: "Modern Fit Suit",
-    color: "Blue",
-    colorKey: "blue",
-    fitName: "Modern fit",
-    fabric: "Wool blend",
-    fit: "balanced",
-    ...moneyParts(199.99, 270),
-    rating: 3.8,
-    reviews: 4,
-    image: catalogImage("TMW_3YC2_14_NAUTICA_2_PIECE_SUITS_BLUEPOSTMAN_MAIN"),
-    formality: ["work", "wedding", "versatile", "milestone"],
-    versatility: 4,
-    comfort: 4,
-    tailoringEase: 4,
-    stretch: false,
-    cutNote: "The modern cut gives a shaped jacket with room to move at the shoulder.",
-    rewearNote: "A solid blue is easy to wear again with a different shirt and tie.",
-    occasionNotes: {
-      work: "A mid blue is a straightforward work suit.",
-      wedding: "Blue looks dressed up at a wedding and still comfortable for a long day.",
-      versatile: "Solid blue is useful whenever the dress code is unclear.",
-      milestone: "Blue photographs clearly and looks finished without looking formal.",
-    },
-  },
-  {
-    id: "paisley-gray-modern-sage",
-    catalogId: "modern-fit-suit-32",
-    brand: "Paisley & Gray",
-    name: "Modern Fit Suit",
-    color: "Sage",
-    colorKey: "green",
-    fitName: "Modern fit",
-    fabric: "Wool blend",
-    fit: "balanced",
-    ...moneyParts(99.99, 135),
-    rating: 4.6,
-    reviews: 18,
-    image: catalogImage("TMW_3BYW_35_PAISLEY_GRAY_2_PIECE_SUITS_SAGE_MAIN"),
-    formality: ["work", "wedding", "versatile"],
-    versatility: 3,
-    comfort: 4,
-    tailoringEase: 4,
-    stretch: false,
-    cutNote: "The modern cut looks current through the chest and still has room at the waist.",
-    rewearNote: "Sage is a specific color. It works again when the room can take a softer shade.",
-    occasionNotes: {
-      work: "Sage is a softer take on a work suit when you don't want navy or gray.",
-      wedding: "Sage stands out at a daytime wedding and stays out of the wedding party's colors.",
-      versatile: "Sage is less of an all-purpose color than navy, and right when you want something softer.",
-    },
-  },
-  {
-    id: "gino-vitale-slim-gray",
-    catalogId: "slim-fit-suit-8",
-    brand: "Gino Vitale",
-    name: "Slim Fit Suit",
-    color: "Gray",
-    colorKey: "gray",
-    fitName: "Slim fit",
-    fabric: "Wool blend",
-    fit: "close",
-    ...moneyParts(300, 405),
-    rating: 4.2,
-    reviews: 46,
-    image: catalogImage("TMW_3WB8_17_GINO_VITALE_2_PIECE_SUITS_DARK_GREY_MAIN"),
-    formality: ["work", "funeral", "versatile"],
-    versatility: 4,
-    comfort: 3,
-    tailoringEase: 4,
-    stretch: false,
-    cutNote: "The slim cut sits close through the chest, waist, and thigh.",
-    rewearNote: "Gray pairs with almost any shirt, so it earns repeat wear.",
-    occasionNotes: {
-      work: "Gray is serious enough for the office and easier to vary than navy.",
-      funeral: "Gray is respectful when black feels too formal.",
-      versatile: "Gray is right at work, a dinner, or a memorial.",
-    },
-  },
-  {
-    id: "joseph-abboud-modern-navy",
-    catalogId: "modern-fit-suit-18",
-    brand: "Joseph Abboud",
-    name: "Modern Fit Suit",
-    color: "Navy",
-    colorKey: "navy",
-    fitName: "Modern fit",
-    fabric: "Wool blend",
-    fit: "balanced",
-    ...moneyParts(649.99),
-    rating: 4.2,
-    reviews: 36,
-    image: catalogImage("TMW_3BVW_51_JOSEPH_ABBOUD_2_PIECE_SUITS_NAVY_MAIN"),
-    formality: ["work", "wedding", "versatile", "funeral"],
-    versatility: 5,
-    comfort: 4,
-    tailoringEase: 5,
-    stretch: false,
-    cutNote: "The modern cut is tailored through the chest and soft through the armhole, so it looks sharp without feeling slim.",
-    rewearNote: "A navy suit at this level is the one you reach for when it matters.",
-    occasionNotes: {
-      work: "Navy in a sharper cloth is a suit you can wear to the meetings that matter.",
-      wedding: "Navy looks dressed up in photos and never competes with the wedding party.",
-      versatile: "Navy is the safest color when you don't know the room yet.",
-      funeral: "Navy is respectful and quiet when black feels too stark.",
-    },
-  },
 ];
+
+export const TAILORING_ESTIMATE = 85;

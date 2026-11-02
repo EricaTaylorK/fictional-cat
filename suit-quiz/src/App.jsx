@@ -1,93 +1,24 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import IntroModal from "./components/IntroModal.jsx";
 import ProductGridEntry from "./components/ProductGridEntry.jsx";
-import ProductDetail from "./components/ProductDetail.jsx";
 import Results from "./components/Results.jsx";
 import TextInput from "./components/TextInput.jsx";
-import { RENTAL_PACKAGES } from "./data/rentals.js";
-import { colorThemes, getQuestionFlow, occasionOptions, questions } from "./data/quizConfig.js";
-import { formatDate, quizCatalogIds, quizListingFilters, rentalDates } from "./lib/recommendation.js";
+import { getQuestionFlow, questions } from "./data/quizConfig.js";
 
 const STORAGE_KEY = "suit-quiz-wireframe-progress";
 
 function loadProgress() {
   try {
     const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
-    if (saved?.screen && saved?.answers) {
-      const answers = { ...saved.answers };
-      delete answers.rentalBudget;
-      const next = { ...saved, answers };
-      const place = next.place === "sale" || next.place === "home"
-        ? next.place
-        : (next.screen === "start" || next.screen === "matches" ? "sale" : "home");
-      if (next.currentId === "rentalBudget" && next.screen === "question") {
-        return { ...next, place, screen: "matching" };
-      }
-      return { ...next, place };
-    }
+    if (saved?.screen && saved?.answers) return saved;
   } catch {
     // Ignore malformed or unavailable local storage.
   }
-  return { screen: "home", currentId: "mode", answers: {}, place: "home" };
-}
-
-function leaveQuiz(previous) {
-  return { ...previous, screen: previous.place === "sale" ? "start" : "home" };
-}
-
-function OptionCards({ options, isSelected, onPick, label, compact = false, className = "" }) {
-  const classes = ["option-cards", compact && "option-cards-compact", className].filter(Boolean).join(" ");
-  return (
-    <div className={classes} role="group" aria-label={label}>
-      {options.map((option) => (
-        <button
-          className="option-card"
-          type="button"
-          key={option.value}
-          aria-pressed={option.locked ? true : isSelected(option.value)}
-          aria-disabled={option.locked || undefined}
-          onClick={() => {
-            if (option.locked) return;
-            onPick(option.value);
-          }}
-        >
-          <span className="option-art">
-            {option.swatches ? (
-              <span className="option-palette" aria-hidden="true">
-                {option.swatches.map((swatch) => (
-                  <span className={`option-swatch option-swatch-${swatch.key}`} key={swatch.key} style={{ background: swatch.hex }} />
-                ))}
-              </span>
-            ) : option.icon ? (
-              <img className="option-icon" src={option.icon} alt="" />
-            ) : (
-              <span className="option-icon-slot" aria-hidden="true" />
-            )}
-          </span>
-          <span className="option-copy">
-            <strong>{option.label}</strong>
-            {option.detail && <span>{option.detail}</span>}
-          </span>
-        </button>
-      ))}
-    </div>
-  );
+  return { screen: "start", currentId: "occasion", answers: {} };
 }
 
 function ChoiceQuestion({ question, value, onChange }) {
   const isMulti = question.type === "multi";
   const selectedValues = isMulti ? value ?? [] : [];
-
-  if (!isMulti) {
-    return (
-      <OptionCards
-        label={question.title}
-        options={question.options}
-        isSelected={(optionValue) => value === optionValue}
-        onPick={onChange}
-      />
-    );
-  }
 
   function toggleMulti(optionValue) {
     if (selectedValues.includes(optionValue)) {
@@ -105,282 +36,72 @@ function ChoiceQuestion({ question, value, onChange }) {
   }
 
   return (
-    <OptionCards
-      label={question.title}
-      compact
-      options={question.options}
-      isSelected={(optionValue) => selectedValues.includes(optionValue)}
-      onPick={toggleMulti}
-    />
-  );
-}
-
-function OccasionQuestion({ question, answers, onChange }) {
-  const options = occasionOptions(question, answers);
-  return (
-    <ChoiceQuestion
-      question={{ ...question, options }}
-      value={answers.occasion}
-      onChange={(occasion) => onChange({ occasion })}
-    />
-  );
-}
-
-function ColorQuestion({ mode, value, onChange }) {
-  const options = colorThemes(mode);
-  const known = new Set(options.map((option) => option.value));
-  const prefer = (value?.prefer ?? []).filter((item) => known.has(item));
-
-  return (
-    <OptionCards
-      label="Colors you'd wear"
-      options={options}
-      isSelected={(theme) => prefer.includes(theme)}
-      onPick={(theme) => onChange((current) => {
-        const wearing = current?.prefer ?? [];
-        return {
-          prefer: wearing.includes(theme) ? wearing.filter((item) => item !== theme) : [...wearing, theme],
-          avoid: [],
-        };
+    <div className="choice-grid">
+      {question.options.map((option) => {
+        const checked = isMulti ? selectedValues.includes(option.value) : value === option.value;
+        return (
+          <label className="choice" key={option.value}>
+            <input
+              type={isMulti ? "checkbox" : "radio"}
+              name={question.id}
+              value={option.value}
+              checked={checked}
+              onChange={() => isMulti ? toggleMulti(option.value) : onChange(option.value)}
+            />
+            <span className="choice-copy">
+              <strong>{option.label}</strong>
+              {option.detail && <span>{option.detail}</span>}
+            </span>
+            <span className={`choice-mark${isMulti ? " choice-mark-multi" : ""}`} aria-hidden="true">
+              <svg viewBox="0 0 16 16" width="14" height="14">
+                <path fill="currentColor" d="M6.3 12.2 1.8 7.7l1.2-1.2 3.3 3.3 6.7-6.7 1.2 1.2-7.9 7.9Z" />
+              </svg>
+            </span>
+          </label>
+        );
       })}
-    />
-  );
-}
-
-function todayIso() {
-  const now = new Date();
-  const pad = (number) => String(number).padStart(2, "0");
-  return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
-}
-
-function DateQuestion({ value, onChange }) {
-  const dates = rentalDates(value);
-  return (
-    <div className="date-question">
-      <label className="date-field">
-        <span className="date-label">Event date</span>
-        <input type="date" min={todayIso()} value={value ?? ""} onChange={(event) => onChange(event.target.value)} />
-      </label>
-      {dates && !dates.past && (
-        <div className="date-plan">
-          <p className="date-plan-lead">This date sets the timing: when your look is ready, and when it has to be back.</p>
-          <ol>
-            <li>
-              <span className="date-plan-mark">
-                <img src="/icons/mw/in-store-pickup.png" alt="" />
-              </span>
-              <span className="date-plan-copy">
-                <strong>Ready {formatDate(dates.ready)}</strong>
-                <span>Your look is ready before the event, for pickup or delivered to you.</span>
-              </span>
-            </li>
-            <li>
-              <span className="date-plan-mark">
-                <img src="/icons/mw/special-event.png" alt="" />
-              </span>
-              <span className="date-plan-copy">
-                <strong>Event {formatDate(dates.event)}</strong>
-                <span>The day you wear it.</span>
-              </span>
-            </li>
-            <li>
-              <span className="date-plan-mark">
-                <img src="/icons/mw/shipping.png" alt="" />
-              </span>
-              <span className="date-plan-copy">
-                <strong>Return {formatDate(dates.returnBy)}</strong>
-                <span>It comes back the day after, in store or by mail.</span>
-              </span>
-            </li>
-          </ol>
-        </div>
-      )}
-      {dates?.tooSoon && (
-        <p className="date-warning" role="status">
-          That's less than 4 days away. You can still reserve, but call or visit a store to make sure your look is ready in time.
-        </p>
-      )}
-      {dates?.past && <p className="date-warning" role="status">That date has passed. Choose an upcoming date.</p>}
     </div>
   );
 }
 
-function PiecesQuestion({ value, onChange }) {
-  return (
-    <OptionCards
-      label="What should the look include?"
-      options={RENTAL_PACKAGES.map((pack) => ({
-        value: pack.id,
-        label: pack.label,
-        detail: pack.detail,
-        icon: "/icons/mw/suits-bundle.png",
-      }))}
-      isSelected={(id) => Number(value) === id}
-      onPick={onChange}
-    />
-  );
-}
-
-const CHEST_SIZES = [36, 38, 40, 42, 44, 46, 48, 50, 52, 54];
-const WAIST_SIZES = [28, 29, 30, 31, 32, 33, 34, 36, 38, 40, 42, 44, 46, 48];
-const HEIGHT_MIN = 58;
-const HEIGHT_MAX = 84;
-
-function estimateGroups(answers) {
-  if (answers.measurementKnowledge === "no") return questions.everydaySizes.groups;
-  const unknown = answers.unknownSizes ?? {};
-  return questions.everydaySizes.groups.filter((group) => (
-    (group.id === "shirt" && unknown.chest) || (group.id === "waist" && unknown.waist)
-  ));
-}
-
-function questionHelp(question, answers) {
-  if (question.id === "everydaySizes" && answers.measurementKnowledge !== "no") {
-    const unknown = answers.unknownSizes ?? {};
-    if (unknown.chest && !unknown.waist) return "This stands in for the jacket size.";
-    if (unknown.waist && !unknown.chest) return "This stands in for the pant size.";
-    return "These stand in for a jacket and pant size.";
-  }
-  return answers.mode === "rent" && question.rentHelp ? question.rentHelp : question.help;
-}
-
-const MEASUREMENT_FIELDS = [
-  { id: "chest", label: "Jacket size", sizes: CHEST_SIZES, estimateId: "shirt" },
-  { id: "waist", label: "Pant size", sizes: WAIST_SIZES, estimateId: "waist" },
-];
-
-function MeasurementsQuestion({
-  value = {},
-  onChange,
-  everydaySizes = {},
-  onEverydaySizes,
-  unknownSizes = {},
-  onUnknownSizes,
-}) {
-  function writeMeasurements(next) {
-    const chest = next.chest ? String(next.chest) : "";
-    onChange({
-      chest,
-      waist: next.waist ? String(next.waist) : "",
-      jacket: chest,
-    });
-  }
-
-  function selectKnown(id, nextValue) {
-    const field = MEASUREMENT_FIELDS.find((item) => item.id === id);
-    writeMeasurements({ ...value, [id]: nextValue });
-    if (unknownSizes[id]) onUnknownSizes({ ...unknownSizes, [id]: false });
-    if (everydaySizes[field.estimateId]) {
-      onEverydaySizes({ ...everydaySizes, [field.estimateId]: "" });
-    }
-  }
-
-  function toggleUnknown(id) {
-    const field = MEASUREMENT_FIELDS.find((item) => item.id === id);
-    const nextUnknown = !unknownSizes[id];
-    onUnknownSizes({ ...unknownSizes, [id]: nextUnknown });
-    if (nextUnknown) {
-      writeMeasurements({ ...value, [id]: "" });
-      return;
-    }
-    if (everydaySizes[field.estimateId]) {
-      onEverydaySizes({ ...everydaySizes, [field.estimateId]: "" });
-    }
+function MeasurementsQuestion({ value = {}, onChange }) {
+  function update(field, nextValue) {
+    onChange({ ...value, [field]: nextValue });
   }
 
   return (
-    <div className="size-groups">
-      <div className="size-pair">
-        {MEASUREMENT_FIELDS.map((field) => {
-          const unknown = Boolean(unknownSizes[field.id]);
-          const known = value[field.id] ? String(value[field.id]) : "";
-          return (
-            <fieldset className="size-group" key={field.id}>
-              <legend>{field.label}</legend>
-              <div className="size-chips">
-                {field.sizes.map((size) => {
-                  const sizeValue = String(size);
-                  const selected = known === sizeValue;
-                  return (
-                    <label className="size-chip" key={sizeValue}>
-                      <input
-                        type="radio"
-                        name={field.id}
-                        value={sizeValue}
-                        checked={selected}
-                        onClick={() => {
-                          if (selected) selectKnown(field.id, "");
-                        }}
-                        onChange={() => selectKnown(field.id, sizeValue)}
-                      />
-                      <span>{sizeValue}</span>
-                    </label>
-                  );
-                })}
-              </div>
-              <button
-                className={`unknown-size${unknown ? " is-on" : ""}`}
-                type="button"
-                aria-pressed={unknown}
-                onClick={() => toggleUnknown(field.id)}
-              >
-                I don't know this
-              </button>
-            </fieldset>
-          );
-        })}
-      </div>
-    </div>
-  );
-}
-
-function HeightQuestion({ value, onChange }) {
-  const total = Number(value);
-  const valid = Number.isFinite(total) && total >= HEIGHT_MIN && total <= HEIGHT_MAX;
-  const [feet, setFeet] = useState(valid ? String(Math.floor(total / 12)) : "");
-  const [inches, setInches] = useState(valid ? String(total % 12) : "");
-
-  function commit(nextFeet, nextInches) {
-    setFeet(nextFeet);
-    setInches(nextInches);
-    if (nextFeet === "" || nextInches === "") {
-      if (value !== "" && value != null) onChange("");
-      return;
-    }
-    const combined = Number(nextFeet) * 12 + Number(nextInches);
-    if (!Number.isInteger(combined) || combined < HEIGHT_MIN || combined > HEIGHT_MAX) {
-      if (value !== "" && value != null) onChange("");
-      return;
-    }
-    if (combined !== total) onChange(combined);
-  }
-
-  return (
-    <div className="height-question">
-      <div className="height-inputs">
-        <label>
-          <span>Feet</span>
-          <input
-            type="number"
-            inputMode="numeric"
-            min="4"
-            max="7"
-            value={feet}
-            onChange={(event) => commit(event.target.value, inches)}
-          />
-        </label>
-        <label>
-          <span>Inches</span>
-          <input
-            type="number"
-            inputMode="numeric"
-            min="0"
-            max="11"
-            value={inches}
-            onChange={(event) => commit(feet, event.target.value)}
-          />
-        </label>
-      </div>
+    <div className="field-grid">
+      <TextInput
+        label="Jacket size"
+        value={value.jacket}
+        onChange={(next) => update("jacket", next)}
+        helperText="The number on the tag before S, R, or L, like 40"
+      />
+      <TextInput
+        label="Chest (inches)"
+        value={value.chest}
+        onChange={(next) => update("chest", next)}
+        helperText="Around the fullest part of your chest"
+      />
+      <TextInput
+        label="Waist (inches)"
+        value={value.waist}
+        onChange={(next) => update("waist", next)}
+        helperText="Where your dress pants usually sit"
+      />
+      <fieldset className="field-pair">
+        <legend className="visually-hidden">Height</legend>
+        <TextInput
+          label="Height (ft)"
+          value={value.heightFeet}
+          onChange={(next) => update("heightFeet", next)}
+        />
+        <TextInput
+          label="Height (in)"
+          value={value.heightInches}
+          onChange={(next) => update("heightInches", next)}
+        />
+      </fieldset>
     </div>
   );
 }
@@ -411,48 +132,37 @@ function SizesQuestion({ question, value = {}, onChange }) {
   );
 }
 
-const MATCHING_STEPS = {
-  buy: [
-    "Reading your occasion",
-    "Working out your jacket and pants sizes",
-    "Comparing cuts against how you want it to feel",
-    "Checking prices against your budget",
-  ],
-  rent: [
-    "Reading your occasion",
-    "Choosing suits or tuxedos for the room",
-    "Checking the package you picked",
-    "Working out your sizes for the fitting",
-  ],
-};
+const MATCHING_STEPS = [
+  "Reading your occasion",
+  "Working out your jacket and pants sizes",
+  "Comparing cuts against how you want it to feel",
+  "Choosing your tailoring",
+];
 const MATCHING_STEP_MS = 750;
 
-function MatchingScreen({ mode, onDone }) {
-  const steps = MATCHING_STEPS[mode] ?? MATCHING_STEPS.buy;
+function MatchingScreen({ onDone }) {
   const [step, setStep] = useState(0);
 
   useEffect(() => {
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const delay = reduceMotion ? 250 : MATCHING_STEP_MS;
-    if (step >= steps.length) {
+    if (step >= MATCHING_STEPS.length) {
       const done = setTimeout(onDone, reduceMotion ? 0 : 400);
       return () => clearTimeout(done);
     }
     const next = setTimeout(() => setStep((current) => current + 1), delay);
     return () => clearTimeout(next);
-  }, [step, steps.length, onDone]);
+  }, [step, onDone]);
 
   return (
     <section className="matching" aria-labelledby="matching-title" aria-live="polite">
       <div className="matching-scan" aria-hidden="true">
-        <img src="/icons/mw/ai-quiz.png" alt="" />
+        <img src="/icons/product_hanger.svg" alt="" />
       </div>
-      <h1 id="matching-title">{mode === "rent" ? "Finding your look" : "Finding your best fit"}</h1>
-      <p className="matching-copy">
-        {mode === "rent" ? "Checking every rental look against your answers." : "Checking every suit against your answers."}
-      </p>
+      <h1 id="matching-title">Finding your best fit</h1>
+      <p className="matching-copy">Checking every suit against your answers.</p>
       <ol className="matching-steps">
-        {steps.map((label, index) => {
+        {MATCHING_STEPS.map((label, index) => {
           const state = index < step ? "done" : index === step ? "active" : "pending";
           return (
             <li className={`matching-step matching-step-${state}`} key={label}>
@@ -467,17 +177,22 @@ function MatchingScreen({ mode, onDone }) {
   );
 }
 
-function isAnswered(question, answers) {
-  const answer = answers[question.id];
-  if (question.type === "occasionPlus") {
-    return Boolean(answers.occasion);
-  }
-  if (question.type === "colors" || question.type === "measurements" || question.type === "sizes" || question.type === "height") return true;
-  if (question.type === "date") {
-    const dates = rentalDates(answer);
-    return Boolean(dates && !dates.past);
-  }
+function ArrowLeftIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true">
+      <path fill="currentColor" fillRule="evenodd" d="M9.5 5.5 3 12l6.5 6.5.707-.707L4.914 12.5H21v-1H4.913l5.294-5.293L9.5 5.5Z" clipRule="evenodd" />
+    </svg>
+  );
+}
+
+function isAnswered(question, answer) {
   if (question.type === "multi") return Array.isArray(answer) && answer.length > 0;
+  if (question.type === "measurements") {
+    return Boolean(answer?.jacket || answer?.chest || answer?.waist);
+  }
+  if (question.type === "sizes") {
+    return question.groups.every((group) => Boolean(answer?.[group.id]));
+  }
   return Boolean(answer);
 }
 
@@ -487,50 +202,27 @@ export default function App() {
   const flow = useMemo(() => getQuestionFlow(answers), [answers]);
   const currentQuestion = questions[currentId];
   const currentIndex = Math.max(0, flow.indexOf(currentId));
-  const totalQuestions = answers.measurementKnowledge
-    ? flow.length
-    : getQuestionFlow({ ...answers, measurementKnowledge: "no" }).length;
-  const moreMode = new URLSearchParams(window.location.search).get("more") === "link" ? "link" : "toggle";
-  const listingFilters = useMemo(() => quizListingFilters(answers), [answers]);
-  const quizMatchIds = useMemo(() => quizCatalogIds(answers), [answers]);
+  const totalQuestions = answers.measurementKnowledge ? flow.length : 8;
 
   useEffect(() => {
-    if (screen === "start" || screen === "intro") return;
+    if (screen === "start") return;
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
   }, [state, screen]);
 
   useEffect(() => {
-    if (screen !== "question") return;
-    if (currentId === "rentalBudget") {
-      setState((previous) => (
-        previous.currentId === "rentalBudget" ? { ...previous, screen: "matching" } : previous
-      ));
-    }
-  }, [screen, currentId]);
-
-  useEffect(() => {
-    const lightPage = screen === "start" || screen === "home" || screen === "results" || screen === "product";
+    const lightPage = screen === "start" || screen === "matching" || screen === "results";
     document.documentElement.classList.toggle("page-white", lightPage);
     return () => document.documentElement.classList.remove("page-white");
   }, [screen]);
 
   function startQuiz() {
-    setState((previous) => ({ ...previous, screen: "question", currentId: "mode", answers: {} }));
+    setState({ screen: "question", currentId: "occasion", answers: {} });
   }
 
   function setAnswer(value) {
-    setState((previous) => {
-      if (previous.currentId === "mode" && previous.answers.mode !== value) {
-        return { ...previous, answers: { mode: value } };
-      }
-      return { ...previous, answers: { ...previous.answers, [previous.currentId]: value } };
-    });
-  }
-
-  function mergeAnswers(partial) {
     setState((previous) => ({
       ...previous,
-      answers: { ...previous.answers, ...partial },
+      answers: { ...previous.answers, [previous.currentId]: value },
     }));
   }
 
@@ -546,7 +238,7 @@ export default function App() {
 
   function goBack() {
     if (currentIndex <= 0) {
-      setState(leaveQuiz);
+      setState((previous) => ({ ...previous, screen: "start" }));
       return;
     }
     setState((previous) => ({ ...previous, currentId: flow[currentIndex - 1] }));
@@ -554,20 +246,12 @@ export default function App() {
 
   function restart() {
     localStorage.removeItem(STORAGE_KEY);
-    setState((previous) => ({ screen: "question", currentId: "mode", answers: {}, place: previous.place }));
-  }
-
-  function editAnswers(questionId) {
-    setState((previous) => {
-      const nextFlow = getQuestionFlow(previous.answers);
-      const currentId = typeof questionId === "string" && nextFlow.includes(questionId) ? questionId : "mode";
-      return { ...previous, screen: "question", currentId };
-    });
+    setState({ screen: "question", currentId: "occasion", answers: {} });
   }
 
   function saveAndExit() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-    setState(leaveQuiz);
+    setState((previous) => ({ ...previous, screen: "start" }));
   }
 
   function resumeQuiz() {
@@ -578,197 +262,95 @@ export default function App() {
     setState((previous) => ({ ...previous, screen: "results" }));
   }, []);
 
-  function openProduct(productId, colorKey) {
-    setState((previous) => ({
-      ...previous,
-      screen: "product",
-      productId,
-      productColorKey: colorKey ?? null,
-    }));
-  }
-
-  function backToResults() {
-    setState((previous) => ({ ...previous, screen: "results" }));
-  }
-
   const hasSavedProgress = Object.keys(answers).length > 0;
 
-  function openIntro() {
-    setState((previous) => ({ ...previous, screen: "intro" }));
-  }
-
-  const closeIntro = useCallback(() => {
-    setState(leaveQuiz);
-  }, []);
-
-  function goHome() {
-    setState((previous) => ({ ...previous, screen: "home", place: "home" }));
-  }
-
-  function goSale() {
-    setState((previous) => ({ ...previous, screen: "start", place: "sale" }));
-  }
-
-  const questionSlide = currentQuestion && (
-    <section className="quiz-slide" aria-labelledby="question-title">
-      <div className="question-head">
-        {currentQuestion.icon && <img className="question-icon" src={currentQuestion.icon} alt="" />}
-        <div>
-          <h2 id="question-title">{currentQuestion.title}</h2>
-          {questionHelp(currentQuestion, answers) && (
-            <p className="helper">{questionHelp(currentQuestion, answers)}</p>
-          )}
-        </div>
-      </div>
-
-      {currentQuestion.type === "occasionPlus" ? (
-        <OccasionQuestion
-          question={currentQuestion}
-          answers={answers}
-          onChange={mergeAnswers}
-        />
-      ) : currentQuestion.type === "colors" ? (
-        <ColorQuestion
-          mode={answers.mode}
-          value={answers.colors}
-          onChange={(updater) => setState((previous) => ({
-            ...previous,
-            answers: {
-              ...previous.answers,
-              colors: typeof updater === "function" ? updater(previous.answers.colors) : updater,
-            },
-          }))}
-        />
-      ) : currentQuestion.type === "date" ? (
-        <DateQuestion value={answers.eventDate} onChange={setAnswer} />
-      ) : currentQuestion.type === "pieces" ? (
-        <PiecesQuestion value={answers.pieces} onChange={setAnswer} />
-      ) : currentQuestion.type === "measurements" ? (
-        <MeasurementsQuestion
-          value={answers[currentId]}
-          onChange={setAnswer}
-          everydaySizes={answers.everydaySizes}
-          onEverydaySizes={(everydaySizes) => mergeAnswers({ everydaySizes })}
-          unknownSizes={answers.unknownSizes}
-          onUnknownSizes={(unknownSizes) => mergeAnswers({ unknownSizes })}
-        />
-      ) : currentQuestion.type === "height" ? (
-        <HeightQuestion
-          value={answers.height}
-          onChange={(height) => mergeAnswers({ height })}
-        />
-      ) : currentQuestion.type === "sizes" ? (
-        <SizesQuestion
-          question={{ ...currentQuestion, groups: estimateGroups(answers) }}
-          value={answers[currentId]}
-          onChange={setAnswer}
-        />
-      ) : (
-        <ChoiceQuestion
-          question={currentQuestion}
-          value={answers[currentId]}
-          onChange={setAnswer}
-        />
-      )}
-
-      <div className="actions actions-pair">
-        {currentQuestion.skippable && (
-          <button className="button secondary skip-button" type="button" onClick={continueQuiz}>
-            {currentQuestion.skipLabel ?? "Skip"}
-          </button>
-        )}
-        <button
-          className="button"
-          type="button"
-          disabled={!isAnswered(currentQuestion, answers)}
-          onClick={continueQuiz}
-        >
-          {currentIndex === flow.length - 1 ? "See recommendations" : "Next"}
-        </button>
-      </div>
-    </section>
-  );
-
-  const view = screen === "home"
-    ? "home"
-    : (screen === "start" || screen === "matches" || state.place === "sale")
-      ? "sale"
-      : "home";
-
-  if (screen === "home" || screen === "start" || screen === "intro" || screen === "matches" || screen === "question" || screen === "matching") {
-    return (
-      <>
-        <ProductGridEntry
-          key={screen === "matches" ? "matches" : view}
-          view={view}
-          title={screen === "matches" ? "Quiz matches" : "All Suits"}
-          crumb={screen === "matches" ? "Quiz matches" : "Suits"}
-          initialFilters={screen === "matches" ? listingFilters : undefined}
-          quizMatchIds={screen === "matches" ? quizMatchIds : undefined}
-          onTakeQuiz={openIntro}
-          onNavigate={(next) => {
-            if (next === "home") goHome();
-            else if (next === "sale" || next === "look") goSale();
-          }}
-          onBackToQuiz={screen === "matches"
-            ? () => setState((previous) => ({ ...previous, screen: "results" }))
-            : undefined}
-        />
-        {(screen === "intro" || screen === "question" || screen === "matching") && (
-          <IntroModal
-            key="quiz-modal"
-            onStart={startQuiz}
-            onResume={screen === "intro" && hasSavedProgress ? resumeQuiz : undefined}
-            onBack={screen === "question" ? goBack : undefined}
-            onClose={screen === "question" || screen === "matching" ? saveAndExit : closeIntro}
-            progress={screen === "matching" ? 1 : screen === "question" && totalQuestions > 0 ? (currentIndex + 1) / totalQuestions : undefined}
-            stepLabel={screen === "question" && totalQuestions > 0 ? `Step ${currentIndex + 1} of ${totalQuestions}` : undefined}
-            labelledBy={screen === "matching" ? "matching-title" : screen === "question" ? "question-title" : "intro-title"}
-          >
-            {screen === "matching" ? (
-              <MatchingScreen mode={answers.mode} onDone={showResults} />
-            ) : screen === "question" ? questionSlide : undefined}
-          </IntroModal>
-        )}
-      </>
-    );
+  if (screen === "start") {
+    return <ProductGridEntry onTakeQuiz={hasSavedProgress ? resumeQuiz : startQuiz} />;
   }
 
   return (
     <>
       <p className="promo-banner">
-        {screen === "results" || screen === "product"
-          ? answers.mode === "rent"
-            ? "Your sizes and event timing are in your plan below."
-            : "Your sizes and today's prices are in your plan below."
+        {screen === "results"
+          ? "Your sizes and today's prices are in your plan below."
           : screen === "start"
             ? "Suits are on sale now."
             : "Suits are on sale now. Finish the quiz to see your size and your price."}
       </p>
       <header className="site-header">
-        <div className="header-slot header-slot-start" />
+        <div className="header-slot header-slot-start">
+          {screen === "question" && (
+            <button className="nav-control" type="button" onClick={goBack} aria-label="Back">
+              <ArrowLeftIcon />
+              <span className="nav-label">Back</span>
+            </button>
+          )}
+          {screen === "results" && (
+            <button
+              className="nav-control"
+              type="button"
+              onClick={() => setState((previous) => ({ ...previous, screen: "question", currentId: "occasion" }))}
+              aria-label="Edit answers"
+            >
+              <ArrowLeftIcon />
+              <span className="nav-label">Edit answers</span>
+            </button>
+          )}
+        </div>
         <a className="logo" href="/" aria-label="Men's Wearhouse">
           <img src="/mw-logo.svg" alt="" />
         </a>
-        <div className="header-slot header-slot-end" />
+        <div className="header-slot header-slot-end">
+          {screen === "question" && (
+            <button className="nav-control" type="button" onClick={saveAndExit}>Save and exit</button>
+          )}
+          {screen === "results" && (
+            <button className="nav-control" type="button" onClick={restart}>Start over</button>
+          )}
+        </div>
       </header>
-      <main className={`app-shell${screen === "results" || screen === "product" ? " app-shell-wide" : ""}`}>
-        {screen === "product" ? (
-          <ProductDetail
-            answers={answers}
-            productId={state.productId}
-            colorKey={state.productColorKey}
-            onBack={backToResults}
-          />
-        ) : (
+      <main className={`app-shell${screen === "results" ? " app-shell-wide" : ""}`}>
+        {screen === "question" && currentQuestion && (
+          <section className="wire-panel" aria-labelledby="question-title">
+            <ol className="quiz-steps" aria-hidden="true">
+              {Array.from({ length: totalQuestions }, (_, index) => (
+                <li className={index <= currentIndex ? "quiz-step-done" : undefined} key={index} />
+              ))}
+            </ol>
+            <div className="progress-row">
+              <span>Question {currentIndex + 1} of {totalQuestions}</span>
+              <span className="save-note">Progress saved on this device</span>
+            </div>
+            <h2 id="question-title">{currentQuestion.title}</h2>
+            <p className="helper">{currentQuestion.help}</p>
+
+            {currentQuestion.type === "measurements" ? (
+              <MeasurementsQuestion value={answers[currentId]} onChange={setAnswer} />
+            ) : currentQuestion.type === "sizes" ? (
+              <SizesQuestion question={currentQuestion} value={answers[currentId]} onChange={setAnswer} />
+            ) : (
+              <ChoiceQuestion question={currentQuestion} value={answers[currentId]} onChange={setAnswer} />
+            )}
+
+            <div className="actions actions-end">
+              <button
+                className="button"
+                type="button"
+                disabled={!isAnswered(currentQuestion, answers[currentId])}
+                onClick={continueQuiz}
+              >
+                {currentIndex === flow.length - 1 ? "See my results" : "Continue"}
+              </button>
+            </div>
+          </section>
+        )}
+
+        {screen === "matching" && <MatchingScreen onDone={showResults} />}
+
+        {screen === "results" && (
           <Results
             answers={answers}
-            moreMode={moreMode}
-            onEditAnswers={editAnswers}
-            onRestart={restart}
-            onViewDetails={openProduct}
-            onSeeAll={() => setState((previous) => ({ ...previous, screen: "matches" }))}
-          />
+            onEditAnswers={() => setState((previous) => ({ ...previous, screen: "question", currentId: "occasion" }))}          />
         )}
       </main>
     </>

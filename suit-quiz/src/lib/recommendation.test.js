@@ -1,22 +1,13 @@
 import { describe, expect, it } from "vitest";
-import { products, SWATCH_HEX, TAILORING_TIERS } from "../data/products.js";
-import { colorThemes, colorsIn, getQuestionFlow } from "../data/quizConfig.js";
-import { rentals } from "../data/rentals.js";
+import { getQuestionFlow } from "../data/quizConfig.js";
 import {
   buildResultSummary,
-  describeSize,
   getFitSignals,
   getRecommendations,
-  getRentalRecommendations,
-  rentalDates,
-  rentalPieces,
-  rentalTotal,
   getSizeEstimate,
   inferLength,
   inferLikelySize,
   isLowConfidence,
-  parseHeight,
-  parseJacket,
   recommendTailoring,
 } from "./recommendation.js";
 
@@ -30,142 +21,24 @@ const baseAnswers = {
   budget: "250-400",
 };
 
-describe("fit issue screens", () => {
-  it("counts pants answers alongside jacket answers", () => {
-    const signals = getFitSignals({ fitIssues: ["runsLong"], pantsFit: ["seatThighs", "none"] });
-    expect(signals.has("runsLong")).toBe(true);
-    expect(signals.has("seatThighs")).toBe(true);
-    expect(signals.has("none")).toBe(false);
-  });
-});
-
 describe("quiz routing", () => {
   it("routes known measurements through the short path", () => {
     expect(getQuestionFlow({ measurementKnowledge: "yes" })).toEqual([
-      "mode",
       "occasion",
       "feel",
-      "colors",
       "measurementKnowledge",
-      "height",
       "measurements",
-      "fitIssues",
-      "pantsFit",
+      "wearIntent",
       "tailoring",
       "budget",
     ]);
   });
 
-  it("asks height before any size questions, then where suits feel off", () => {
-    const some = getQuestionFlow({ measurementKnowledge: "some" });
-    expect(some.indexOf("measurements")).toBe(some.indexOf("height") + 1);
-    expect(some.indexOf("fitIssues")).toBe(some.indexOf("measurements") + 1);
-    const estimate = getQuestionFlow({ measurementKnowledge: "no" });
-    expect(estimate.indexOf("everydaySizes")).toBe(estimate.indexOf("height") + 1);
-    expect(estimate.indexOf("fitIssues")).toBe(estimate.indexOf("everydaySizes") + 1);
-    expect(estimate.indexOf("pantsFit")).toBe(estimate.indexOf("fitIssues") + 1);
-    expect(getQuestionFlow({ mode: "rent", measurementKnowledge: "no" })).toContain("height");
-    expect(getQuestionFlow({ mode: "rent", measurementKnowledge: "yes" })).toContain("height");
-  });
-
-  it("routes unknown measurements through everyday sizes and fit issues", () => {
-    expect(getQuestionFlow({ measurementKnowledge: "no" })).toEqual([
-      "mode",
-      "occasion",
-      "feel",
-      "colors",
-      "measurementKnowledge",
-      "height",
-      "everydaySizes",
-      "fitIssues",
-      "pantsFit",
-      "tailoring",
-      "budget",
-    ]);
-  });
-
-  it("sends renters through pieces and an event date, without a rental price or a buying budget", () => {
-    const known = getQuestionFlow({ mode: "rent", measurementKnowledge: "yes" });
-    expect(known).toEqual([
-      "mode",
-      "occasion",
-      "eventDate",
-      "pieces",
-      "feel",
-      "colors",
-      "measurementKnowledge",
-      "height",
-      "measurements",
-      "fitIssues",
-      "pantsFit",
-    ]);
-    const estimate = getQuestionFlow({ mode: "rent", measurementKnowledge: "no" });
-    expect(estimate).not.toContain("rentalBudget");
-    expect(estimate.at(-1)).toBe("pantsFit");
-    expect(estimate).not.toContain("tailoring");
-    expect(estimate).not.toContain("budget");
-    expect(getQuestionFlow({ measurementKnowledge: "yes" })).toContain("budget");
-  });
-});
-
-describe("rentals", () => {
-  const rentAnswers = {
-    mode: "rent",
-    occasion: "formal",
-    feel: "balanced",
-    measurementKnowledge: "yes",
-    measurements: { jacket: "40", waist: "34" },
-    pieces: 6,
-    rentalBudget: "150-200",
-  };
-
-  it("prices each look with the pieces in the rental package", () => {
-    const look = { price: 139.99 };
-    const pieces = rentalPieces(rentAnswers);
-    expect(pieces.map((piece) => piece.id)).toEqual(["shirt", "neckwear", "vest", "shoes"]);
-    expect(rentalTotal(look, pieces)).toBe(229.99);
-    expect(rentalPieces({ pieces: 2 })).toEqual([]);
-    expect(rentalPieces({ pieces: 9 }).map((piece) => piece.id)).toEqual([
-      "shirt", "neckwear", "vest", "shoes", "pocketsilk", "cufflinks", "suspenders",
-    ]);
-  });
-
-  it("keeps in-budget looks first once pieces are added", () => {
-    const results = getRentalRecommendations(rentAnswers);
-    const firstMiss = results.findIndex((look) => !look.inBudget);
-    expect(results[0].inBudget).toBe(true);
-    expect(results[0].total).toBeLessThanOrEqual(200);
-    if (firstMiss >= 0) expect(results.slice(firstMiss).every((look) => !look.inBudget)).toBe(true);
-  });
-
-  it("favors a tuxedo over a suit for black tie", () => {
-    const [best] = getRentalRecommendations({ ...rentAnswers, rentalBudget: "flexible" });
-    expect(best.type).not.toBe("suit");
-  });
-
-  it("does not explain a rental match with a budget the shopper picked", () => {
-    const results = getRentalRecommendations(rentAnswers);
-    expect(results.budgetMiss).toBeNull();
-    for (const look of results) {
-      expect(look.evidence.join(" ")).not.toMatch(/budget/i);
-      expect(look.tradeoffs.join(" ")).not.toMatch(/budget/i);
-    }
-  });
-
-  it("works out ready and return dates, and flags events that are too soon", () => {
-    const today = new Date(2026, 9, 26);
-    const dates = rentalDates("2026-11-14", today);
-    expect(dates.ready).toEqual(new Date(2026, 10, 11));
-    expect(dates.returnBy).toEqual(new Date(2026, 10, 15));
-    expect(dates.tooSoon).toBe(false);
-    expect(rentalDates("2026-10-28", today).tooSoon).toBe(true);
-    expect(rentalDates("2026-10-20", today).past).toBe(true);
-  });
-});
-
-describe("tailoring tiers", () => {
-  it("adds up the real alteration prices", () => {
-    expect(TAILORING_TIERS.map((tier) => tier.price)).toEqual([55, 115, 199]);
+  it("routes unknown measurements through fit issues and height", () => {
+    expect(getQuestionFlow({ measurementKnowledge: "no" })).toContain("fitIssues");
+    expect(getQuestionFlow({ measurementKnowledge: "no" })).toContain("height");
+    expect(getQuestionFlow({ measurementKnowledge: "no" })).toContain("everydaySizes");
+    expect(getQuestionFlow({ measurementKnowledge: "no" })).not.toContain("measurements");
   });
 });
 
@@ -255,26 +128,6 @@ describe("recommendations", () => {
     expect(getSizeEstimate(baseAnswers)).toEqual({ jacket: "40R", pants: "34W", length: "Regular", lengthCode: "R" });
   });
 
-  it("keeps jacket and pant length when height is entered in inches", () => {
-    expect(inferLength({ height: 66, measurements: { jacket: "40", waist: "34" } })).toBe("S");
-    expect(getSizeEstimate({
-      measurementKnowledge: "some",
-      height: 70,
-      measurements: { chest: "40", jacket: "40" },
-      everydaySizes: { waist: "32" },
-    })).toMatchObject({ jacket: "40R", pants: "32W", length: "Regular", lengthCode: "R" });
-    expect(getSizeEstimate({
-      measurementKnowledge: "some",
-      height: 74,
-      everydaySizes: { shirt: "L" },
-    })).toMatchObject({ jacket: "42L", pants: "36W", length: "Long", lengthCode: "L" });
-    expect(getQuestionFlow({ measurementKnowledge: "some" })).not.toContain("everydaySizes");
-    expect(getQuestionFlow({ measurementKnowledge: "some", unknownSizes: { chest: true } }).indexOf("everydaySizes"))
-      .toBe(getQuestionFlow({ measurementKnowledge: "some" }).indexOf("measurements") + 1);
-    expect(getQuestionFlow({ measurementKnowledge: "some", unknownSizes: { waist: true } })).toContain("everydaySizes");
-    expect(getQuestionFlow({ measurementKnowledge: "no" })).toContain("everydaySizes");
-  });
-
   it("always gives a jacket and a pants size from everyday sizes", () => {
     expect(getSizeEstimate({
       measurementKnowledge: "no",
@@ -320,161 +173,5 @@ describe("recommendations", () => {
       size: "40R jacket, 34 waist pants",
       needsMeasurementHelp: false,
     });
-  });
-
-  it("reads a jacket length and a height written the way people say it", () => {
-    expect(parseJacket("44L")).toEqual({ chest: 44, length: "L" });
-    expect(parseJacket("44 long")).toEqual({ chest: 44, length: "L" });
-    expect(parseHeight("6'5\"")).toEqual({ feet: 6, inches: 5, total: 77 });
-    expect(parseHeight("6 5")).toEqual({ feet: 6, inches: 5, total: 77 });
-    expect(parseHeight("6ft 5")).toEqual({ feet: 6, inches: 5, total: 77 });
-    expect(parseHeight("77")).toEqual({ feet: 6, inches: 5, total: 77 });
-    expect(getSizeEstimate({ measurements: { jacket: "44L", height: "6'5\"" } })).toMatchObject({
-      jacket: "44L",
-      lengthCode: "L",
-      length: "Long",
-    });
-    expect(describeSize(getSizeEstimate(baseAnswers))).toBe(
-      "40 regular jacket, 34-inch waist",
-    );
-  });
-
-  it("ranks suits in a picked palette first", () => {
-    const navy = {
-      id: "navy",
-      fit: "balanced",
-      fitName: "Modern fit",
-      color: "Navy",
-      colorKey: "navy",
-      price: 300,
-      formality: ["wedding"],
-      versatility: 4,
-      comfort: 4,
-      tailoringEase: 4,
-    };
-    const tan = { ...navy, id: "tan", color: "Tan", colorKey: "tan" };
-    const brownTan = getRecommendations({ ...baseAnswers, colors: { prefer: ["brownTan"] } }, [navy, tan]);
-    expect(brownTan.map((product) => product.id)).toEqual(["tan", "navy"]);
-    expect(brownTan[0].evidence.join(" ")).toMatch(/tan, a color you picked/);
-    expect(brownTan[1].tradeoffs.join(" ")).toMatch(/wasn't a color you picked/);
-
-    const navyPick = getRecommendations({ ...baseAnswers, colors: { prefer: ["navy"] } }, [tan, navy]);
-    expect(navyPick[0].id).toBe("navy");
-
-    const warm = getRecommendations({ ...baseAnswers, colors: { prefer: ["warm"] } }, [navy, tan]);
-    expect(warm[0].id).toBe("tan");
-    const darks = getRecommendations({ ...baseAnswers, colors: { prefer: ["darks"] } }, [tan, navy]);
-    expect(darks[0].id).toBe("navy");
-  });
-
-  it("ranks a color to avoid below one that was not ruled out", () => {
-    const black = {
-      id: "black",
-      fit: "balanced",
-      fitName: "Modern fit",
-      color: "Black",
-      colorKey: "black",
-      price: 300,
-      formality: ["wedding"],
-    };
-    const navy = { ...black, id: "navy", color: "Navy", colorKey: "navy" };
-    const ranked = getRecommendations({ ...baseAnswers, colors: { prefer: [], avoid: ["black"] } }, [black, navy]);
-    expect(ranked.map((product) => product.id)).toEqual(["navy", "black"]);
-    expect(ranked[1].tradeoffs.join(" ")).toMatch(/color you wanted to avoid/);
-    expect(ranked[1].matchPercent).toBeLessThan(ranked[0].matchPercent);
-    expect(getRentalRecommendations({ mode: "rent", colors: { avoid: ["darks"] } }).length).toBe(rentals.length);
-  });
-
-  it("builds every color theme from colors the catalog actually carries", () => {
-    const buyKeys = new Set(products.flatMap((product) => [product, ...(product.variants ?? [])]).map((item) => item.colorKey));
-    const rentKeys = new Set(rentals.map((look) => look.colorKey));
-    for (const [mode, keys] of [["buy", buyKeys], ["rent", rentKeys]]) {
-      const themes = colorThemes(mode);
-      expect(themes.length).toBeGreaterThan(0);
-      for (const theme of themes) {
-        for (const swatch of theme.swatches) {
-          expect(keys.has(swatch.key)).toBe(true);
-          expect(swatch.hex).toBe(SWATCH_HEX[swatch.key]);
-        }
-      }
-      const listed = themes.flatMap((theme) => theme.colors);
-      expect(new Set(listed).size).toBe(listed.length);
-      expect(new Set(listed)).toEqual(keys);
-    }
-    const buyThemes = colorThemes("buy");
-    const rentThemes = colorThemes("rent");
-    expect(buyThemes.map((theme) => theme.value)).toEqual(["navy", "blue", "gray", "black", "brownTan", "burgundy", "green"]);
-    expect(rentThemes.map((theme) => theme.value)).toEqual(["navy", "blue", "gray", "black", "brownTan", "green", "white"]);
-    expect(buyThemes.map((theme) => theme.value)).not.toContain("white");
-    expect(buyThemes.map((theme) => theme.value)).not.toContain("light");
-    expect(rentThemes.map((theme) => theme.value)).toContain("white");
-    expect(rentThemes.map((theme) => theme.value)).not.toContain("light");
-    expect(buyThemes.find((theme) => theme.value === "brownTan").colors).toEqual(["brown", "tan"]);
-    expect(rentThemes.find((theme) => theme.value === "brownTan").colors).toEqual(["tan"]);
-    expect(rentThemes.find((theme) => theme.value === "brownTan").label).toBe("Tan");
-    expect(colorsIn(["darks"])).toEqual(["navy", "blue", "gray", "black"]);
-    expect(colorsIn(["warm"])).toEqual(["tan", "brown", "burgundy", "green"]);
-    expect(colorsIn(["light"])).toEqual(["white"]);
-    expect(colorsIn(["navy", "brownTan"])).toEqual(["navy", "brown", "tan"]);
-  });
-
-  it("puts in-budget suits first and says when the budget misses", () => {
-    const suit = {
-      fit: "balanced",
-      fitName: "Modern fit",
-      color: "Navy",
-      colorKey: "navy",
-      formality: ["wedding"],
-      versatility: 4,
-      comfort: 4,
-      tailoringEase: 4,
-    };
-    const ranked = getRecommendations(
-      { ...baseAnswers, budget: "under-250" },
-      [
-        { ...suit, id: "over", price: 400 },
-        { ...suit, id: "under", price: 180 },
-      ],
-    );
-    expect(ranked.map((product) => product.id)).toEqual(["under", "over"]);
-    expect(ranked.budgetMiss.label).toBe("Only 1 suit under $250 matched. Closest options:");
-    expect(ranked[1].tradeoffs.join(" ")).toMatch(/Over your budget/);
-
-    const none = getRecommendations(
-      { ...baseAnswers, budget: "under-250" },
-      [{ ...suit, id: "over", price: 400 }],
-    );
-    expect(none.budgetMiss.label).toBe("Nothing under $250 matched. Closest options:");
-  });
-
-  it("lets a weak match fall below 72 and explains why", () => {
-    const strong = {
-      id: "strong",
-      fit: "balanced",
-      fitName: "Modern fit",
-      color: "Navy",
-      colorKey: "navy",
-      price: 300,
-      formality: ["wedding"],
-      versatility: 5,
-      comfort: 4,
-      tailoringEase: 5,
-    };
-    const weak = {
-      id: "weak",
-      fit: "roomy",
-      fitName: "Classic fit",
-      color: "Tan",
-      colorKey: "tan",
-      price: 900,
-      formality: ["formal"],
-      versatility: 1,
-      comfort: 1,
-      tailoringEase: 1,
-    };
-    const ranked = getRecommendations(baseAnswers, [strong, weak]);
-    expect(ranked[0].id).toBe("strong");
-    expect(ranked[1].matchPercent).toBeLessThan(72);
-    expect(ranked[1].tradeoffs.length).toBeGreaterThan(0);
   });
 });

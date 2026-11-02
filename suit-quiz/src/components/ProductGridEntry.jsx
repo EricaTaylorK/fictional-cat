@@ -3,24 +3,10 @@ import { createRoot } from "react-dom/client";
 import SalePage from "../../../src/SalePage.jsx";
 import pgpCss from "../../../src/style.css?inline";
 
-export default function ProductGridEntry({
-  view = "sale",
-  onTakeQuiz,
-  onBackToQuiz,
-  onNavigate,
-  initialFilters,
-  quizMatchIds,
-  title = "All Suits",
-  crumb = "Suits",
-}) {
+export default function ProductGridEntry({ onTakeQuiz }) {
   const hostRef = useRef(null);
-  const rootRef = useRef(null);
   const onTakeQuizRef = useRef(onTakeQuiz);
-  const onBackRef = useRef(onBackToQuiz);
-  const onNavigateRef = useRef(onNavigate);
   onTakeQuizRef.current = onTakeQuiz;
-  onBackRef.current = onBackToQuiz;
-  onNavigateRef.current = onNavigate;
 
   useEffect(() => {
     const host = hostRef.current;
@@ -31,29 +17,21 @@ export default function ProductGridEntry({
 
     const mount = document.createElement("div");
     shadow.appendChild(mount);
-    rootRef.current = createRoot(mount);
+    const root = createRoot(mount);
+    root.render(
+      <SalePage
+        title="All Suits"
+        crumb="Suits"
+        onNavigate={() => {}}
+        onTakeQuiz={() => onTakeQuizRef.current()}
+      />
+    );
 
     return () => {
-      rootRef.current.unmount();
-      rootRef.current = null;
+      root.unmount();
       mount.remove();
     };
   }, []);
-
-  useEffect(() => {
-    rootRef.current?.render(
-      <SalePage
-        view={view}
-        title={title}
-        crumb={crumb}
-        initialFilters={initialFilters}
-        quizMatchIds={quizMatchIds}
-        onNavigate={(next) => onNavigateRef.current?.(next)}
-        onTakeQuiz={() => onTakeQuizRef.current()}
-        onBackToQuiz={onBackRef.current ? () => onBackRef.current() : undefined}
-      />
-    );
-  }, [view, title, crumb, initialFilters, quizMatchIds]);
 
   return <div className="pgp-host" ref={hostRef} />;
 }
