@@ -4,7 +4,7 @@ import {
   SWATCH_HEX,
   TAILORING_TIERS,
 } from "../data/products.js";
-import { colorsIn, resolvedOccasion } from "../data/quizConfig.js";
+import { colorsIn, questions, resolvedOccasion } from "../data/quizConfig.js";
 import { RENTAL_PACKAGES, RENTAL_STEPS, RENTAL_TYPE_NAMES } from "../data/rentals.js";
 import {
   buildResultSummary,
@@ -87,6 +87,12 @@ function defaultVariantIndex(product, answers) {
   if (preferred >= 0) return preferred;
   const open = options.findIndex((item) => !avoid.includes(item.colorKey));
   return Math.max(0, open);
+}
+
+function matchChips(product, shown, answers) {
+  const options = [...(questions.occasion.options ?? []), ...(questions.occasion.rentOptions ?? [])];
+  const occasion = options.find((option) => option.value === answers.occasion)?.label;
+  return [...new Set([shown?.color || product.color, product.fitName, occasion].filter(Boolean))].slice(0, 3);
 }
 
 function titleWords(value) {
@@ -248,12 +254,9 @@ function TailoringOptions({ suggestedId, suggestedReason, tailoringId, onSelect 
               <span className="rate-choice-copy">
                 <span className="rate-name">
                   {option.name}
-                  {suggested && <span className="tier-tag">Recommended for you</span>}
+                  {suggested && suggestedReason && <span className="tier-tag">{`Recommended · ${suggestedReason}`}</span>}
                 </span>
-                {suggested && suggestedReason && (
-                  <span className="rate-plain">{`Matches your suggested tailoring: ${suggestedReason}.`}</span>
-                )}
-                {selected && <span className="rate-plain">{option.detail}</span>}
+                <span className="rate-plain">{option.detail}</span>
               </span>
               <span className="rate-choice-price">{option.price ? formatPrice(option.price) : "Included"}</span>
             </label>
@@ -540,7 +543,7 @@ function CompleteLook({ id, look, suitColor, suitName, addedLooks, onOpen, onRem
                     else onOpen(item, event);
                   }}
                 >
-                  {added && <CheckIcon />}
+                  <span className="look-check-box" aria-hidden="true">{added && <CheckIcon />}</span>
                 </button>
               </div>
             </li>
@@ -786,13 +789,11 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
     } to your bag.${tailoring ? " After checkout, the next step books your tailoring appointment." : ""}`;
   const barTotal = selected ? (renting ? selected.price : total) : null;
   const optionsRail = selected ? (
-    <aside className="results-rail" key={selected.id} aria-label={`Options for ${selected.brand} ${selected.name}`}>
+    <aside className="results-rail" key={selected.id} aria-label={`${renting ? "Selected look" : "Selected suit"}, ${selected.brand} ${selected.name}`}>
       <header className="rail-suit">
         <img className="rail-suit-image" src={selectedVariant?.image || selected.image} alt="" />
         <div>
-          <p className="rail-kicker" aria-live="polite">
-            {renting ? `Options for ${selected.brand} ${selected.name}` : `Options for ${selected.brand} ${selected.name}`}
-          </p>
+          <p className="rail-kicker">{renting ? "Selected look" : "Selected suit"}</p>
           <p className="rail-brand">{selected.brand}</p>
           <h3 className="rail-name">{selected.name}</h3>
           <p className="rail-price">{formatPrice(selected.price)}</p>
@@ -884,7 +885,7 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
         )}
 
         <p className="visually-hidden" aria-live="polite">
-          {selected ? `Options for ${selected.brand} ${selected.name}` : ""}
+          {selected ? `${renting ? "Selected look" : "Selected suit"}, ${selected.brand} ${selected.name}` : ""}
         </p>
         <div className="results-stage">
           <div className="results-list">
@@ -911,17 +912,14 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
                   </div>
                   <div className="suit-card-body">
                     <div className="suit-card-topbar">
-                      <div className="suit-badge-stack">
-                        <div className="suit-badges">
-                          {product.matchPercent != null ? (
-                            <span className={`match-score match-score-${matchTone(product.matchPercent)}`}>
-                              {product.matchPercent}% match
-                            </span>
-                          ) : index === 0 ? (
-                            <span className="match-tag">Best match</span>
-                          ) : null}
-                        </div>
-                        {product.evidence?.[0] && <p className="match-reason-line">{product.evidence[0]}</p>}
+                      <div className="suit-badges">
+                        {product.matchPercent != null ? (
+                          <span className={`match-score match-score-${matchTone(product.matchPercent)}`}>
+                            {product.matchPercent}% match
+                          </span>
+                        ) : index === 0 ? (
+                          <span className="match-tag">Best match</span>
+                        ) : null}
                       </div>
                       <button
                         className="suit-details-toggle"
@@ -933,8 +931,37 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
                         {detailsOpen ? "Hide details" : "View more details"}
                       </button>
                     </div>
-                    <div className="suit-card-bottom">
-                      <div className="suit-card-copy">
+                    <div className="suit-card-copy">
+                      <p className="product-brand">{product.brand}</p>
+                      <h3 className="product-title">
+                        <button
+                          className="product-choose"
+                          type="button"
+                          aria-pressed={isSummarySuit}
+                          onClick={() => selectSuit(product)}
+                        >
+                          {product.name}
+                        </button>
+                      </h3>
+                      <ul className="match-chips">
+                        {matchChips(product, shown, answers).map((chip) => (
+                          <li key={chip}>{chip}</li>
+                        ))}
+                      </ul>
+                      {renting && (
+                        <p className="product-meta">{RENTAL_TYPE_NAMES[product.type]} · Sizes confirmed at your fitting</p>
+                      )}
+                      {product.rating != null && (
+                        <p className="product-rating suit-rating">
+                          <svg className="star is-on" viewBox="0 0 20 20" aria-hidden="true">
+                            <path d="M10 1.6 12.5 7l5.9.6-4.4 3.9 1.3 5.8L10 14.6 4.7 17.3 6 11.5 1.6 7.6 7.5 7 10 1.6z" />
+                          </svg>
+                          <span>{product.rating.toFixed(1)} ({product.reviews.toLocaleString("en-US")})</span>
+                        </p>
+                      )}
+                    </div>
+                    <div className="suit-card-actions">
+                      <div className="suit-card-meta">
                         {options.length > 0 && (
                           <div className="color-swatches" role="group" aria-label="Colors">
                             {options.map((option, optionIndex) => (
@@ -951,30 +978,7 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
                             ))}
                           </div>
                         )}
-                        <p className="product-brand">{product.brand}</p>
-                        <h3 className="product-title">
-                          <button
-                            className="product-choose"
-                            type="button"
-                            aria-pressed={isSummarySuit}
-                            onClick={() => selectSuit(product)}
-                          >
-                            {product.name}
-                          </button>
-                        </h3>
-                        {renting && (
-                          <p className="product-meta">{RENTAL_TYPE_NAMES[product.type]} · Sizes confirmed at your fitting</p>
-                        )}
-                        {product.rating != null && (
-                          <p className="product-rating suit-rating">
-                            <svg className="star is-on" viewBox="0 0 20 20" aria-hidden="true">
-                              <path d="M10 1.6 12.5 7l5.9.6-4.4 3.9 1.3 5.8L10 14.6 4.7 17.3 6 11.5 1.6 7.6 7.5 7 10 1.6z" />
-                            </svg>
-                            <span>{product.rating.toFixed(1)} ({product.reviews.toLocaleString("en-US")})</span>
-                          </p>
-                        )}
-                      </div>
-                      <div className="suit-card-buy">
+                        {shown?.color && <span className="suit-color-label">{shown.color}</span>}
                         <div className="suit-price-block">
                           <p className="suit-price">
                             <strong>{formatPrice(product.price)}</strong>
@@ -987,13 +991,13 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
                             </p>
                           )}
                         </div>
-                        <button className={`button suit-options${isSummarySuit ? "" : " secondary"}`} type="button" aria-pressed={isSummarySuit} onClick={() => selectSuit(product)}>
-                          {isSummarySuit && <CheckIcon />}
-                          {isSummarySuit
-                            ? (renting ? "Viewing this look" : "Viewing options")
-                            : (renting ? "Choose this look" : "Choose suit options")}
-                        </button>
                       </div>
+                      <button className={`button suit-options${isSummarySuit ? "" : " secondary"}`} type="button" aria-pressed={isSummarySuit} onClick={() => selectSuit(product)}>
+                        {isSummarySuit && <CheckIcon />}
+                        {isSummarySuit
+                          ? (renting ? "Viewing this look" : "Viewing options")
+                          : (renting ? "Choose this look" : "Choose suit options")}
+                      </button>
                     </div>
                   </div>
                   {detailsOpen && (
@@ -1036,7 +1040,7 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
 
             {moreMode === "toggle" && recommendations.length > 3 && (
               <button
-                className="button secondary more-matches"
+                className="text-link more-matches"
                 type="button"
                 onClick={() => {
                   if (expanded) {
@@ -1048,6 +1052,11 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
                 }}
               >
                 {expanded ? "View less" : `View more matches (${Math.min(6, recommendations.length - 3)})`}
+                {!expanded && (
+                  <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true">
+                    <path fill="currentColor" d="M9.3 6.3 14.9 12l-5.6 5.7 1.4 1.4L17.7 12 10.7 4.9z" />
+                  </svg>
+                )}
               </button>
             )}
             {moreMode === "link" && !renting && (
@@ -1228,6 +1237,8 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
                 {`Suit ${formatPrice(selected.price)} + ${tailoring?.price ? `${tailoring.name} ${formatPrice(tailoring.price)}` : (tailoring?.name ?? "No tailoring")} + ${addedQty} ${addedQty === 1 ? "add-on" : "add-ons"}`}
               </p>
             )}
+          </div>
+          <div className="summary-bar-end">
             <button
               className="text-link summary-bar-toggle"
               type="button"
@@ -1237,13 +1248,13 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
             >
               {summaryOpen ? "Hide summary" : "View summary"}
             </button>
+            {barTotal != null && (
+              <p className="summary-bar-total" aria-live="polite">
+                <span>Total</span>
+                <strong>{formatPrice(barTotal)}</strong>
+              </p>
+            )}
           </div>
-          {barTotal != null && (
-            <p className="summary-bar-total" aria-live="polite">
-              <span>Total</span>
-              <strong>{formatPrice(barTotal)}</strong>
-            </p>
-          )}
           <button
             className="button summary-bar-cta"
             type="button"
