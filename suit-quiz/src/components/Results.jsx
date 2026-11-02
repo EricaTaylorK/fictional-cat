@@ -636,27 +636,16 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
                     </div>
                   </div>
                   <div className="suit-card-copy">
-                    <div className="suit-card-top">
-                      <div className="suit-badges">
-                        {product.matchPercent != null ? (
-                          <span className={`match-score match-score-${matchTone(product.matchPercent)}`}>
-                            {product.matchPercent}% match
-                          </span>
-                        ) : index === 0 ? (
-                          <span className="match-tag">Best match</span>
-                        ) : null}
-                      </div>
-                      <button
-                        className="text-link suit-details-toggle"
-                        type="button"
-                        aria-expanded={detailsOpen}
-                        aria-controls={`details-${product.id}`}
-                        onClick={() => setDetailsId(detailsOpen ? null : product.id)}
-                      >
-                        {detailsOpen ? "Hide details" : "View more details"}
-                      </button>
+                    <div className="suit-badges">
+                      {product.matchPercent != null ? (
+                        <span className={`match-score match-score-${matchTone(product.matchPercent)}`}>
+                          {product.matchPercent}% match
+                        </span>
+                      ) : index === 0 ? (
+                        <span className="match-tag">Best match</span>
+                      ) : null}
                     </div>
-                    {options.length > 1 && (
+                    {options.length > 0 && (
                       <div className="color-swatches" role="group" aria-label="Colors">
                         {options.map((option, optionIndex) => (
                           <button
@@ -683,24 +672,40 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
                         {product.name}
                       </button>
                     </h3>
-                    <p className="suit-price">
-                      <strong>{formatPrice(product.price)}</strong>
-                      {product.compareAt && <s>{formatPrice(product.compareAt)}</s>}
-                    </p>
-                    {product.compareAt && <p className="suit-clearance">Clearance</p>}
                     {renting && (
                       <p className="product-meta">{RENTAL_TYPE_NAMES[product.type]} · Sizes confirmed at your fitting</p>
                     )}
                     {product.rating != null && (
-                      <p className="product-rating">
-                        <Stars value={product.rating} />
+                      <p className="product-rating suit-rating">
+                        <svg className="star is-on" viewBox="0 0 20 20" aria-hidden="true">
+                          <path d="M10 1.6 12.5 7l5.9.6-4.4 3.9 1.3 5.8L10 14.6 4.7 17.3 6 11.5 1.6 7.6 7.5 7 10 1.6z" />
+                        </svg>
                         <span>{product.rating.toFixed(1)} ({product.reviews.toLocaleString("en-US")})</span>
                       </p>
                     )}
+                  </div>
+                  <div className="suit-card-buy">
+                    <button
+                      className="text-link suit-details-toggle"
+                      type="button"
+                      aria-expanded={detailsOpen}
+                      aria-controls={`details-${product.id}`}
+                      onClick={() => setDetailsId(detailsOpen ? null : product.id)}
+                    >
+                      {detailsOpen ? "Hide details" : "View more details"}
+                    </button>
+                    <div className="suit-price-block">
+                      <p className="suit-price">
+                        <strong>{formatPrice(product.price)}</strong>
+                        {product.compareAt && <s>{formatPrice(product.compareAt)}</s>}
+                      </p>
+                      {product.compareAt && <p className="suit-clearance">Clearance</p>}
+                    </div>
                     <button className="button suit-options" type="button" onClick={() => selectSuit(product)}>
                       {renting ? "Choose this look" : "Choose suit options"}
                     </button>
-                    {detailsOpen && (
+                  </div>
+                  {detailsOpen && (
                       <div className="suit-details" id={`details-${product.id}`}>
                         {checks.length > 0 && (
                           <div className="match-why">
@@ -731,7 +736,6 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
                         )}
                       </div>
                     )}
-                  </div>
                 </div>
                 </div>
                 {narrow && isSummarySuit && optionsRail}

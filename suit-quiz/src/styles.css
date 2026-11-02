@@ -2184,7 +2184,7 @@ h2 {
   align-items: start;
   column-gap: 24px;
   display: grid;
-  grid-template-columns: minmax(0, 1.15fr) minmax(280px, 0.85fr);
+  grid-template-columns: minmax(0, 1fr) 320px;
 }
 
 .results-list {
@@ -2263,10 +2263,11 @@ h2 {
 }
 
 .suit-card-main {
+  align-items: center;
   cursor: pointer;
   display: grid;
-  gap: 16px;
-  grid-template-columns: 128px minmax(0, 1fr);
+  gap: 8px 24px;
+  grid-template-columns: 120px minmax(0, 1fr) minmax(220px, auto);
   padding: 16px;
 }
 
@@ -2338,7 +2339,9 @@ h2 {
 }
 
 .suit-card-media .product-image {
-  width: 100%;
+  aspect-ratio: 1;
+  background: #f2f2f2;
+  width: 120px;
 }
 
 .suit-card-media .color-swatches {
@@ -2348,7 +2351,33 @@ h2 {
 .suit-card-copy {
   display: flex;
   flex-direction: column;
+  gap: 8px;
+  justify-content: center;
   min-width: 0;
+}
+
+.suit-card-copy .color-swatches {
+  gap: 8px;
+  margin: 0;
+}
+
+.suit-card-copy .color-swatch {
+  background: transparent;
+  border: 2px solid transparent;
+  box-shadow: none;
+  height: 28px;
+  width: 28px;
+}
+
+.suit-card-copy .color-swatch.is-selected {
+  border-color: #12315c;
+  box-shadow: none;
+}
+
+.suit-card-copy .color-swatch span {
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  height: 20px;
+  width: 20px;
 }
 
 .suit-badges {
@@ -2361,19 +2390,57 @@ h2 {
 
 .suit-badges .match-tag,
 .suit-badges .match-score {
+  background: #1f8f4e;
+  border-radius: 999px;
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  line-height: 16px;
   margin-bottom: 0;
-}
-
-.suit-badges .match-tag {
-  background: var(--color-font-black);
+  padding: 6px 12px;
 }
 
 .suit-card-copy .product-brand {
-  margin-bottom: 0;
+  color: #1a1a1a;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0;
+  line-height: 20px;
+  margin: 0;
+  text-transform: none;
 }
 
-.suit-card-copy .product-title {
-  margin-bottom: 0;
+.suit-card-copy .product-title,
+.suit-card-copy .product-choose {
+  color: #6d6d6d;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 24px;
+  margin: 0;
+  text-align: left;
+  width: 100%;
+}
+
+.suit-card-copy .product-meta,
+.suit-card-copy .suit-rating {
+  margin: 0;
+}
+
+.suit-rating .star {
+  fill: #1a1a1a;
+  height: 16px;
+  width: 16px;
+}
+
+.suit-card-buy {
+  align-items: flex-end;
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  justify-content: space-between;
+  min-width: 0;
 }
 
 .product-choose {
@@ -2548,42 +2615,64 @@ h2 {
   padding: 16px;
 }
 
+.suit-price-block {
+  display: grid;
+  justify-items: end;
+}
+
 .suit-price {
   align-items: baseline;
   display: flex;
-  flex-wrap: wrap;
   gap: 8px;
-  margin: 8px 0 0;
-}
-
-.suit-price strong {
-  font-size: var(--font-size-18);
-  font-weight: var(--font-weight-bold);
-}
-
-.suit-price s,
-.suit-clearance {
-  color: var(--text-secondary);
-  font-size: var(--font-size-14);
-}
-
-.suit-clearance {
+  justify-content: flex-end;
   margin: 0;
 }
 
+.suit-price strong {
+  color: #1a1a1a;
+  font-size: 28px;
+  font-weight: 500;
+  letter-spacing: 0;
+  line-height: 32px;
+}
+
+.suit-price s {
+  color: #8a8a8a;
+  font-size: 20px;
+  line-height: 24px;
+}
+
+.suit-clearance {
+  color: #6d6d6d;
+  font-size: 16px;
+  line-height: 24px;
+  margin: 0;
+  text-align: right;
+}
+
 .suit-details-toggle {
-  font-size: var(--font-size-14);
+  color: #1a1a1a;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 24px;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
   white-space: nowrap;
 }
 
+.suit-details-toggle:hover {
+  color: #1a1a1a;
+}
+
 .suit-details {
-  margin-top: 16px;
+  grid-column: 1 / -1;
+  margin: 8px 0 0;
 }
 
 .button.suit-options {
-  margin-top: 16px;
+  margin-top: 8px;
   min-height: 48px;
-  min-width: 0;
+  min-width: 220px;
   width: 100%;
 }
 
@@ -4095,13 +4184,23 @@ h2 {
   }
 
   .suit-card-main {
+    align-items: start;
     gap: 12px;
-    grid-template-columns: 96px minmax(0, 1fr);
+    grid-template-columns: 88px minmax(0, 1fr);
     padding: 12px;
   }
 
   .suit-card-media .product-image {
-    aspect-ratio: 3 / 4;
+    width: 88px;
+  }
+
+  .suit-card-buy {
+    grid-column: 1 / -1;
+  }
+
+  .suit-price strong {
+    font-size: 24px;
+    line-height: 28px;
   }
 
   .suit-card-foot {
