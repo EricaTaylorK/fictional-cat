@@ -457,9 +457,8 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
     [answers, renting],
   );
   const summary = useMemo(() => buildResultSummary(answers), [answers]);
-  const firstId = recommendations[0]?.id ?? null;
-  const [selectedId, setSelectedId] = useState(firstId);
-  const [openId, setOpenId] = useState(firstId);
+  const [selectedId, setSelectedId] = useState(null);
+  const [openId, setOpenId] = useState(null);
   const [expanded, setExpanded] = useState(false);
   const [variantIndexes, setVariantIndexes] = useState({});
   const [tailoringId, setTailoringId] = useState(SUIT_ONLY.id);
