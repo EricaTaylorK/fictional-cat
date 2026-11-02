@@ -1,11 +1,11 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   lookForColor,
   SWATCH_HEX,
   TAILORING_PERKS,
   TAILORING_TIERS,
 } from "../data/products.js";
-import { colorsIn, getQuestionFlow, resolvedOccasion } from "../data/quizConfig.js";
+import { colorsIn, resolvedOccasion } from "../data/quizConfig.js";
 import { RENTAL_PACKAGES, RENTAL_STEPS, RENTAL_TYPE_NAMES } from "../data/rentals.js";
 import {
   buildResultSummary,
@@ -24,12 +24,6 @@ const SUIT_ONLY = {
   icon: "/icons/mw/suits-bundle.png",
 };
 
-const SUIT_FIT_NAMES = {
-  close: "Slim",
-  balanced: "Modern",
-  roomy: "Classic",
-};
-
 const FIT_NOTE_COPY = {
   broadShoulders: "Jackets pull across the shoulders or back",
   fullerMidsection: "Jackets pull at the button",
@@ -43,50 +37,16 @@ function selectedIssues(values) {
   return (values ?? []).filter((issue) => issue && issue !== "none");
 }
 
-function fitNoteText(answers) {
-  const notes = [...selectedIssues(answers.fitIssues), ...selectedIssues(answers.pantsFit)]
-    .map((issue) => FIT_NOTE_COPY[issue])
-    .filter(Boolean);
-  if (notes.length === 0) return "No common fit problems selected";
-  return `${notes.join(". ")}.`;
-}
-
 function heightLabel(height) {
   const parsed = parseHeight(height);
   if (!parsed) return null;
   return `${parsed.feet}'${parsed.inches}"`;
 }
 
-function estimateSources(answers) {
-  if (answers.measurementKnowledge === "no") return { shirt: true, waist: true };
-  if (answers.measurementKnowledge === "yes" || answers.measurementKnowledge === "some") {
-    const unknown = answers.unknownSizes ?? {};
-    return { shirt: Boolean(unknown.chest), waist: Boolean(unknown.waist) };
-  }
-  return { shirt: false, waist: false };
-}
-
-function sizeEditStep(answers, kind) {
-  if (answers.measurementKnowledge === "no") return "everydaySizes";
-  const unknown = answers.unknownSizes ?? {};
-  if (kind === "jacket" && unknown.chest) return "everydaySizes";
-  if (kind === "pants" && unknown.waist) return "everydaySizes";
-  if (answers.measurementKnowledge === "yes" || answers.measurementKnowledge === "some") return "measurements";
-  return null;
-}
-
 function PencilIcon() {
   return (
     <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true">
       <path fill="currentColor" d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25ZM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83Z" />
-    </svg>
-  );
-}
-
-function RestartIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true">
-      <path fill="currentColor" d="M12 5V2L7 7l5 5V8c2.76 0 5 2.24 5 5a5 5 0 0 1-8.9 3.1l-1.46 1.46A7 7 0 0 0 19 13c0-3.87-3.13-7-7-7Z" />
     </svg>
   );
 }
@@ -149,13 +109,53 @@ function pantsFact(size, renting) {
   return renting ? "Confirmed at your fitting" : "Measured in store";
 }
 
-function jacketWords(size, renting) {
-  return jacketFact(size, renting);
+const SHIRT_SIZES = ["15 32/33", "15.5 32/33", "16 32/33", "16.5 33/34", "17 33/34"];
+const TIE_SIZES = ["Regular", "Extra long"];
+const SHOE_SIZES = ["8", "8.5", "9", "9.5", "10", "10.5", "11", "11.5", "12"];
+const SHIRT_SERVICES = [
+  { id: "press", label: "Press" },
+  { id: "shorten-sleeves", label: "Shorten sleeves" },
+];
+
+function lookKind(item) {
+  return `${item?.type || ""} ${item?.name || ""}`.toLowerCase();
 }
 
-function pantsWords(size, renting) {
-  if (size?.pants) return `${String(size.pants).replace(/W$/i, "")}-inch waist`;
-  return renting ? "Confirmed at your fitting" : "Measured in store";
+function sizesForLookItem(item) {
+  const kind = lookKind(item);
+  if (kind.includes("shirt")) return SHIRT_SIZES;
+  if (kind.includes("tie")) return TIE_SIZES;
+  if (kind.includes("shoe")) return SHOE_SIZES;
+  return ["One size"];
+}
+
+function servicesForLookItem(item) {
+  return lookKind(item).includes("shirt") ? SHIRT_SERVICES : [];
+}
+
+function serviceLabels(item, ids) {
+  const catalog = servicesForLookItem(item);
+  return (ids ?? [])
+    .map((id) => catalog.find((service) => service.id === id)?.label)
+    .filter(Boolean);
+}
+
+function stylistLookLine(suitColor, note) {
+  const color = String(suitColor || "suit").replace(/\s+/g, " ").trim().toLowerCase();
+  const parts = String(note || "")
+    .replace(/\s+/g, " ")
+    .trim()
+    .split(/(?<=[.!?])\s+/)
+    .filter(Boolean)
+    .slice(0, 2);
+  const lead = `The shirt, tie, and shoes that finish this ${color} suit.`;
+  if (parts.length === 0) return lead;
+  const first = parts[0].replace(/[.!?]+$/, "");
+  const second = parts[1]
+    ? parts[1].replace(/[.!?]+$/, "").replace(/^./, (letter) => letter.toLowerCase())
+    : "";
+  const reason = second ? `${first}; ${second}` : first;
+  return `${lead} ${reason.charAt(0).toUpperCase()}${reason.slice(1)}.`;
 }
 
 function compatibleLookIds(colorKey, ids) {
@@ -183,7 +183,7 @@ function matchTone(percent) {
 
 function ShareIcon() {
   return (
-    <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true">
+    <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true">
       <path fill="currentColor" d="M12 3.2 6.8 8.4h3.2V15h4V8.4h3.2L12 3.2ZM5 14v6h14v-6h2v8H3v-8h2Z" />
     </svg>
   );
@@ -243,7 +243,7 @@ function TailoringOptions({ suggestedId, tailoringId, suitOnly, onSelect }) {
                 checked={selected}
                 onChange={() => onSelect(option.id)}
               />
-              {suggested && <span className="tier-tag">Best value</span>}
+              {suggested && <span className="tier-tag">Recommended for you</span>}
               <img className="rate-choice-icon" src={option.icon} alt="" />
               <span className="rate-choice-copy">
                 <span className="rate-name">{option.name}</span>
@@ -283,32 +283,240 @@ function RentalPackage({ pack, pieces, price }) {
   );
 }
 
-function CompleteLook({ id, look, addedIds, onToggle }) {
+function QuickView({ item, initial, onConfirm, onClose }) {
+  const dialogRef = useRef(null);
+  const sizes = sizesForLookItem(item);
+  const services = servicesForLookItem(item);
+  const colorChoices = Array.isArray(item.colors) && item.colors.length > 1 ? item.colors : null;
+  const [size, setSize] = useState(initial?.size ?? "");
+  const [quantity, setQuantity] = useState(initial?.quantity ?? 1);
+  const [serviceIds, setServiceIds] = useState(initial?.services ?? []);
+  const [colorKey, setColorKey] = useState(initial?.colorKey ?? item.colorKey ?? "");
+  const editing = Boolean(initial?.size);
+  const shownColor = colorChoices?.find((choice) => choice.colorKey === colorKey)?.color || item.color;
+
+  useEffect(() => {
+    const node = dialogRef.current;
+    node?.querySelector(".quick-view-close")?.focus();
+  }, []);
+
+  useEffect(() => {
+    const node = dialogRef.current;
+    if (!node) return undefined;
+    const onKey = (event) => {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        onClose();
+        return;
+      }
+      if (event.key !== "Tab") return;
+      const focusable = [...node.querySelectorAll("button, select, a[href], input")];
+      if (focusable.length === 0) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [onClose]);
+
+  function toggleValue(current, value) {
+    return current === value ? "" : value;
+  }
+
+  return (
+    <div className="quick-view-backdrop" onClick={onClose}>
+      <div
+        className="quick-view"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="quick-view-title"
+        ref={dialogRef}
+        tabIndex={-1}
+        onClick={(event) => event.stopPropagation()}
+      >
+        <div className="quick-view-media">
+          {item.icon ? <img src={item.icon} alt="" /> : <span className="quick-view-media-empty" aria-hidden="true" />}
+        </div>
+        <div className="quick-view-info">
+          {item.brand ? <p className="quick-view-brand">{item.brand}</p> : null}
+          <h2 id="quick-view-title">{item.name}</h2>
+          {item.rating != null && (
+            <p className="quick-view-rating">
+              <span className="stars" aria-hidden="true">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <svg key={star} className={star <= Math.round(item.rating) ? "star is-on" : "star"} viewBox="0 0 20 20">
+                    <path d="M10 1.6 12.5 7l5.9.6-4.4 3.9 1.3 5.8L10 14.6 4.7 17.3 6 11.5 1.6 7.6 7.5 7 10 1.6z" />
+                  </svg>
+                ))}
+              </span>
+              <span>{Number(item.rating).toFixed(1)}{item.reviews ? ` (${Number(item.reviews).toLocaleString("en-US")})` : ""}</span>
+            </p>
+          )}
+          <p className="quick-view-price">{formatPrice(item.price)}</p>
+        </div>
+        <div className="quick-view-field">
+          <p className="quick-view-label" id="quick-view-color-label">Color</p>
+          {colorChoices ? (
+            <div className="color-swatches quick-view-swatches" role="group" aria-labelledby="quick-view-color-label">
+              {colorChoices.map((choice) => {
+                const selected = choice.colorKey === colorKey;
+                return (
+                  <button
+                    key={choice.colorKey}
+                    type="button"
+                    className={selected ? "color-swatch is-selected" : "color-swatch"}
+                    aria-pressed={selected}
+                    aria-label={choice.color}
+                    onClick={() => setColorKey((current) => toggleValue(current, choice.colorKey))}
+                  >
+                    <span style={{ background: SWATCH_HEX[choice.colorKey] ?? "#888" }} />
+                  </button>
+                );
+              })}
+            </div>
+          ) : (
+            <p className="quick-view-value">{item.color}</p>
+          )}
+        </div>
+        <div className="quick-view-field">
+          <p className="quick-view-label" id="quick-view-size-label">Size</p>
+          <div className="quick-view-choices" role="group" aria-labelledby="quick-view-size-label">
+            {sizes.map((option) => {
+              const selected = option === size;
+              return (
+                <button
+                  key={option}
+                  type="button"
+                  className={selected ? "quick-view-choice is-selected" : "quick-view-choice"}
+                  aria-pressed={selected}
+                  onClick={() => setSize((current) => toggleValue(current, option))}
+                >
+                  {option}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+        {services.length > 0 && (
+          <div className="quick-view-field">
+            <p className="quick-view-label" id="quick-view-service-label">Services</p>
+            <div className="quick-view-choices" role="group" aria-labelledby="quick-view-service-label">
+              {services.map((service) => {
+                const selected = serviceIds.includes(service.id);
+                return (
+                  <button
+                    key={service.id}
+                    type="button"
+                    className={selected ? "quick-view-choice is-selected" : "quick-view-choice"}
+                    aria-pressed={selected}
+                    onClick={() => setServiceIds((current) => (
+                      current.includes(service.id)
+                        ? current.filter((id) => id !== service.id)
+                        : [...current, service.id]
+                    ))}
+                  >
+                    {service.label}
+                  </button>
+                );
+              })}
+            </div>
+            <p className="quick-view-note">Optional. No charge added here.</p>
+          </div>
+        )}
+        <label className="quick-view-qty" htmlFor="quick-view-qty">
+          <span className="quick-view-label">Quantity</span>
+          <select
+            id="quick-view-qty"
+            value={quantity}
+            onChange={(event) => setQuantity(Number(event.target.value))}
+          >
+            {[1, 2, 3].map((qty) => (
+              <option key={qty} value={qty}>{qty}</option>
+            ))}
+          </select>
+        </label>
+        <button
+          className="button quick-view-add"
+          type="button"
+          aria-disabled={!size}
+          onClick={() => {
+            if (!size) return;
+            onConfirm({
+              size,
+              quantity,
+              services: serviceIds,
+              colorKey: colorKey || item.colorKey,
+              color: shownColor,
+            });
+          }}
+        >
+          {editing ? "Update look" : "Add Product to Look"}
+        </button>
+        <button className="quick-view-close" type="button" aria-label="Close" onClick={onClose}>
+          ×
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function CompleteLook({ id, look, suitColor, addedLooks, onOpen, onRemove }) {
+  const lede = stylistLookLine(suitColor, look.note);
   return (
     <section className="complete-look" aria-labelledby={id}>
       <div className="look-head">
         <h3 id={id} className="complete-look-title">Complete the look</h3>
         <p className="look-optional">Optional add-ons</p>
       </div>
+      {lede && <p className="look-lede">{lede}</p>}
       <ul className="look-list">
         {look.items.map((item) => {
-          const added = addedIds.includes(item.id);
+          const selection = addedLooks[item.id];
+          const added = Boolean(selection);
+          const services = added ? serviceLabels(item, selection.services) : [];
           return (
             <li key={item.id}>
-              <div className={`look-row${added ? " is-added" : ""}`}>
+              <div
+                className={`look-row${added ? " is-added" : ""}`}
+                onClick={(event) => {
+                  if (added) return;
+                  if (event.target.closest(".look-check, .look-edit, .look-promo")) return;
+                  onOpen(item, event);
+                }}
+              >
                 {item.icon ? (
                   <img className="look-thumb" src={item.icon} alt="" />
                 ) : (
                   <span className="look-thumb look-thumb-blank" aria-hidden="true" />
                 )}
                 <div className="look-copy">
-                  <p className="look-color">{item.color}</p>
-                  <p className="look-name">{item.name}</p>
+                  <p className="look-name">{item.color} {item.name}</p>
                   <p className="look-price">{formatPrice(item.price)}</p>
+                  {item.promo && (
+                    <p className="look-promo" onClick={(event) => event.stopPropagation()}>{item.promo}</p>
+                  )}
                   {added && (
                     <p className="look-meta">
-                      Qty: 1 · {item.color}{" "}
-                      <button className="text-link look-edit" type="button">Edit</button>
+                      Qty: {selection.quantity} · {selection.size} · {selection.color || item.color}
+                      {services.length > 0 ? ` · ${services.join(", ")}` : ""}
+                      {" "}
+                      <button
+                        className="text-link look-edit"
+                        type="button"
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          onOpen(item, event);
+                        }}
+                      >
+                        Edit
+                      </button>
                     </p>
                   )}
                 </div>
@@ -316,8 +524,12 @@ function CompleteLook({ id, look, addedIds, onToggle }) {
                   className={`look-check${added ? " is-on" : ""}`}
                   type="button"
                   aria-pressed={added}
-                  aria-label={added ? `Remove ${item.name}` : `Add ${item.name}`}
-                  onClick={() => onToggle(item.id)}
+                  aria-label={added ? `Remove ${item.name}` : `View ${item.name}`}
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    if (added) onRemove(item.id);
+                    else onOpen(item, event);
+                  }}
                 >
                   {added && <CheckIcon />}
                 </button>
@@ -330,79 +542,59 @@ function CompleteLook({ id, look, addedIds, onToggle }) {
   );
 }
 
-function FitProfile({ answers, renting, size, flow, onEditAnswers, onAccount, accountStatus }) {
-  const sources = estimateSources(answers);
-  const everyday = answers.everydaySizes ?? {};
+function FitProfile({ answers, renting, size, fitName, onRestart, onAccount, accountStatus }) {
   const height = heightLabel(answers.height);
-  const suitFit = SUIT_FIT_NAMES[answers.feel];
-  const jacketIssues = selectedIssues(answers.fitIssues);
-  const pantsIssues = selectedIssues(answers.pantsFit);
-  const notesStep = jacketIssues.length === 0 && pantsIssues.length > 0 ? "pantsFit" : "fitIssues";
+  const everyday = answers.everydaySizes ?? {};
+  const jacketValue = size?.jacket ? jacketFact(size, renting) : null;
+  const waistNumber = size?.pants ? String(size.pants).replace(/W$/i, "") : null;
+  const length = size?.length ? titleWords(size.length) : null;
+  const fit = fitName ? titleWords(fitName) : null;
   const personal = [
-    height ? { key: "Height", value: height } : null,
-    sources.shirt && everyday.shirt ? { key: "Usual shirt", value: everyday.shirt } : null,
-    sources.waist && everyday.waist ? { key: "Usual waist", value: everyday.waist } : null,
+    height,
+    jacketValue ? `Jacket ${jacketValue}` : null,
+    waistNumber ? `Waist ${waistNumber}"` : null,
+    !jacketValue && everyday.shirt ? `Shirt ${everyday.shirt}` : null,
+    !waistNumber && everyday.waist ? `Waist ${everyday.waist}` : null,
   ].filter(Boolean);
-  const groups = [
-    personal.length
-      ? { label: "Personal info", lines: personal, step: height ? "height" : "everydaySizes" }
-      : null,
-    {
-      label: "Size",
-      lines: [
-        { key: "Jacket", value: jacketWords(size, renting) },
-        { key: "Pants", value: pantsWords(size, renting) },
-      ],
-      step: sizeEditStep(answers, "jacket") ?? sizeEditStep(answers, "pants"),
-    },
-    suitFit ? { label: "Fit preference", lines: [{ key: "Suit fit", value: suitFit }], step: "feel" } : null,
-    { label: "Fit notes", text: fitNoteText(answers), step: notesStep },
+  const pantsIssues = selectedIssues(answers.pantsFit).map((issue) => FIT_NOTE_COPY[issue]).filter(Boolean);
+  const jacketIssues = selectedIssues(answers.fitIssues).map((issue) => FIT_NOTE_COPY[issue]).filter(Boolean);
+  const pantsValue = [
+    waistNumber ? `${waistNumber}-inch waist` : null,
+    ...pantsIssues,
+  ].filter(Boolean).join(" · ");
+  const rows = [
+    personal.length ? { label: "Personal info", value: personal.join(" · ") } : null,
+    jacketValue ? { label: "Size", value: jacketValue } : null,
+    fit ? { label: "Fit preference", value: fit } : null,
+    length ? { label: "Length", value: length } : null,
+    pantsValue ? { label: "Pants", value: pantsValue } : null,
+    jacketIssues.length ? { label: "Fit notes", value: `${jacketIssues.join(". ")}.` } : null,
   ].filter(Boolean);
   const benefits = renting
     ? [
-      "Future suit and rental picks start in the right size.",
-      "Fit preference is remembered.",
-      "Sizing for the next rental stays with the profile.",
+      "Rental looks in your size and fit.",
+      "Fit notes ready for your fitting.",
+      "Package pieces that finish the look.",
     ]
     : [
-      "Future suit picks start in the right size.",
-      "Fit preference is remembered.",
-      "Tailoring guidance stays with the profile.",
+      "Suits in your size and fit.",
+      "Tailoring that matches how the suit runs.",
+      "Pieces that finish the look.",
     ];
   const saveCopy = renting
-    ? "Saving keeps these sizes and fit preferences ready for future suit and rental recommendations."
-    : "Saving keeps these sizes and fit preferences ready for future suit recommendations.";
+    ? "Saving this profile personalizes later visits in this prototype, so the next rental can start from your size and fit."
+    : "Saving this profile personalizes later visits in this prototype, so the next suit can start from your size and fit.";
 
   return (
     <section className="fit-band" aria-labelledby="fit-profile-title">
       <div className="fit-card">
         <h2 id="fit-profile-title" className="fit-card-title">Your fit profile</h2>
-        {groups.map((group) => {
-          const onEdit = onEditAnswers && group.step && flow.includes(group.step)
-            ? () => onEditAnswers(group.step)
-            : null;
-          return (
-            <div className="fit-group" key={group.label}>
-              <div className="fit-group-body">
-                <p className="fit-group-label">{group.label}</p>
-                {group.lines ? (
-                  group.lines.map((line) => (
-                    <p className="fit-group-line" key={line.key}>
-                      <strong>{line.key}:</strong> {line.value}
-                    </p>
-                  ))
-                ) : (
-                  <p className="fit-group-line">{group.text}</p>
-                )}
-              </div>
-              {onEdit && (
-                <button className="fit-edit" type="button" onClick={onEdit} aria-label={`Edit ${group.label.toLowerCase()}`}>
-                  <PencilIcon />
-                </button>
-              )}
-            </div>
-          );
-        })}
+        {rows.map((row) => (
+          <div className="fit-group" key={row.label}>
+            <p className="fit-group-label">{row.label}</p>
+            <p className="fit-group-line">{row.value}</p>
+          </div>
+        ))}
       </div>
       <div className="fit-save">
         <h2 className="fit-save-title">Save your fit profile</h2>
@@ -413,9 +605,12 @@ function FitProfile({ answers, renting, size, flow, onEditAnswers, onAccount, ac
           ))}
         </ul>
         <div className="fit-profile-actions">
-          <button className="button button-charcoal" type="button" onClick={() => onAccount("create-account")}>Create an account</button>
+          <button className="button" type="button" onClick={() => onAccount("create-account")}>Create an account</button>
           <button className="button secondary" type="button" onClick={() => onAccount("sign-in")}>Sign in</button>
         </div>
+        {onRestart && (
+          <button className="fit-retake" type="button" onClick={onRestart}>Retake the quiz</button>
+        )}
         {accountStatus && <p className="handoff-inline" role="status">{accountStatus}</p>}
       </div>
     </section>
@@ -438,7 +633,9 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
   const [expanded, setExpanded] = useState(false);
   const [variantIndexes, setVariantIndexes] = useState({});
   const [tailoringId, setTailoringId] = useState(skipTailoring ? SUIT_ONLY.id : suggestedTierId);
-  const [addedLookIds, setAddedLookIds] = useState([]);
+  const [addedLooks, setAddedLooks] = useState({});
+  const [quickViewId, setQuickViewId] = useState(null);
+  const quickViewTrigger = useRef(null);
   const [handoff, setHandoff] = useState("");
   const [summaryOpen, setSummaryOpen] = useState(false);
   const narrow = useNarrowStage();
@@ -446,11 +643,11 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
   useEffect(() => {
     if (!summaryOpen) return undefined;
     const onKey = (event) => {
-      if (event.key === "Escape") setSummaryOpen(false);
+      if (event.key === "Escape" && !quickViewId) setSummaryOpen(false);
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [summaryOpen]);
+  }, [summaryOpen, quickViewId]);
 
   const selected = recommendations.find((product) => product.id === selectedId) ?? null;
   const size = summary.sizeEstimate;
@@ -463,7 +660,6 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
   const shownRecommendations = selected && !visibleRecommendations.some((product) => product.id === selected.id)
     ? [...visibleRecommendations, selected]
     : visibleRecommendations;
-  const flow = useMemo(() => getQuestionFlow(answers), [answers]);
   const occasion = resolvedOccasion(answers);
   const headline = answers.feel
     ? `Recommended for ${summary.occasion}, in a ${summary.fitName}.`
@@ -475,14 +671,16 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
     ? selectedOptions[variantIndexes[selected.id] ?? defaultVariantIndex(selected, answers)]
     : null;
   const selectedLook = !renting && selectedVariant ? lookForColor(selectedVariant.colorKey, occasion) : null;
-  const addedItems = selectedLook ? selectedLook.items.filter((item) => addedLookIds.includes(item.id)) : [];
-  const accessoryTotal = addedItems.reduce((sum, item) => sum + item.price, 0);
+  const addedItems = selectedLook ? selectedLook.items.filter((item) => addedLooks[item.id]) : [];
+  const accessoryTotal = addedItems.reduce((sum, item) => sum + item.price * (addedLooks[item.id]?.quantity || 1), 0);
   const savings = !renting && selected?.compareAt ? selected.compareAt - selected.price : 0;
   const subtotal = !renting && selected
     ? (selected.compareAt ?? selected.price) + (tailoring?.price ?? 0) + accessoryTotal
     : 0;
   const total = subtotal - savings;
-  const itemCount = !renting && selected ? 2 + (tailoring ? 1 : 0) + addedItems.length : 0;
+  const addedQty = addedItems.reduce((sum, item) => sum + (addedLooks[item.id]?.quantity || 1), 0);
+  const itemCount = !renting && selected ? 2 + (tailoring ? 1 : 0) + addedQty : 0;
+  const quickViewItem = selectedLook?.items.find((item) => item.id === quickViewId) ?? null;
 
   function shownFor(product) {
     const options = renting
@@ -497,7 +695,11 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
     if (renting || product.id !== selectedId) return;
     const options = variantOptions(product);
     const shown = options[index] ?? options[0];
-    setAddedLookIds((current) => compatibleLookIds(shown?.colorKey, current));
+    setAddedLooks((current) => {
+      const allowed = new Set(compatibleLookIds(shown?.colorKey, Object.keys(current)));
+      return Object.fromEntries(Object.entries(current).filter(([id]) => allowed.has(id)));
+    });
+    setQuickViewId(null);
   }
 
   function selectSuit(product) {
@@ -506,10 +708,10 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
       setSelectedId(product.id);
       return;
     }
-    const { shown } = shownFor(product);
     setSelectedId(product.id);
     setTailoringId(skipTailoring ? SUIT_ONLY.id : suggestedTierId);
-    setAddedLookIds(compatibleLookIds(shown?.colorKey, []));
+    setAddedLooks({});
+    setQuickViewId(null);
   }
 
   function onCardClick(event, product) {
@@ -517,10 +719,38 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
     selectSuit(product);
   }
 
-  function toggleLook(id) {
-    setAddedLookIds((current) => (
-      current.includes(id) ? current.filter((item) => item !== id) : [...current, id]
-    ));
+  function openQuickView(item, event) {
+    const current = event?.currentTarget;
+    const trigger = current?.matches?.("button") ? current : current?.querySelector?.(".look-check");
+    quickViewTrigger.current = trigger ?? null;
+    window.dataLayer = window.dataLayer || [];
+    window.dataLayer.push({ event: "quick_view_item", productId: item.id });
+    setQuickViewId(item.id);
+  }
+
+  function closeQuickView() {
+    setQuickViewId(null);
+    const trigger = quickViewTrigger.current;
+    window.requestAnimationFrame(() => {
+      if (trigger && document.contains(trigger)) trigger.focus();
+    });
+  }
+
+  function confirmQuickView(selection) {
+    if (!quickViewId) return;
+    const id = quickViewId;
+    setAddedLooks((current) => ({ ...current, [id]: selection }));
+    closeQuickView();
+  }
+
+  function removeLook(id) {
+    setAddedLooks((current) => {
+      if (!current[id]) return current;
+      const next = { ...current };
+      delete next[id];
+      return next;
+    });
+    if (quickViewId === id) closeQuickView();
   }
 
   const checkoutNote = renting
@@ -556,8 +786,10 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
             <CompleteLook
               id={`complete-look-${selected.id}`}
               look={selectedLook}
-              addedIds={addedLookIds}
-              onToggle={toggleLook}
+              suitColor={selectedVariant?.color || selected.color}
+              addedLooks={addedLooks}
+              onOpen={openQuickView}
+              onRemove={removeLook}
             />
           )}
         </>
@@ -582,10 +814,6 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
               <button className="results-hero-action" type="button">
                 <ShareIcon />
                 Share results
-              </button>
-              <button className="results-hero-action" type="button" onClick={() => onRestart?.()}>
-                <RestartIcon />
-                Restart quiz
               </button>
             </div>
           </div>
@@ -645,75 +873,81 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
                       <img src={shown.image} alt="" />
                     </div>
                   </div>
-                  <div className="suit-card-copy">
-                    <div className="suit-badges">
-                      {product.matchPercent != null ? (
-                        <span className={`match-score match-score-${matchTone(product.matchPercent)}`}>
-                          {product.matchPercent}% match
-                        </span>
-                      ) : index === 0 ? (
-                        <span className="match-tag">Best match</span>
-                      ) : null}
-                    </div>
-                    {options.length > 0 && (
-                      <div className="color-swatches" role="group" aria-label="Colors">
-                        {options.map((option, optionIndex) => (
-                          <button
-                            key={option.color}
-                            type="button"
-                            className={optionIndex === variantIndex ? "color-swatch is-selected" : "color-swatch"}
-                            aria-label={optionIndex === variantIndex ? `${option.color}, selected` : option.color}
-                            aria-pressed={optionIndex === variantIndex}
-                            onClick={() => chooseVariant(product, optionIndex)}
-                          >
-                            <span style={{ background: SWATCH_HEX[option.colorKey] ?? "#888" }} />
-                          </button>
-                        ))}
+                  <div className="suit-card-body">
+                    <div className="suit-card-topbar">
+                      <div className="suit-badges">
+                        {product.matchPercent != null ? (
+                          <span className={`match-score match-score-${matchTone(product.matchPercent)}`}>
+                            {product.matchPercent}% match
+                          </span>
+                        ) : index === 0 ? (
+                          <span className="match-tag">Best match</span>
+                        ) : null}
                       </div>
-                    )}
-                    <p className="product-brand">{product.brand}</p>
-                    <h3 className="product-title">
                       <button
-                        className="product-choose"
+                        className="suit-details-toggle"
                         type="button"
-                        aria-pressed={isSummarySuit}
-                        onClick={() => selectSuit(product)}
+                        aria-expanded={detailsOpen}
+                        aria-controls={`details-${product.id}`}
+                        onClick={() => setDetailsId(detailsOpen ? null : product.id)}
                       >
-                        {product.name}
+                        {detailsOpen ? "Hide details" : "View more details"}
                       </button>
-                    </h3>
-                    {renting && (
-                      <p className="product-meta">{RENTAL_TYPE_NAMES[product.type]} · Sizes confirmed at your fitting</p>
-                    )}
-                    {product.rating != null && (
-                      <p className="product-rating suit-rating">
-                        <svg className="star is-on" viewBox="0 0 20 20" aria-hidden="true">
-                          <path d="M10 1.6 12.5 7l5.9.6-4.4 3.9 1.3 5.8L10 14.6 4.7 17.3 6 11.5 1.6 7.6 7.5 7 10 1.6z" />
-                        </svg>
-                        <span>{product.rating.toFixed(1)} ({product.reviews.toLocaleString("en-US")})</span>
-                      </p>
-                    )}
-                  </div>
-                  <div className="suit-card-buy">
-                    <button
-                      className="text-link suit-details-toggle"
-                      type="button"
-                      aria-expanded={detailsOpen}
-                      aria-controls={`details-${product.id}`}
-                      onClick={() => setDetailsId(detailsOpen ? null : product.id)}
-                    >
-                      {detailsOpen ? "Hide details" : "View more details"}
-                    </button>
-                    <div className="suit-price-block">
-                      <p className="suit-price">
-                        <strong>{formatPrice(product.price)}</strong>
-                        {product.compareAt && <s>{formatPrice(product.compareAt)}</s>}
-                      </p>
-                      {product.compareAt && <p className="suit-clearance">Clearance</p>}
                     </div>
-                    <button className={`button suit-options${isSummarySuit ? "" : " secondary"}`} type="button" aria-pressed={isSummarySuit} onClick={() => selectSuit(product)}>
-                      {renting ? "Choose this look" : "Choose suit options"}
-                    </button>
+                    <div className="suit-card-bottom">
+                      <div className="suit-card-copy">
+                        {options.length > 0 && (
+                          <div className="color-swatches" role="group" aria-label="Colors">
+                            {options.map((option, optionIndex) => (
+                              <button
+                                key={option.color}
+                                type="button"
+                                className={optionIndex === variantIndex ? "color-swatch is-selected" : "color-swatch"}
+                                aria-label={optionIndex === variantIndex ? `${option.color}, selected` : option.color}
+                                aria-pressed={optionIndex === variantIndex}
+                                onClick={() => chooseVariant(product, optionIndex)}
+                              >
+                                <span style={{ background: SWATCH_HEX[option.colorKey] ?? "#888" }} />
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                        <p className="product-brand">{product.brand}</p>
+                        <h3 className="product-title">
+                          <button
+                            className="product-choose"
+                            type="button"
+                            aria-pressed={isSummarySuit}
+                            onClick={() => selectSuit(product)}
+                          >
+                            {product.name}
+                          </button>
+                        </h3>
+                        {renting && (
+                          <p className="product-meta">{RENTAL_TYPE_NAMES[product.type]} · Sizes confirmed at your fitting</p>
+                        )}
+                        {product.rating != null && (
+                          <p className="product-rating suit-rating">
+                            <svg className="star is-on" viewBox="0 0 20 20" aria-hidden="true">
+                              <path d="M10 1.6 12.5 7l5.9.6-4.4 3.9 1.3 5.8L10 14.6 4.7 17.3 6 11.5 1.6 7.6 7.5 7 10 1.6z" />
+                            </svg>
+                            <span>{product.rating.toFixed(1)} ({product.reviews.toLocaleString("en-US")})</span>
+                          </p>
+                        )}
+                      </div>
+                      <div className="suit-card-buy">
+                        <div className="suit-price-block">
+                          <p className="suit-price">
+                            <strong>{formatPrice(product.price)}</strong>
+                            {product.compareAt && <s>{formatPrice(product.compareAt)}</s>}
+                          </p>
+                          {product.compareAt && <p className="suit-clearance">Clearance</p>}
+                        </div>
+                        <button className={`button suit-options${isSummarySuit ? "" : " secondary"}`} type="button" aria-pressed={isSummarySuit} onClick={() => selectSuit(product)}>
+                          {renting ? "Choose this look" : "Choose suit options"}
+                        </button>
+                      </div>
+                    </div>
                   </div>
                   {detailsOpen && (
                       <div className="suit-details" id={`details-${product.id}`}>
@@ -753,17 +987,17 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
             );
           })}
 
+          </div>
           {moreMode === "toggle" && recommendations.length > 3 && (
-            <button className="button secondary more-matches" type="button" onClick={() => setExpanded((value) => !value)}>
+            <button className="more-matches" type="button" onClick={() => setExpanded((value) => !value)}>
               {expanded ? "View less" : `View more matches (${Math.min(6, recommendations.length - 3)})`}
             </button>
           )}
           {moreMode === "link" && !renting && (
-            <button className="button secondary more-matches" type="button" onClick={onSeeAll}>
-            See all quiz matches
-          </button>
+            <button className="more-matches" type="button" onClick={onSeeAll}>
+              See all quiz matches
+            </button>
           )}
-          </div>
           {!narrow && optionsRail}
         </div>
 
@@ -771,8 +1005,8 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
           answers={answers}
           renting={renting}
           size={size}
-          flow={flow}
-          onEditAnswers={onEditAnswers}
+          fitName={summary.fitName}
+          onRestart={onRestart}
           onAccount={setHandoff}
           accountStatus={
             handoff === "create-account"
@@ -890,17 +1124,27 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
                         <span className="summary-amount">{formatPrice(tailoring.price)}</span>
                       </li>
                     )}
-                    {addedItems.map((item) => (
-                      <li key={item.id}>
-                        <span>{item.type} · {item.color}</span>
-                        <span className="summary-line-actions">
-                          <span className="summary-amount">{formatPrice(item.price)}</span>
-                          <button className="text-link" type="button" onClick={() => toggleLook(item.id)}>
-                            Remove<span className="visually-hidden"> {item.name}</span>
-                          </button>
-                        </span>
-                      </li>
-                    ))}
+                    {addedItems.map((item) => {
+                      const selection = addedLooks[item.id];
+                      const qty = selection?.quantity || 1;
+                      const services = serviceLabels(item, selection?.services);
+                      return (
+                        <li key={item.id}>
+                          <span>
+                            {item.name} · {selection?.color || item.color}
+                            {selection?.size ? ` · ${selection.size}` : ""}
+                            {` · Qty ${qty}`}
+                            {services.length ? ` · ${services.join(", ")}` : ""}
+                          </span>
+                          <span className="summary-line-actions">
+                            <span className="summary-amount">{formatPrice(item.price * qty)}</span>
+                            <button className="text-link" type="button" onClick={() => removeLook(item.id)}>
+                              Remove<span className="visually-hidden"> {item.name}</span>
+                            </button>
+                          </span>
+                        </li>
+                      );
+                    })}
                   </ul>
                   <ul className="summary-lines summary-totals">
                     <li><span>Subtotal ({itemCount} {itemCount === 1 ? "item" : "items"})</span><span className="summary-amount">{formatPrice(subtotal)}</span></li>
@@ -950,6 +1194,15 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
           </button>
         </div>
       </div>
+      {quickViewItem && (
+        <QuickView
+          key={quickViewItem.id}
+          item={quickViewItem}
+          initial={addedLooks[quickViewItem.id] || null}
+          onConfirm={confirmQuickView}
+          onClose={closeQuickView}
+        />
+      )}
     </div>
   );
 }
