@@ -4,7 +4,6 @@ import {
   SWATCH_HEX,
   TAILORING_PERKS,
   TAILORING_TIERS,
-  TAILORING_TURNAROUND,
 } from "../data/products.js";
 import { colorsIn, getQuestionFlow, resolvedOccasion } from "../data/quizConfig.js";
 import { RENTAL_PACKAGES, RENTAL_STEPS, RENTAL_TYPE_NAMES } from "../data/rentals.js";
@@ -16,9 +15,6 @@ import {
   getRentalRecommendations,
   parseHeight,
 } from "../lib/recommendation.js";
-import TextInput from "./TextInput.jsx";
-import { ItemCard } from "../../../src/components/AddOnItems.jsx";
-
 const SUIT_ONLY = {
   id: "none",
   name: "Suit only",
@@ -27,8 +23,6 @@ const SUIT_ONLY = {
   items: [],
   icon: "/icons/mw/suits-bundle.png",
 };
-
-const BUY_OPTIONS = [SUIT_ONLY, ...TAILORING_TIERS];
 
 const SUIT_FIT_NAMES = {
   close: "Slim",
@@ -105,14 +99,16 @@ function CheckIcon() {
   );
 }
 
-function SelectedMark({ selected, idle = "" }) {
-  if (!selected && !idle) return null;
-  return (
-    <span className={`pick-mark${selected ? " is-on" : ""}`} aria-hidden="true">
-      {selected && <span className="pick-dot"><CheckIcon /></span>}
-      {selected ? "Selected" : idle}
-    </span>
-  );
+function useNarrowStage() {
+  const [narrow, setNarrow] = useState(() => window.matchMedia("(max-width: 900px)").matches);
+  useEffect(() => {
+    const query = window.matchMedia("(max-width: 900px)");
+    const update = () => setNarrow(query.matches);
+    update();
+    query.addEventListener("change", update);
+    return () => query.removeEventListener("change", update);
+  }, []);
+  return narrow;
 }
 
 function isInnerControl(event) {
@@ -193,32 +189,6 @@ function ShareIcon() {
   );
 }
 
-function EmailForm({ onSent }) {
-  const [email, setEmail] = useState("");
-
-  function handleSubmit(event) {
-    event.preventDefault();
-    if (!email.trim()) return;
-    onSent(email.trim());
-    setEmail("");
-  }
-
-  return (
-    <form className="email-form-banner" onSubmit={handleSubmit}>
-      <TextInput
-        label="Email address"
-        type="email"
-        inputMode="email"
-        autoComplete="email"
-        value={email}
-        onChange={setEmail}
-        required
-      />
-      <button className="button email-form-send" type="submit">Send</button>
-    </form>
-  );
-}
-
 function rentalStepDetail(stepId, dates) {
   const ready = dates && !dates.past ? formatDate(dates.ready) : null;
   const event = dates && !dates.past ? formatDate(dates.event) : null;
@@ -252,93 +222,108 @@ function HowToRent({ dates }) {
   );
 }
 
-function OptionRow({ label, children }) {
+function TailoringOptions({ suggestedId, tailoringId, suitOnly, onSelect }) {
   return (
-    <div className="rate-row" role="group" aria-label={label}>
-      {children}
+    <div className="rail-block">
+      {suitOnly && (
+        <p className="rail-note">Suit only until you choose a tailoring option.</p>
+      )}
+      <div className="rate-row" role="radiogroup" aria-label="Tailoring options">
+        {TAILORING_TIERS.map((option) => {
+          const suggested = option.id === suggestedId;
+          const selected = option.id === tailoringId;
+          return (
+            <label className={`rate-card rate-choice${selected ? " is-selected" : ""}${suggested ? " is-suggested" : ""}`} key={option.id}>
+              <input
+                className="visually-hidden"
+                type="radio"
+                name="tailoring-tier"
+                value={option.id}
+                checked={selected}
+                onChange={() => onSelect(option.id)}
+              />
+              {suggested && <span className="tier-tag">Best value</span>}
+              <img className="rate-choice-icon" src={option.icon} alt="" />
+              <span className="rate-choice-copy">
+                <span className="rate-name">{option.name}</span>
+                <span className="rate-plain">{option.detail}</span>
+              </span>
+              <span className="rate-choice-price">{formatPrice(option.price)}</span>
+            </label>
+          );
+        })}
+      </div>
+      <p className="tier-perks">{TAILORING_PERKS}</p>
     </div>
   );
 }
 
-function BuyOptionCard({
-  option,
-  group,
-  suggested,
-  selected,
-  detailsOpen,
-  onToggleDetails,
-  onSelect,
-}) {
-  const days = TAILORING_TURNAROUND[option.id];
+function RentalPackage({ pack, pieces, price }) {
   return (
-    <label className={`rate-card rate-choice${selected ? " is-selected" : ""}${suggested ? " is-suggested" : ""}`}>
-      <input
-        className="visually-hidden"
-        type="radio"
-        name={group}
-        checked={selected}
-        readOnly
-        onClick={onSelect}
-      />
-      {suggested && <span className="tier-tag">Suggested</span>}
-      <img className="rate-choice-icon" src={option.icon} alt="" />
-      <span className="rate-choice-copy">
-        <span className="rate-name">{option.name}</span>
-        <span className="rate-plain">
-          {option.detail}
-          {days ? ` Ready in about ${days} days.` : ""}
-        </span>
-        {option.items.length > 0 && (
-          <button
-            className="text-link rate-details"
-            type="button"
-            aria-expanded={detailsOpen}
-            onClick={(event) => {
-              event.preventDefault();
-              event.stopPropagation();
-              onToggleDetails();
-            }}
-          >
-            {detailsOpen ? "Hide details" : "Details"}
-          </button>
-        )}
-        {detailsOpen && (
-          <span className="rate-items">
-            {option.items.map((item) => (
-              <span className="rate-item" key={item.id}>
-                <span>{item.label}</span>
-                <span>{formatPrice(item.price)}</span>
-              </span>
-            ))}
-          </span>
-        )}
-      </span>
-      <span className="rate-choice-price">{option.price ? formatPrice(option.price) : "Included"}</span>
-    </label>
+    <div className="rail-block">
+      <article className="rate-card rental-package">
+        <h3 className="rate-name">{pack?.label ?? "Rental package"}</h3>
+        <p className="rate-plain">{pack?.detail ?? "Jacket and pants come with every rental."}</p>
+        <ul className="rate-includes">
+          <li className="rate-include">
+            <img src="/icons/mw/suits-bundle.png" alt="" />
+            <span>Jacket and pants</span>
+          </li>
+          {pieces.map((piece) => (
+            <li className="rate-include" key={piece.id}>
+              {piece.icon ? <img src={piece.icon} alt="" /> : <span className="piece-icon-blank" aria-hidden="true" />}
+              <span>{piece.label}</span>
+            </li>
+          ))}
+        </ul>
+        <p className="rate-total">{formatPrice(price)} for this rental</p>
+      </article>
+    </div>
   );
 }
 
-const LOOK_ART = { Shirt: "shirt", Tie: "neckwear", Shoes: "shoes" };
-
-function CompleteLook({ id, look, colorName, occasionLabel, addedIds, onToggle }) {
-  const [shirt, tie, shoes] = look.items;
-  const event = occasionLabel && occasionLabel !== "your event" ? ` for ${occasionLabel}` : "";
-  const lead = `${shirt.color} ${shirt.name.toLowerCase()}, ${tie.color.toLowerCase()} ${tie.name.toLowerCase()}, and ${shoes.color.toLowerCase()} ${shoes.name.toLowerCase()} go with this ${colorName.toLowerCase()} suit${event}.`;
+function CompleteLook({ id, look, addedIds, onToggle }) {
   return (
     <section className="complete-look" aria-labelledby={id}>
-      <h4 id={id} className="complete-look-title">Complete the look</h4>
-      <p className="section-copy">{lead} {look.note}</p>
-      <ul className="item-grid">
-        {look.items.map((item) => (
-          <li key={item.id}>
-            <ItemCard
-              item={{ id: item.id, name: `${item.color} ${item.name.toLowerCase()}`, price: item.price }}
-              art={LOOK_ART[item.type]}
-              mode={addedIds.includes(item.id) ? "added" : "addon"}
-              onToggle={() => onToggle(item.id)}
-            />
-          </li>
-        ))}
+      <div className="look-head">
+        <h3 id={id} className="complete-look-title">Complete the look</h3>
+        <p className="look-optional">Optional add-ons</p>
+      </div>
+      <ul className="look-list">
+        {look.items.map((item) => {
+          const added = addedIds.includes(item.id);
+          return (
+            <li key={item.id}>
+              <div className={`look-row${added ? " is-added" : ""}`}>
+                {item.icon ? (
+                  <img className="look-thumb" src={item.icon} alt="" />
+                ) : (
+                  <span className="look-thumb look-thumb-blank" aria-hidden="true" />
+                )}
+                <div className="look-copy">
+                  <p className="look-color">{item.color}</p>
+                  <p className="look-name">{item.name}</p>
+                  <p className="look-price">{formatPrice(item.price)}</p>
+                  {added && (
+                    <p className="look-meta">
+                      Qty: 1 · {item.color}{" "}
+                      <button className="text-link look-edit" type="button">Edit</button>
+                    </p>
+                  )}
+                </div>
+                <button
+                  className={`look-check${added ? " is-on" : ""}`}
+                  type="button"
+                  aria-pressed={added}
+                  aria-label={added ? `Remove ${item.name}` : `Add ${item.name}`}
+                  onClick={() => onToggle(item.id)}
+                >
+                  {added && <CheckIcon />}
+                </button>
+              </div>
+            </li>
+          );
+        })}
       </ul>
     </section>
   );
@@ -443,17 +428,19 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
     [answers, renting],
   );
   const summary = useMemo(() => buildResultSummary(answers), [answers]);
-  const [selectedId, setSelectedId] = useState(null);
-  const [openId, setOpenId] = useState(null);
+  const skipTailoring = answers.tailoring === "skip";
+  const suggestedTierId = TAILORING_TIERS.some((tier) => tier.id === summary.tailoring?.id)
+    ? summary.tailoring.id
+    : SUIT_ONLY.id;
+  const [selectedId, setSelectedId] = useState(() => recommendations[0]?.id ?? null);
+  const [detailsId, setDetailsId] = useState(null);
   const [expanded, setExpanded] = useState(false);
   const [variantIndexes, setVariantIndexes] = useState({});
-  const [tailoringId, setTailoringId] = useState(SUIT_ONLY.id);
+  const [tailoringId, setTailoringId] = useState(skipTailoring ? SUIT_ONLY.id : suggestedTierId);
   const [addedLookIds, setAddedLookIds] = useState([]);
-  const [detailOpen, setDetailOpen] = useState({});
   const [handoff, setHandoff] = useState("");
-  const [emailOpen, setEmailOpen] = useState(false);
-  const [sentTo, setSentTo] = useState("");
   const [summaryOpen, setSummaryOpen] = useState(false);
+  const narrow = useNarrowStage();
 
   useEffect(() => {
     if (!summaryOpen) return undefined;
@@ -477,7 +464,6 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
     : visibleRecommendations;
   const flow = useMemo(() => getQuestionFlow(answers), [answers]);
   const occasion = resolvedOccasion(answers);
-  const suggestTailoring = answers.tailoring !== "skip";
   const headline = answers.feel
     ? `Recommended for ${summary.occasion}, in a ${summary.fitName}.`
     : `Recommended for ${summary.occasion}.`;
@@ -505,10 +491,6 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
     return { options, variantIndex, shown: options[variantIndex] ?? options[0] };
   }
 
-  function toggleOpen(productId) {
-    setOpenId((current) => (current === productId ? null : productId));
-  }
-
   function chooseVariant(product, index) {
     setVariantIndexes((current) => ({ ...current, [product.id]: index }));
     if (renting || product.id !== selectedId) return;
@@ -517,25 +499,16 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
     setAddedLookIds((current) => compatibleLookIds(shown?.colorKey, current));
   }
 
-  function selectBuyOption(product, optionId) {
-    const { shown } = shownFor(product);
-    setSelectedId(product.id);
-    setTailoringId(optionId);
-    setOpenId(product.id);
-    setAddedLookIds((current) => compatibleLookIds(shown?.colorKey, current));
-  }
-
-  function selectRental(productId) {
-    setSelectedId(productId);
-    setOpenId(productId);
-  }
-
   function selectSuit(product) {
+    if (product.id === selectedId) return;
     if (renting) {
-      selectRental(product.id);
+      setSelectedId(product.id);
       return;
     }
-    selectBuyOption(product, product.id === selectedId ? tailoringId : SUIT_ONLY.id);
+    const { shown } = shownFor(product);
+    setSelectedId(product.id);
+    setTailoringId(skipTailoring ? SUIT_ONLY.id : suggestedTierId);
+    setAddedLookIds(compatibleLookIds(shown?.colorKey, []));
   }
 
   function onCardClick(event, product) {
@@ -549,11 +522,6 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
     ));
   }
 
-  function toggleDetails(productId, optionId) {
-    const key = `${productId}:${optionId}`;
-    setDetailOpen((current) => ({ ...current, [key]: !current[key] }));
-  }
-
   const checkoutNote = renting
     ? "Prototype: this would reserve the look and its pieces for your event date."
     : `Prototype: this would add the suit in your sizes${
@@ -562,6 +530,30 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
         : ""
     } to your bag.${tailoring ? " After checkout, the next step books your tailoring appointment." : ""}`;
   const barTotal = selected ? (renting ? selected.price : total) : null;
+  const optionsRail = selected ? (
+    <aside className="results-rail" aria-label={`Options for ${selected.brand} ${selected.name}`}>
+      {renting ? (
+        <RentalPackage pack={pack} pieces={pieces} price={selected.price} />
+      ) : (
+        <>
+          <TailoringOptions
+            suggestedId={skipTailoring ? null : suggestedTierId}
+            tailoringId={tailoringId}
+            suitOnly={skipTailoring && tailoringId === SUIT_ONLY.id}
+            onSelect={setTailoringId}
+          />
+          {selectedLook && (
+            <CompleteLook
+              id={`complete-look-${selected.id}`}
+              look={selectedLook}
+              addedIds={addedLookIds}
+              onToggle={toggleLook}
+            />
+          )}
+        </>
+      )}
+    </aside>
+  ) : null;
 
   return (
     <div className="results-layout">
@@ -577,15 +569,7 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
                 <PencilIcon />
                 Edit answers
               </button>
-              <button
-                className="results-hero-action"
-                type="button"
-                aria-expanded={emailOpen}
-                onClick={() => {
-                  setSentTo("");
-                  setEmailOpen((value) => !value);
-                }}
-              >
+              <button className="results-hero-action" type="button">
                 <ShareIcon />
                 Share results
               </button>
@@ -595,19 +579,6 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
               </button>
             </div>
           </div>
-          {emailOpen && (
-            <EmailForm
-              onSent={(address) => {
-                setSentTo(address);
-                setEmailOpen(false);
-              }}
-            />
-          )}
-          {sentTo && !emailOpen && (
-            <p className="success-note email-sent" role="status">
-              Sent to {sentTo}. Prototype: a real experience would email the results now.
-            </p>
-          )}
           <div className="results-hero-copy">
             <h1 id="results-title">{headline}</h1>
             {lede && <p className="results-lede">{lede}</p>}
@@ -647,22 +618,43 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
           </p>
         )}
 
-        <h2 className="section-title results-list-title">{renting ? "Select a look" : "Select a suit"}</h2>
-
-        <div className="suit-list">
+        <div className="results-stage">
+          <div className="results-list">
+          <h2 className="section-title results-list-title">Your matches are in</h2>
           {shownRecommendations.map((product, index) => {
             const { options, variantIndex, shown } = shownFor(product);
-            const isOpen = product.id === openId;
             const isSummarySuit = product.id === selectedId;
-            const showLook = !renting && isSummarySuit;
-            const cardLook = showLook ? lookForColor(shown.colorKey, occasion) : null;
+            const detailsOpen = product.id === detailsId;
             const checks = product.evidence?.slice(0, 3) ?? [];
             return (
               <article className={`suit-card${isSummarySuit ? " is-selected" : ""}`} key={product.id}>
+                <div className="suit-card-face">
                 <div className="suit-card-main" onClick={(event) => onCardClick(event, product)}>
                   <div className="suit-card-media">
                     <div className="product-image">
                       <img src={shown.image} alt="" />
+                    </div>
+                  </div>
+                  <div className="suit-card-copy">
+                    <div className="suit-card-top">
+                      <div className="suit-badges">
+                        {product.matchPercent != null ? (
+                          <span className={`match-score match-score-${matchTone(product.matchPercent)}`}>
+                            {product.matchPercent}% match
+                          </span>
+                        ) : index === 0 ? (
+                          <span className="match-tag">Best match</span>
+                        ) : null}
+                      </div>
+                      <button
+                        className="text-link suit-details-toggle"
+                        type="button"
+                        aria-expanded={detailsOpen}
+                        aria-controls={`details-${product.id}`}
+                        onClick={() => setDetailsId(detailsOpen ? null : product.id)}
+                      >
+                        {detailsOpen ? "Hide details" : "View more details"}
+                      </button>
                     </div>
                     {options.length > 1 && (
                       <div className="color-swatches" role="group" aria-label="Colors">
@@ -680,19 +672,6 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
                         ))}
                       </div>
                     )}
-                  </div>
-                  <div className="suit-card-copy">
-                    {(product.matchPercent != null || index === 0) && (
-                      <div className="suit-badges">
-                        {product.matchPercent != null ? (
-                          <span className={`match-score match-score-${matchTone(product.matchPercent)}`}>
-                            {product.matchPercent}% match
-                          </span>
-                        ) : (
-                          <span className="match-tag">Best match</span>
-                        )}
-                      </div>
-                    )}
                     <p className="product-brand">{product.brand}</p>
                     <h3 className="product-title">
                       <button
@@ -704,6 +683,11 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
                         {product.name}
                       </button>
                     </h3>
+                    <p className="suit-price">
+                      <strong>{formatPrice(product.price)}</strong>
+                      {product.compareAt && <s>{formatPrice(product.compareAt)}</s>}
+                    </p>
+                    {product.compareAt && <p className="suit-clearance">Clearance</p>}
                     {renting && (
                       <p className="product-meta">{RENTAL_TYPE_NAMES[product.type]} · Sizes confirmed at your fitting</p>
                     )}
@@ -713,137 +697,61 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
                         <span>{product.rating.toFixed(1)} ({product.reviews.toLocaleString("en-US")})</span>
                       </p>
                     )}
-                    {checks.length > 0 && (
-                      <div className="match-why">
-                        <p className="why-label">{renting ? "Why this look" : "Why this suit"}</p>
-                        <ul className="why-list">
-                          {checks.map((line) => (
-                            <li key={line}>{line}</li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-                    {product.matchPercent != null && product.matchPercent < 80 && (
-                      <p className="match-reason">
-                        {product.tradeoffs?.length
-                          ? product.tradeoffs.join(" ")
-                          : "A partial match. It lines up on some of your answers, not every one."}
-                      </p>
-                    )}
-                    <button
-                      className="button link try-on-link"
-                      type="button"
-                      onClick={() => setHandoff("tryon")}
-                    >
-                      Try it on
+                    <button className="button suit-options" type="button" onClick={() => selectSuit(product)}>
+                      {renting ? "Choose this look" : "Choose suit options"}
                     </button>
-                    <div className="suit-card-foot">
-                      <div className="suit-from">
-                        <span className="suit-from-kicker">From</span>
-                        <strong>{formatPrice(product.price)}</strong>
-                        {product.compareAt && <s>{formatPrice(product.compareAt)}</s>}
-                        <span className="suit-from-note">{renting ? "rental" : "suit only"}</span>
-                        {product.compareAt && <span className="suit-from-sale">Sale price</span>}
+                    {detailsOpen && (
+                      <div className="suit-details" id={`details-${product.id}`}>
+                        {checks.length > 0 && (
+                          <div className="match-why">
+                            <p className="why-label">{renting ? "Why this look" : "Why this suit"}</p>
+                            <ul className="why-list">
+                              {checks.map((line) => (
+                                <li key={line}>{line}</li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+                        {product.matchPercent != null && product.matchPercent < 80 && (
+                          <p className="match-reason">
+                            {product.tradeoffs?.length
+                              ? product.tradeoffs.join(" ")
+                              : "A partial match. It lines up on some of your answers, not every one."}
+                          </p>
+                        )}
+                        <button
+                          className="button link try-on-link"
+                          type="button"
+                          onClick={() => setHandoff(`tryon:${product.id}`)}
+                        >
+                          Try it on
+                        </button>
+                        {handoff === `tryon:${product.id}` && (
+                          <p className="handoff-inline" role="status">Prototype: this would open nearby stores with this suit in your size.</p>
+                        )}
                       </div>
-                      <button
-                        className="button secondary card-toggle"
-                        type="button"
-                        aria-expanded={isOpen}
-                        aria-controls={`options-${product.id}`}
-                        onClick={() => toggleOpen(product.id)}
-                      >
-                        {isOpen
-                          ? (renting ? "Hide package" : "Hide tailoring")
-                          : (renting ? "See package" : "Choose tailoring")}
-                      </button>
-                    </div>
+                    )}
                   </div>
                 </div>
-
-                {isOpen && (
-                  <div className="suit-card-options" id={`options-${product.id}`}>
-                    {renting ? (
-                      <OptionRow label={`Rental package for ${product.brand} ${product.name}`}>
-                        <label className={`rate-card${isSummarySuit ? " is-selected" : ""}`}>
-                          <input
-                            className="visually-hidden"
-                            type="radio"
-                            name={`package-${product.id}`}
-                            checked={isSummarySuit}
-                            readOnly
-                            onClick={() => selectRental(product.id)}
-                          />
-                          <span className="rate-head">
-                            <span className="rate-name">{pack?.label ?? "Rental package"}</span>
-                            <SelectedMark selected={isSummarySuit} />
-                          </span>
-                          <span className="rate-plain">{pack?.detail ?? "Jacket and pants come with every rental."}</span>
-                          <span className="rate-includes">
-                            <span className="rate-include">
-                              <img src="/icons/mw/suits-bundle.png" alt="" />
-                              <span>Jacket and pants</span>
-                            </span>
-                            {pieces.map((piece) => (
-                              <span className="rate-include" key={piece.id}>
-                                {piece.icon ? <img src={piece.icon} alt="" /> : <span className="piece-icon-blank" aria-hidden="true" />}
-                                <span>{piece.label}</span>
-                              </span>
-                            ))}
-                          </span>
-                          <span className="rate-total">{formatPrice(product.price)} for this rental</span>
-                        </label>
-                      </OptionRow>
-                    ) : (
-                      <>
-                        <OptionRow label={`Tailoring for ${product.brand} ${product.name}`}>
-                          {BUY_OPTIONS.map((option) => {
-                            return (
-                              <BuyOptionCard
-                                key={option.id}
-                                option={option}
-                                group={`tailoring-${product.id}`}
-                                suggested={suggestTailoring && option.id === summary.tailoring.id}
-                                selected={isSummarySuit && tailoringId === option.id}
-                                detailsOpen={Boolean(detailOpen[`${product.id}:${option.id}`])}
-                                onToggleDetails={() => toggleDetails(product.id, option.id)}
-                                onSelect={() => selectBuyOption(product, option.id)}
-                              />
-                            );
-                          })}
-                        </OptionRow>
-                        <p className="tier-perks">{TAILORING_PERKS}</p>
-                        {cardLook && (
-                          <CompleteLook
-                            id={`complete-look-${product.id}`}
-                            look={cardLook}
-                            colorName={shown.color}
-                            occasionLabel={summary.occasion}
-                            addedIds={addedLookIds}
-                            onToggle={toggleLook}
-                          />
-                        )}
-                      </>
-                    )}
-                  </div>
-                )}
+                </div>
+                {narrow && isSummarySuit && optionsRail}
               </article>
             );
           })}
-        </div>
 
-        {moreMode === "toggle" && recommendations.length > 3 && (
-          <button className="button secondary more-matches" type="button" onClick={() => setExpanded((value) => !value)}>
-            {expanded ? "View less" : `View more matches (${Math.min(6, recommendations.length - 3)})`}
-          </button>
-        )}
-        {moreMode === "link" && !renting && (
-          <button className="button secondary more-matches" type="button" onClick={onSeeAll}>
+          {moreMode === "toggle" && recommendations.length > 3 && (
+            <button className="button secondary more-matches" type="button" onClick={() => setExpanded((value) => !value)}>
+              {expanded ? "View less" : `View more matches (${Math.min(6, recommendations.length - 3)})`}
+            </button>
+          )}
+          {moreMode === "link" && !renting && (
+            <button className="button secondary more-matches" type="button" onClick={onSeeAll}>
             See all quiz matches
           </button>
-        )}
-        {handoff === "tryon" && (
-          <p className="handoff-inline" role="status">Prototype: this would open nearby stores with this suit in your size.</p>
-        )}
+          )}
+          </div>
+          {!narrow && optionsRail}
+        </div>
 
         <FitProfile
           answers={answers}
