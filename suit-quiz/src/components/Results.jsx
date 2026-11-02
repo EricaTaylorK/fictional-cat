@@ -541,7 +541,6 @@ function FitProfile({ answers, renting, size, fitName, onRestart, onAccount, acc
   const everyday = answers.everydaySizes ?? {};
   const jacketValue = size?.jacket ? jacketFact(size, renting) : null;
   const waistNumber = size?.pants ? String(size.pants).replace(/W$/i, "") : null;
-  const length = size?.length ? titleWords(size.length) : null;
   const fit = fitName ? titleWords(fitName) : null;
   const personal = [
     height,
@@ -550,19 +549,14 @@ function FitProfile({ answers, renting, size, fitName, onRestart, onAccount, acc
     !jacketValue && everyday.shirt ? `Shirt ${everyday.shirt}` : null,
     !waistNumber && everyday.waist ? `Waist ${everyday.waist}` : null,
   ].filter(Boolean);
-  const pantsIssues = selectedIssues(answers.pantsFit).map((issue) => FIT_NOTE_COPY[issue]).filter(Boolean);
-  const jacketIssues = selectedIssues(answers.fitIssues).map((issue) => FIT_NOTE_COPY[issue]).filter(Boolean);
-  const pantsValue = [
-    waistNumber ? `${waistNumber}-inch waist` : null,
-    ...pantsIssues,
-  ].filter(Boolean).join(" · ");
+  const notes = [
+    ...selectedIssues(answers.fitIssues).map((issue) => FIT_NOTE_COPY[issue]),
+    ...selectedIssues(answers.pantsFit).map((issue) => FIT_NOTE_COPY[issue]),
+  ].filter(Boolean);
   const rows = [
     personal.length ? { label: "Personal info", value: personal.join(" · ") } : null,
-    jacketValue ? { label: "Size", value: jacketValue } : null,
     fit ? { label: "Fit preference", value: fit } : null,
-    length ? { label: "Length", value: length } : null,
-    pantsValue ? { label: "Pants", value: pantsValue } : null,
-    jacketIssues.length ? { label: "Fit notes", value: `${jacketIssues.join(". ")}.` } : null,
+    notes.length ? { label: "Fit notes", value: `${notes.join(". ")}.` } : null,
   ].filter(Boolean);
   const benefits = renting
     ? [

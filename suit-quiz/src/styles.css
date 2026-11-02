@@ -2272,14 +2272,15 @@ h2 {
   margin-top: 4px;
 }
 
-.rail-section-title {
-  font-family: var(--font-family-oswald);
+.rail-section-title,
+.complete-look-title {
+  font-family: var(--font-family-roboto);
   font-size: 16px;
-  font-weight: 500;
-  letter-spacing: 0.04em;
+  font-weight: 700;
+  letter-spacing: 0;
   line-height: 24px;
   margin: 0;
-  text-transform: uppercase;
+  text-transform: none;
 }
 
 .results-rail .rate-card,
@@ -2888,7 +2889,28 @@ h2 {
 }
 
 .rate-choice.is-suggested {
-  margin-top: 12px;
+  align-items: center;
+  grid-template-areas:
+    "tag tag price"
+    "icon copy price";
+  margin-top: 0;
+}
+
+.rate-choice.is-suggested .tier-tag {
+  grid-area: tag;
+}
+
+.rate-choice.is-suggested .rate-choice-icon {
+  grid-area: icon;
+}
+
+.rate-choice.is-suggested .rate-choice-copy {
+  grid-area: copy;
+}
+
+.rate-choice.is-suggested .rate-choice-price {
+  align-self: start;
+  grid-area: price;
 }
 
 .rate-choice .rate-name {
@@ -2922,20 +2944,22 @@ h2 {
 }
 
 .rate-choice .tier-tag {
-  background: #e7f0fb;
-  border-radius: 4px;
-  color: var(--color-background-dark-blue);
+  background: var(--color-info-light-blue);
+  border-radius: 25px;
+  color: var(--color-info-blue);
+  font-family: var(--font-family-roboto);
   font-size: 10px;
-  font-weight: var(--font-weight-bold);
-  left: 16px;
-  letter-spacing: 0.04em;
-  line-height: 16px;
+  font-weight: 700;
+  justify-self: start;
+  letter-spacing: 0.02em;
+  line-height: 12px;
+  margin-bottom: 4px;
   padding: 4px 8px;
-  position: absolute;
+  position: static;
   text-transform: uppercase;
-  top: 0;
-  transform: translateY(-50%);
+  transform: none;
   white-space: nowrap;
+  width: fit-content;
 }
 
 .rate-card:has(input:focus-visible) {
