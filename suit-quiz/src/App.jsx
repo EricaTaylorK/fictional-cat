@@ -481,6 +481,55 @@ function isAnswered(question, answers) {
   return Boolean(answer);
 }
 
+const STORE_LINKS = ["Suits", "Sport Coats & Blazers", "Dress Shirts", "Pants", "Shoes", "Outerwear", "Accessories", "Casual", "Brands", "Wedding", "Featured", "Rental"];
+
+function StoreChrome() {
+  return (
+    <header className="store-chrome">
+      <p className="store-banner">Clearance up to 70% Off Original Prices | Shop Now &gt;</p>
+      <div className="store-utility">
+        <img className="store-logo" src="/mw-logo.svg" alt="Men's Wearhouse" />
+        <form className="store-search" role="search" onSubmit={(event) => event.preventDefault()}>
+          <input type="search" placeholder="What are you looking for?" aria-label="Search" />
+          <button type="submit" aria-label="Search">
+            <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true">
+              <path fill="#fff" d="M15.5 14h-.8l-.3-.3a6.5 6.5 0 1 0-.7.7l.3.3v.8L19 20.5 20.5 19l-5-5Zm-6 0A4.5 4.5 0 1 1 14 9.5 4.5 4.5 0 0 1 9.5 14Z" />
+            </svg>
+          </button>
+        </form>
+        <div className="store-utilities">
+          <button type="button">
+            <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true">
+              <path fill="#3A3A3A" d="M12 2.8a6.2 6.2 0 0 0-6.2 6.2c0 4.7 6.2 12.2 6.2 12.2s6.2-7.5 6.2-12.2A6.2 6.2 0 0 0 12 2.8Zm0 8.4a2.2 2.2 0 1 1 2.2-2.2A2.2 2.2 0 0 1 12 11.2Z" />
+            </svg>
+            Find a Store
+          </button>
+          <button className="store-signin" type="button">
+            <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true">
+              <path fill="#3A3A3A" d="M12 12.2a4 4 0 1 0-4-4 4 4 0 0 0 4 4Zm0 2c-3.3 0-8 1.7-8 4.2V20h16v-1.6c0-2.5-4.7-4.2-8-4.2Z" />
+            </svg>
+            Sign in
+            <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true">
+              <path fill="#3A3A3A" d="M7 10.2 12 15l5-4.8-1.2-1.2L12 12.6 8.2 9Z" />
+            </svg>
+          </button>
+          <button type="button" aria-label="Bag">
+            <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true">
+              <path fill="#3A3A3A" d="M7 8V7a5 5 0 0 1 10 0v1h3v13H4V8h3Zm2 0h6V7a3 3 0 0 0-6 0v1Z" />
+            </svg>
+          </button>
+        </div>
+      </div>
+      <nav className="store-nav" aria-label="Departments">
+        {STORE_LINKS.map((label) => (
+          <button type="button" key={label}>{label}</button>
+        ))}
+        <button className="store-sale" type="button">Sale</button>
+      </nav>
+    </header>
+  );
+}
+
 export default function App() {
   const [state, setState] = useState(loadProgress);
   const { screen, currentId, answers } = state;
@@ -736,8 +785,9 @@ export default function App() {
 
   return (
     <>
+      {screen === "results" ? <StoreChrome /> : (
       <p className="promo-banner">
-        {screen === "results" || screen === "product"
+        {screen === "product"
           ? answers.mode === "rent"
             ? "Your sizes and event timing are in your plan below."
             : "Your sizes and today's prices are in your plan below."
@@ -745,6 +795,8 @@ export default function App() {
             ? "Suits are on sale now."
             : "Suits are on sale now. Finish the quiz to see your size and your price."}
       </p>
+      )}
+      {screen !== "results" && (
       <header className="site-header">
         <div className="header-slot header-slot-start" />
         <a className="logo" href="/" aria-label="Men's Wearhouse">
@@ -752,6 +804,7 @@ export default function App() {
         </a>
         <div className="header-slot header-slot-end" />
       </header>
+      )}
       <main className={`app-shell${screen === "results" || screen === "product" ? " app-shell-wide" : ""}`}>
         {screen === "product" ? (
           <ProductDetail

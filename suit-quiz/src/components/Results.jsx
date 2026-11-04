@@ -44,7 +44,7 @@ function heightLabel(height) {
 
 function PencilIcon() {
   return (
-    <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true">
+    <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true">
       <path fill="currentColor" d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25ZM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83Z" />
     </svg>
   );
@@ -194,10 +194,99 @@ function matchTone(percent) {
 
 function ShareIcon() {
   return (
-    <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true">
+    <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true">
       <path fill="currentColor" d="M12 3.2 6.8 8.4h3.2V15h4V8.4h3.2L12 3.2ZM5 14v6h14v-6h2v8H3v-8h2Z" />
     </svg>
   );
+}
+
+function ShuffleIcon() {
+  return (
+    <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true">
+      <path fill="currentColor" d="M16.4 4.2 20 7.6l-3.6 3.4-1.1-1.2 1.2-1.1H14c-.8 0-1.6.4-2.1 1L9.7 12l2.2 2.3c.5.6 1.3 1 2.1 1h2.5l-1.2-1.1 1.1-1.2 3.6 3.4-3.6 3.4-1.1-1.2 1.2-1.1H14c-1.4 0-2.7-.7-3.5-1.8L8.6 13.4 7 15.1c-.5.6-1.3 1-2.1 1H3v-1.6h1.9c.3 0 .6-.2.8-.4l1.9-2.1-1.9-2.1c-.2-.2-.5-.4-.8-.4H3V7.4h1.9c.8 0 1.6.4 2.1 1l1.6 1.7 1.9-2c.8-1.1 2.1-1.7 3.5-1.7h2.5l-1.2-1.1 1.1-1.1Z" />
+    </svg>
+  );
+}
+
+function ChevronIcon({ open = false }) {
+  return (
+    <svg className={open ? "is-open" : undefined} width="14" height="8" viewBox="0 0 14 8" aria-hidden="true">
+      <path fill="currentColor" d="M1.2 1.3 7 6.7l5.8-5.4-1.1-1.2L7 4.4 2.3.1 1.2 1.3Z" />
+    </svg>
+  );
+}
+
+function PlusIcon() {
+  return (
+    <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true">
+      <path fill="currentColor" d="M11.4 5h1.2v6.4H19v1.2h-6.4V19h-1.2v-6.4H5v-1.2h6.4V5Z" />
+    </svg>
+  );
+}
+
+const OCCASION_PHRASES = {
+  wedding: "your upcoming wedding",
+  funeral: "a funeral or memorial",
+  work: "work",
+  business: "work",
+  formal: "a black-tie evening",
+  milestone: "a graduation or prom",
+  versatile: "all-purpose events",
+  travel: "travel",
+  prom: "prom",
+  mixed: "all-purpose events",
+  special: "a special event",
+};
+
+const FIT_WORDS = {
+  close: "slim-fit",
+  balanced: "modern-fit",
+  roomy: "classic-fit",
+};
+
+const FEEL_PRIORITY = {
+  roomy: "comfort",
+  close: "a sharper shape",
+  balanced: "room to move",
+};
+
+const ISSUE_PRIORITY = {
+  broadShoulders: "your shoulders",
+  fullerMidsection: "the waist",
+  runsLong: "sleeve length",
+  runsShort: "sleeve length",
+  athleticBuild: "the waist",
+  seatThighs: "the seat and thighs",
+};
+
+function preferredColorPhrase(answers) {
+  const labels = (answers.colors?.prefer ?? []).slice(0, 2).map((value) => {
+    const option = questions.colors.options.find((item) => item.value === value);
+    return String(option?.label ?? value).toLowerCase();
+  }).filter(Boolean);
+  if (labels.length === 0) return "";
+  if (labels.length === 1) return labels[0];
+  return `${labels[0]} and ${labels[1]}`;
+}
+
+function priorityPhrase(answers) {
+  const issues = [...selectedIssues(answers.fitIssues), ...selectedIssues(answers.pantsFit)];
+  const fromIssue = issues.map((issue) => ISSUE_PRIORITY[issue]).find(Boolean);
+  if (fromIssue) return fromIssue;
+  return answers.feel ? FEEL_PRIORITY[answers.feel] ?? "" : "";
+}
+
+function matchLede(answers) {
+  const occasionKey = resolvedOccasion(answers) || answers.occasion;
+  const occasion = occasionKey ? OCCASION_PHRASES[occasionKey] : "";
+  const fit = answers.feel ? FIT_WORDS[answers.feel] : "";
+  const color = preferredColorPhrase(answers);
+  const priority = color ? "" : priorityPhrase(answers);
+  const suits = fit ? `${fit} suits` : "suits";
+  let sentence = occasion ? `For ${occasion}, we found ${suits}` : `We found ${suits}`;
+  if (color) sentence += ` in ${color}`;
+  if (priority) sentence += ` that keep ${priority} in mind`;
+  return `${sentence}.`;
 }
 
 function rentalStepDetail(stepId, dates) {
@@ -599,16 +688,21 @@ function FitProfile({ answers, renting, size, fitName, onEditAnswers, onAccount,
   return (
     <section className="fit-band" aria-labelledby="fit-profile-title">
       <div className="fit-card">
-        <h2 id="fit-profile-title" className="fit-card-title">Your fit profile</h2>
+        <div className="fit-card-head">
+          <h2 id="fit-profile-title" className="fit-card-title">Your fit profile</h2>
+          {onEditAnswers && (
+            <button className="results-hero-action" type="button" onClick={() => onEditAnswers()}>
+              <PencilIcon />
+              Edit answers
+            </button>
+          )}
+        </div>
         {rows.map((row) => (
           <div className="fit-group" key={row.label}>
             <p className="fit-group-label">{row.label}</p>
             <p className="fit-group-line">{row.value}</p>
           </div>
         ))}
-        {onEditAnswers && (
-          <button className="fit-retake" type="button" onClick={() => onEditAnswers()}>Edit My Answers</button>
-        )}
       </div>
       <div className="fit-save">
         <h2 className="fit-save-title">Save your fit profile</h2>
@@ -628,7 +722,7 @@ function FitProfile({ answers, renting, size, fitName, onEditAnswers, onAccount,
   );
 }
 
-export default function Results({ answers, moreMode = "toggle", onSeeAll, onEditAnswers, onRestart }) {
+export default function Results({ answers, moreMode = "toggle", onSeeAll, onEditAnswers, onRestart, onViewDetails }) {
   const renting = answers.mode === "rent";
   const recommendations = useMemo(() => {
     const list = renting ? getRentalRecommendations(answers) : getRecommendations(answers);
@@ -647,8 +741,7 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
     ? summary.tailoring.id
     : NO_HEM.id;
   const defaultTierId = answers.tailoring === "bundle" && suggestedTierId !== NO_HEM.id ? suggestedTierId : NO_HEM.id;
-  const [selectedId, setSelectedId] = useState(() => recommendations[0]?.id ?? null);
-  const [detailsId, setDetailsId] = useState(null);
+  const [openId, setOpenId] = useState(null);
   const [expanded, setExpanded] = useState(false);
   const [variantIndexes, setVariantIndexes] = useState({});
   const [tailoringId, setTailoringId] = useState(defaultTierId);
@@ -658,8 +751,7 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
   const [quickViewId, setQuickViewId] = useState(null);
   const quickViewTrigger = useRef(null);
   const [handoff, setHandoff] = useState("");
-  const [summaryOpen, setSummaryOpen] = useState(false);
-  const narrow = useNarrowStage();
+  const followedId = openId ?? recommendations[0]?.id ?? null;
 
   useEffect(() => {
     if (!expanded || !focusNewCard.current) return;
@@ -668,15 +760,12 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
   }, [expanded]);
 
   useEffect(() => {
-    if (!summaryOpen) return undefined;
-    const onKey = (event) => {
-      if (event.key === "Escape" && !quickViewId) setSummaryOpen(false);
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [summaryOpen, quickViewId]);
+    setTailoringId(defaultTierId);
+    setAddedLooks({});
+    setQuickViewId(null);
+  }, [followedId, defaultTierId]);
 
-  const selected = recommendations.find((product) => product.id === selectedId) ?? null;
+  const selected = recommendations.find((product) => product.id === followedId) ?? null;
   const size = summary.sizeEstimate;
   const dates = summary.dates;
   const pack = RENTAL_PACKAGES.find((item) => item.id === Number(answers.pieces));
@@ -688,10 +777,8 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
     ? [...visibleRecommendations, selected]
     : visibleRecommendations;
   const occasion = resolvedOccasion(answers);
-  const headline = answers.feel
-    ? `Recommended for ${summary.occasion}, in a ${summary.fitName}.`
-    : `Recommended for ${summary.occasion}.`;
-  const lede = recommendations[0]?.evidence?.[0];
+  const lede = matchLede(answers);
+  const ringPercent = Number.isFinite(selected?.matchPercent) ? selected.matchPercent : null;
 
   const selectedOptions = selected ? variantOptions(selected) : [];
   const selectedVariant = selected
@@ -706,7 +793,7 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
     : 0;
   const total = subtotal - savings;
   const addedQty = addedItems.reduce((sum, item) => sum + (addedLooks[item.id]?.quantity || 1), 0);
-  const itemCount = !renting && selected ? 2 + (tailoring?.price ? 1 : 0) + addedQty : 0;
+  const itemCount = !renting && selected ? 1 + (tailoring?.price ? 1 : 0) + addedQty : (renting && selected ? 1 : 0);
   const quickViewItem = selectedLook?.items.find((item) => item.id === quickViewId) ?? null;
 
   function shownFor(product) {
@@ -719,7 +806,7 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
 
   function chooseVariant(product, index) {
     setVariantIndexes((current) => ({ ...current, [product.id]: index }));
-    if (renting || product.id !== selectedId) return;
+    if (renting || product.id !== followedId) return;
     const options = variantOptions(product);
     const shown = options[index] ?? options[0];
     setAddedLooks((current) => {
@@ -729,21 +816,8 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
     setQuickViewId(null);
   }
 
-  function selectSuit(product) {
-    if (product.id === selectedId) return;
-    if (renting) {
-      setSelectedId(product.id);
-      return;
-    }
-    setSelectedId(product.id);
-    setTailoringId(defaultTierId);
-    setAddedLooks({});
-    setQuickViewId(null);
-  }
-
-  function onCardClick(event, product) {
-    if (isInnerControl(event)) return;
-    selectSuit(product);
+  function toggleCard(product) {
+    setOpenId((current) => (current === product.id ? null : product.id));
   }
 
   function openQuickView(item, event) {
@@ -787,43 +861,78 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
         ? ` and ${[tailoring ? "the tailoring" : null, addedItems.length ? "the pieces you added" : null].filter(Boolean).join(" and ")}`
         : ""
     } to your bag.${tailoring ? " After checkout, the next step books your tailoring appointment." : ""}`;
-  const barTotal = selected ? (renting ? selected.price : total) : null;
-  const optionsRail = selected ? (
-    <aside className="results-rail" key={selected.id} aria-label={`${renting ? "Selected look" : "Selected suit"}, ${selected.brand} ${selected.name}`}>
-      <header className="rail-suit">
-        <img className="rail-suit-image" src={selectedVariant?.image || selected.image} alt="" />
-        <div>
-          <p className="rail-kicker">{renting ? "Selected look" : "Selected suit"}</p>
-          <p className="rail-brand">{selected.brand}</p>
-          <h3 className="rail-name">{selected.name}</h3>
-          <p className="rail-price">{formatPrice(selected.price)}</p>
-        </div>
-      </header>
-      {renting ? (
-        <RentalPackage pack={pack} pieces={pieces} price={selected.price} />
-      ) : (
-        <>
-          <TailoringOptions
-            suggestedId={answers.tailoring === "skip" ? null : suggestedTierId}
-            suggestedReason={TAILORING_TIERS.find((tier) => tier.id === suggestedTierId)?.plain ?? ""}
-            tailoringId={tailoringId}
-            onSelect={setTailoringId}
-          />
-          {selectedLook && (
-            <CompleteLook
-              id={`complete-look-${selected.id}`}
-              look={selectedLook}
-              suitColor={selectedVariant?.color || selected.color}
-              suitName={selected.name}
-              addedLooks={addedLooks}
-              onOpen={openQuickView}
-              onRemove={removeLook}
-            />
-          )}
-        </>
+  const orderSummary = (
+    <aside className="order-summary" aria-label="Order summary">
+      <h2 className="order-summary-title">Order summary</h2>
+      {!renting && savings > 0 && <p className="order-promo">Look at the promo you're getting!</p>}
+      {!selected && <p className="order-empty">Choose a suit to see your total.</p>}
+      {selected && renting && (
+        <ul className="order-lines">
+          <li>
+            <span>{selected.brand} {selected.name}</span>
+            <span className="order-amount">{formatPrice(selected.price)}</span>
+          </li>
+          {pieces.map((piece) => (
+            <li key={piece.id}><span>{piece.label}</span><span className="order-amount">Included</span></li>
+          ))}
+        </ul>
       )}
+      {selected && !renting && (
+        <ul className="order-lines">
+          <li>
+            <span>Suit</span>
+            <span className="order-amount">
+              {selected.compareAt ? <s>{formatPrice(selected.compareAt)}</s> : null}
+              <span>{formatPrice(selected.price)}</span>
+            </span>
+          </li>
+          {tailoring && (
+            <li>
+              <span>{tailoring.price ? tailoring.name : "Tailoring package"}</span>
+              <span className="order-amount">{tailoring.price ? formatPrice(tailoring.price) : "Included"}</span>
+            </li>
+          )}
+          {addedItems.map((item) => {
+            const selection = addedLooks[item.id];
+            const qty = selection?.quantity || 1;
+            return (
+              <li key={item.id}>
+                <span>{item.name}{qty > 1 ? ` · Qty ${qty}` : ""}</span>
+                <span className="order-amount">{formatPrice(item.price * qty)}</span>
+              </li>
+            );
+          })}
+        </ul>
+      )}
+      {selected && (
+        <div className="order-totals">
+          <div>
+            <span>Subtotal ({itemCount} {itemCount === 1 ? "item" : "items"})</span>
+            <span>{formatPrice(renting ? selected.price : subtotal)}</span>
+          </div>
+          {!renting && savings > 0 && (
+            <div className="order-promo-line">
+              <span>Suit sale</span>
+              <span>-{formatPrice(savings)}</span>
+            </div>
+          )}
+          <div className="order-grand">
+            <span>Grand total</span>
+            <strong>{formatPrice(renting ? selected.price : total)}</strong>
+          </div>
+        </div>
+      )}
+      <button
+        className="order-checkout"
+        type="button"
+        disabled={!selected}
+        onClick={() => setHandoff("checkout")}
+      >
+        Checkout
+      </button>
+      {handoff === "checkout" && <p className="handoff-inline" role="status">{checkoutNote}</p>}
     </aside>
-  ) : null;
+  );
 
   return (
     <div className="results-layout">
@@ -835,19 +944,41 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
               <span className="results-expert-label">AI Style Expert</span>
             </div>
             <div className="results-hero-actions">
-              <button className="results-hero-action" type="button" onClick={() => onRestart?.()}>
+              <button className="results-hero-action" type="button" onClick={() => onEditAnswers?.()}>
                 <PencilIcon />
-                Retake the quiz
+                Edit answers
               </button>
               <button className="results-hero-action" type="button">
                 <ShareIcon />
                 Share results
               </button>
+              <button className="results-hero-action" type="button" onClick={() => onRestart?.()}>
+                <ShuffleIcon />
+                Restart quiz
+              </button>
             </div>
           </div>
-          <div className="results-hero-copy">
-            <h1 id="results-title">{headline}</h1>
-            {lede && <p className="results-lede">{lede}</p>}
+          <div className="results-hero-headline">
+            <div
+              className="match-ring"
+              style={{ "--match-turn": `${ringPercent ?? 100}%` }}
+              aria-hidden="true"
+            >
+              <div className="match-ring-hole">
+                {ringPercent != null ? (
+                  <>
+                    <span className="match-ring-value">{ringPercent}%</span>
+                    <span className="match-ring-label">Match</span>
+                  </>
+                ) : (
+                  <span className="match-ring-label">Great match</span>
+                )}
+              </div>
+            </div>
+            <div className="results-hero-copy">
+              <h1 id="results-title">We found your best matches!</h1>
+              <p className="results-lede">{lede}</p>
+            </div>
           </div>
           <div className="hero-facts">
             <div className="hero-fact">
@@ -859,7 +990,7 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
             <div className="hero-fact">
               <div>
                 <p className="hero-fact-label">Your fit</p>
-                <p className="hero-fact-value">{titleWords(summary.fitName)}</p>
+                <p className="hero-fact-value">{answers.feel ? titleWords(summary.fitName) : "Not selected"}</p>
               </div>
             </div>
             <div className="hero-fact">
@@ -868,9 +999,7 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
                 <p className="hero-fact-value">
                   {renting
                     ? (pack?.label ?? "Rental package")
-                      : (answers.tailoring === "skip"
-                      ? "No tailoring"
-                      : (TAILORING_TIERS.find((tier) => tier.id === summary.tailoring?.id)?.plain ?? "No tailoring"))}
+                    : (TAILORING_TIERS.find((tier) => tier.id === summary.tailoring?.id)?.plain ?? "No tailoring")}
                 </p>
               </div>
             </div>
@@ -892,148 +1021,93 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
           <h2 className="section-title results-list-title">Your matches are in</h2>
           {shownRecommendations.map((product, index) => {
             const { options, variantIndex, shown } = shownFor(product);
-            const isSummarySuit = product.id === selectedId;
-            const detailsOpen = product.id === detailsId;
-            const checks = product.evidence?.slice(0, 3) ?? [];
+            const open = product.id === openId;
+            const scored = Number.isFinite(product.matchPercent);
             return (
               <article
-                className={`suit-card${isSummarySuit ? " is-selected" : ""}`}
+                className={`suit-card${open ? " is-open" : ""}`}
                 key={product.id}
-                aria-current={isSummarySuit ? "true" : undefined}
                 tabIndex={index === 3 ? -1 : undefined}
                 ref={index === 3 ? firstNewCardRef : undefined}
               >
                 <div className="suit-card-face">
-                <div className="suit-card-main" onClick={(event) => onCardClick(event, product)}>
-                  <div className="suit-card-media">
-                    <div className="product-image">
-                      <img src={shown.image} alt="" />
-                    </div>
-                  </div>
-                  <div className="suit-card-body">
-                    <div className="suit-card-topbar">
-                      <div className="suit-badges">
-                        {product.matchPercent != null ? (
-                          <span className={`match-score match-score-${matchTone(product.matchPercent)}`}>
-                            {product.matchPercent}% match
-                          </span>
-                        ) : index === 0 ? (
-                          <span className="match-tag">Best match</span>
-                        ) : null}
+                  <div className="suit-row">
+                    <div className="suit-card-media">
+                      <div className="product-image">
+                        <img src={shown.image} alt="" />
                       </div>
-                      <button
-                        className="suit-details-toggle"
-                        type="button"
-                        aria-expanded={detailsOpen}
-                        aria-controls={`details-${product.id}`}
-                        onClick={() => setDetailsId(detailsOpen ? null : product.id)}
-                      >
-                        {detailsOpen ? "Hide details" : "View more details"}
-                      </button>
                     </div>
-                    <div className="suit-card-copy">
-                      <p className="product-brand">{product.brand}</p>
-                      <h3 className="product-title">
+                    <div className="suit-card-body">
+                      <div className="suit-card-topbar">
+                        <div className="suit-badges">
+                          <span className="match-score">
+                            {scored ? `${product.matchPercent}% match` : "Great match"}
+                          </span>
+                        </div>
                         <button
-                          className="product-choose"
+                          className="suit-details-link"
                           type="button"
-                          aria-pressed={isSummarySuit}
-                          onClick={() => selectSuit(product)}
+                          onClick={() => onViewDetails?.(product.id, shown?.colorKey)}
                         >
-                          {product.name}
+                          View more details
                         </button>
-                      </h3>
-                      <ul className="match-chips">
-                        {matchChips(product, shown, answers).map((chip) => (
-                          <li key={chip}>{chip}</li>
-                        ))}
-                      </ul>
-                      {renting && (
-                        <p className="product-meta">{RENTAL_TYPE_NAMES[product.type]} · Sizes confirmed at your fitting</p>
-                      )}
-                      {product.rating != null && (
-                        <p className="product-rating suit-rating">
-                          <svg className="star is-on" viewBox="0 0 20 20" aria-hidden="true">
-                            <path d="M10 1.6 12.5 7l5.9.6-4.4 3.9 1.3 5.8L10 14.6 4.7 17.3 6 11.5 1.6 7.6 7.5 7 10 1.6z" />
-                          </svg>
-                          <span>{product.rating.toFixed(1)} ({product.reviews.toLocaleString("en-US")})</span>
-                        </p>
-                      )}
-                    </div>
-                    <div className="suit-card-actions">
-                      <div className="suit-card-meta">
-                        {options.length > 0 && (
-                          <div className="color-swatches" role="group" aria-label="Colors">
-                            {options.map((option, optionIndex) => (
-                              <button
-                                key={option.color}
-                                type="button"
-                                className={optionIndex === variantIndex ? "color-swatch is-selected" : "color-swatch"}
-                                aria-label={optionIndex === variantIndex ? `${option.color}, selected` : option.color}
-                                aria-pressed={optionIndex === variantIndex}
-                                onClick={() => chooseVariant(product, optionIndex)}
-                              >
-                                <span style={{ background: SWATCH_HEX[option.colorKey] ?? "#888" }} />
-                              </button>
-                            ))}
-                          </div>
-                        )}
-                        {shown?.color && <span className="suit-color-label">{shown.color}</span>}
-                        <div className="suit-price-block">
-                          <p className="suit-price">
-                            <strong>{formatPrice(product.price)}</strong>
-                            {product.compareAt && <s>{formatPrice(product.compareAt)}</s>}
-                          </p>
-                          {product.compareAt && (
-                            <p className="suit-clearance">
-                              Clearance
-                              <span className="suit-save">Save {formatPrice(product.compareAt - product.price)}</span>
+                      </div>
+                      <div className="suit-card-info">
+                        <div className="suit-card-copy">
+                          {options.length > 0 && (
+                            <div className="color-swatches" role="group" aria-label="Colors">
+                              {options.map((option, optionIndex) => (
+                                <button
+                                  key={`${option.colorKey}-${optionIndex}`}
+                                  type="button"
+                                  className={optionIndex === variantIndex ? "color-swatch is-selected" : "color-swatch"}
+                                  aria-label={optionIndex === variantIndex ? `${option.color}, selected` : option.color}
+                                  aria-pressed={optionIndex === variantIndex}
+                                  onClick={() => chooseVariant(product, optionIndex)}
+                                >
+                                  <span style={{ background: SWATCH_HEX[option.colorKey] ?? "#888" }} />
+                                </button>
+                              ))}
+                            </div>
+                          )}
+                          <p className="product-brand">{product.brand}</p>
+                          <h3 className="product-title">{product.name}</h3>
+                          {renting && (
+                            <p className="product-meta">{RENTAL_TYPE_NAMES[product.type]} · Sizes confirmed at your fitting</p>
+                          )}
+                          {product.rating != null && (
+                            <p className="product-rating suit-rating">
+                              <svg className="star is-on" viewBox="0 0 20 20" aria-hidden="true">
+                                <path d="M10 1.6 12.5 7l5.9.6-4.4 3.9 1.3 5.8L10 14.6 4.7 17.3 6 11.5 1.6 7.6 7.5 7 10 1.6z" />
+                              </svg>
+                              <span>{product.rating.toFixed(1)} ({product.reviews.toLocaleString("en-US")})</span>
                             </p>
                           )}
                         </div>
+                        <div className="suit-price-col">
+                          <div className="suit-price-stack">
+                            <p className="suit-price">
+                              <strong>{formatPrice(product.price)}</strong>
+                              {product.compareAt && <s>{formatPrice(product.compareAt)}</s>}
+                            </p>
+                            {product.compareAt && <p className="suit-clearance">Clearance</p>}
+                          </div>
+                          <button
+                            className="suit-expand-toggle"
+                            type="button"
+                            aria-expanded={open}
+                            aria-controls={`suit-expand-${product.id}`}
+                            aria-label={open ? `Hide options for ${product.name}` : `Show options for ${product.name}`}
+                            onClick={() => toggleCard(product)}
+                          >
+                            <ChevronIcon open={open} />
+                          </button>
+                        </div>
                       </div>
-                      <button className={`button suit-options${isSummarySuit ? "" : " secondary"}`} type="button" aria-pressed={isSummarySuit} onClick={() => selectSuit(product)}>
-                        {isSummarySuit && <CheckIcon />}
-                        {isSummarySuit
-                          ? (renting ? "Viewing this look" : "Viewing options")
-                          : (renting ? "Choose this look" : "Choose suit options")}
-                      </button>
                     </div>
                   </div>
-                  {detailsOpen && (
-                      <div className="suit-details" id={`details-${product.id}`}>
-                        {checks.length > 0 && (
-                          <div className="match-why">
-                            <p className="why-label">{renting ? "Why this look" : "Why this suit"}</p>
-                            <ul className="why-list">
-                              {checks.map((line) => (
-                                <li key={line}>{line}</li>
-                              ))}
-                            </ul>
-                          </div>
-                        )}
-                        {product.matchPercent != null && product.matchPercent < 80 && (
-                          <p className="match-reason">
-                            {product.tradeoffs?.length
-                              ? product.tradeoffs.join(" ")
-                              : "A partial match. It lines up on some of your answers, not every one."}
-                          </p>
-                        )}
-                        <button
-                          className="button link try-on-link"
-                          type="button"
-                          onClick={() => setHandoff(`tryon:${product.id}`)}
-                        >
-                          Try it on
-                        </button>
-                        {handoff === `tryon:${product.id}` && (
-                          <p className="handoff-inline" role="status">Prototype: this would open nearby stores with this suit in your size.</p>
-                        )}
-                      </div>
-                    )}
+                  {open && <div className="suit-expand" id={`suit-expand-${product.id}`} />}
                 </div>
-                </div>
-                {narrow && isSummarySuit && optionsRail}
               </article>
             );
           })}
@@ -1051,12 +1125,8 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
                   setExpanded(true);
                 }}
               >
-                {expanded ? "View less" : `View more matches (${Math.min(6, recommendations.length - 3)})`}
-                {!expanded && (
-                  <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true">
-                    <path fill="currentColor" d="M9.3 6.3 14.9 12l-5.6 5.7 1.4 1.4L17.7 12 10.7 4.9z" />
-                  </svg>
-                )}
+                {expanded ? "View less" : "View more products"}
+                {!expanded && <PlusIcon />}
               </button>
             )}
             {moreMode === "link" && !renting && (
@@ -1065,7 +1135,7 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
               </button>
             )}
           </div>
-          {!narrow && optionsRail}
+          {orderSummary}
         </div>
 
         <FitProfile
@@ -1137,137 +1207,6 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
         </div>
       )}
 
-      <div className="summary-dock">
-        {summaryOpen && (
-          <div className="summary-panel" id="summary-panel" role="region" aria-labelledby="summary-title">
-            <div className="summary-panel-head">
-              <h2 id="summary-title">{renting ? "Rental summary" : "Order summary"}</h2>
-              <button className="text-link" type="button" onClick={() => setSummaryOpen(false)}>Close</button>
-            </div>
-              {!selected && (
-                <p className="summary-empty">
-                  {renting ? "Select a look to see what's included." : "Select a suit to see your total."}
-                </p>
-              )}
-              {selected && renting && (
-                <>
-                  <p className="summary-suit">{selected.brand} {selected.name}</p>
-                  <ul className="summary-lines">
-                    <li><span>Jacket and pants</span></li>
-                    {pieces.map((piece) => (
-                      <li key={piece.id}>
-                        <span>{piece.label}</span>
-                      </li>
-                    ))}
-                  </ul>
-                  <p className="summary-note summary-price-note">
-                    Sizes are confirmed at your fitting.
-                    {dates && !dates.past ? ` Ready ${formatDate(dates.ready)}, return by ${formatDate(dates.returnBy)}.` : ""}
-                  </p>
-                </>
-              )}
-              {selected && !renting && (
-                <>
-                  {savings > 0 && <p className="promo-strip">Sale price applied: you save {formatPrice(savings)}</p>}
-                  <p className="summary-suit">{selected.brand} {selected.name}</p>
-                  <ul className="summary-lines">
-                    <li>
-                      <span>Jacket{size.jacket ? ` · ${String(size.jacket).replace(/[SRL]$/i, "")} ${(size.length || "Regular").toLowerCase()}` : size.length ? ` · ${size.length.toLowerCase()} length` : ""}</span>
-                      <span className="summary-amount">
-                        {selected.jacket.compareAt && <s>{formatPrice(selected.jacket.compareAt)}</s>}
-                        {formatPrice(selected.jacket.price)}
-                      </span>
-                    </li>
-                    <li>
-                      <span>Pants{size.pants ? ` · ${String(size.pants).replace(/W$/i, "")}-inch waist` : ""}</span>
-                      <span className="summary-amount">
-                        {selected.pants.compareAt && <s>{formatPrice(selected.pants.compareAt)}</s>}
-                        {formatPrice(selected.pants.price)}
-                      </span>
-                    </li>
-                    {tailoring && (
-                      <li>
-                        <span>{tailoring.name}</span>
-                        <span className="summary-amount">{tailoring.price ? formatPrice(tailoring.price) : "Included"}</span>
-                      </li>
-                    )}
-                    {addedItems.map((item) => {
-                      const selection = addedLooks[item.id];
-                      const qty = selection?.quantity || 1;
-                      const services = serviceLabels(item, selection?.services);
-                      return (
-                        <li key={item.id}>
-                          <span>
-                            {item.name} · {selection?.color || item.color}
-                            {selection?.size ? ` · ${selection.size}` : ""}
-                            {` · Qty ${qty}`}
-                            {services.length ? ` · ${services.join(", ")}` : ""}
-                          </span>
-                          <span className="summary-line-actions">
-                            <span className="summary-amount">{formatPrice(item.price * qty)}</span>
-                            <button className="text-link" type="button" onClick={() => removeLook(item.id)}>
-                              Remove<span className="visually-hidden"> {item.name}</span>
-                            </button>
-                          </span>
-                        </li>
-                      );
-                    })}
-                  </ul>
-                  <ul className="summary-lines summary-totals">
-                    <li><span>Subtotal ({itemCount} {itemCount === 1 ? "item" : "items"})</span><span className="summary-amount">{formatPrice(subtotal)}</span></li>
-                    {savings > 0 && (
-                      <li className="summary-promo"><span>Suit sale</span><span className="summary-amount">-{formatPrice(savings)}</span></li>
-                    )}
-                    <li className="summary-grand"><span>Grand total</span><span className="summary-amount">{formatPrice(total)}</span></li>
-                  </ul>
-                  <p className="summary-note summary-price-note">Shipping and tax calculated at checkout.</p>
-                  {tailoring && <p className="summary-note summary-price-note">Tailoring is finished in store after checkout.</p>}
-                </>
-              )}
-            {handoff === "checkout" && (
-              <p className="handoff-inline" role="status">{checkoutNote}</p>
-            )}
-          </div>
-        )}
-        <div className="summary-bar">
-          <div className="summary-bar-info">
-            <p className="summary-bar-name">{selected ? `${selected.brand} ${selected.name}` : renting ? "Select a look" : "Select a suit"}</p>
-            {selected && !renting && (
-              <p className="summary-bar-breakdown">
-                {`Suit ${formatPrice(selected.price)} + ${tailoring?.price ? `${tailoring.name} ${formatPrice(tailoring.price)}` : (tailoring?.name ?? "No tailoring")} + ${addedQty} ${addedQty === 1 ? "add-on" : "add-ons"}`}
-              </p>
-            )}
-          </div>
-          <div className="summary-bar-end">
-            <button
-              className="text-link summary-bar-toggle"
-              type="button"
-              aria-expanded={summaryOpen}
-              aria-controls="summary-panel"
-              onClick={() => setSummaryOpen((value) => !value)}
-            >
-              {summaryOpen ? "Hide summary" : "View summary"}
-            </button>
-            {barTotal != null && (
-              <p className="summary-bar-total" aria-live="polite">
-                <span>Total</span>
-                <strong>{formatPrice(barTotal)}</strong>
-              </p>
-            )}
-          </div>
-          <button
-            className="button summary-bar-cta"
-            type="button"
-            disabled={!selected}
-            onClick={() => {
-              setHandoff("checkout");
-              setSummaryOpen(true);
-            }}
-          >
-            {renting ? "Reserve this look" : "Add to cart"}
-          </button>
-        </div>
-      </div>
       {quickViewItem && (
         <QuickView
           key={quickViewItem.id}
