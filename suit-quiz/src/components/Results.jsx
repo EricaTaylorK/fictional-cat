@@ -218,9 +218,56 @@ function ChevronIcon({ open = false }) {
 
 function PlusIcon() {
   return (
-    <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true">
-      <path fill="currentColor" d="M11.4 5h1.2v6.4H19v1.2h-6.4V19h-1.2v-6.4H5v-1.2h6.4V5Z" />
+    <svg className="more-matches-plus" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true">
+      <rect x="5" y="11" width="14" height="2" fill="#3A3A3A" />
+      <rect x="11" y="5" width="2" height="14" fill="#3A3A3A" />
     </svg>
+  );
+}
+
+function MatchRing({ percent }) {
+  const scored = Number.isFinite(percent);
+  const turn = scored ? Math.max(0, Math.min(100, percent)) : 0;
+  const radius = 51;
+  const circumference = 2 * Math.PI * radius;
+  const dash = turn >= 100 ? circumference + 1 : (turn / 100) * circumference;
+  return (
+    <div className="match-ring" aria-hidden="true">
+      <svg className="match-ring-art" viewBox="0 0 178 178" width="170" height="171">
+        <defs>
+          <filter id="match-ring-shadow" x="-40%" y="-40%" width="180%" height="180%" colorInterpolationFilters="sRGB">
+            <feDropShadow dx="0" dy="0" stdDeviation="0.5" floodColor="#000000" floodOpacity="0.1" />
+            <feDropShadow dx="0" dy="2" stdDeviation="1" floodColor="#000000" floodOpacity="0.1" />
+          </filter>
+        </defs>
+        <g className="match-ring-track" opacity="0.8">
+          <circle cx="89" cy="89" r={radius} fill="none" stroke="#D9D9D9" strokeWidth="18" />
+        </g>
+        {turn > 0 && (
+          <circle
+            cx="89"
+            cy="89"
+            r={radius}
+            fill="none"
+            stroke="#046DE9"
+            strokeWidth="18"
+            strokeDasharray={`${dash} ${circumference}`}
+            transform="rotate(-90 89 89)"
+            filter="url(#match-ring-shadow)"
+          />
+        )}
+      </svg>
+      <div className="match-ring-copy">
+        {scored ? (
+          <>
+            <span className="match-ring-value">{percent}%</span>
+            <span className="match-ring-label">Match</span>
+          </>
+        ) : (
+          <span className="match-ring-label">Great match</span>
+        )}
+      </div>
+    </div>
   );
 }
 
@@ -959,22 +1006,7 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
             </div>
           </div>
           <div className="results-hero-headline">
-            <div
-              className="match-ring"
-              style={{ "--match-turn": `${ringPercent ?? 100}%` }}
-              aria-hidden="true"
-            >
-              <div className="match-ring-hole">
-                {ringPercent != null ? (
-                  <>
-                    <span className="match-ring-value">{ringPercent}%</span>
-                    <span className="match-ring-label">Match</span>
-                  </>
-                ) : (
-                  <span className="match-ring-label">Great match</span>
-                )}
-              </div>
-            </div>
+            <MatchRing percent={ringPercent} />
             <div className="results-hero-copy">
               <h1 id="results-title">We found your best matches!</h1>
               <p className="results-lede">{lede}</p>
@@ -1049,7 +1081,7 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
                           type="button"
                           onClick={() => onViewDetails?.(product.id, shown?.colorKey)}
                         >
-                          View more details
+                          View More Details
                         </button>
                       </div>
                       <div className="suit-card-info">
@@ -1070,8 +1102,10 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
                               ))}
                             </div>
                           )}
-                          <p className="product-brand">{product.brand}</p>
-                          <h3 className="product-title">{product.name}</h3>
+                          <div className="suit-card-names">
+                            <p className="product-brand">{product.brand}</p>
+                            <h3 className="product-title">{product.name}</h3>
+                          </div>
                           {renting && (
                             <p className="product-meta">{RENTAL_TYPE_NAMES[product.type]} · Sizes confirmed at your fitting</p>
                           )}
@@ -1113,21 +1147,23 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
           })}
 
             {moreMode === "toggle" && recommendations.length > 3 && (
-              <button
-                className="text-link more-matches"
-                type="button"
-                onClick={() => {
-                  if (expanded) {
-                    setExpanded(false);
-                    return;
-                  }
-                  focusNewCard.current = true;
-                  setExpanded(true);
-                }}
-              >
-                {expanded ? "View less" : "View more products"}
-                {!expanded && <PlusIcon />}
-              </button>
+              <div className="more-matches-row">
+                <button
+                  className={`more-matches${expanded ? " is-less" : ""}`}
+                  type="button"
+                  onClick={() => {
+                    if (expanded) {
+                      setExpanded(false);
+                      return;
+                    }
+                    focusNewCard.current = true;
+                    setExpanded(true);
+                  }}
+                >
+                  <span className="more-matches-label">{expanded ? "View less" : "View more products"}</span>
+                  {!expanded && <PlusIcon />}
+                </button>
+              </div>
             )}
             {moreMode === "link" && !renting && (
               <button className="more-matches" type="button" onClick={onSeeAll}>
