@@ -10,6 +10,27 @@ import { formatDate, quizCatalogIds, quizListingFilters, rentalDates } from "./l
 
 const STORAGE_KEY = "suit-quiz-wireframe-progress";
 
+function linkedProduct(search = window.location.search) {
+  const params = new URLSearchParams(search);
+  const productId = params.get("product");
+  if (!productId) return null;
+  return {
+    productId,
+    productColorKey: params.get("color"),
+  };
+}
+
+function openLinkedProduct(state, search) {
+  const linked = linkedProduct(search);
+  if (!linked) return state;
+  return {
+    ...state,
+    screen: "product",
+    productId: linked.productId,
+    productColorKey: linked.productColorKey,
+  };
+}
+
 function loadProgress() {
   try {
     const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
@@ -21,14 +42,14 @@ function loadProgress() {
         ? next.place
         : (next.screen === "start" || next.screen === "matches" ? "sale" : "home");
       if (next.currentId === "rentalBudget" && next.screen === "question") {
-        return { ...next, place, screen: "matching" };
+        return openLinkedProduct({ ...next, place, screen: "matching" });
       }
-      return { ...next, place };
+      return openLinkedProduct({ ...next, place });
     }
   } catch {
     // Ignore malformed or unavailable local storage.
   }
-  return { screen: "home", currentId: "mode", answers: {}, place: "home" };
+  return openLinkedProduct({ screen: "home", currentId: "mode", answers: {}, place: "home" });
 }
 
 function leaveQuiz(previous) {
@@ -628,12 +649,11 @@ export default function App() {
   }, []);
 
   function openProduct(productId, colorKey) {
-    setState((previous) => ({
-      ...previous,
-      screen: "product",
-      productId,
-      productColorKey: colorKey ?? null,
-    }));
+    const url = new URL(window.location.href);
+    url.searchParams.set("product", productId);
+    if (colorKey) url.searchParams.set("color", colorKey);
+    else url.searchParams.delete("color");
+    window.open(url.toString(), "_blank", "noopener,noreferrer");
   }
 
   function backToResults() {
