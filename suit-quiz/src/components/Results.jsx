@@ -196,6 +196,38 @@ function sizesForLookItem(item) {
   return ["One size"];
 }
 
+const LOOK_COLOR_KEYS = {
+  shirt: ["white", "blue", "navy"],
+  tie: ["burgundy", "navy", "blue", "black"],
+  shoe: ["black", "brown", "burgundy"],
+};
+
+const LOOK_COLOR_LABELS = {
+  white: "White",
+  blue: "Blue",
+  navy: "Navy",
+  burgundy: "Burgundy",
+  black: "Black",
+  brown: "Brown",
+};
+
+function colorChoicesForLookItem(item) {
+  const kind = lookKind(item);
+  const keys = kind.includes("shirt")
+    ? LOOK_COLOR_KEYS.shirt
+    : kind.includes("tie")
+      ? LOOK_COLOR_KEYS.tie
+      : LOOK_COLOR_KEYS.shoe;
+  const choices = keys.map((colorKey) => ({
+    colorKey,
+    color: LOOK_COLOR_LABELS[colorKey] || colorKey,
+  }));
+  if (item.colorKey && !choices.some((choice) => choice.colorKey === item.colorKey)) {
+    choices.unshift({ colorKey: item.colorKey, color: item.color || item.colorKey });
+  }
+  return choices;
+}
+
 function servicesForLookItem(item) {
   return lookKind(item).includes("shirt") ? SHIRT_SERVICES : [];
 }
@@ -422,8 +454,12 @@ function SuitOptions({ tailoringId, onTailoring, look, addedLooks, onOpenLook })
           </div>
           <div className="pair-row">
             {items.map((item) => {
-              const added = Boolean(addedLooks[item.id]);
+              const selection = addedLooks[item.id];
+              const added = Boolean(selection);
               const title = lookPieceTitle(item);
+              const pickedColor = selection?.color || item.color;
+              const pickedSize = selection?.size || "";
+              const pickedQty = selection?.quantity || 1;
               return (
                 <article className={`pair-card${added ? " is-on" : ""}`} key={item.id}>
                   <div className="pair-photo">
@@ -432,7 +468,7 @@ function SuitOptions({ tailoringId, onTailoring, look, addedLooks, onOpenLook })
                       className={`card-plus pair-add${added ? " is-on" : ""}`}
                       type="button"
                       aria-pressed={added}
-                      aria-label={added ? `${title} added. View details` : `Add ${title}`}
+                      aria-label={added ? `${title} added. Edit` : `Add ${title}`}
                       onClick={(event) => onOpenLook(item, event)}
                     >
                       {added ? (
@@ -450,6 +486,14 @@ function SuitOptions({ tailoringId, onTailoring, look, addedLooks, onOpenLook })
                     <span className="pair-brand">{lookPieceBrand(item)}</span>
                     <span className="pair-name">{title}</span>
                     <span className="pair-price">{formatPrice(item.price)}</span>
+                    {added && (
+                      <p className="pair-picked">
+                        <span>{`Qty: ${pickedQty} · ${pickedSize} · ${pickedColor}`}</span>
+                        <button type="button" className="pair-edit" onClick={(event) => onOpenLook(item, event)}>
+                          Edit
+                        </button>
+                      </p>
+                    )}
                   </div>
                 </article>
               );
@@ -687,8 +731,8 @@ function QuickView({ item, initial, suggestedSize = "", onConfirm, onClose }) {
   const dialogRef = useRef(null);
   const sizes = sizesForLookItem(item);
   const services = servicesForLookItem(item);
-  const colorChoices = Array.isArray(item.colors) && item.colors.length > 1 ? item.colors : null;
-  const [size, setSize] = useState(initial?.size || suggestedSize || "");
+  const colorChoices = colorChoicesForLookItem(item);
+  const [size, setSize] = useState(initial?.size || suggestedSize || sizes[0] || "");
   const [quantity, setQuantity] = useState(initial?.quantity ?? 1);
   const [serviceIds, setServiceIds] = useState(initial?.services ?? []);
   const [colorKey, setColorKey] = useState(initial?.colorKey ?? item.colorKey ?? "");
@@ -726,10 +770,6 @@ function QuickView({ item, initial, suggestedSize = "", onConfirm, onClose }) {
     return () => document.removeEventListener("keydown", onKey);
   }, [onClose]);
 
-  function toggleValue(current, value) {
-    return current === value ? "" : value;
-  }
-
   return (
     <div className="quick-view-backdrop" onClick={onClose}>
       <div
@@ -744,121 +784,106 @@ function QuickView({ item, initial, suggestedSize = "", onConfirm, onClose }) {
         <div className="quick-view-media">
           {item.image || item.icon ? <img src={item.image || item.icon} alt="" /> : <span className="quick-view-media-empty" aria-hidden="true" />}
         </div>
-        <div className="quick-view-info">
-          <p className="quick-view-brand">{lookPieceBrand(item)}</p>
-          <h2 id="quick-view-title">{lookPieceTitle(item)}</h2>
-          {item.rating != null && (
-            <p className="quick-view-rating">
-              <span className="stars" aria-hidden="true">
-                {[1, 2, 3, 4, 5].map((star) => (
-                  <svg key={star} className={star <= Math.round(item.rating) ? "star is-on" : "star"} viewBox="0 0 20 20">
-                    <path d="M10 1.6 12.5 7l5.9.6-4.4 3.9 1.3 5.8L10 14.6 4.7 17.3 6 11.5 1.6 7.6 7.5 7 10 1.6z" />
-                  </svg>
-                ))}
-              </span>
-              <span>{Number(item.rating).toFixed(1)}{item.reviews ? ` (${Number(item.reviews).toLocaleString("en-US")})` : ""}</span>
-            </p>
-          )}
-          <p className="quick-view-price">{formatPrice(item.price)}</p>
-        </div>
-        <div className="quick-view-field">
-          <p className="quick-view-label" id="quick-view-color-label">Color</p>
-          {colorChoices ? (
-            <div className="color-swatches quick-view-swatches" role="group" aria-labelledby="quick-view-color-label">
+        <div className="quick-view-details">
+          <div className="quick-view-info">
+            <p className="quick-view-brand">{lookPieceBrand(item)}</p>
+            <h2 id="quick-view-title">{lookPieceTitle(item)}</h2>
+            <p className="quick-view-price">{formatPrice(item.price)}</p>
+          </div>
+          <div className="quick-view-field">
+            <p className="quick-view-label" id="quick-view-color-label">Color</p>
+            <div className="quick-view-swatches" role="group" aria-labelledby="quick-view-color-label">
               {colorChoices.map((choice) => {
-                const selected = choice.colorKey === colorKey;
+                const selected = choice.colorKey === (colorKey || item.colorKey);
                 return (
                   <button
                     key={choice.colorKey}
                     type="button"
-                    className={selected ? "color-swatch is-selected" : "color-swatch"}
+                    className={selected ? "quick-view-swatch is-selected" : "quick-view-swatch"}
                     aria-pressed={selected}
                     aria-label={choice.color}
-                    onClick={() => setColorKey((current) => toggleValue(current, choice.colorKey))}
+                    onClick={() => setColorKey(choice.colorKey)}
                   >
                     <span style={{ background: SWATCH_HEX[choice.colorKey] ?? "#888" }} />
                   </button>
                 );
               })}
             </div>
-          ) : (
-            <p className="quick-view-value">{item.color}</p>
-          )}
-        </div>
-        <div className="quick-view-field">
-          <p className="quick-view-label" id="quick-view-size-label">Size</p>
-          <div className="quick-view-choices" role="group" aria-labelledby="quick-view-size-label">
-            {sizes.map((option) => {
-              const selected = option === size;
-              return (
-                <button
-                  key={option}
-                  type="button"
-                  className={selected ? "quick-view-choice is-selected" : "quick-view-choice"}
-                  aria-pressed={selected}
-                  onClick={() => setSize((current) => toggleValue(current, option))}
-                >
-                  {option}
-                </button>
-              );
-            })}
           </div>
-        </div>
-        {services.length > 0 && (
           <div className="quick-view-field">
-            <p className="quick-view-label" id="quick-view-service-label">Services</p>
-            <div className="quick-view-choices" role="group" aria-labelledby="quick-view-service-label">
-              {services.map((service) => {
-                const selected = serviceIds.includes(service.id);
+            <p className="quick-view-label" id="quick-view-size-label">Size</p>
+            <div className="quick-view-choices" role="group" aria-labelledby="quick-view-size-label">
+              {sizes.map((option) => {
+                const selected = option === size;
                 return (
                   <button
-                    key={service.id}
+                    key={option}
                     type="button"
                     className={selected ? "quick-view-choice is-selected" : "quick-view-choice"}
                     aria-pressed={selected}
-                    onClick={() => setServiceIds((current) => (
-                      current.includes(service.id)
-                        ? current.filter((id) => id !== service.id)
-                        : [...current, service.id]
-                    ))}
+                    onClick={() => setSize(option)}
                   >
-                    {service.label}
+                    {option}
                   </button>
                 );
               })}
             </div>
-            <p className="quick-view-note">Optional. No charge added here.</p>
           </div>
-        )}
-        <label className="quick-view-qty" htmlFor="quick-view-qty">
-          <span className="quick-view-label">Quantity</span>
-          <select
-            id="quick-view-qty"
-            value={quantity}
-            onChange={(event) => setQuantity(Number(event.target.value))}
-          >
-            {[1, 2, 3].map((qty) => (
-              <option key={qty} value={qty}>{qty}</option>
-            ))}
-          </select>
-        </label>
-        <button
-          className="button quick-view-add"
-          type="button"
-          disabled={alreadyAdded}
-          onClick={() => {
-            if (alreadyAdded) return;
-            onConfirm({
-              size: size || suggestedSize || sizes[0] || "",
-              quantity,
-              services: serviceIds,
-              colorKey: colorKey || item.colorKey,
-              color: shownColor,
-            });
-          }}
-        >
-          {alreadyAdded ? "Added" : "Add to look"}
-        </button>
+          {services.length > 0 && (
+            <div className="quick-view-field">
+              <p className="quick-view-label" id="quick-view-service-label">Services</p>
+              <div className="quick-view-choices" role="group" aria-labelledby="quick-view-service-label">
+                {services.map((service) => {
+                  const selected = serviceIds.includes(service.id);
+                  return (
+                    <button
+                      key={service.id}
+                      type="button"
+                      className={selected ? "quick-view-choice is-selected" : "quick-view-choice"}
+                      aria-pressed={selected}
+                      onClick={() => setServiceIds((current) => (
+                        current.includes(service.id)
+                          ? current.filter((id) => id !== service.id)
+                          : [...current, service.id]
+                      ))}
+                    >
+                      {service.label}
+                    </button>
+                  );
+                })}
+              </div>
+              <p className="quick-view-note">Optional. No charge added here.</p>
+            </div>
+          )}
+          <div className="quick-view-buy">
+            <select
+              id="quick-view-qty"
+              className="quick-view-qty"
+              aria-label="Quantity"
+              value={quantity}
+              onChange={(event) => setQuantity(Number(event.target.value))}
+            >
+              {[1, 2, 3].map((qty) => (
+                <option key={qty} value={qty}>{qty}</option>
+              ))}
+            </select>
+            <button
+              className="button quick-view-add"
+              type="button"
+              onClick={() => {
+                onConfirm({
+                  size: size || suggestedSize || sizes[0] || "",
+                  quantity,
+                  services: serviceIds,
+                  colorKey: colorKey || item.colorKey,
+                  color: shownColor,
+                });
+              }}
+            >
+              {alreadyAdded ? "Update" : "Add to look"}
+            </button>
+          </div>
+        </div>
         <button className="quick-view-close" type="button" aria-label="Close" onClick={onClose}>
           ×
         </button>
