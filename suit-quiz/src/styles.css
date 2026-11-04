@@ -5722,6 +5722,7 @@ h2 {
 
 .tailor-card p {
   flex: 1 1 auto;
+  margin-top: -8px;
 }
 
 .tailor-card strong,
@@ -5758,12 +5759,13 @@ h2 {
 }
 
 .pair-card {
-  background: transparent;
+  background: #fff;
   border: 1px solid rgba(0, 0, 0, 0.1);
   border-radius: 6px;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
+  height: auto;
   min-width: 0;
   overflow: hidden;
   padding: 0;
@@ -5772,11 +5774,11 @@ h2 {
 
 .pair-photo {
   align-items: center;
-  aspect-ratio: 1 / 1.08;
+  aspect-ratio: 1 / 1;
   background: #e6e6e6;
   display: flex;
+  flex: 0 0 auto;
   justify-content: center;
-  min-height: 160px;
   position: relative;
 }
 
@@ -5787,28 +5789,21 @@ h2 {
 }
 
 .pair-copy {
-  background: #111;
+  background: #fff;
   display: flex;
+  flex: 0 0 auto;
   flex-direction: column;
   gap: 12px;
   min-width: 0;
   padding: 16px;
 }
 
-.pair-brand {
-  color: #c8c8c8;
-}
-
 .pair-name {
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
-  color: #fff;
   display: -webkit-box;
+  margin-top: -8px;
   overflow: hidden;
-}
-
-.pair-price {
-  color: #fff;
 }
 
 .expand-rent-note {
@@ -6003,7 +5998,7 @@ h2 {
 }
 
 .results-layout .fit-band {
-  align-items: flex-start;
+  align-items: center;
   box-sizing: border-box;
   display: flex;
   gap: 64px;
@@ -6036,7 +6031,6 @@ h2 {
 
 .results-layout .fit-save {
   flex: 0 1 480px;
-  margin-top: 40px;
   max-width: 480px;
   width: 436px;
 }
