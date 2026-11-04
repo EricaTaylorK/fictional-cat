@@ -6,6 +6,7 @@ import {
 } from "../data/products.js";
 import { colorsIn, occasionOptions, questions, resolvedOccasion } from "../data/quizConfig.js";
 import { RENTAL_PACKAGES, RENTAL_STEPS, RENTAL_TYPE_NAMES } from "../data/rentals.js";
+import { lookTotals } from "../lib/lookSummary.js";
 import {
   buildResultSummary,
   formatDate,
@@ -960,7 +961,13 @@ function CompleteLook({ id, look, suitColor, suitName, addedLooks, onOpen, onRem
                     else onOpen(item, event);
                   }}
                 >
-                  <span className="look-check-box" aria-hidden="true">{added && <CheckIcon />}</span>
+                  <span className="look-check-box" aria-hidden="true">
+                    {added ? <CheckIcon /> : (
+                      <svg viewBox="0 0 14 14" width="14" height="14" aria-hidden="true">
+                        <path fill="currentColor" d="M6 1h2v5h5v2H8v5H6V8H1V6h5V1Z" />
+                      </svg>
+                    )}
+                  </span>
                 </button>
               </div>
             </li>
@@ -1019,6 +1026,352 @@ function FitProfile({ answers, renting, size, fitName, onEditAnswers, onAccount,
         {accountStatus && <p className="handoff-inline" role="status">{accountStatus}</p>}
       </div>
     </section>
+  );
+}
+
+function exactPrice(amount) {
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(amount);
+}
+
+function pushLook(payload) {
+  window.dataLayer = window.dataLayer || [];
+  window.dataLayer.push(payload);
+}
+
+function lookBagShouldFail() {
+  return window.__SUIT_LOOK_FAIL === true || new URLSearchParams(window.location.search).get("bag") === "fail";
+}
+
+function CirclePlus() {
+  return (
+    <svg viewBox="0 0 14 14" width="14" height="14" aria-hidden="true">
+      <path fill="currentColor" d="M6 1h2v5h5v2H8v5H6V8H1V6h5V1Z" />
+    </svg>
+  );
+}
+
+function RemoveMark() {
+  return (
+    <svg viewBox="0 0 14 14" width="14" height="14" aria-hidden="true">
+      <path fill="currentColor" d="M2 2.8 2.8 2 7 6.2 11.2 2l.8.8L7.8 7 12 11.2l-.8.8L7 7.8 2.8 12 2 11.2 6.2 7 2 2.8Z" />
+    </svg>
+  );
+}
+
+function WarningMark() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
+      <path fill="currentColor" d="M12 3.2 1.8 21h20.4L12 3.2Zm1 13.3h-2v-2h2v2Zm0-3.5h-2v-5h2v5Z" />
+    </svg>
+  );
+}
+
+function TagMark() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true">
+      <path fill="currentColor" d="M21.4 13.1 12.9 4.6A2 2 0 0 0 11.5 4H5a1 1 0 0 0-1 1v6.5c0 .5.2 1 .6 1.4l8.5 8.5a2 2 0 0 0 2.8 0l5.5-5.5a2 2 0 0 0 0-2.8ZM7.5 8.5A1.5 1.5 0 1 1 9 7a1.5 1.5 0 0 1-1.5 1.5Z" />
+    </svg>
+  );
+}
+
+function YourLook({ suit, image, size, tailoringId, onTailoring, items, addedLooks, onOpenLook, onRemoveLook }) {
+  const [sheetOpen, setSheetOpen] = useState(false);
+  const [bagStatus, setBagStatus] = useState("idle");
+  const [flash, setFlash] = useState(false);
+  const bagTimer = useRef(null);
+  const viewedSuit = useRef(null);
+  const promoState = useRef({ suitId: null, earned: null, nudge: null });
+  const sizesTracked = useRef(null);
+  const lastTotal = useRef(null);
+  const selectedPackage = CARD_TAILORING.find((item) => item.id === tailoringId) ?? null;
+  const recommended = CARD_TAILORING.find((item) => item.id === "signature") ?? CARD_TAILORING.find((item) => item.recommended);
+  const tailoringOn = Boolean(selectedPackage);
+  const shownTailoring = selectedPackage ?? recommended;
+  const rows = (items ?? []).map((item) => ({
+    ...item,
+    added: Boolean(addedLooks[item.id]),
+    quantity: addedLooks[item.id]?.quantity || 1,
+  }));
+  const totals = lookTotals({
+    suitPrice: suit?.price ?? 0,
+    tailoringPrice: tailoringOn ? shownTailoring?.price ?? 0 : 0,
+    items: rows.map((item) => ({
+      type: item.type,
+      price: item.price,
+      quantity: item.quantity,
+      added: item.added,
+    })),
+    hasJacketSize: Boolean(size?.jacket),
+    hasPantsSize: Boolean(size?.pants),
+  });
+  const pantsLabel = size?.pants
+    ? (String(size.pants).toUpperCase().endsWith("W") ? size.pants : `${size.pants}W`)
+    : "";
+  const sizeLabel = size?.jacket && pantsLabel ? `Jacket ${size.jacket} · Pants ${pantsLabel}` : "";
+  const countLabel = `${totals.itemCount} ${totals.itemCount === 1 ? "item" : "items"}`;
+  const context = { suitId: suit?.id ?? null, itemCount: totals.itemCount, total: totals.total };
+
+  useEffect(() => () => window.clearTimeout(bagTimer.current), []);
+
+  useEffect(() => {
+    setBagStatus("idle");
+    setSheetOpen(false);
+    return () => window.clearTimeout(bagTimer.current);
+  }, [suit?.id]);
+
+  useEffect(() => {
+    if (!suit?.id || viewedSuit.current === suit.id) return;
+    viewedSuit.current = suit.id;
+    pushLook({ event: "order_summary_viewed", suitId: suit.id, itemCount: totals.itemCount, total: totals.total });
+  }, [suit?.id, totals.itemCount, totals.total]);
+
+  useEffect(() => {
+    const previous = promoState.current;
+    const suitChanged = previous.suitId !== (suit?.id ?? null);
+    if (totals.promoEarned && (suitChanged || previous.earned === false)) {
+      pushLook({ event: "promo_earned", promoName: totals.promoName, ...context });
+    }
+    if (!totals.promoEarned && totals.nudge && (suitChanged || previous.nudge !== totals.nudge)) {
+      pushLook({ event: "promo_nudge_shown", nudge: totals.nudge, ...context });
+    }
+    promoState.current = {
+      suitId: suit?.id ?? null,
+      earned: totals.promoEarned,
+      nudge: totals.promoEarned ? null : totals.nudge,
+    };
+  }, [suit?.id, totals.promoEarned, totals.nudge, totals.itemCount, totals.total, totals.promoName, context.suitId, context.itemCount, context.total]);
+
+  useEffect(() => {
+    if (!suit?.id || totals.canAddToBag) return;
+    const key = `${suit.id}:error`;
+    if (sizesTracked.current === key) return;
+    sizesTracked.current = key;
+    pushLook({ event: "sizes_error_shown", ...context });
+  }, [suit?.id, totals.canAddToBag, context.suitId, context.itemCount, context.total]);
+
+  useEffect(() => {
+    if (lastTotal.current == null) {
+      lastTotal.current = totals.total;
+      return;
+    }
+    if (lastTotal.current === totals.total) return;
+    lastTotal.current = totals.total;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    setFlash(true);
+    const timer = window.setTimeout(() => setFlash(false), 650);
+    return () => window.clearTimeout(timer);
+  }, [totals.total]);
+
+  function focusSizes(fromCta) {
+    if (fromCta) pushLook({ event: "size_selector_opened_from_cta", ...context });
+    const node = document.getElementById("your-sizes");
+    if (!node) return;
+    node.scrollIntoView({ behavior: "smooth", block: "center" });
+    node.focus({ preventScroll: true });
+  }
+
+  function scrollToSuits(eventName) {
+    pushLook({ event: eventName, ...context });
+    document.getElementById("results-list")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  function toggleSheet() {
+    setSheetOpen((open) => {
+      const next = !open;
+      if (next) pushLook({ event: "order_summary_expanded", ...context });
+      return next;
+    });
+  }
+
+  function submitBag() {
+    if (!totals.canAddToBag) {
+      focusSizes(true);
+      return;
+    }
+    if (bagStatus === "adding") return;
+    pushLook({ event: "add_look_to_bag_clicked", ...context });
+    setBagStatus("adding");
+    window.clearTimeout(bagTimer.current);
+    bagTimer.current = window.setTimeout(() => {
+      const latest = context;
+      if (lookBagShouldFail()) {
+        setBagStatus("error");
+        pushLook({ event: "add_look_to_bag_failed", ...latest });
+        return;
+      }
+      setBagStatus("done");
+      pushLook({ event: "add_look_to_bag_succeeded", ...latest });
+    }, 650);
+  }
+
+  const ctaLabel = !totals.canAddToBag
+    ? "Select sizes to continue"
+    : bagStatus === "adding"
+      ? "Adding..."
+      : "Add look to bag";
+
+  return (
+    <aside className={`your-look${sheetOpen ? " is-open" : ""}`} aria-label="Your Look">
+      <div className="your-look-accent" aria-hidden="true" />
+      <div className="your-look-panel" id="your-look-details">
+        <button className="your-look-close" type="button" onClick={() => setSheetOpen(false)}>Close</button>
+        <div className="your-look-head">
+          <h2 className="your-look-title">Your Look</h2>
+          <button className="your-look-link" type="button" onClick={() => scrollToSuits("edit_look_clicked")}>Edit look</button>
+        </div>
+        <p className="your-look-summary">{countLabel} · {suit.brand} {suit.name}</p>
+        <button
+          className={`your-look-sizes${totals.canAddToBag ? "" : " is-error"}`}
+          type="button"
+          onClick={() => focusSizes(false)}
+        >
+          {totals.canAddToBag ? sizeLabel : (
+            <>
+              <WarningMark />
+              Select jacket and pants size
+            </>
+          )}
+        </button>
+        <section aria-labelledby="your-suit-label">
+          <h3 id="your-suit-label" className="your-look-kicker">Your suit</h3>
+          <div className="your-look-suit">
+            <img className="your-look-thumb" src={image} alt="" />
+            <div className="your-look-copy">
+              <p className="your-look-name">{suit.name}</p>
+              {suit.fitName && <p className="your-look-meta">{suit.fitName}</p>}
+              <button className="your-look-link" type="button" onClick={() => scrollToSuits("swap_suit_clicked")}>Swap suit</button>
+            </div>
+            <p className="your-look-price">{formatPrice(suit.price)}</p>
+          </div>
+        </section>
+        {shownTailoring && (
+          <section aria-labelledby="your-tailoring-label">
+            <h3 id="your-tailoring-label" className="your-look-kicker">Tailoring</h3>
+            <div className="your-look-tailor">
+              <div className="your-look-copy">
+                <p className="your-look-name">{shownTailoring.name}</p>
+                <p className="your-look-meta">{shownTailoring.body}</p>
+                <label className="look-switch">
+                  <input
+                    type="checkbox"
+                    role="switch"
+                    checked={tailoringOn}
+                    onChange={(event) => onTailoring(event.target.checked ? "signature" : NO_HEM.id)}
+                  />
+                  <span>{tailoringOn ? "Added" : "Add tailoring"}</span>
+                  <span className="visually-hidden">{shownTailoring.name}</span>
+                </label>
+              </div>
+              <p className="your-look-price">
+                {tailoringOn ? formatPrice(shownTailoring.price) : `+ ${formatPrice(shownTailoring.price)}`}
+              </p>
+            </div>
+          </section>
+        )}
+        <section aria-labelledby="your-pieces-label">
+          <h3 id="your-pieces-label" className="your-look-kicker">Complete the look</h3>
+          <ul className="your-look-pieces">
+            {rows.map((item) => {
+              const title = lookPieceTitle(item);
+              return (
+                <li className={`your-look-piece${item.added ? "" : " is-off"}`} key={item.id}>
+                  <img className="your-look-thumb" src={item.image} alt="" />
+                  <div className="your-look-copy">
+                    <p className="your-look-name">{title}</p>
+                    <p className="your-look-meta">{item.type}</p>
+                  </div>
+                  <p className="your-look-price">{item.added ? formatPrice(item.price) : `+ ${formatPrice(item.price)}`}</p>
+                  <button
+                    className={item.added ? "look-remove" : "look-add"}
+                    type="button"
+                    aria-label={item.added ? `Remove ${title}` : `Add ${title}`}
+                    onClick={(event) => {
+                      if (item.added) onRemoveLook(item.id);
+                      else onOpenLook(item, event);
+                    }}
+                  >
+                    <span>{item.added ? <RemoveMark /> : <CirclePlus />}</span>
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+        </section>
+        <div className="your-look-totals" aria-live="polite">
+          <div className="your-look-line">
+            <span>Subtotal ({countLabel})</span>
+            <span>{formatPrice(totals.subtotal)}</span>
+          </div>
+          {totals.promoEarned && (
+            <div className="your-look-discount">
+              <TagMark />
+              <span>{totals.promoName} −{exactPrice(totals.discount)}</span>
+            </div>
+          )}
+          <div className={`your-look-total${flash ? " is-flash" : ""}`}>
+            <span>Total</span>
+            <strong>{formatPrice(totals.total)}</strong>
+          </div>
+          <p className="your-look-tax">(+ applicable tax & shipping)</p>
+        </div>
+        <p className={`your-look-banner${totals.promoEarned ? " is-earned" : ""}`}>{totals.nudge}</p>
+      </div>
+      <div className="your-look-dock">
+        <button
+          className="your-look-bar"
+          type="button"
+          aria-expanded={sheetOpen}
+          aria-controls="your-look-details"
+          onClick={toggleSheet}
+        >
+          <span aria-live={sheetOpen ? undefined : "polite"}>{countLabel} · {formatPrice(totals.total)}</span>
+        </button>
+        {bagStatus === "done" && <p className="your-look-status" role="status">This look was added to your bag.</p>}
+        {bagStatus === "error" && (
+          <p className="your-look-status is-error" role="status">
+            We couldn&apos;t add this look. <button type="button" onClick={submitBag}>Try again</button>
+          </p>
+        )}
+        <button
+          className={`your-look-cta${totals.canAddToBag ? "" : " is-disabled"}`}
+          type="button"
+          aria-disabled={totals.canAddToBag ? undefined : "true"}
+          aria-busy={bagStatus === "adding" ? "true" : undefined}
+          onClick={submitBag}
+        >
+          {ctaLabel}
+        </button>
+      </div>
+    </aside>
+  );
+}
+
+function RentalAside({ suit, pieces, onReserve, reserved, note }) {
+  return (
+    <aside className="rental-summary" aria-label="Your rental">
+      <h2 className="rental-summary-title">Your rental</h2>
+      {!suit && <p className="your-look-summary">Choose a look to reserve.</p>}
+      {suit && (
+        <ul className="order-lines">
+          <li>
+            <span>{suit.brand} {suit.name}</span>
+            <span className="order-amount">{formatPrice(suit.price)}</span>
+          </li>
+          {pieces.map((piece) => (
+            <li key={piece.id}><span>{piece.label}</span><span className="order-amount">Included</span></li>
+          ))}
+        </ul>
+      )}
+      <button className="your-look-cta" type="button" disabled={!suit} onClick={onReserve}>
+        Reserve this look
+      </button>
+      {reserved && <p className="handoff-inline" role="status">{note}</p>}
+    </aside>
   );
 }
 
@@ -1085,16 +1438,22 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
     ? selectedOptions[variantIndexes[selected.id] ?? defaultVariantIndex(selected, answers)]
     : null;
   const selectedLook = !renting && selectedVariant ? lookForColor(selectedVariant.colorKey, occasion) : null;
-  const addedItems = selectedLook ? selectedLook.items.filter((item) => addedLooks[item.id]) : [];
-  const accessoryTotal = addedItems.reduce((sum, item) => sum + item.price * (addedLooks[item.id]?.quantity || 1), 0);
-  const savings = !renting && selected?.compareAt ? selected.compareAt - selected.price : 0;
-  const subtotal = !renting && selected
-    ? (selected.compareAt ?? selected.price) + (tailoring?.price ?? 0) + accessoryTotal
-    : 0;
-  const total = subtotal - savings;
-  const addedQty = addedItems.reduce((sum, item) => sum + (addedLooks[item.id]?.quantity || 1), 0);
-  const itemCount = !renting && selected ? 1 + (tailoring?.price ? 1 : 0) + addedQty : (renting && selected ? 1 : 0);
   const quickViewItem = selectedLook?.items.find((item) => item.id === quickViewId) ?? null;
+
+  function lookPreview(nextAdded, tailoringPrice) {
+    return lookTotals({
+      suitPrice: selected?.price ?? 0,
+      tailoringPrice,
+      items: (selectedLook?.items ?? []).map((item) => ({
+        type: item.type,
+        price: item.price,
+        quantity: nextAdded[item.id]?.quantity || 1,
+        added: Boolean(nextAdded[item.id]),
+      })),
+      hasJacketSize: Boolean(size?.jacket),
+      hasPantsSize: Boolean(size?.pants),
+    });
+  }
 
   function shownFor(product) {
     const options = renting
@@ -1120,8 +1479,22 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
     setOpenId((current) => (current === product.id ? null : product.id));
   }
 
+  function commitTailoring(nextId) {
+    setTailoringId(nextId);
+    const price = CARD_TAILORING.find((item) => item.id === nextId)?.price ?? 0;
+    const preview = lookPreview(addedLooks, price);
+    pushLook({
+      event: "tailoring_toggled",
+      state: price > 0 ? "on" : "off",
+      tailoringId: nextId,
+      suitId: selected?.id ?? null,
+      itemCount: preview.itemCount,
+      total: preview.total,
+    });
+  }
+
   function chooseTailoring(id) {
-    setTailoringId((current) => (current === id ? NO_HEM.id : id));
+    commitTailoring(tailoringId === id ? NO_HEM.id : id);
   }
 
   function openQuickView(item, event) {
@@ -1144,97 +1517,68 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
   function confirmQuickView(selection) {
     if (!quickViewId) return;
     const id = quickViewId;
-    setAddedLooks((current) => ({ ...current, [id]: selection }));
+    const already = Boolean(addedLooks[id]);
+    const nextAdded = { ...addedLooks, [id]: selection };
+    setAddedLooks(nextAdded);
+    if (!already) {
+      const preview = lookPreview(nextAdded, tailoring?.price ?? 0);
+      pushLook({
+        event: "recommended_item_added",
+        sku: id,
+        id,
+        suitId: selected?.id ?? null,
+        itemCount: preview.itemCount,
+        total: preview.total,
+      });
+    }
     closeQuickView();
   }
 
   function removeLook(id) {
-    setAddedLooks((current) => {
-      if (!current[id]) return current;
-      const next = { ...current };
-      delete next[id];
-      return next;
+    if (!addedLooks[id]) return;
+    const nextAdded = { ...addedLooks };
+    delete nextAdded[id];
+    setAddedLooks(nextAdded);
+    const preview = lookPreview(nextAdded, tailoring?.price ?? 0);
+    pushLook({
+      event: "recommended_item_removed",
+      sku: id,
+      id,
+      suitId: selected?.id ?? null,
+      itemCount: preview.itemCount,
+      total: preview.total,
     });
     if (quickViewId === id) closeQuickView();
   }
 
-  const checkoutNote = renting
-    ? "Prototype: this would reserve the look and its pieces for your event date."
-    : `Prototype: this would add the suit in your sizes${
-      [tailoring ? "the tailoring" : null, addedItems.length ? "the pieces you added" : null].filter(Boolean).length
-        ? ` and ${[tailoring ? "the tailoring" : null, addedItems.length ? "the pieces you added" : null].filter(Boolean).join(" and ")}`
-        : ""
-    } to your bag.${tailoring ? " After checkout, the next step books your tailoring appointment." : ""}`;
-  const orderSummary = (
-    <aside className="order-summary" aria-label="Order Summary">
-      <h2 className="order-summary-title">Order Summary</h2>
-      {!renting && savings > 0 && <p className="order-promo">Look at the promo you're getting!</p>}
-      {!selected && <p className="order-empty">Choose a suit to see your total.</p>}
-      {selected && renting && (
-        <ul className="order-lines">
-          <li>
-            <span>{selected.brand} {selected.name}</span>
-            <span className="order-amount">{formatPrice(selected.price)}</span>
-          </li>
-          {pieces.map((piece) => (
-            <li key={piece.id}><span>{piece.label}</span><span className="order-amount">Included</span></li>
-          ))}
-        </ul>
-      )}
-      {selected && !renting && (
-        <ul className="order-lines">
-          <li>
-            <span>Suit</span>
-            <span className="order-amount">
-              {selected.compareAt ? <s>{formatPrice(selected.compareAt)}</s> : null}
-              <span>{formatPrice(selected.price)}</span>
-            </span>
-          </li>
-          {tailoring && (
-            <li>
-              <span>{tailoring.price ? tailoring.name : "Tailoring package"}</span>
-              <span className="order-amount">{tailoring.price ? formatPrice(tailoring.price) : "Included"}</span>
-            </li>
-          )}
-          {addedItems.map((item) => {
-            const selection = addedLooks[item.id];
-            const qty = selection?.quantity || 1;
-            return (
-              <li key={item.id}>
-                <span>{item.name}{qty > 1 ? ` · Qty ${qty}` : ""}</span>
-                <span className="order-amount">{formatPrice(item.price * qty)}</span>
-              </li>
-            );
-          })}
-        </ul>
-      )}
-      {selected && (
-        <div className="order-totals">
-          <div>
-            <span>Subtotal ({itemCount} {itemCount === 1 ? "item" : "items"})</span>
-            <span>{formatPrice(renting ? selected.price : subtotal)}</span>
-          </div>
-          {!renting && savings > 0 && (
-            <div className="order-promo-line">
-              <span>Suit sale</span>
-              <span>-{formatPrice(savings)}</span>
-            </div>
-          )}
-          <div className="order-grand">
-            <span>Grand total</span>
-            <strong>{formatPrice(renting ? selected.price : total)}</strong>
-          </div>
-        </div>
-      )}
-      <button
-        className="order-checkout"
-        type="button"
-        disabled={!selected}
-        onClick={() => setHandoff("checkout")}
-      >
-        Checkout
-      </button>
-      {handoff === "checkout" && <p className="handoff-inline" role="status">{checkoutNote}</p>}
+  const rentalNote = "Prototype: this would reserve the look and its pieces for your event date.";
+  const purchaseAside = renting ? (
+    <RentalAside
+      suit={selected}
+      pieces={pieces}
+      reserved={handoff === "reserve"}
+      note={rentalNote}
+      onReserve={() => setHandoff("reserve")}
+    />
+  ) : selected ? (
+    <YourLook
+      suit={selected}
+      image={selectedVariant?.image || selected.image}
+      size={size}
+      tailoringId={tailoringId}
+      onTailoring={commitTailoring}
+      items={selectedLook?.items ?? []}
+      addedLooks={addedLooks}
+      onOpenLook={openQuickView}
+      onRemoveLook={removeLook}
+    />
+  ) : (
+    <aside className="your-look" aria-label="Your Look">
+      <div className="your-look-accent" aria-hidden="true" />
+      <div className="your-look-panel">
+        <h2 className="your-look-title">Your Look</h2>
+        <p className="your-look-summary">Choose a suit to build your look.</p>
+      </div>
     </aside>
   );
 
@@ -1266,7 +1610,7 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
             </div>
           </div>
           <div className="hero-facts">
-            <div className="hero-fact">
+            <div className="hero-fact" id="your-sizes" tabIndex={-1}>
               <div>
                 <p className="hero-fact-label">Your sizes</p>
                 <p className="hero-fact-value">Jacket: {jacketFact(size, renting)} · Pants: {pantsFact(size, renting)}</p>
@@ -1302,7 +1646,7 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
           {selected ? `${renting ? "Selected look" : "Selected suit"}, ${selected.brand} ${selected.name}` : ""}
         </p>
         <div className="results-stage">
-          <div className="results-list">
+          <div className="results-list" id="results-list">
           <h2 className="section-title results-list-title">Your matches are in</h2>
           {shownRecommendations.map((product, index) => {
             const { options, variantIndex, shown } = shownFor(product);
@@ -1438,7 +1782,7 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
               </button>
             )}
           </div>
-          {orderSummary}
+          {purchaseAside}
         </div>
 
         <FitProfile
