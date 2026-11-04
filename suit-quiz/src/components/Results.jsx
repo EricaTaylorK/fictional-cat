@@ -363,7 +363,18 @@ function TailorGlyph({ name }) {
     </svg>
   );
 }
-function SuitOptions({ tailoringId, onTailoring, look, addedLooks, onToggleLook }) {
+function lookPieceBrand(item) {
+  return item.brand || "Men's Wearhouse";
+}
+
+function lookPieceTitle(item) {
+  const name = item.name ?? "";
+  const color = item.color ?? "";
+  if (!color || name.toLowerCase().includes(color.toLowerCase())) return name;
+  return `${color} ${name}`.replace(/\s+/g, " ").trim();
+}
+
+function SuitOptions({ tailoringId, onTailoring, look, addedLooks, onOpenLook }) {
   const items = look?.items ?? [];
   return (
     <>
@@ -411,23 +422,36 @@ function SuitOptions({ tailoringId, onTailoring, look, addedLooks, onToggleLook 
           </div>
           <div className="pair-row">
             {items.map((item) => {
-              const checked = Boolean(addedLooks[item.id]);
-              const title = `${item.color} ${item.name}`.replace(/\s+/g, " ").trim();
+              const added = Boolean(addedLooks[item.id]);
+              const title = lookPieceTitle(item);
               return (
-                <label className={`pair-card${checked ? " is-on" : ""}`} key={item.id}>
-                  <img src={item.image} alt="" />
-                  <span className="pair-copy">
-                    <span className="pair-brand">Men's Wearhouse</span>
+                <article className={`pair-card${added ? " is-on" : ""}`} key={item.id}>
+                  <div className="pair-photo">
+                    <img src={item.image} alt="" />
+                    <button
+                      className={`pair-add${added ? " is-on" : ""}`}
+                      type="button"
+                      aria-pressed={added}
+                      aria-label={added ? `${title} added. View details` : `Add ${title}`}
+                      onClick={(event) => onOpenLook(item, event)}
+                    >
+                      {added ? (
+                        <svg viewBox="0 0 14 14" aria-hidden="true">
+                          <path fill="currentColor" d="M5.2 10.4 2.1 7.3 1 8.4l4.2 4.2L13 4.8 11.9 3.7 5.2 10.4Z" />
+                        </svg>
+                      ) : (
+                        <svg viewBox="0 0 14 14" aria-hidden="true">
+                          <path fill="currentColor" d="M6 1h2v5h5v2H8v5H6V8H1V6h5V1Z" />
+                        </svg>
+                      )}
+                    </button>
+                  </div>
+                  <div className="pair-copy">
+                    <span className="pair-brand">{lookPieceBrand(item)}</span>
                     <span className="pair-name">{title}</span>
                     <span className="pair-price">{formatPrice(item.price)}</span>
-                  </span>
-                  <input
-                    type="checkbox"
-                    checked={checked}
-                    aria-label={`${checked ? "Remove" : "Add"} ${title}`}
-                    onChange={() => onToggleLook(item)}
-                  />
-                </label>
+                  </div>
+                </article>
               );
             })}
           </div>
@@ -668,7 +692,7 @@ function QuickView({ item, initial, suggestedSize = "", onConfirm, onClose }) {
   const [quantity, setQuantity] = useState(initial?.quantity ?? 1);
   const [serviceIds, setServiceIds] = useState(initial?.services ?? []);
   const [colorKey, setColorKey] = useState(initial?.colorKey ?? item.colorKey ?? "");
-  const editing = Boolean(initial?.size);
+  const alreadyAdded = Boolean(initial);
   const shownColor = colorChoices?.find((choice) => choice.colorKey === colorKey)?.color || item.color;
 
   useEffect(() => {
@@ -721,8 +745,8 @@ function QuickView({ item, initial, suggestedSize = "", onConfirm, onClose }) {
           {item.image || item.icon ? <img src={item.image || item.icon} alt="" /> : <span className="quick-view-media-empty" aria-hidden="true" />}
         </div>
         <div className="quick-view-info">
-          {item.brand ? <p className="quick-view-brand">{item.brand}</p> : null}
-          <h2 id="quick-view-title">{item.name}</h2>
+          <p className="quick-view-brand">{lookPieceBrand(item)}</p>
+          <h2 id="quick-view-title">{lookPieceTitle(item)}</h2>
           {item.rating != null && (
             <p className="quick-view-rating">
               <span className="stars" aria-hidden="true">
@@ -821,11 +845,11 @@ function QuickView({ item, initial, suggestedSize = "", onConfirm, onClose }) {
         <button
           className="button quick-view-add"
           type="button"
-          aria-disabled={!size}
+          disabled={alreadyAdded}
           onClick={() => {
-            if (!size) return;
+            if (alreadyAdded) return;
             onConfirm({
-              size,
+              size: size || suggestedSize || sizes[0] || "",
               quantity,
               services: serviceIds,
               colorKey: colorKey || item.colorKey,
@@ -833,7 +857,7 @@ function QuickView({ item, initial, suggestedSize = "", onConfirm, onClose }) {
             });
           }}
         >
-          {editing ? "Update look" : "Add Product to Look"}
+          {alreadyAdded ? "Added" : "Add to look"}
         </button>
         <button className="quick-view-close" type="button" aria-label="Close" onClick={onClose}>
           ×
@@ -1075,17 +1099,6 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
     setTailoringId((current) => (current === id ? NO_HEM.id : id));
   }
 
-  function toggleLookPiece(item) {
-    setAddedLooks((current) => {
-      if (current[item.id]) {
-        const next = { ...current };
-        delete next[item.id];
-        return next;
-      }
-      return { ...current, [item.id]: { quantity: 1 } };
-    });
-  }
-
   function openQuickView(item, event) {
     const current = event?.currentTarget;
     const trigger = current?.matches?.("button") ? current : current?.querySelector?.(".look-check");
@@ -1128,8 +1141,8 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
         : ""
     } to your bag.${tailoring ? " After checkout, the next step books your tailoring appointment." : ""}`;
   const orderSummary = (
-    <aside className="order-summary" aria-label="Order summary">
-      <h2 className="order-summary-title">Order summary</h2>
+    <aside className="order-summary" aria-label="Order Summary">
+      <h2 className="order-summary-title">Order Summary</h2>
       {!renting && savings > 0 && <p className="order-promo">Look at the promo you're getting!</p>}
       {!selected && <p className="order-empty">Choose a suit to see your total.</p>}
       {selected && renting && (
@@ -1365,7 +1378,7 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
                           onTailoring={chooseTailoring}
                           look={lookForColor(shown?.colorKey, occasion)}
                           addedLooks={addedLooks}
-                          onToggleLook={toggleLookPiece}
+                          onOpenLook={openQuickView}
                         />
                       )}
                     </div>
