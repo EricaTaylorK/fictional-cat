@@ -5623,10 +5623,6 @@ h2 {
   margin-top: 16px;
 }
 
-.pair-row {
-  gap: 15px;
-}
-
 .tailor-card {
   background: #fff;
   border: 1px solid rgba(0, 0, 0, 0.1);
@@ -5664,7 +5660,7 @@ h2 {
   top: 0;
 }
 
-.tailor-add {
+.card-plus {
   align-items: center;
   background: #fff;
   border: 1px solid #000c2c;
@@ -5681,16 +5677,16 @@ h2 {
   width: 40px;
 }
 
-.tailor-card.is-recommended .tailor-add {
+.tailor-card.is-recommended .card-plus {
   top: 8px;
 }
 
-.tailor-add svg {
+.card-plus svg {
   height: 14px;
   width: 14px;
 }
 
-.tailor-add.is-on {
+.card-plus.is-on {
   background: #001e56;
   border-color: #001e56;
   color: #fff;
@@ -5702,7 +5698,8 @@ h2 {
   width: 40px;
 }
 
-.tailor-card h4 {
+.tailor-card h4,
+.pair-name {
   color: #001e56;
   font-family: var(--font-family-roboto);
   font-size: 17px;
@@ -5712,22 +5709,30 @@ h2 {
   margin: 0;
 }
 
-.tailor-card p {
+.tailor-card p,
+.pair-brand {
   color: #232323;
-  flex: 1 1 auto;
   font-family: var(--font-family-roboto);
   font-size: 12px;
   font-weight: 400;
+  letter-spacing: 0;
   line-height: 18px;
   margin: 0;
 }
 
-.tailor-card strong {
+.tailor-card p {
+  flex: 1 1 auto;
+}
+
+.tailor-card strong,
+.pair-price {
   color: #232323;
   font-family: var(--font-family-roboto);
   font-size: 18px;
   font-weight: 700;
+  letter-spacing: 0;
   line-height: 24px;
+  margin: 0;
 }
 
 .expand-divider {
@@ -5754,8 +5759,8 @@ h2 {
 
 .pair-card {
   background: transparent;
-  border: 1px solid rgba(0, 0, 0, 0.12);
-  border-radius: 4px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 6px;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
@@ -5781,50 +5786,17 @@ h2 {
   width: 78%;
 }
 
-.pair-add {
-  align-items: center;
-  background: #fff;
-  border: 1px solid #000c2c;
-  border-radius: 50%;
-  color: #000c2c;
-  cursor: pointer;
-  display: flex;
-  height: 34px;
-  justify-content: center;
-  padding: 0;
-  position: absolute;
-  right: 8px;
-  top: 8px;
-  width: 34px;
-}
-
-.pair-add svg {
-  height: 14px;
-  width: 14px;
-}
-
-.pair-add.is-on {
-  background: #001e56;
-  border-color: #001e56;
-  color: #fff;
-}
-
 .pair-copy {
   background: #111;
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 12px;
   min-width: 0;
-  padding: 12px;
+  padding: 16px;
 }
 
 .pair-brand {
   color: #c8c8c8;
-  font-family: var(--font-family-roboto);
-  font-size: 12px;
-  font-weight: 400;
-  letter-spacing: 0.005em;
-  line-height: 16px;
 }
 
 .pair-name {
@@ -5832,22 +5804,11 @@ h2 {
   -webkit-line-clamp: 2;
   color: #fff;
   display: -webkit-box;
-  font-family: var(--font-family-roboto);
-  font-size: 14px;
-  font-weight: 400;
-  letter-spacing: 0;
-  line-height: 18px;
   overflow: hidden;
 }
 
 .pair-price {
   color: #fff;
-  font-family: var(--font-family-roboto);
-  font-size: 16px;
-  font-weight: 700;
-  letter-spacing: 0.005em;
-  line-height: 22px;
-  margin-top: 4px;
 }
 
 .expand-rent-note {
@@ -6049,15 +6010,15 @@ h2 {
   isolation: isolate;
   justify-content: center;
   margin: 40px 0 0;
-  padding: 40px 24px;
+  padding: 0 24px;
   width: 100%;
 }
 
 .results-layout .fit-band::before {
-  bottom: 0;
+  bottom: 40px;
   left: 0;
   right: 0;
-  top: 0;
+  top: 40px;
   transform: none;
   width: auto;
 }
@@ -6065,8 +6026,9 @@ h2 {
 .results-layout .fit-card {
   border: 1px solid #f2f2f2;
   border-radius: 4px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1), 0 0 2px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12), 0 0 2px rgba(0, 0, 0, 0.1);
   flex: 0 1 406px;
+  margin: 0;
   max-width: 100%;
   padding: 32px 24px 24px;
   width: 406px;
@@ -6074,6 +6036,7 @@ h2 {
 
 .results-layout .fit-save {
   flex: 0 1 480px;
+  margin-top: 40px;
   max-width: 480px;
   width: 436px;
 }
@@ -6169,8 +6132,12 @@ h2 {
   .results-layout .fit-band {
     margin-left: 0;
     margin-right: 0;
-    padding-left: 24px;
-    padding-right: 24px;
+    padding: 40px 24px;
+  }
+
+  .results-layout .fit-band::before {
+    bottom: 0;
+    top: 0;
   }
 
   .results-layout .results-stage,
@@ -6195,6 +6162,10 @@ h2 {
     flex-basis: auto;
     max-width: 100%;
     width: 100%;
+  }
+
+  .results-layout .fit-save {
+    margin-top: 24px;
   }
 
   .pair-row {

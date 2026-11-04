@@ -389,7 +389,7 @@ function SuitOptions({ tailoringId, onTailoring, look, addedLooks, onOpenLook })
             <article className={`tailor-card${option.recommended ? " is-recommended" : ""}`} key={option.id}>
               {option.recommended && <span className="tailor-badge">Recommended</span>}
               <button
-                className={`tailor-add${selected ? " is-on" : ""}`}
+                className={`card-plus tailor-add${selected ? " is-on" : ""}`}
                 type="button"
                 aria-pressed={selected}
                 aria-label={selected ? `Remove ${option.name}` : `Add ${option.name}`}
@@ -429,7 +429,7 @@ function SuitOptions({ tailoringId, onTailoring, look, addedLooks, onOpenLook })
                   <div className="pair-photo">
                     <img src={item.image} alt="" />
                     <button
-                      className={`pair-add${added ? " is-on" : ""}`}
+                      className={`card-plus pair-add${added ? " is-on" : ""}`}
                       type="button"
                       aria-pressed={added}
                       aria-label={added ? `${title} added. View details` : `Add ${title}`}
