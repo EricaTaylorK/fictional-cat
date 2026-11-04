@@ -4,7 +4,7 @@ import {
   SWATCH_HEX,
   TAILORING_TIERS,
 } from "../data/products.js";
-import { colorsIn, questions, resolvedOccasion } from "../data/quizConfig.js";
+import { colorsIn, occasionOptions, questions, resolvedOccasion } from "../data/quizConfig.js";
 import { RENTAL_PACKAGES, RENTAL_STEPS, RENTAL_TYPE_NAMES } from "../data/rentals.js";
 import {
   buildResultSummary,
@@ -13,6 +13,7 @@ import {
   getRecommendations,
   getRentalRecommendations,
   parseHeight,
+  rentalDates,
 } from "../lib/recommendation.js";
 const NO_HEM = {
   id: "no-hem",
@@ -34,6 +35,57 @@ const FIT_NOTE_COPY = {
 
 function selectedIssues(values) {
   return (values ?? []).filter((issue) => issue && issue !== "none");
+}
+
+function quizOptionLabel(question, value, answers) {
+  if (value == null || value === "") return null;
+  const options = question.id === "occasion" ? occasionOptions(question, answers ?? {}) : (question.options ?? []);
+  return options.find((option) => option.value === value)?.label ?? null;
+}
+
+function colorAnswerLabel(values) {
+  const labels = (values ?? []).map((value) => (
+    questions.colors.options.find((option) => option.value === value)?.label
+  )).filter(Boolean);
+  return labels.length ? labels.join(" · ") : null;
+}
+
+function fitProfileRows({ answers, renting, size, fitName }) {
+  const height = heightLabel(answers.height);
+  const everyday = answers.everydaySizes ?? {};
+  const jacketValue = size?.jacket ? jacketFact(size, renting) : null;
+  const waistNumber = size?.pants ? String(size.pants).replace(/W$/i, "") : null;
+  const fit = fitName ? titleWords(fitName) : null;
+  const personal = [
+    height,
+    jacketValue ? `Jacket ${jacketValue}` : null,
+    waistNumber ? `Waist ${waistNumber}"` : null,
+    !jacketValue && everyday.shirt ? `Shirt ${everyday.shirt}` : null,
+    !waistNumber && everyday.waist ? `Waist ${everyday.waist}` : null,
+  ].filter(Boolean);
+  const usual = [
+    everyday.shirt && !personal.some((part) => part.includes(`Shirt ${everyday.shirt}`)) ? `Shirt ${everyday.shirt}` : null,
+    everyday.waist && !personal.some((part) => part.includes(String(everyday.waist))) ? `Waist ${everyday.waist}` : null,
+  ].filter(Boolean);
+  const notes = [
+    ...selectedIssues(answers.fitIssues).map((issue) => FIT_NOTE_COPY[issue]),
+    ...selectedIssues(answers.pantsFit).map((issue) => FIT_NOTE_COPY[issue]),
+  ].filter(Boolean);
+  const event = formatDate(rentalDates(answers.eventDate)?.event);
+  const pack = RENTAL_PACKAGES.find((item) => item.id === Number(answers.pieces));
+  return [
+    personal.length ? { label: "Personal info", value: personal.join(" · ") } : null,
+    usual.length ? { label: "Usual sizes", value: usual.join(" · ") } : null,
+    fit ? { label: "Fit preference", value: fit } : null,
+    notes.length ? { label: "Fit notes", value: `${notes.join(". ")}.` } : null,
+    quizOptionLabel(questions.occasion, answers.occasion, answers) ? { label: "Occasion", value: quizOptionLabel(questions.occasion, answers.occasion, answers) } : null,
+    colorAnswerLabel(answers.colors?.prefer) ? { label: "Colors", value: colorAnswerLabel(answers.colors.prefer) } : null,
+    colorAnswerLabel(answers.colors?.avoid) ? { label: "Colors to avoid", value: colorAnswerLabel(answers.colors.avoid) } : null,
+    quizOptionLabel(questions.budget, answers.budget) ? { label: "Budget", value: quizOptionLabel(questions.budget, answers.budget) } : null,
+    quizOptionLabel(questions.tailoring, answers.tailoring) ? { label: "Tailoring", value: quizOptionLabel(questions.tailoring, answers.tailoring) } : null,
+    event ? { label: "Event date", value: event } : null,
+    renting && pack ? { label: "Package", value: pack.label } : null,
+  ].filter(Boolean);
 }
 
 function heightLabel(height) {
@@ -225,34 +277,181 @@ function PlusIcon() {
   );
 }
 
+const CARD_TAILORING = [
+  {
+    id: "essentials",
+    name: "Fit Essentials",
+    price: 55,
+    body: "We'll hem the pants and adjust sleeve length for a clean, finished look.",
+    icon: "hem",
+  },
+  {
+    id: "signature",
+    name: "Signature Fit",
+    price: 100,
+    recommended: true,
+    body: "Everything in Essentials, plus we shape the jacket and waist so you look sharper.",
+    icon: "jacket",
+  },
+  {
+    id: "signature-shield",
+    name: "Signature Fit",
+    price: 100,
+    body: "Everything in Essentials, plus we shape the jacket and waist so you look sharper.",
+    icon: "shield",
+  },
+];
+
+function TailorGlyph({ name }) {
+  if (name === "jacket") {
+    return (
+      <svg className="tailor-glyph" viewBox="0 0 40 40" aria-hidden="true">
+        <path fill="#B9CADD" d="M8 14 14 8h12l6 6-4 3-4-4v19H12V13l-4 4-0-3Z" />
+        <path fill="none" stroke="#232323" strokeWidth="1.4" d="M14 8h12l6 6-4 3-4-4v19H12V13l-4 4-4-3 6-6Z" />
+        <path fill="none" stroke="#046DE9" strokeDasharray="2 2" strokeWidth="1.2" d="M20 14v14M16 22h8" />
+      </svg>
+    );
+  }
+  if (name === "shield") {
+    return (
+      <svg className="tailor-glyph" viewBox="0 0 40 40" aria-hidden="true">
+        <path fill="#B9CADD" d="M20 6 32 11v9c0 7.2-5 12.4-12 15-7-2.6-12-7.8-12-15v-9L20 6Z" />
+        <path fill="none" stroke="#232323" strokeWidth="1.4" d="M20 6 32 11v9c0 7.2-5 12.4-12 15-7-2.6-12-7.8-12-15v-9L20 6Z" />
+        <path fill="none" stroke="#046DE9" strokeWidth="1.6" d="m15 20 3.2 3.2L25 16.5" />
+      </svg>
+    );
+  }
+  return (
+    <svg className="tailor-glyph" viewBox="0 0 40 40" aria-hidden="true">
+      <path fill="#B9CADD" d="M15 7h10l2 16-3 2v8H16v-8l-3-2 2-16Z" />
+      <path fill="none" stroke="#232323" strokeWidth="1.4" d="M15 7h10l2 16-3 2v8H16v-8l-3-2 2-16Z" />
+      <path fill="none" stroke="#046DE9" strokeWidth="1.4" d="M14 23h12M16 29h8" />
+    </svg>
+  );
+}
+
+function SuitOptions({ tailoringId, onTailoring, look, addedLooks, onToggleLook }) {
+  const items = look?.items ?? [];
+  return (
+    <>
+      <div className="expand-head">
+        <h3>Add Tailoring</h3>
+        <p>Optional Add Ons</p>
+      </div>
+      <div className="tailor-row">
+        {CARD_TAILORING.map((option) => {
+          const selected = tailoringId === option.id;
+          return (
+            <article className={`tailor-card${option.recommended ? " is-recommended" : ""}`} key={option.id}>
+              {option.recommended && <span className="tailor-badge">Recommended</span>}
+              <button
+                className={`tailor-add${selected ? " is-on" : ""}`}
+                type="button"
+                aria-pressed={selected}
+                aria-label={selected ? `Remove ${option.name}` : `Add ${option.name}`}
+                onClick={() => onTailoring(option.id)}
+              >
+                {selected ? (
+                  <svg viewBox="0 0 14 14" aria-hidden="true">
+                    <path fill="currentColor" d="M5.2 10.4 2.1 7.3 1 8.4l4.2 4.2L13 4.8 11.9 3.7 5.2 10.4Z" />
+                  </svg>
+                ) : (
+                  <svg viewBox="0 0 14 14" aria-hidden="true">
+                    <path fill="currentColor" d="M6 1h2v5h5v2H8v5H6V8H1V6h5V1Z" />
+                  </svg>
+                )}
+              </button>
+              <TailorGlyph name={option.icon} />
+              <h4>{option.name}</h4>
+              <p>{option.body}</p>
+              <strong>{formatPrice(option.price)}</strong>
+            </article>
+          );
+        })}
+      </div>
+      {items.length > 0 && (
+        <>
+          <div className="expand-divider" />
+          <div className="pair-head">
+            <h3>Your look, pulled together</h3>
+            <p>We chose these pieces to complement this suit, based on your quiz answers.</p>
+          </div>
+          <div className="pair-row">
+            {items.map((item) => {
+              const checked = Boolean(addedLooks[item.id]);
+              const title = `${item.color} ${item.name}`.replace(/\s+/g, " ").trim();
+              return (
+                <label className={`pair-card${checked ? " is-on" : ""}`} key={item.id}>
+                  <img src={item.image} alt="" />
+                  <span className="pair-copy">
+                    <span className="pair-brand">Men's Wearhouse</span>
+                    <span className="pair-name">{title}</span>
+                    <span className="pair-price">{formatPrice(item.price)}</span>
+                  </span>
+                  <input
+                    type="checkbox"
+                    checked={checked}
+                    aria-label={`${checked ? "Remove" : "Add"} ${title}`}
+                    onChange={() => onToggleLook(item)}
+                  />
+                </label>
+              );
+            })}
+          </div>
+        </>
+      )}
+    </>
+  );
+}
+
 function MatchRing({ percent }) {
   const scored = Number.isFinite(percent);
   const turn = scored ? Math.max(0, Math.min(100, percent)) : 0;
-  const radius = 51;
+  // Centerline of the Figma 178 donut: outer radius ~84.7, inner ~60, stroke ~24.7.
+  const cx = 89.21;
+  const cy = 87.21;
+  const radius = 72.32;
+  const stroke = 24.71;
   const circumference = 2 * Math.PI * radius;
-  const dash = turn >= 100 ? circumference + 1 : (turn / 100) * circumference;
+  const capPortion = stroke / circumference;
+  const visual = turn / 100;
+  const dashPortion = visual >= 1 ? 1 : Math.max(0, visual - capPortion);
+  const dash = dashPortion >= 1 ? circumference + 1 : dashPortion * circumference;
   return (
     <div className="match-ring" aria-hidden="true">
-      <svg className="match-ring-art" viewBox="0 0 178 178" width="170" height="171">
+      <svg className="match-ring-art" viewBox="0 0 178 178" width="178" height="178">
         <defs>
-          <filter id="match-ring-shadow" x="-40%" y="-40%" width="180%" height="180%" colorInterpolationFilters="sRGB">
-            <feDropShadow dx="0" dy="0" stdDeviation="0.5" floodColor="#000000" floodOpacity="0.1" />
-            <feDropShadow dx="0" dy="2" stdDeviation="1" floodColor="#000000" floodOpacity="0.1" />
+          <filter id="match-ring-shadow" x="-12" y="-12" width="202" height="206" filterUnits="userSpaceOnUse" colorInterpolationFilters="sRGB">
+            <feFlood floodOpacity="0" result="BackgroundImageFix" />
+            <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha" />
+            <feOffset />
+            <feGaussianBlur stdDeviation="1" />
+            <feComposite in2="hardAlpha" operator="out" />
+            <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.1 0" />
+            <feBlend in2="BackgroundImageFix" mode="normal" result="effect1" />
+            <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha" />
+            <feOffset dy="2" />
+            <feGaussianBlur stdDeviation="2" />
+            <feComposite in2="hardAlpha" operator="out" />
+            <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.1 0" />
+            <feBlend in2="effect1" mode="normal" result="effect2" />
+            <feBlend in="SourceGraphic" in2="effect2" mode="normal" />
           </filter>
         </defs>
         <g className="match-ring-track" opacity="0.8">
-          <circle cx="89" cy="89" r={radius} fill="none" stroke="#D9D9D9" strokeWidth="18" />
+          <circle cx={cx} cy={cy} r={radius} fill="none" stroke="#D9D9D9" strokeWidth={stroke} />
         </g>
         {turn > 0 && (
           <circle
-            cx="89"
-            cy="89"
+            cx={cx}
+            cy={cy}
             r={radius}
             fill="none"
             stroke="#046DE9"
-            strokeWidth="18"
+            strokeWidth={stroke}
+            strokeLinecap="round"
             strokeDasharray={`${dash} ${circumference}`}
-            transform="rotate(-90 89 89)"
+            transform={`rotate(-90 ${cx} ${cy})`}
             filter="url(#match-ring-shadow)"
           />
         )}
@@ -696,47 +895,19 @@ function CompleteLook({ id, look, suitColor, suitName, addedLooks, onOpen, onRem
 }
 
 function FitProfile({ answers, renting, size, fitName, onEditAnswers, onAccount, accountStatus }) {
-  const height = heightLabel(answers.height);
-  const everyday = answers.everydaySizes ?? {};
-  const jacketValue = size?.jacket ? jacketFact(size, renting) : null;
-  const waistNumber = size?.pants ? String(size.pants).replace(/W$/i, "") : null;
-  const fit = fitName ? titleWords(fitName) : null;
-  const personal = [
-    height,
-    jacketValue ? `Jacket ${jacketValue}` : null,
-    waistNumber ? `Waist ${waistNumber}"` : null,
-    !jacketValue && everyday.shirt ? `Shirt ${everyday.shirt}` : null,
-    !waistNumber && everyday.waist ? `Waist ${everyday.waist}` : null,
-  ].filter(Boolean);
-  const notes = [
-    ...selectedIssues(answers.fitIssues).map((issue) => FIT_NOTE_COPY[issue]),
-    ...selectedIssues(answers.pantsFit).map((issue) => FIT_NOTE_COPY[issue]),
-  ].filter(Boolean);
-  const rows = [
-    personal.length ? { label: "Personal info", value: personal.join(" · ") } : null,
-    fit ? { label: "Fit preference", value: fit } : null,
-    notes.length ? { label: "Fit notes", value: `${notes.join(". ")}.` } : null,
-  ].filter(Boolean);
-  const benefits = renting
-    ? [
-      "Rental looks in your size and fit.",
-      "Fit notes ready for your fitting.",
-      "Package pieces that finish the look.",
-    ]
-    : [
-      "Suits in your size and fit.",
-      "Tailoring that matches how the suit runs.",
-      "Pieces that finish the look.",
-    ];
-  const saveCopy = renting
-    ? "Saving this profile personalizes later visits in this prototype, so the next rental can start from your size and fit."
-    : "Saving this profile personalizes later visits in this prototype, so the next suit can start from your size and fit.";
+  const rows = fitProfileRows({ answers, renting, size, fitName });
+  const benefits = [
+    "Find suits in your size and preferred fit.",
+    "Explore styles for your occasion, colors, and budget.",
+    "Get tailoring suggestions and coordinating pieces to complete the look.",
+  ];
+  const saveCopy = "Create an account to save your suit profile. We\u2019ll use your size, fit, occasion, color, and budget preferences to make suit recommendations more relevant\u2014and guide tailoring and styling suggestions for the full look.";
 
   return (
     <section className="fit-band" aria-labelledby="fit-profile-title">
       <div className="fit-card">
         <div className="fit-card-head">
-          <h2 id="fit-profile-title" className="fit-card-title">Your fit profile</h2>
+          <h2 id="fit-profile-title" className="fit-card-title">Your suit profile</h2>
           {onEditAnswers && (
             <button className="results-hero-action" type="button" onClick={() => onEditAnswers()}>
               <PencilIcon />
@@ -752,7 +923,7 @@ function FitProfile({ answers, renting, size, fitName, onEditAnswers, onAccount,
         ))}
       </div>
       <div className="fit-save">
-        <h2 className="fit-save-title">Save your fit profile</h2>
+        <h2 className="fit-save-title">Save your suit profile</h2>
         <p className="fit-save-copy">{saveCopy}</p>
         <ul className="fit-profile-benefits">
           {benefits.map((line) => (
@@ -817,7 +988,7 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
   const dates = summary.dates;
   const pack = RENTAL_PACKAGES.find((item) => item.id === Number(answers.pieces));
   const pieces = summary.pieces;
-  const tailoring = TAILORING_CHOICES.find((item) => item.id === tailoringId);
+  const tailoring = CARD_TAILORING.find((item) => item.id === tailoringId) ?? null;
   const visibleCount = expanded ? Math.min(recommendations.length, 9) : Math.min(3, recommendations.length);
   const visibleRecommendations = recommendations.slice(0, visibleCount);
   const shownRecommendations = selected && !visibleRecommendations.some((product) => product.id === selected.id)
@@ -865,6 +1036,21 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
 
   function toggleCard(product) {
     setOpenId((current) => (current === product.id ? null : product.id));
+  }
+
+  function chooseTailoring(id) {
+    setTailoringId((current) => (current === id ? NO_HEM.id : id));
+  }
+
+  function toggleLookPiece(item) {
+    setAddedLooks((current) => {
+      if (current[item.id]) {
+        const next = { ...current };
+        delete next[item.id];
+        return next;
+      }
+      return { ...current, [item.id]: { quantity: 1 } };
+    });
   }
 
   function openQuickView(item, event) {
@@ -991,10 +1177,6 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
               <span className="results-expert-label">AI Style Expert</span>
             </div>
             <div className="results-hero-actions">
-              <button className="results-hero-action" type="button" onClick={() => onEditAnswers?.()}>
-                <PencilIcon />
-                Edit answers
-              </button>
               <button className="results-hero-action" type="button">
                 <ShareIcon />
                 Share results
@@ -1140,7 +1322,21 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
                       </div>
                     </div>
                   </div>
-                  {open && <div className="suit-expand" id={`suit-expand-${product.id}`} />}
+                  {open && (
+                    <div className="suit-expand" id={`suit-expand-${product.id}`}>
+                      {renting ? (
+                        <p className="expand-rent-note">Sizes for this look are confirmed at your fitting.</p>
+                      ) : (
+                        <SuitOptions
+                          tailoringId={tailoringId}
+                          onTailoring={chooseTailoring}
+                          look={lookForColor(shown?.colorKey, occasion)}
+                          addedLooks={addedLooks}
+                          onToggleLook={toggleLookPiece}
+                        />
+                      )}
+                    </div>
+                  )}
                 </div>
               </article>
             );
