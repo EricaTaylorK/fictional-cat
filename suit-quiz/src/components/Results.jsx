@@ -185,76 +185,128 @@ function pantsFact(size, renting) {
 }
 
 const SHIRT_SIZES = ["15 32/33", "15.5 32/33", "16 32/33", "16.5 33/34", "17 33/34"];
-const TIE_SIZES = ["Regular", "Extra long"];
 const SHOE_SIZES = ["8", "8.5", "9", "9.5", "10", "10.5", "11", "11.5", "12"];
-const SHIRT_SERVICES = [
-  { id: "press", label: "Press" },
-  { id: "shorten-sleeves", label: "Shorten sleeves" },
+const SHIRT_INSEAMS = [
+  { id: "32", label: "32", price: 0 },
+  { id: "34", label: "34", price: 10 },
 ];
+const SHIRT_FINISHES = [
+  { id: "plain", label: "Plain", price: 0 },
+  { id: "hem", label: "Hem", price: 15 },
+];
+
+function roundMoney(value) {
+  return Math.round(Number(value) * 100) / 100;
+}
+
+function lookProfile(item) {
+  const kind = lookKind(item);
+  const image = item.image;
+  const price = Number(item.price) || 0;
+  if (kind.includes("shirt")) {
+    return {
+      badge: "Popular",
+      onlineExclusive: false,
+      rating: 4.5,
+      promo: "Promotion",
+      hems: true,
+      sizes: SHIRT_SIZES,
+      colors: [
+        { colorKey: "white", color: "White", price, image, outOfStockSizes: ["17 33/34"] },
+        {
+          colorKey: "blue",
+          color: "Blue",
+          price: roundMoney(price + 10),
+          compareAt: roundMoney(price + 25),
+          onSale: true,
+          image,
+          outOfStockSizes: [],
+        },
+        {
+          colorKey: "navy",
+          color: "Navy",
+          price: roundMoney(Math.max(price - 8, 19.99)),
+          compareAt: roundMoney(price + 12),
+          clearance: true,
+          image,
+          outOfStock: true,
+          outOfStockSizes: [],
+        },
+      ],
+    };
+  }
+  if (kind.includes("tie")) {
+    return {
+      badge: "Going Fast",
+      onlineExclusive: true,
+      rating: 4.6,
+      promo: "",
+      hems: false,
+      sizes: ["One Size"],
+      colors: [
+        {
+          colorKey: item.colorKey || "navy",
+          color: item.color || "Navy",
+          price,
+          image,
+          outOfStockSizes: [],
+        },
+      ],
+    };
+  }
+  return {
+    badge: null,
+    onlineExclusive: false,
+    rating: 4.2,
+    promo: "",
+    hems: false,
+    sizes: SHOE_SIZES,
+    colors: [
+      { colorKey: "black", color: "Black", price, image, outOfStockSizes: ["8"] },
+      {
+        colorKey: "brown",
+        color: "Brown",
+        price: roundMoney(price + 10),
+        compareAt: roundMoney(price + 30),
+        onSale: true,
+        image,
+        outOfStockSizes: [],
+      },
+      { colorKey: "burgundy", color: "Burgundy", price, image, outOfStock: true, outOfStockSizes: [] },
+    ],
+  };
+}
 
 function lookKind(item) {
   return `${item?.type || ""} ${item?.name || ""}`.toLowerCase();
 }
 
-function preferredLookSize(item, answers) {
-  const sizes = sizesForLookItem(item);
-  const everyday = answers?.everydaySizes ?? {};
-  const measurements = answers?.measurements ?? {};
-  const candidates = [...sizeList(everyday.shirt), everyday.shoe, measurements.shirt, measurements.neck, measurements.shoe]
-    .filter(Boolean)
-    .map(String);
-  return candidates.find((value) => sizes.includes(value)) || "";
-}
-
 function sizesForLookItem(item) {
-  const kind = lookKind(item);
-  if (kind.includes("shirt")) return SHIRT_SIZES;
-  if (kind.includes("tie")) return TIE_SIZES;
-  if (kind.includes("shoe")) return SHOE_SIZES;
-  return ["One size"];
+  return lookProfile(item).sizes;
 }
-
-const LOOK_COLOR_KEYS = {
-  shirt: ["white", "blue", "navy"],
-  tie: ["burgundy", "navy", "blue", "black"],
-  shoe: ["black", "brown", "burgundy"],
-};
-
-const LOOK_COLOR_LABELS = {
-  white: "White",
-  blue: "Blue",
-  navy: "Navy",
-  burgundy: "Burgundy",
-  black: "Black",
-  brown: "Brown",
-};
 
 function colorChoicesForLookItem(item) {
-  const kind = lookKind(item);
-  const keys = kind.includes("shirt")
-    ? LOOK_COLOR_KEYS.shirt
-    : kind.includes("tie")
-      ? LOOK_COLOR_KEYS.tie
-      : LOOK_COLOR_KEYS.shoe;
-  const choices = keys.map((colorKey) => ({
-    colorKey,
-    color: LOOK_COLOR_LABELS[colorKey] || colorKey,
-  }));
-  if (item.colorKey && !choices.some((choice) => choice.colorKey === item.colorKey)) {
-    choices.unshift({ colorKey: item.colorKey, color: item.color || item.colorKey });
-  }
-  return choices;
+  return lookProfile(item).colors;
 }
 
-function servicesForLookItem(item) {
-  return lookKind(item).includes("shirt") ? SHIRT_SERVICES : [];
-}
-
-function serviceLabels(item, ids) {
-  const catalog = servicesForLookItem(item);
+function serviceLabels(_item, ids) {
   return (ids ?? [])
-    .map((id) => catalog.find((service) => service.id === id)?.label)
+    .map((id) => {
+      if (String(id).startsWith("inseam:")) return `Inseam ${String(id).slice(7)}`;
+      if (String(id).startsWith("finish:")) {
+        return SHIRT_FINISHES.find((finish) => finish.id === String(id).slice(7))?.label;
+      }
+      return "";
+    })
     .filter(Boolean);
+}
+
+function vasSummary(selection) {
+  if (!selection) return "";
+  return [
+    selection.inseam ? `Inseam ${selection.inseam}` : "",
+    selection.finish ? SHIRT_FINISHES.find((finish) => finish.id === selection.finish)?.label : "",
+  ].filter(Boolean).join(" · ");
 }
 
 function joinPhrases(phrases) {
@@ -424,7 +476,7 @@ function lookPieceTitle(item) {
   return `${color} ${name}`.replace(/\s+/g, " ").trim();
 }
 
-function SuitOptions({ tailoringId, onTailoring, look, addedLooks, onOpenLook, showSuggestion = true }) {
+function SuitOptions({ tailoringId, onTailoring, look, addedLooks, onOpenLook, onRemoveLook, showSuggestion = true }) {
   const items = look?.items ?? [];
   return (
     <>
@@ -475,19 +527,32 @@ function SuitOptions({ tailoringId, onTailoring, look, addedLooks, onOpenLook, s
               const selection = addedLooks[item.id];
               const added = Boolean(selection);
               const title = lookPieceTitle(item);
+              const profile = lookProfile(item);
               const pickedColor = selection?.color || item.color;
               const pickedSize = selection?.size || "";
               const pickedQty = selection?.quantity || 1;
+              const pickedVas = vasSummary(selection);
+              const pickedLine = [`Qty: ${pickedQty}`, pickedSize, pickedColor, pickedVas].filter(Boolean).join(" · ");
               return (
-                <article className={`pair-card${added ? " is-on" : ""}`} key={item.id}>
+                <article
+                  className={`pair-card${added ? " is-on" : ""}`}
+                  key={item.id}
+                  onClick={() => {
+                    if (!added) onOpenLook(item);
+                  }}
+                >
                   <div className="pair-photo">
                     <img src={item.image} alt="" />
                     <button
                       className={`card-plus pair-add${added ? " is-on" : ""}`}
                       type="button"
                       aria-pressed={added}
-                      aria-label={added ? `${title} added. Edit` : `Add ${title}`}
-                      onClick={(event) => onOpenLook(item, event)}
+                      aria-label={added ? `Remove ${title}` : `Add ${title}`}
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        if (added) onRemoveLook(item.id);
+                        else onOpenLook(item, event);
+                      }}
                     >
                       {added ? (
                         <svg viewBox="0 0 14 14" aria-hidden="true">
@@ -504,10 +569,26 @@ function SuitOptions({ tailoringId, onTailoring, look, addedLooks, onOpenLook, s
                     <span className="pair-brand">{lookPieceBrand(item)}</span>
                     <span className="pair-name">{title}</span>
                     <span className="pair-price">{formatPrice(item.price)}</span>
+                    {profile.promo && (
+                      <button
+                        type="button"
+                        className="pair-promo"
+                        onClick={(event) => event.stopPropagation()}
+                      >
+                        {profile.promo}
+                      </button>
+                    )}
                     {added && (
                       <p className="pair-picked">
-                        <span>{`Qty: ${pickedQty} · ${pickedSize} · ${pickedColor}`}</span>
-                        <button type="button" className="pair-edit" onClick={(event) => onOpenLook(item, event)}>
+                        <span>{pickedLine}</span>
+                        <button
+                          type="button"
+                          className="pair-edit"
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            onOpenLook(item, event);
+                          }}
+                        >
                           Edit
                         </button>
                       </p>
@@ -752,21 +833,35 @@ function RentalPackage({ pack, pieces, price }) {
   );
 }
 
-function QuickView({ item, initial, suggestedSize = "", onConfirm, onClose }) {
+function QuickView({ item, initial, onConfirm, onClose }) {
   const dialogRef = useRef(null);
-  const sizes = sizesForLookItem(item);
-  const services = servicesForLookItem(item);
-  const colorChoices = colorChoicesForLookItem(item);
-  const [size, setSize] = useState(initial?.size || suggestedSize || sizes[0] || "");
+  const errorRef = useRef(null);
+  const priceWas = useRef(null);
+  const profile = lookProfile(item);
+  const colors = profile.colors;
+  const startingKey = initial?.colorKey || item.colorKey || colors[0]?.colorKey || "";
+  const [colorKey, setColorKey] = useState(startingKey);
+  const [size, setSize] = useState(initial?.size || (profile.sizes.length === 1 ? profile.sizes[0] : ""));
   const [quantity, setQuantity] = useState(initial?.quantity ?? 1);
-  const [serviceIds, setServiceIds] = useState(initial?.services ?? []);
-  const [colorKey, setColorKey] = useState(initial?.colorKey ?? item.colorKey ?? "");
+  const [inseam, setInseam] = useState(initial?.inseam || "");
+  const [finish, setFinish] = useState(initial?.finish || "");
+  const [frame, setFrame] = useState(0);
+  const [errors, setErrors] = useState({});
+  const [delta, setDelta] = useState(null);
   const alreadyAdded = Boolean(initial);
-  const shownColor = colorChoices?.find((choice) => choice.colorKey === colorKey)?.color || item.color;
+  const color = colors.find((choice) => choice.colorKey === colorKey) ?? colors[0];
+  const shownSizes = profile.sizes;
+  const inseamChoice = SHIRT_INSEAMS.find((option) => option.id === inseam);
+  const finishChoice = SHIRT_FINISHES.find((option) => option.id === finish);
+  const sizeDelta = size === "Extra long" ? 5 : 0;
+  const vasDelta = (inseamChoice?.price ?? 0) + (finishChoice?.price ?? 0);
+  const unitPrice = roundMoney((color?.price ?? item.price) + sizeDelta + vasDelta);
+  const compareAt = color?.compareAt ? roundMoney(color.compareAt + sizeDelta + vasDelta) : null;
+  const off = compareAt && compareAt > unitPrice ? Math.round((1 - unitPrice / compareAt) * 100) : null;
+  const images = color?.image ? [color.image] : [];
 
   useEffect(() => {
-    const node = dialogRef.current;
-    node?.querySelector(".quick-view-close")?.focus();
+    dialogRef.current?.querySelector(".quick-view-close")?.focus();
   }, []);
 
   useEffect(() => {
@@ -779,7 +874,7 @@ function QuickView({ item, initial, suggestedSize = "", onConfirm, onClose }) {
         return;
       }
       if (event.key !== "Tab") return;
-      const focusable = [...node.querySelectorAll("button, select, a[href], input")];
+      const focusable = [...node.querySelectorAll("button, select, a[href], input")].filter((el) => !el.disabled);
       if (focusable.length === 0) return;
       const first = focusable[0];
       const last = focusable[focusable.length - 1];
@@ -795,6 +890,77 @@ function QuickView({ item, initial, suggestedSize = "", onConfirm, onClose }) {
     return () => document.removeEventListener("keydown", onKey);
   }, [onClose]);
 
+  useEffect(() => {
+    if (priceWas.current == null) {
+      priceWas.current = unitPrice;
+      return undefined;
+    }
+    const diff = roundMoney(unitPrice - priceWas.current);
+    priceWas.current = unitPrice;
+    if (!diff) return undefined;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return undefined;
+    setDelta(diff);
+    const timer = window.setTimeout(() => setDelta(null), 900);
+    return () => window.clearTimeout(timer);
+  }, [unitPrice]);
+
+  function chooseColor(next) {
+    setColorKey(next.colorKey);
+    setFrame(0);
+    setErrors({});
+    if (profile.sizes.length === 1) {
+      setSize(profile.sizes[0]);
+      return;
+    }
+    if (size && (next.outOfStock || next.outOfStockSizes?.includes(size))) setSize("");
+  }
+
+  function chooseSize(option) {
+    const blocked = color?.outOfStock || color?.outOfStockSizes?.includes(option);
+    if (!blocked) {
+      setSize(option);
+      setErrors((current) => ({ ...current, size: "" }));
+      return;
+    }
+    const next = colors.find((choice) => (
+      choice.colorKey !== colorKey && !choice.outOfStock && !choice.outOfStockSizes?.includes(option)
+    ));
+    if (!next) return;
+    setColorKey(next.colorKey);
+    setSize(option);
+    setFrame(0);
+    setErrors((current) => ({ ...current, size: "" }));
+  }
+
+  function submit() {
+    const next = {};
+    if (shownSizes.length > 1 && !size) next.size = "Select your size";
+    if (profile.hems && !inseam) next.inseam = "Please select inseam";
+    if (profile.hems && !finish) next.finish = "Please select Finish";
+    setErrors(next);
+    if (Object.keys(next).length > 0) {
+      window.requestAnimationFrame(() => {
+        errorRef.current?.scrollIntoView({ block: "nearest", behavior: "smooth" });
+      });
+      return;
+    }
+    onConfirm({
+      size,
+      quantity,
+      inseam,
+      finish,
+      services: [
+        inseam ? `inseam:${inseam}` : "",
+        finish ? `finish:${finish}` : "",
+      ].filter(Boolean),
+      colorKey: color?.colorKey || item.colorKey,
+      color: color?.color || item.color,
+      price: unitPrice,
+    });
+  }
+
+  const firstError = errors.size || errors.inseam || errors.finish;
+
   return (
     <div className="quick-view-backdrop" onClick={onClose}>
       <div
@@ -806,117 +972,194 @@ function QuickView({ item, initial, suggestedSize = "", onConfirm, onClose }) {
         tabIndex={-1}
         onClick={(event) => event.stopPropagation()}
       >
-        <div className="quick-view-media">
-          {item.image || item.icon ? <img src={item.image || item.icon} alt="" /> : <span className="quick-view-media-empty" aria-hidden="true" />}
+        <div className="quick-view-closebar">
+          <button className="quick-view-close" type="button" aria-label="Close" onClick={onClose}>
+            <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true">
+              <path fill="#3A3A3A" d="M1.1 0 6 4.9 10.9 0 12 1.1 7.1 6 12 10.9 10.9 12 6 7.1 1.1 12 0 10.9 4.9 6 0 1.1 1.1 0Z" />
+            </svg>
+          </button>
         </div>
-        <div className="quick-view-details">
-          <div className="quick-view-info">
-            <p className="quick-view-brand">{lookPieceBrand(item)}</p>
-            <h2 id="quick-view-title">{lookPieceTitle(item)}</h2>
-            <p className="quick-view-price">{formatPrice(item.price)}</p>
-          </div>
-          <div className="quick-view-field">
-            <p className="quick-view-label" id="quick-view-color-label">Color</p>
-            <div className="quick-view-swatches" role="group" aria-labelledby="quick-view-color-label">
-              {colorChoices.map((choice) => {
-                const selected = choice.colorKey === (colorKey || item.colorKey);
-                return (
-                  <button
-                    key={choice.colorKey}
-                    type="button"
-                    className={selected ? "quick-view-swatch is-selected" : "quick-view-swatch"}
-                    aria-pressed={selected}
-                    aria-label={choice.color}
-                    onClick={() => setColorKey(choice.colorKey)}
-                  >
-                    <span style={{ background: SWATCH_HEX[choice.colorKey] ?? "#888" }} />
-                  </button>
-                );
-              })}
+        <div className="quick-view-body">
+          <div className="quick-view-gallery">
+            <div className="quick-view-stage">
+              {images.map((src, index) => (
+                <img key={`${src}-${index}`} src={src} alt="" className={index === frame ? "is-active" : undefined} />
+              ))}
+              {profile.badge && <span className="quick-view-badge">{profile.badge}</span>}
             </div>
-          </div>
-          <div className="quick-view-field">
-            <p className="quick-view-label" id="quick-view-size-label">Size</p>
-            <div className="quick-view-choices" role="group" aria-labelledby="quick-view-size-label">
-              {sizes.map((option) => {
-                const selected = option === size;
-                return (
+            {images.length > 0 && (
+              <div className="quick-view-thumbs">
+                {images.map((src, index) => (
                   <button
-                    key={option}
+                    key={`thumb-${src}-${index}`}
                     type="button"
-                    className={selected ? "quick-view-choice is-selected" : "quick-view-choice"}
-                    aria-pressed={selected}
-                    onClick={() => setSize(option)}
+                    className={index === frame ? "is-active" : undefined}
+                    aria-label={`Image ${index + 1}`}
+                    aria-pressed={index === frame}
+                    onClick={() => setFrame(index)}
                   >
-                    {option}
+                    <img src={src} alt="" />
                   </button>
-                );
-              })}
-            </div>
+                ))}
+              </div>
+            )}
           </div>
-          {services.length > 0 && (
+          <div className="quick-view-details">
+            <div className="quick-view-brandline">
+              <p className="quick-view-brand">{lookPieceBrand(item)}</p>
+              {profile.onlineExclusive && <span className="quick-view-exclusive">Online Exclusive</span>}
+            </div>
+            <h2 id="quick-view-title" className="quick-view-name">{lookPieceTitle(item)}</h2>
+            <p className="quick-view-rating">
+              <Stars value={profile.rating} />
+              <span>({profile.rating.toFixed(1)})</span>
+            </p>
+            <div className="quick-view-priceblock">
+              <p className="quick-view-price">
+                <span>{formatPrice(unitPrice)}</span>
+                {compareAt && <s>{formatPrice(compareAt)}</s>}
+                {off ? <span className="quick-view-off">{off}% off</span> : null}
+                {delta != null && (
+                  <span className={`quick-view-delta${delta < 0 ? " is-down" : ""}`}>
+                    {delta > 0 ? "+" : "−"} ${Math.abs(delta).toFixed(2)}
+                  </span>
+                )}
+              </p>
+              {color?.clearance && (
+                <p className="quick-view-clearance">
+                  Clearance
+                  <button type="button" className="quick-view-info" aria-label="Clearance disclaimer">
+                    i
+                    <span className="quick-view-tip" role="tooltip">Clearance items are final sale.</span>
+                  </button>
+                </p>
+              )}
+              {(color?.promo || profile.promo) && (
+                <button type="button" className="quick-view-promo">{color?.promo || profile.promo}</button>
+              )}
+            </div>
             <div className="quick-view-field">
-              <p className="quick-view-label" id="quick-view-service-label">Services</p>
-              <div className="quick-view-choices" role="group" aria-labelledby="quick-view-service-label">
-                {services.map((service) => {
-                  const selected = serviceIds.includes(service.id);
+              <p className="quick-view-label" id="quick-view-color-label">
+                Color: <span>{color?.color}</span>
+              </p>
+              <div className="quick-view-swatches" role="group" aria-labelledby="quick-view-color-label">
+                {colors.map((choice) => {
+                  const selected = choice.colorKey === color?.colorKey;
                   return (
                     <button
-                      key={service.id}
+                      key={choice.colorKey}
                       type="button"
-                      className={selected ? "quick-view-choice is-selected" : "quick-view-choice"}
+                      className={[
+                        "quick-view-swatch",
+                        selected ? "is-selected" : "",
+                        choice.outOfStock ? "is-oos" : "",
+                        choice.onSale ? "is-sale" : "",
+                      ].filter(Boolean).join(" ")}
                       aria-pressed={selected}
-                      onClick={() => setServiceIds((current) => (
-                        current.includes(service.id)
-                          ? current.filter((id) => id !== service.id)
-                          : [...current, service.id]
-                      ))}
+                      aria-label={choice.outOfStock ? `${choice.color}, Out of Stock` : choice.color}
+                      title={choice.outOfStock ? "Out of Stock" : undefined}
+                      onClick={() => chooseColor(choice)}
                     >
-                      {service.label}
+                      <span style={{ background: SWATCH_HEX[choice.colorKey] ?? "#888" }} />
+                      {choice.onSale && <em>Sale</em>}
                     </button>
                   );
                 })}
               </div>
-              <p className="quick-view-note">Optional. No charge added here.</p>
             </div>
-          )}
-          <div className="quick-view-buy">
-            <select
-              id="quick-view-qty"
-              className="quick-view-qty"
-              aria-label="Quantity"
-              value={quantity}
-              onChange={(event) => setQuantity(Number(event.target.value))}
-            >
-              {[1, 2, 3].map((qty) => (
-                <option key={qty} value={qty}>{qty}</option>
-              ))}
-            </select>
-            <button
-              className="button quick-view-add"
-              type="button"
-              onClick={() => {
-                onConfirm({
-                  size: size || suggestedSize || sizes[0] || "",
-                  quantity,
-                  services: serviceIds,
-                  colorKey: colorKey || item.colorKey,
-                  color: shownColor,
-                });
-              }}
-            >
-              {alreadyAdded ? "Update" : "Add to look"}
-            </button>
+            <div className="quick-view-field" ref={errors.size ? errorRef : undefined}>
+              <p className="quick-view-label" id="quick-view-size-label">Size</p>
+              <div className="quick-view-choices" role="group" aria-labelledby="quick-view-size-label">
+                {shownSizes.map((option) => {
+                  const selected = option === size;
+                  const oos = color?.outOfStock || color?.outOfStockSizes?.includes(option);
+                  return (
+                    <button
+                      key={option}
+                      type="button"
+                      className={[
+                        "quick-view-choice",
+                        selected ? "is-selected" : "",
+                        oos ? "is-oos" : "",
+                      ].filter(Boolean).join(" ")}
+                      aria-pressed={selected}
+                      title={oos ? "Out of Stock" : undefined}
+                      onClick={() => chooseSize(option)}
+                    >
+                      {option}
+                    </button>
+                  );
+                })}
+              </div>
+              {errors.size && <p className="quick-view-error" role="alert">{errors.size}</p>}
+            </div>
+            {profile.hems && (
+              <>
+                <div className="quick-view-field" ref={!errors.size && errors.inseam ? errorRef : undefined}>
+                  <p className="quick-view-label" id="quick-view-inseam-label">Inseam</p>
+                  <div className="quick-view-choices" role="group" aria-labelledby="quick-view-inseam-label">
+                    {SHIRT_INSEAMS.map((option) => (
+                      <button
+                        key={option.id}
+                        type="button"
+                        className={inseam === option.id ? "quick-view-choice is-selected" : "quick-view-choice"}
+                        aria-pressed={inseam === option.id}
+                        onClick={() => {
+                          setInseam(option.id);
+                          setErrors((current) => ({ ...current, inseam: "" }));
+                        }}
+                      >
+                        {option.label}
+                      </button>
+                    ))}
+                  </div>
+                  {errors.inseam && <p className="quick-view-error" role="alert">{errors.inseam}</p>}
+                </div>
+                <div className="quick-view-field" ref={!errors.size && !errors.inseam && errors.finish ? errorRef : undefined}>
+                  <p className="quick-view-label" id="quick-view-finish-label">Finish</p>
+                  <div className="quick-view-choices" role="group" aria-labelledby="quick-view-finish-label">
+                    {SHIRT_FINISHES.map((option) => (
+                      <button
+                        key={option.id}
+                        type="button"
+                        className={finish === option.id ? "quick-view-choice is-selected" : "quick-view-choice"}
+                        aria-pressed={finish === option.id}
+                        onClick={() => {
+                          setFinish(option.id);
+                          setErrors((current) => ({ ...current, finish: "" }));
+                        }}
+                      >
+                        {option.label}
+                      </button>
+                    ))}
+                  </div>
+                  {errors.finish && <p className="quick-view-error" role="alert">{errors.finish}</p>}
+                </div>
+              </>
+            )}
+            <div className="quick-view-buy">
+              <select
+                className="quick-view-qty"
+                aria-label="Quantity"
+                value={quantity}
+                onChange={(event) => setQuantity(Number(event.target.value))}
+              >
+                {[1, 2, 3].map((qty) => (
+                  <option key={qty} value={qty}>{qty}</option>
+                ))}
+              </select>
+              <button className="button quick-view-add" type="button" onClick={submit}>
+                {alreadyAdded ? "Update Product" : "Add Product to Look"}
+              </button>
+            </div>
+            <button type="button" className="quick-view-details-link">View full product details</button>
+            {firstError ? <span className="quick-view-error-live" role="status">{firstError}</span> : null}
           </div>
         </div>
-        <button className="quick-view-close" type="button" aria-label="Close" onClick={onClose}>
-          ×
-        </button>
       </div>
     </div>
   );
 }
-
 function CompleteLook({ id, look, suitColor, suitName, addedLooks, onOpen, onRemove }) {
   const lede = stylistLookLine(suitColor, suitName, look.items);
   const [showAll, setShowAll] = useState(false);
@@ -1734,6 +1977,7 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
                           look={lookForColor(shown?.colorKey, occasion)}
                           addedLooks={addedLooks}
                           onOpenLook={openQuickView}
+                          onRemoveLook={removeLook}
                         />
                       )}
                     </div>
@@ -1823,7 +2067,6 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
         <QuickView
           key={quickViewItem.id}
           item={quickViewItem}
-          suggestedSize={preferredLookSize(quickViewItem, answers)}
           initial={addedLooks[quickViewItem.id] || null}
           onConfirm={confirmQuickView}
           onClose={closeQuickView}
