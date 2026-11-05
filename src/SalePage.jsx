@@ -219,8 +219,6 @@ function HomeScreen({ onTakeQuiz, onNavigate }) {
         ))}
       </section>
 
-      <QuizEntry onTakeQuiz={onTakeQuiz} />
-
       <section className="deal-bar" aria-label="Everyday deals">
         <div className="deal-bar-title">
           <h2>Everyday deals</h2>

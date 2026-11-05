@@ -5276,7 +5276,7 @@ h2 {
 
 .app-shell.app-shell-wide:has(.results-layout) {
   max-width: none;
-  padding: 0 0 48px;
+  padding: 0;
 }
 
 .store-chrome {
@@ -5422,7 +5422,11 @@ button.store-logo {
 
 .results-layout {
   background: #f4f5f7;
-  padding-bottom: 48px;
+  padding-bottom: 0;
+}
+
+.results-layout .site-footer {
+  margin-top: 24px;
 }
 
 .results-layout .results-main {
@@ -5448,9 +5452,9 @@ button.store-logo {
     linear-gradient(90deg, #fbf6f4 0%, #f8f7f5 40%, #f6f9fd 60%, #e6f1fc 100%);
   bottom: 52px;
   content: "";
-  left: 0;
+  left: 80px;
   position: absolute;
-  right: 0;
+  right: 80px;
   top: 0;
   z-index: 0;
 }
@@ -5468,7 +5472,7 @@ button.store-logo {
 .results-layout .results-hero-headline {
   align-items: center;
   display: flex;
-  gap: 40px;
+  gap: 32px;
   width: 100%;
 }
 
@@ -6421,6 +6425,11 @@ button.store-logo {
     padding-right: 24px;
   }
 
+  .results-layout .results-hero::before {
+    left: 24px;
+    right: 24px;
+  }
+
   .results-layout .budget-alert {
     margin-left: 24px;
     margin-right: 24px;
@@ -6446,7 +6455,8 @@ button.store-logo {
 
   .results-layout .results-list,
   .order-summary,
-  .rental-summary {
+  .rental-summary,
+  .your-look {
     max-width: 100%;
     position: static;
     top: auto;
@@ -6455,6 +6465,7 @@ button.store-logo {
 
   .order-summary,
   .rental-summary,
+  .your-look,
   .results-layout .fit-card,
   .results-layout .fit-save {
     flex: 1 1 auto;
@@ -6618,22 +6629,27 @@ button.store-logo {
 }
 
 .your-look,
-.rental-summary {
-  align-self: flex-start;
+.rental-summary,
+#your-look-details.your-look-panel {
   background: #fff;
-  border: 1px solid rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(0, 0, 0, 0.14);
   border-radius: 4px;
   box-shadow: none;
   box-sizing: border-box;
+}
+
+.your-look,
+.rental-summary {
+  align-self: flex-start;
   color: #232323;
   display: flex;
-  flex: 0 0 383px;
+  flex: 0 0 320px;
   flex-direction: column;
   max-width: 100%;
   overflow: hidden;
   position: sticky;
   top: 24px;
-  width: 383px;
+  width: 320px;
 }
 
 .your-look-accent {
@@ -6641,11 +6657,19 @@ button.store-logo {
 }
 
 .your-look-panel {
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 12px;
   min-width: 0;
-  padding: 24px 24px 8px;
+  padding: 20px 20px 8px;
+}
+
+/* Card stroke lives on the aside; keep the panel flush inside so buy/rental read as one card. */
+.your-look > #your-look-details.your-look-panel,
+.your-look > .your-look-panel {
+  border: 0;
+  border-radius: 0;
 }
 
 .your-look-dock {
@@ -6653,7 +6677,18 @@ button.store-logo {
   flex-direction: column;
   gap: 8px;
   min-width: 0;
-  padding: 8px 24px 24px;
+  padding: 8px 20px 20px;
+}
+
+.your-look-tailoring.is-selected .your-look-selected-label {
+  color: #001e56;
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  line-height: 16px;
+  margin-top: 2px;
+  text-transform: uppercase;
 }
 
 .your-look-head {
@@ -6675,8 +6710,8 @@ button.store-logo {
 }
 
 .rental-summary {
-  gap: 16px;
-  padding: 24px;
+  gap: 12px;
+  padding: 20px;
 }
 
 .your-look-link,

@@ -1266,6 +1266,29 @@ h1 {
   flex: 0 0 240px;
   width: 240px;
   max-width: 240px;
+  gap: 6px;
+  padding: 14px 12px 12px;
+}
+
+.dept-promos .sf-entry--card .sf-entry-art {
+  width: 96px;
+}
+
+.dept-promos .sf-entry--card .sf-entry-copy {
+  gap: 4px;
+}
+
+.dept-promos .sf-entry--card .sf-entry-title {
+  font-size: 17px;
+}
+
+.dept-promos .sf-entry--card .sf-entry-lede {
+  display: none;
+}
+
+.dept-promos .sf-entry--card .sf-entry-cta {
+  min-height: 40px;
+  font-size: 11px;
 }
 
 .dept-feature,

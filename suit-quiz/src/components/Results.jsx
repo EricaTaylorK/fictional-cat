@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import SiteFooter from "../../../src/components/SiteFooter.jsx";
 import {
   lookForColor,
   SWATCH_HEX,
@@ -1268,8 +1269,11 @@ function YourLook({ suit, size, tailoringId, items, addedLooks, onOpenLook, onRe
             <span className="order-amount">{formatPrice(suit.price)}</span>
           </li>
           {selectedPackage && selectedPackage.price > 0 && (
-            <li>
-              <span>{selectedPackage.name}</span>
+            <li className="your-look-tailoring is-selected">
+              <span>
+                {selectedPackage.name}
+                <span className="your-look-selected-label">Selected</span>
+              </span>
               <span className="order-amount">{formatPrice(selectedPackage.price)}</span>
             </li>
           )}
@@ -1854,6 +1858,7 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
           onClose={closeQuickView}
         />
       )}
+      <SiteFooter />
     </div>
   );
 }
