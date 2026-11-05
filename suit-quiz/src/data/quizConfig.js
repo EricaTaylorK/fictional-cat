@@ -184,12 +184,13 @@ export const questions = {
   },
   tailoring: {
     id: "tailoring",
-    title: "Want this suit tailored?",
-    help: "Most suits look best with some tailoring, and there are plenty of options. We'll suggest what's right for you. The price shows before checkout, and you can remove it.",
+    title: "Want your suit tailored?",
+    help: "Most suits look sharpest with a few small adjustments. We'll suggest what yours needs, based on your answers.",
+    note: "You'll see the price before checkout, and you can remove tailoring anytime.",
     type: "single",
     options: [
+      { value: "consider", label: "Yes, suggest tailoring" },
       { value: "skip", label: "No, just the suit" },
-      { value: "consider", label: "Tell me what you'd suggest" },
     ],
   },
   budget: {

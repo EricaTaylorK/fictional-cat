@@ -4510,6 +4510,15 @@ h2 {
   margin-top: 4px;
 }
 
+.quiz-slide .question-note {
+  color: var(--color-font-dark-gray);
+  font-size: var(--font-size-14);
+  line-height: var(--line-height-20);
+  margin: 0 auto;
+  text-align: center;
+  width: min(1024px, 100%);
+}
+
 .date-hint {
   color: var(--color-font-dark-gray);
   font-size: var(--font-size-12);

@@ -163,6 +163,16 @@ describe("rentals", () => {
   });
 });
 
+describe("tailoring suggestion on results", () => {
+  it("drops the suggestion when the shopper picks No, just the suit", () => {
+    expect(buildResultSummary({ ...baseAnswers, tailoring: "skip" }).tailoring).toBeNull();
+  });
+
+  it("keeps a suggestion when the shopper wants tailoring suggested", () => {
+    expect(buildResultSummary({ ...baseAnswers, tailoring: "consider" }).tailoring).toMatchObject({ id: expect.any(String) });
+  });
+});
+
 describe("tailoring tiers", () => {
   it("adds up the real alteration prices", () => {
     expect(TAILORING_TIERS.map((tier) => tier.price)).toEqual([55, 115, 199]);

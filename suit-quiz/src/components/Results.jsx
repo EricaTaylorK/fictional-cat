@@ -407,7 +407,7 @@ function lookPieceTitle(item) {
   return `${color} ${name}`.replace(/\s+/g, " ").trim();
 }
 
-function SuitOptions({ tailoringId, onTailoring, look, addedLooks, onOpenLook }) {
+function SuitOptions({ tailoringId, onTailoring, look, addedLooks, onOpenLook, showSuggestion = true }) {
   const items = look?.items ?? [];
   return (
     <>
@@ -419,8 +419,8 @@ function SuitOptions({ tailoringId, onTailoring, look, addedLooks, onOpenLook })
         {CARD_TAILORING.map((option) => {
           const selected = tailoringId === option.id;
           return (
-            <article className={`tailor-card${option.recommended ? " is-recommended" : ""}`} key={option.id}>
-              {option.recommended && <span className="tailor-badge">Recommended</span>}
+            <article className={`tailor-card${option.recommended && showSuggestion ? " is-recommended" : ""}`} key={option.id}>
+              {option.recommended && showSuggestion && <span className="tailor-badge">Recommended</span>}
               <button
                 className={`card-plus tailor-add${selected ? " is-on" : ""}`}
                 type="button"
@@ -1626,6 +1626,7 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
                 <p className="hero-fact-value">{answers.feel ? titleWords(summary.fitName) : "Not selected"}</p>
               </div>
             </div>
+            {(renting || summary.tailoring) && (
             <div className="hero-fact">
               <div>
                 <p className="hero-fact-label">{renting ? "Package" : "Suggested tailoring"}</p>
@@ -1636,6 +1637,7 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
                 </p>
               </div>
             </div>
+            )}
           </div>
         </div>
 
@@ -1747,6 +1749,7 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
                         <p className="expand-rent-note">Sizes for this look are confirmed at your fitting.</p>
                       ) : (
                         <SuitOptions
+                          showSuggestion={answers.tailoring !== "skip"}
                           tailoringId={tailoringId}
                           onTailoring={chooseTailoring}
                           look={lookForColor(shown?.colorKey, occasion)}

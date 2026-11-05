@@ -6,6 +6,7 @@ import Results from "./components/Results.jsx";
 import TextInput from "./components/TextInput.jsx";
 import { RENTAL_MIN_LEAD_DAYS, RENTAL_PACKAGES } from "./data/rentals.js";
 import { colorThemes, getQuestionFlow, occasionOptions, questions } from "./data/quizConfig.js";
+import { matchingSteps, matchingSubtext } from "./lib/matchingSteps.js";
 import { formatDate, quizCatalogIds, quizListingFilters, rentalDates } from "./lib/recommendation.js";
 
 const STORAGE_KEY = "suit-quiz-wireframe-progress";
@@ -474,24 +475,10 @@ function SizesQuestion({ question, value = {}, onChange }) {
   );
 }
 
-const MATCHING_STEPS = {
-  buy: [
-    "Reading your occasion",
-    "Working out your jacket and pants sizes",
-    "Comparing cuts against how you want it to feel",
-    "Checking prices against your budget",
-  ],
-  rent: [
-    "Reading your occasion",
-    "Choosing suits or tuxedos for the room",
-    "Checking the package you picked",
-    "Working out your sizes for the fitting",
-  ],
-};
 const MATCHING_STEP_MS = 750;
 
-function MatchingScreen({ mode, onDone }) {
-  const steps = MATCHING_STEPS[mode] ?? MATCHING_STEPS.buy;
+function MatchingScreen({ mode, answers, onDone }) {
+  const steps = useMemo(() => matchingSteps(answers), [answers]);
   const [step, setStep] = useState(0);
 
   useEffect(() => {
@@ -505,22 +492,24 @@ function MatchingScreen({ mode, onDone }) {
     return () => clearTimeout(next);
   }, [step, steps.length, onDone]);
 
+  const heading = mode === "rent" ? "Finding your look" : "Finding your best fit";
+  const sizesLine = steps.at(-1)?.active.replace("…", ".") ?? "";
+
   return (
-    <section className="matching" aria-labelledby="matching-title" aria-live="polite">
+    <section className="matching" aria-labelledby="matching-title">
       <div className="matching-scan" aria-hidden="true">
         <img src="/icons/mw/ai-quiz.png" alt="" />
       </div>
-      <h1 id="matching-title">{mode === "rent" ? "Finding your look" : "Finding your best fit"}</h1>
-      <p className="matching-copy">
-        {mode === "rent" ? "Checking every rental look against your answers." : "Checking every suit against your answers."}
-      </p>
+      <p className="visually-hidden" role="status">{`${heading}. ${sizesLine}`}</p>
+      <h1 id="matching-title">{heading}</h1>
+      <p className="matching-copy">{matchingSubtext(mode)}</p>
       <ol className="matching-steps">
-        {steps.map((label, index) => {
+        {steps.map((item, index) => {
           const state = index < step ? "done" : index === step ? "active" : "pending";
           return (
-            <li className={`matching-step matching-step-${state}`} key={label}>
+            <li className={`matching-step matching-step-${state}`} key={item.id}>
               <span className="matching-dot" aria-hidden="true" />
-              {label}
+              {state === "done" ? item.done : item.active}
               {state === "done" && <span className="visually-hidden"> (done)</span>}
             </li>
           );
@@ -782,6 +771,8 @@ export default function App() {
         />
       )}
 
+      {currentQuestion.note && <p className="question-note">{currentQuestion.note}</p>}
+
       <div className="actions actions-pair">
         {currentQuestion.skippable && (
           <button className="button secondary skip-button" type="button" onClick={continueQuiz}>
@@ -842,7 +833,7 @@ export default function App() {
             labelledBy={screen === "matching" ? "matching-title" : screen === "question" ? "question-title" : "intro-title"}
           >
             {screen === "matching" ? (
-              <MatchingScreen mode={answers.mode} onDone={showResults} />
+              <MatchingScreen mode={answers.mode} answers={answers} onDone={showResults} />
             ) : screen === "question" ? questionSlide : undefined}
           </IntroModal>
         )}

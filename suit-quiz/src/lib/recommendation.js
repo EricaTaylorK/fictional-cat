@@ -800,7 +800,8 @@ export function buildResultSummary(answers) {
     fitName: fitNameLabels[answers.feel] ?? "balanced fit",
     size: inferLikelySize(answers),
     sizeEstimate: getSizeEstimate(answers),
-    tailoring: recommendTailoring(answers),
+    // A shopper who chose "No, just the suit" gets no suggestion at all.
+    tailoring: answers.tailoring === "skip" ? null : recommendTailoring(answers),
     fitNotes: [...getFitSignals(answers)].map((signal) => fitNoteLabels[signal]),
     colors: prefer,
     needsMeasurementHelp: isLowConfidence(answers),
