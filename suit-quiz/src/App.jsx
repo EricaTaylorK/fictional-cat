@@ -6,7 +6,7 @@ import Results from "./components/Results.jsx";
 import SiteHeaderEntry from "./components/SiteHeaderEntry.jsx";
 import TextInput from "./components/TextInput.jsx";
 import { RENTAL_MIN_LEAD_DAYS, RENTAL_PACKAGES } from "./data/rentals.js";
-import { colorThemes, getQuestionFlow, occasionOptions, questions } from "./data/quizConfig.js";
+import { colorThemes, getQuestionFlow, occasionOptions, PLACEHOLDER_ICON, questions } from "./data/quizConfig.js";
 import { matchingSteps, matchingSubtext } from "./lib/matchingSteps.js";
 import { formatDate, quizCatalogIds, quizListingFilters, rentalDates, sizeList } from "./lib/recommendation.js";
 
@@ -82,10 +82,8 @@ function OptionCards({ options, isSelected, onPick, label, compact = false, clas
                   <span className={`option-swatch option-swatch-${swatch.key}`} key={swatch.key} style={{ background: swatch.hex }} />
                 ))}
               </span>
-            ) : option.icon ? (
-              <img className="option-icon" src={option.icon} alt="" />
             ) : (
-              <span className="option-icon-slot" aria-hidden="true" />
+              <img className="option-icon" src={option.icon || PLACEHOLDER_ICON} alt="" />
             )}
           </span>
           <span className="option-copy">

@@ -1,6 +1,9 @@
 import { products, SWATCH_HEX } from "./products.js";
 import { rentals } from "./rentals.js";
 
+// Stand-in for answer cards that do not have a finished icon yet.
+export const PLACEHOLDER_ICON = "/icons/mw/placeholder-hammer.svg";
+
 export const questions = {
   mode: {
     id: "mode",
@@ -80,8 +83,8 @@ export const questions = {
     help: "Jacket size, pant size, or both. Even one helps.",
     type: "single",
     options: [
-      { value: "some", label: "I know my size", detail: "Share your jacket size, pant size, or both." },
-      { value: "no", label: "Help me estimate", detail: "We'll work it out from your usual shirt and jeans sizes." },
+      { value: "some", label: "I know my size", detail: "Share your jacket size, pant size, or both.", icon: PLACEHOLDER_ICON },
+      { value: "no", label: "Help me estimate", detail: "We'll work it out from your usual shirt and jeans sizes.", icon: PLACEHOLDER_ICON },
     ],
   },
   measurements: {
@@ -200,8 +203,8 @@ export const questions = {
     note: "You'll see the price before checkout, and you can remove tailoring anytime.",
     type: "single",
     options: [
-      { value: "consider", label: "Yes, suggest tailoring" },
-      { value: "skip", label: "No, just the suit" },
+      { value: "consider", label: "Yes, suggest tailoring", icon: PLACEHOLDER_ICON },
+      { value: "skip", label: "No, just the suit", icon: PLACEHOLDER_ICON },
     ],
   },
   budget: {
@@ -210,11 +213,11 @@ export const questions = {
     help: "We ask so we can show suits in this range first.",
     type: "single",
     options: [
-      { value: "under-250", label: "Under $250" },
-      { value: "250-400", label: "$250–$400" },
-      { value: "400-600", label: "$400–$600" },
-      { value: "over-600", label: "$600+" },
-      { value: "flexible", label: "Flexible for the right fit" },
+      { value: "under-250", label: "Under $250", icon: PLACEHOLDER_ICON },
+      { value: "250-400", label: "$250–$400", icon: PLACEHOLDER_ICON },
+      { value: "400-600", label: "$400–$600", icon: PLACEHOLDER_ICON },
+      { value: "over-600", label: "$600+", icon: PLACEHOLDER_ICON },
+      { value: "flexible", label: "Flexible for the right fit", icon: PLACEHOLDER_ICON },
     ],
   },
 };
