@@ -9,7 +9,7 @@ import entryCss from "./entries/entries.css?inline";
  * global CSS (h1 max-width, .site-header grid, :root tokens) cannot
  * restyle it, matching ProductGridEntry's SalePage chrome.
  */
-export default function SiteHeaderEntry({ onNavigate, onFindSuit, current }) {
+export default function SiteHeaderEntry({ onNavigate, onFindSuit, current, accountName }) {
   const hostRef = useRef(null);
   const rootRef = useRef(null);
   const [search, setSearch] = useState("");
@@ -42,11 +42,12 @@ export default function SiteHeaderEntry({ onNavigate, onFindSuit, current }) {
         search={search}
         onSearch={setSearch}
         current={current}
+        accountName={accountName}
         onNavigate={(next) => onNavigateRef.current?.(next)}
         onFindSuit={() => onFindSuitRef.current?.()}
       />,
     );
-  }, [search, current]);
+  }, [search, current, accountName]);
 
   return <div className="site-header-host" ref={hostRef} />;
 }

@@ -64,7 +64,7 @@ function numberRange(value) {
   return list[0] === list.at(-1) ? String(list[0]) : `${list[0]}–${list.at(-1)}`;
 }
 
-function fitProfileRows({ answers, renting, size, fitName }) {
+export function fitProfileRows({ answers, renting, size, fitName }) {
   const height = heightLabel(answers.height);
   const everyday = answers.everydaySizes ?? {};
   const jacketValue = size?.jacket ? jacketFact(size, renting) : null;

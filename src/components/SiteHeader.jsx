@@ -43,6 +43,12 @@ const SUIT_PROMO = {
 
 const UTILITIES = ["Find a Store", "Sign In"];
 
+function accountLabel(name) {
+  const text = String(name).trim();
+  if (text.length <= 20) return text;
+  return `${text.slice(0, 20)}…`;
+}
+
 function departmentById(id) {
   return DEPARTMENTS.find((item) => item.id === id) ?? null;
 }
@@ -55,7 +61,7 @@ function focusableIn(root) {
   });
 }
 
-export default function SiteHeader({ search, onSearch, onNavigate, onFindSuit, current }) {
+export default function SiteHeader({ search, onSearch, onNavigate, onFindSuit, current, accountName }) {
   const desktop = useDesktop();
   const [searchOpen, setSearchOpen] = useState(Boolean(search));
   const [menuOpen, setMenuOpen] = useState(false);
@@ -355,9 +361,15 @@ export default function SiteHeader({ search, onSearch, onNavigate, onFindSuit, c
                 <PinIcon />
                 Find a Store
               </button>
-              <button type="button" className="text-link">
-                Sign In
-              </button>
+              {accountName ? (
+                <a className="text-link account-name" href="/myAccount">
+                  <span className="account-name-text">{accountLabel(accountName)}</span>
+                </a>
+              ) : (
+                <button type="button" className="text-link">
+                  Sign In
+                </button>
+              )}
               <button type="button" className="icon-btn" aria-label="Bag">
                 <BagIcon />
               </button>
@@ -453,6 +465,11 @@ export default function SiteHeader({ search, onSearch, onNavigate, onFindSuit, c
               <img src="/mw-logo.svg" alt="" />
             </button>
             <div className="header-icons">
+              {accountName && (
+                <a className="account-name" href="/myAccount">
+                  <span className="account-name-text">{accountLabel(accountName)}</span>
+                </a>
+              )}
               <button
                 type="button"
                 className="icon-btn icon-search"
@@ -487,11 +504,7 @@ export default function SiteHeader({ search, onSearch, onNavigate, onFindSuit, c
                       <ChevronIcon />
                     </button>
                   ))}
-                  <div className="mobile-utilities">
-                    {UTILITIES.map((label) => (
-                      <button key={label} type="button" className="mobile-utility">{label}</button>
-                    ))}
-                  </div>
+                  <MobileUtilities accountName={accountName} />
                 </div>
                 {mobileDepartment && (
                   <MobilePanel
@@ -503,6 +516,7 @@ export default function SiteHeader({ search, onSearch, onNavigate, onFindSuit, c
                     }}
                     onGo={go}
                     onFindSuit={startQuiz}
+                    accountName={accountName}
                   />
                 )}
               </nav>
@@ -530,7 +544,7 @@ export default function SiteHeader({ search, onSearch, onNavigate, onFindSuit, c
   );
 }
 
-function MobilePanel({ department, backRef, onBack, onGo, onFindSuit }) {
+function MobilePanel({ department, backRef, onBack, onGo, onFindSuit, accountName }) {
   const suits = department.id === "suits";
   return (
     <div className="mobile-panel" id="mobile-dept-panel" role="region" aria-label={department.label}>
@@ -564,11 +578,21 @@ function MobilePanel({ department, backRef, onBack, onGo, onFindSuit }) {
           </span>
         </button>
       )}
-      <div className="mobile-utilities">
-        {UTILITIES.map((label) => (
+      <MobileUtilities accountName={accountName} />
+    </div>
+  );
+}
+
+function MobileUtilities({ accountName }) {
+  return (
+    <div className="mobile-utilities">
+      {UTILITIES.map((label) => (
+        label === "Sign In" && accountName ? (
+          <a key={label} className="mobile-utility" href="/myAccount">{accountLabel(accountName)}</a>
+        ) : (
           <button key={label} type="button" className="mobile-utility">{label}</button>
-        ))}
-      </div>
+        )
+      ))}
     </div>
   );
 }

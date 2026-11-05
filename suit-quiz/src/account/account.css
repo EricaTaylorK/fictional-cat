@@ -1,0 +1,284 @@
+html.page-white:has(.account-page) {
+  background: #f4f5f7;
+}
+
+.account-page {
+  align-items: start;
+  box-sizing: border-box;
+  display: grid;
+  gap: 32px;
+  grid-template-columns: 280px minmax(0, 1fr);
+  margin: 0 auto;
+  max-width: 1180px;
+  padding: 32px 24px 64px;
+}
+
+.account-content {
+  background: #fff;
+  min-width: 0;
+  padding: 24px;
+}
+
+.account-section > h2,
+.account-recs-title {
+  color: #232323;
+  font-family: var(--font-family-oswald);
+  font-size: 20px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  line-height: 28px;
+  margin: 0 0 12px;
+  text-transform: uppercase;
+}
+
+.account-note,
+.account-empty {
+  color: #3a3a3a;
+  font-size: 16px;
+  line-height: 24px;
+  margin: 0;
+}
+
+.account-empty a {
+  color: #001e56;
+  font-weight: 500;
+}
+
+.account-nav {
+  background: #fff;
+  border: 1px solid #e6e6e6;
+  display: flex;
+  flex-direction: column;
+}
+
+.account-nav button {
+  align-items: center;
+  background: #fff;
+  border: 0;
+  border-bottom: 1px solid #e6e6e6;
+  color: #232323;
+  display: flex;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  gap: 12px;
+  line-height: 20px;
+  min-height: 52px;
+  padding: 12px 16px;
+  text-align: left;
+  width: 100%;
+}
+
+.account-nav button:last-child {
+  border-bottom: 0;
+}
+
+.account-nav button:hover {
+  background: #f7f7f7;
+}
+
+.account-nav button.is-selected,
+.account-nav button.is-selected:hover {
+  background: #f4f7fb;
+  box-shadow: inset 3px 0 0 #001e56;
+  color: #001e56;
+  font-weight: 700;
+}
+
+.account-nav button:focus-visible,
+.account-menu-toggle:focus-visible,
+.account-page a:focus-visible {
+  outline: 2px solid var(--color-focus-outline, #046de9);
+  outline-offset: 2px;
+}
+
+.account-icon {
+  align-items: center;
+  color: currentColor;
+  display: inline-flex;
+  flex: none;
+  height: 24px;
+  justify-content: center;
+  position: relative;
+  width: 24px;
+}
+
+.account-icon svg {
+  display: block;
+  height: 24px;
+  width: 24px;
+}
+
+.account-menu {
+  position: relative;
+}
+
+.account-menu-toggle {
+  align-items: center;
+  background: #fff;
+  border: 1px solid #e6e6e6;
+  color: #232323;
+  display: flex;
+  font: inherit;
+  font-size: 16px;
+  font-weight: 500;
+  gap: 12px;
+  justify-content: space-between;
+  min-height: 56px;
+  padding: 8px 8px 8px 16px;
+  text-align: left;
+  width: 100%;
+}
+
+.account-menu-current {
+  align-items: center;
+  display: flex;
+  gap: 12px;
+  min-width: 0;
+}
+
+.account-menu-current > span:last-child {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.account-chevron {
+  align-items: center;
+  background: #001e56;
+  border-radius: 50%;
+  color: #fff;
+  display: grid;
+  flex: none;
+  height: 32px;
+  place-items: center;
+  width: 32px;
+}
+
+.account-chevron svg {
+  height: 16px;
+  width: 16px;
+}
+
+.account-chevron svg.is-open {
+  transform: rotate(180deg);
+}
+
+.account-nav-menu {
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+  left: 0;
+  position: absolute;
+  right: 0;
+  top: calc(100% - 1px);
+  z-index: 3;
+}
+
+.account-page .fit-card {
+  border: 1px solid #f2f2f2;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12), 0 0 2px rgba(0, 0, 0, 0.1);
+  padding: 32px 24px 24px;
+  width: 100%;
+}
+
+.account-page .fit-card-title {
+  color: #232323;
+  font-family: var(--font-family-oswald);
+  font-size: 20px;
+  font-weight: 400;
+  letter-spacing: 1.2px;
+  line-height: 30px;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.account-page .fit-card .results-hero-action {
+  font-size: 14px;
+  line-height: 20px;
+  min-height: 20px;
+}
+
+.account-page .fit-card .results-hero-action svg {
+  height: 14px;
+  width: 14px;
+}
+
+.account-recs {
+  margin-top: 32px;
+}
+
+.account-recs-title {
+  margin-bottom: 16px;
+}
+
+.account-rec-list {
+  display: grid;
+  gap: 16px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.account-rec.suit-card {
+  gap: 0;
+}
+
+.account-rec .suit-card-face {
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
+  box-shadow: none;
+  padding: 16px;
+}
+
+.account-rec .suit-row {
+  align-items: center;
+  min-height: 0;
+}
+
+.account-rec .suit-card-media {
+  flex: 0 0 104px;
+  height: 140px;
+  min-height: 140px;
+  position: relative;
+  width: 104px;
+}
+
+.account-rec .suit-card-body {
+  gap: 8px;
+  min-width: 0;
+}
+
+.account-rec .suit-card-names {
+  height: auto;
+}
+
+.account-rec .suit-price {
+  justify-content: flex-start;
+}
+
+@media (max-width: 1023px) {
+  .account-page {
+    gap: 0;
+    grid-template-columns: minmax(0, 1fr);
+    padding: 0 0 48px;
+  }
+
+  .account-content {
+    padding: 16px;
+  }
+
+  .account-menu-toggle,
+  .account-nav-menu {
+    border-left: 0;
+    border-right: 0;
+  }
+
+  .account-page .fit-card {
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .account-chevron svg {
+    transition: none;
+  }
+}
