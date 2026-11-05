@@ -1071,39 +1071,22 @@ function lookBagShouldFail() {
   return window.__SUIT_LOOK_FAIL === true || new URLSearchParams(window.location.search).get("bag") === "fail";
 }
 
-function CirclePlus() {
-  return (
-    <svg viewBox="0 0 14 14" width="14" height="14" aria-hidden="true">
-      <path fill="currentColor" d="M6 1h2v5h5v2H8v5H6V8H1V6h5V1Z" />
-    </svg>
-  );
-}
-
-function RemoveMark() {
-  return (
-    <svg viewBox="0 0 14 14" width="14" height="14" aria-hidden="true">
-      <path fill="currentColor" d="M2 2.8 2.8 2 7 6.2 11.2 2l.8.8L7.8 7 12 11.2l-.8.8L7 7.8 2.8 12 2 11.2 6.2 7 2 2.8Z" />
-    </svg>
-  );
-}
-
-function WarningMark() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
-      <path fill="currentColor" d="M12 3.2 1.8 21h20.4L12 3.2Zm1 13.3h-2v-2h2v2Zm0-3.5h-2v-5h2v5Z" />
-    </svg>
-  );
-}
-
-function TagMark() {
+function TrashIcon() {
   return (
     <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true">
-      <path fill="currentColor" d="M21.4 13.1 12.9 4.6A2 2 0 0 0 11.5 4H5a1 1 0 0 0-1 1v6.5c0 .5.2 1 .6 1.4l8.5 8.5a2 2 0 0 0 2.8 0l5.5-5.5a2 2 0 0 0 0-2.8ZM7.5 8.5A1.5 1.5 0 1 1 9 7a1.5 1.5 0 0 1-1.5 1.5Z" />
+      <path
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M4.5 7h15M9 7V4.5h6V7M7.2 7l.8 13h8l.8-13M10 11v5M14 11v5"
+      />
     </svg>
   );
 }
 
-function YourLook({ suit, size, tailoringId, items, addedLooks, onOpenLook, onRemoveLook }) {
+function YourLook({ suit, size, tailoringId, items, addedLooks, onRemoveLook, onRemoveTailoring }) {
   const [sheetOpen, setSheetOpen] = useState(false);
   const [bagStatus, setBagStatus] = useState("idle");
   const [flash, setFlash] = useState(false);
@@ -1113,9 +1096,6 @@ function YourLook({ suit, size, tailoringId, items, addedLooks, onOpenLook, onRe
   const sizesTracked = useRef(null);
   const lastTotal = useRef(null);
   const selectedPackage = CARD_TAILORING.find((item) => item.id === tailoringId) ?? null;
-  const recommended = CARD_TAILORING.find((item) => item.id === "signature") ?? CARD_TAILORING.find((item) => item.recommended);
-  const tailoringOn = Boolean(selectedPackage);
-  const shownTailoring = selectedPackage ?? recommended;
   const rows = (items ?? []).map((item) => ({
     ...item,
     added: Boolean(addedLooks[item.id]),
@@ -1123,7 +1103,7 @@ function YourLook({ suit, size, tailoringId, items, addedLooks, onOpenLook, onRe
   }));
   const totals = lookTotals({
     suitPrice: suit?.price ?? 0,
-    tailoringPrice: tailoringOn ? shownTailoring?.price ?? 0 : 0,
+    tailoringPrice: selectedPackage?.price > 0 ? selectedPackage.price : 0,
     items: rows.map((item) => ({
       type: item.type,
       price: item.price,
@@ -1247,82 +1227,73 @@ function YourLook({ suit, size, tailoringId, items, addedLooks, onOpenLook, onRe
           <h2 className="your-look-title">Your Look</h2>
           <button className="your-look-link" type="button" onClick={() => scrollToSuits("edit_look_clicked")}>Edit look</button>
         </div>
-        <p className="your-look-summary">{countLabel} · {suit.brand} {suit.name}</p>
-        <button
-          className={`your-look-sizes${totals.canAddToBag ? "" : " is-error"}`}
-          type="button"
-          onClick={() => focusSizes(false)}
-        >
-          {totals.canAddToBag ? sizeLabel : (
-            <>
-              <WarningMark />
-              Select jacket and pants size
-            </>
-          )}
-        </button>
         <ul className="order-lines" aria-label="Your suit">
           <li>
             <span>
-              {suit.name}
+              <span>{suit.brand} {suit.name}</span>
+              <span className="order-line-meta">{totals.canAddToBag ? sizeLabel : "Size not selected"}</span>
+              {!totals.canAddToBag && (
+                <button className="your-look-link" type="button" onClick={() => focusSizes(false)}>
+                  Select jacket and pants size
+                </button>
+              )}
               <button className="your-look-link" type="button" onClick={() => scrollToSuits("swap_suit_clicked")}>Swap suit</button>
             </span>
             <span className="order-amount">{formatPrice(suit.price)}</span>
           </li>
           {selectedPackage && selectedPackage.price > 0 && (
-            <li className="your-look-tailoring is-selected">
-              <span>
-                {selectedPackage.name}
-                <span className="your-look-selected-label">Selected</span>
+            <li>
+              <span>{selectedPackage.name}</span>
+              <span className="order-amount">
+                {formatPrice(selectedPackage.price)}
+                <button
+                  className="look-remove"
+                  type="button"
+                  aria-label={`Remove ${selectedPackage.name}`}
+                  onClick={onRemoveTailoring}
+                >
+                  <TrashIcon />
+                </button>
               </span>
-              <span className="order-amount">{formatPrice(selectedPackage.price)}</span>
             </li>
           )}
+          {rows.filter((item) => item.added).map((item) => {
+            const title = lookPieceTitle(item);
+            return (
+              <li key={item.id}>
+                <span>{title}</span>
+                <span className="order-amount">
+                  {formatPrice(item.price)}
+                  <button
+                    className="look-remove"
+                    type="button"
+                    aria-label={`Remove ${title}`}
+                    onClick={() => onRemoveLook(item.id)}
+                  >
+                    <TrashIcon />
+                  </button>
+                </span>
+              </li>
+            );
+          })}
         </ul>
-        <section aria-labelledby="your-pieces-label">
-          <h3 id="your-pieces-label" className="your-look-kicker">Complete the look</h3>
-          <ul className="order-lines your-look-pieces">
-            {rows.map((item) => {
-              const title = lookPieceTitle(item);
-              return (
-                <li className={item.added ? undefined : "is-off"} key={item.id}>
-                  <span>{title}</span>
-                  <span className="order-amount">
-                    {item.added ? formatPrice(item.price) : `+ ${formatPrice(item.price)}`}
-                    <button
-                      className={item.added ? "look-remove" : "look-add"}
-                      type="button"
-                      aria-label={item.added ? `Remove ${title}` : `Add ${title}`}
-                      onClick={(event) => {
-                        if (item.added) onRemoveLook(item.id);
-                        else onOpenLook(item, event);
-                      }}
-                    >
-                      <span>{item.added ? <RemoveMark /> : <CirclePlus />}</span>
-                    </button>
-                  </span>
-                </li>
-              );
-            })}
-          </ul>
-        </section>
-        <div className="your-look-totals" aria-live="polite">
+        <div className="order-totals your-look-totals" aria-live="polite">
           <div className="your-look-line">
-            <span>Subtotal ({countLabel})</span>
+            <span>Subtotal</span>
             <span>{formatPrice(totals.subtotal)}</span>
           </div>
           {totals.promoEarned && (
-            <div className="your-look-discount">
-              <TagMark />
-              <span>{totals.promoName} −{exactPrice(totals.discount)}</span>
+            <div className="your-look-line order-promo-line">
+              <span>{totals.promoName}</span>
+              <span>−{exactPrice(totals.discount)}</span>
             </div>
           )}
           <div className={`your-look-total${flash ? " is-flash" : ""}`}>
-            <span>Total</span>
+            <span>Est. Total</span>
             <strong>{formatPrice(totals.total)}</strong>
           </div>
           <p className="your-look-tax">(+ applicable tax & shipping)</p>
         </div>
-        <p className={`your-look-banner${totals.promoEarned ? " is-earned" : ""}`}>{totals.nudge}</p>
       </div>
       <div className="your-look-dock">
         <button
@@ -1575,8 +1546,8 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
       tailoringId={tailoringId}
       items={selectedLook?.items ?? []}
       addedLooks={addedLooks}
-      onOpenLook={openQuickView}
       onRemoveLook={removeLook}
+      onRemoveTailoring={() => commitTailoring(NO_HEM.id)}
     />
   ) : (
     <aside className="your-look" aria-label="Your Look">
