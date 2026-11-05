@@ -5,88 +5,98 @@ export const questions = {
   mode: {
     id: "mode",
     title: "Are you buying or renting?",
-    help: "Buying is a suit you keep, and renting is a full look for one event.",
+    help: "Not sure? Think about how many times you'll wear it.",
     type: "single",
     options: [
-      { value: "buy", label: "Buy a suit", detail: "A suit that is yours to keep.", icon: "/icons/mw/shop.png" },
-      { value: "rent", label: "Rent a look", detail: "A suit or tux for one event.", icon: "/icons/mw/suits-bundle.png" },
+      { value: "buy", label: "Buy a suit", detail: "Yours to keep and wear again.", icon: "/icons/mw/shop.png" },
+      { value: "rent", label: "Rent a suit or tux", detail: "A suit or tux for one event.", icon: "/icons/mw/suits-bundle.png" },
     ],
   },
   occasion: {
     id: "occasion",
     title: "What's the occasion?",
-    help: "The event sets how dressed up the suit should be.",
+    help: "Pick one. The event tells us how formal the suit should be.",
     type: "occasionPlus",
     skippable: true,
-    rentHelp: "We ask because the event decides whether you need a suit or a tuxedo.",
+    rentHelp: "Pick one. The event helps us decide between a suit and a tux.",
     rentOptions: [
-      { value: "wedding", label: "Wedding", detail: "For you, or for someone you're with.", icon: "/icons/mw/wedding.png" },
-      { value: "formal", label: "Black tie", detail: "Galas, formal dinners, and black-tie invitations.", icon: "/icons/mw/special-event.png" },
-      { value: "prom", label: "Prom", detail: "For you, or for someone you're taking.", icon: "/icons/mw/school-event.png" },
+      { value: "wedding", label: "Wedding", detail: "Getting married, or going as a guest.", icon: "/icons/mw/wedding.png" },
+      { value: "formal", label: "Black tie", detail: "Galas, formal dinners, and any invite that says black tie.", icon: "/icons/mw/special-event.png" },
+      { value: "prom", label: "Prom", detail: "For you, or a prom-goer you're shopping for.", icon: "/icons/mw/school-event.png" },
       { value: "special", label: "Special event", detail: "A quinceañera, anniversary, or other celebration.", icon: "/icons/mw/quinceanera.png" },
     ],
     options: [
-      { value: "business", label: "Work", detail: "The office, and the meetings that matter.", icon: "/icons/mw/suits-bundle.png" },
-      { value: "wedding", label: "Wedding", detail: "For you, or for someone you're with.", icon: "/icons/mw/wedding.png" },
-      { value: "funeral", label: "Funeral", detail: "A quiet funeral or memorial service.", icon: "/icons/mw/invitation.png" },
-      { value: "prom", label: "Prom", detail: "For you, or for someone you're taking.", icon: "/icons/mw/school-event.png" },
-      { value: "mixed", label: "All-purpose suit", detail: "Work, a wedding, and other events.", icon: "/icons/mw/special-event.png" },
+      { value: "business", label: "Work", detail: "Office days, big meetings, and interviews.", icon: "/icons/mw/suits-bundle.png" },
+      { value: "wedding", label: "Wedding", detail: "Getting married, or going as a guest.", icon: "/icons/mw/wedding.png" },
+      { value: "funeral", label: "Funeral", detail: "A funeral or memorial service.", icon: "/icons/mw/invitation.png" },
+      { value: "prom", label: "Prom", detail: "For you, or a prom-goer you're shopping for.", icon: "/icons/mw/school-event.png" },
+      { value: "mixed", label: "A bit of everything", detail: "One suit for work, weddings, and whatever comes up.", icon: "/icons/mw/special-event.png" },
     ],
   },
   feel: {
     id: "feel",
     title: "How do you like a suit to fit?",
-    help: "The words in parentheses are the fit: Slim, Modern, or Classic.",
+    help: "Pick the one that sounds most like you. The fit name is in parentheses.",
     type: "single",
+    skippable: true,
     options: [
-      { value: "close", label: "Close and sharp (Slim fit)", detail: "A trimmer shape, with less room through the body.", icon: "/icons/mw/sharp.png" },
-      { value: "balanced", label: "Polished, with room to move (Modern fit)", detail: "Shaped at the shoulder, with room through the middle.", icon: "/icons/mw/balanced.png" },
+      { value: "skinny", label: "As close as it gets (Skinny fit)", detail: "The sharpest, most tapered cut, with the least room through the body and legs.", icon: "/icons/mw/sharp.png" },
+      { value: "close", label: "Close and sharp (Slim fit)", detail: "A trim shape that follows your frame, tapered through the sleeves and legs.", icon: "/icons/mw/sharp.png" },
+      { value: "balanced", label: "Polished, with room to move (Modern fit)", detail: "A balanced cut with a little tapering and room through the body.", icon: "/icons/mw/balanced.png" },
       { value: "roomy", label: "Comfortable with room (Classic fit)", detail: "Room through the chest, seat, and legs, without looking loose.", icon: "/icons/mw/relaxed.png" },
+      { value: "executive", label: "Most room for comfort (Executive fit)", detail: "The roomiest cut, with extra room through the midsection and legs.", icon: "/icons/mw/relaxed.png" },
     ],
   },
   eventDate: {
     id: "eventDate",
     title: "When is the event?",
-    help: "The look is ready 3 days before the event and goes back the day after.",
+    help: "Your look is ready 3 days before the event and due back the day after.",
     type: "date",
   },
   pieces: {
     id: "pieces",
     title: "What should the look include?",
-    help: "We ask because a 2-piece is the jacket and pants, while a 6-piece or 9-piece adds the shirt and shoes.",
+    help: "Pick one. The more pieces, the less you have to bring.",
     type: "pieces",
+    skippable: true,
   },
   colors: {
     id: "colors",
     title: "Any colors in mind?",
-    help: "We ask so we can favor the colors you'd wear, and you can skip this if you're open.",
+    help: "Pick all you like and we'll show those first. Open to anything? Skip this one.",
     type: "colors",
     skippable: true,
     options: [
-      { value: "navy", label: "Navy", colors: ["navy"] },
-      { value: "blue", label: "Blue", colors: ["blue"] },
-      { value: "gray", label: "Gray", colors: ["gray"] },
-      { value: "black", label: "Black", colors: ["black"] },
-      { value: "brownTan", label: "Brown and tan", colors: ["brown", "tan"] },
-      { value: "burgundy", label: "Burgundy", colors: ["burgundy"] },
-      { value: "green", label: "Green", colors: ["green"] },
-      { value: "white", label: "White", colors: ["white"] },
+      { value: "navy", label: "Navy", colors: ["navy"], group: "classics" },
+      { value: "gray", label: "Gray", caption: "Charcoal to light", colors: ["gray"], group: "classics" },
+      { value: "black", label: "Black", colors: ["black"], group: "classics" },
+      { value: "brownTan", label: "Brown and tan", caption: "Chocolate to khaki", colors: ["brown", "tan"], group: "earthy" },
+      { value: "burgundy", label: "Burgundy", colors: ["burgundy"], group: "earthy" },
+      { value: "green", label: "Green", caption: "Olive, sage, forest", colors: ["green"], group: "earthy" },
+      { value: "blue", label: "Blue", caption: "Royal, cobalt", colors: ["blue"], group: "bright" },
+      { value: "pink", label: "Pink", colors: ["pink"], group: "bright" },
+      { value: "white", label: "White or cream", colors: ["white"], group: "bright" },
+    ],
+    groups: [
+      { id: "classics", label: "Classics" },
+      { id: "earthy", label: "Rich and earthy" },
+      { id: "bright", label: "Light and bright" },
     ],
   },
   measurementKnowledge: {
     id: "measurementKnowledge",
     title: "Do you know your suit size?",
-    help: "Jacket size, pant size, or both.",
+    help: "Jacket size, pant size, or both. Even one helps.",
     type: "single",
     options: [
-      { value: "some", label: "I know some of my sizes", detail: "Jacket or pant size, and either one can be blank." },
-      { value: "no", label: "No, help me estimate", detail: "We'll use your shirt size and jeans waist." },
+      { value: "some", label: "I know my size", detail: "Share your jacket size, pant size, or both." },
+      { value: "no", label: "Help me estimate", detail: "We'll work it out from your usual shirt and jeans sizes." },
     ],
   },
   measurements: {
     id: "measurements",
-    title: "Share the sizes you know",
-    help: "The jacket and pant sizes you know.",
+    title: "What sizes do you know?",
+    help: "Choose your jacket size, pant size, or both. Check the tag inside a jacket you already own.",
     type: "measurements",
   },
   fitIssues: {
@@ -150,25 +160,25 @@ export const questions = {
   everydaySizes: {
     id: "everydaySizes",
     title: "What sizes do you usually buy?",
-    help: "These stand in for a jacket and pant size.",
+    help: "We'll use these to estimate your jacket and pant size.",
     type: "sizes",
     groups: [
       {
         id: "shirt",
-        label: "T-shirt or casual shirt",
-        options: ["XS", "S", "M", "L", "XL", "XXL", "3XL"].map((value) => ({ value, label: value })),
+        label: "T-shirt or casual shirt size",
+        options: ["XS", "S", "M", "L", "XL", "XXL", "3XL", "4XL", "5XL"].map((value) => ({ value, label: value })),
       },
       {
         id: "waist",
-        label: "Jeans or pants waist",
-        options: [28, 29, 30, 31, 32, 33, 34, 36, 38, 40, 42, 44, 46, 48].map((value) => ({ value: String(value), label: String(value) })),
+        label: "Jeans or pants waist size",
+        options: [28, 29, 30, 31, 32, 33, 34, 36, 38, 40, 42, 44, 46, 48, 50, 52, 54, 56, 58, 60].map((value) => ({ value: String(value), label: String(value) })),
       },
     ],
   },
   height: {
     id: "height",
     title: "How tall are you?",
-    help: "Your height helps us recommend the right length, so the suits we show you fit you better.",
+    help: "Your height helps us pick the right jacket and pant length. A close guess is fine.",
     type: "height",
     skippable: true,
   },
@@ -246,6 +256,7 @@ const COLOR_NAMES = {
   tan: "Tan",
   burgundy: "Burgundy",
   green: "Green",
+  pink: "Pink",
   white: "White",
 };
 
@@ -257,10 +268,9 @@ export function colorsIn(values) {
   return [...new Set((Array.isArray(values) ? values : []).flatMap((value) => palettes.get(value) ?? [value]))];
 }
 
-function visibleCopy(option, colors) {
-  if (colors.length === option.colors.length) return { label: option.label };
-  if (colors.length === 1) return { label: COLOR_NAMES[colors[0]] ?? option.label };
-  return { label: colors.map((key) => COLOR_NAMES[key] ?? key).join(" and ") };
+// The chip keeps its own label (for example "Brown and tan") even when the lane only carries one of its colors.
+function visibleCopy(option) {
+  return { label: option.label };
 }
 
 function catalogColors(mode) {
@@ -275,7 +285,7 @@ export function colorThemes(mode) {
       const colors = option.colors.filter((key) => available.has(key));
       return {
         ...option,
-        ...visibleCopy(option, colors),
+        ...visibleCopy(option),
         colors,
         swatches: colors.map((key) => ({ key, hex: SWATCH_HEX[key] })),
       };

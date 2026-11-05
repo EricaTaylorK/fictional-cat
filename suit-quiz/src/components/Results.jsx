@@ -587,13 +587,17 @@ const OCCASION_PHRASES = {
 };
 
 const FIT_WORDS = {
+  skinny: "slim-fit",
   close: "slim-fit",
   balanced: "modern-fit",
   roomy: "classic-fit",
+  executive: "classic-fit",
 };
 
 const FEEL_PRIORITY = {
+  executive: "comfort",
   roomy: "comfort",
+  skinny: "a sharper shape",
   close: "a sharper shape",
   balanced: "room to move",
 };

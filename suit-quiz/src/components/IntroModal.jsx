@@ -134,7 +134,7 @@ export default function IntroModal({ onStart, onResume, onClose, onBack, progres
           ) : <span />}
           <span className="intro-brand">
             <span className="intro-badge" aria-hidden="true">MW</span>
-            <span className="intro-header-title">Find the Right Suit for You</span>
+            <span className="intro-header-title">Find the right suit for you</span>
           </span>
           <span className="intro-header-end">
             {stepLabel && <span className="intro-step">{stepLabel}</span>}
@@ -153,15 +153,14 @@ export default function IntroModal({ onStart, onResume, onClose, onBack, progres
         {children ?? (
         <div className="intro-body">
           <IntroIllustration />
-          <h1 id="intro-title" className="intro-title">Find a suit for the occasion</h1>
+          <h1 id="intro-title" className="intro-title">Tell us the occasion. We'll find the suit.</h1>
           <p className="intro-copy">
-            A few questions about the event, how the suit should feel, and your size. We’ll narrow the options.
+            Answer a few quick questions about the event, the look you want, and what you know about your size. You'll get matches right away, with the reasons behind each.
           </p>
           <button className="intro-start" type="button" ref={startRef} onClick={onStart}>
             <SparkleIcon />
-            Start
+            Start the quiz
           </button>
-          <p className="intro-note">About a minute. Skip anything you’re not sure about.</p>
           {onResume && (
             <button className="text-link intro-resume" type="button" onClick={onResume}>
               Or pick up where you left off

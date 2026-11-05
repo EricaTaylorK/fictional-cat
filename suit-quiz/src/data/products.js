@@ -30,6 +30,7 @@ export const SWATCH_HEX = {
   tan: "#c4a574",
   burgundy: "#6e2430",
   green: "#9aaa98",
+  pink: "#e6c3c6",
   white: "#f2eee4",
 };
 

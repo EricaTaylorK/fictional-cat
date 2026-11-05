@@ -24,16 +24,28 @@ const occasionLabels = {
 };
 
 const fitLabels = {
+  skinny: "as close as it gets",
   close: "close and sharp",
   balanced: "polished, with room to move",
   roomy: "comfortable with room",
+  executive: "most room for comfort",
 };
 
 const fitNameLabels = {
+  skinny: "skinny fit",
   close: "slim fit",
   balanced: "modern fit",
   roomy: "classic fit",
+  executive: "executive fit",
 };
+
+// Skinny and executive have no catalog suits of their own, so they score as the nearest catalog fit.
+const FIT_SCORING = { skinny: "close", executive: "roomy" };
+const CLOSEST_FIT_ONLY = { skinny: true, executive: true };
+
+export function scoringFeel(feel) {
+  return FIT_SCORING[feel] ?? feel;
+}
 
 const budgetPhrases = {
   "under-250": "under $250",
@@ -206,7 +218,7 @@ export function inferLength(answers) {
   return LENGTHS[index];
 }
 
-export const SHIRT_SIZE_CHEST = { XS: 36, S: 38, M: 40, L: 42, XL: 46, XXL: 48, "3XL": 52 };
+export const SHIRT_SIZE_CHEST = { XS: 36, S: 38, M: 40, L: 42, XL: 46, XXL: 48, "3XL": 52, "4XL": 56, "5XL": 60 };
 
 function buildDrop(answers) {
   const signals = getFitSignals(answers);
@@ -410,10 +422,10 @@ function scoreProduct(product, answers, index) {
 
   score += scoreFitSignals(product, answers, evidence);
 
-  if (product.fit === answers.feel) {
+  if (product.fit === scoringFeel(answers.feel)) {
     score += 26;
-    evidence.push(product.cutNote ?? `The fit matches how you want it to feel: ${fitLabels[answers.feel]}.`);
-  } else if (isAdjacentFit(product.fit, answers.feel)) {
+    evidence.push(product.cutNote ?? `The fit matches how you want it to feel: ${fitLabels[scoringFeel(answers.feel)]}.`);
+  } else if (isAdjacentFit(product.fit, scoringFeel(answers.feel))) {
     score += 9;
   }
 
@@ -430,7 +442,7 @@ function scoreProduct(product, answers, index) {
     score -= Math.min(18, Math.ceil(Math.abs(product.price - edge) / 20));
   }
 
-  if (answers.feel === "roomy") score += (product.comfort ?? 0) * 2;
+  if (scoringFeel(answers.feel) === "roomy") score += (product.comfort ?? 0) * 2;
   if (answers.tailoring !== "skip") {
     score += (product.tailoringEase ?? 0) * 2;
   }
@@ -467,8 +479,11 @@ function buildTradeoffs(product, answers) {
   if (occasion && product.formality && !product.formality.includes(occasion)) {
     notes.push(`Not the usual choice for ${occasionLabels[answers.occasion]}.`);
   }
-  if (answers.feel && product.fit && product.fit !== answers.feel && product.fitName) {
+  if (answers.feel && product.fit && product.fit !== scoringFeel(answers.feel) && product.fitName) {
     notes.push(`${product.fitName} isn't the ${fitNameLabels[answers.feel]} you asked for.`);
+  }
+  if (CLOSEST_FIT_ONLY[answers.feel] && product.fit === scoringFeel(answers.feel)) {
+    notes.push(`The closest fit we carry to the ${fitNameLabels[answers.feel]} you picked.`);
   }
   if (answers.budget && answers.budget !== "flexible" && !product.inBudget) {
     if (product.price > budgetMax) {
@@ -572,7 +587,7 @@ export function quizListingFilters(answers) {
   const selections = {};
   const prefer = colorsIn(answers.colors?.prefer);
   if (prefer.length) selections.color = [...prefer];
-  if (FIT_TO_CATALOG[answers.feel]) selections.fit = [FIT_TO_CATALOG[answers.feel]];
+  if (FIT_TO_CATALOG[scoringFeel(answers.feel)]) selections.fit = [FIT_TO_CATALOG[scoringFeel(answers.feel)]];
 
   const filters = { selections, priceMin: null, priceMax: null };
   if (answers.budget === "under-250") filters.priceMax = 250;

@@ -403,15 +403,15 @@ describe("recommendations", () => {
     }
     const buyThemes = colorThemes("buy");
     const rentThemes = colorThemes("rent");
-    expect(buyThemes.map((theme) => theme.value)).toEqual(["navy", "blue", "gray", "black", "brownTan", "burgundy", "green"]);
-    expect(rentThemes.map((theme) => theme.value)).toEqual(["navy", "blue", "gray", "black", "brownTan", "green", "white"]);
+    expect(buyThemes.map((theme) => theme.value)).toEqual(["navy", "gray", "black", "brownTan", "burgundy", "green", "blue"]);
+    expect(rentThemes.map((theme) => theme.value)).toEqual(["navy", "gray", "black", "brownTan", "green", "blue", "white"]);
     expect(buyThemes.map((theme) => theme.value)).not.toContain("white");
     expect(buyThemes.map((theme) => theme.value)).not.toContain("light");
     expect(rentThemes.map((theme) => theme.value)).toContain("white");
     expect(rentThemes.map((theme) => theme.value)).not.toContain("light");
     expect(buyThemes.find((theme) => theme.value === "brownTan").colors).toEqual(["brown", "tan"]);
     expect(rentThemes.find((theme) => theme.value === "brownTan").colors).toEqual(["tan"]);
-    expect(rentThemes.find((theme) => theme.value === "brownTan").label).toBe("Tan");
+    expect(rentThemes.find((theme) => theme.value === "brownTan").label).toBe("Brown and tan");
     expect(colorsIn(["darks"])).toEqual(["navy", "blue", "gray", "black"]);
     expect(colorsIn(["warm"])).toEqual(["tan", "brown", "burgundy", "green"]);
     expect(colorsIn(["light"])).toEqual(["white"]);

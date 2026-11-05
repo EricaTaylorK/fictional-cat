@@ -4,7 +4,7 @@ import ProductGridEntry from "./components/ProductGridEntry.jsx";
 import ProductDetail from "./components/ProductDetail.jsx";
 import Results from "./components/Results.jsx";
 import TextInput from "./components/TextInput.jsx";
-import { RENTAL_PACKAGES } from "./data/rentals.js";
+import { RENTAL_MIN_LEAD_DAYS, RENTAL_PACKAGES } from "./data/rentals.js";
 import { colorThemes, getQuestionFlow, occasionOptions, questions } from "./data/quizConfig.js";
 import { formatDate, quizCatalogIds, quizListingFilters, rentalDates } from "./lib/recommendation.js";
 
@@ -153,9 +153,9 @@ function ColorQuestion({ mode, value, onChange }) {
   const prefer = (value?.prefer ?? []).filter((item) => known.has(item));
 
   return (
-    <OptionCards
-      label="Colors you'd wear"
+    <ColorChips
       options={options}
+      groups={questions.colors.groups}
       isSelected={(theme) => prefer.includes(theme)}
       onPick={(theme) => onChange((current) => {
         const wearing = current?.prefer ?? [];
@@ -168,6 +168,45 @@ function ColorQuestion({ mode, value, onChange }) {
   );
 }
 
+function ColorChips({ options, groups, isSelected, onPick }) {
+  const grouped = groups
+    .map((group) => ({ ...group, options: options.filter((option) => option.group === group.id) }))
+    .filter((group) => group.options.length > 0);
+  return (
+    <div className="color-picks" role="group" aria-label="Colors you'd wear">
+      {grouped.map((group) => (
+        <div className="color-group" key={group.id}>
+          <h3 className="color-group-label" id={`color-group-${group.id}`}>{group.label}</h3>
+          <div className="color-chip-row" role="group" aria-labelledby={`color-group-${group.id}`}>
+            {group.options.map((option) => {
+              const selected = isSelected(option.value);
+              return (
+                <button
+                  className={`color-chip${selected ? " is-selected" : ""}`}
+                  type="button"
+                  key={option.value}
+                  aria-pressed={selected}
+                  onClick={() => onPick(option.value)}
+                >
+                  <span className="color-chip-swatch" aria-hidden="true">
+                    {option.swatches.map((swatch) => (
+                      <span key={swatch.key} style={{ background: swatch.hex }} />
+                    ))}
+                  </span>
+                  <span className="color-chip-copy">
+                    <span className="color-chip-label">{option.label}</span>
+                    {option.caption && <span className="color-chip-caption">{option.caption}</span>}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 function todayIso() {
   const now = new Date();
   const pad = (number) => String(number).padStart(2, "0");
@@ -176,52 +215,43 @@ function todayIso() {
 
 function DateQuestion({ value, onChange }) {
   const dates = rentalDates(value);
+  const today = new Date();
+  const earliest = new Date(today.getFullYear(), today.getMonth(), today.getDate() + RENTAL_MIN_LEAD_DAYS);
   return (
     <div className="date-question">
       <label className="date-field">
-        <span className="date-label">Event date</span>
+        <span className="date-label">
+          Event date
+          <span className="date-hint">MM/DD/YYYY</span>
+        </span>
         <input type="date" min={todayIso()} value={value ?? ""} onChange={(event) => onChange(event.target.value)} />
       </label>
+      {dates?.past && <p className="date-warning" role="status">That date has passed. Pick an upcoming date.</p>}
       {dates && !dates.past && (
-        <div className="date-plan">
-          <p className="date-plan-lead">This date sets the timing: when your look is ready, and when it has to be back.</p>
-          <ol>
-            <li>
-              <span className="date-plan-mark">
-                <img src="/icons/mw/in-store-pickup.png" alt="" />
-              </span>
-              <span className="date-plan-copy">
-                <strong>Ready {formatDate(dates.ready)}</strong>
-                <span>Your look is ready before the event, for pickup or delivered to you.</span>
-              </span>
-            </li>
-            <li>
-              <span className="date-plan-mark">
-                <img src="/icons/mw/special-event.png" alt="" />
-              </span>
-              <span className="date-plan-copy">
-                <strong>Event {formatDate(dates.event)}</strong>
-                <span>The day you wear it.</span>
-              </span>
-            </li>
-            <li>
-              <span className="date-plan-mark">
-                <img src="/icons/mw/shipping.png" alt="" />
-              </span>
-              <span className="date-plan-copy">
-                <strong>Return {formatDate(dates.returnBy)}</strong>
-                <span>It comes back the day after, in store or by mail.</span>
-              </span>
-            </li>
-          </ol>
-        </div>
+        <ol className="date-plan" aria-label="Your timing">
+          <li>
+            <span className="date-plan-label">Ready</span>
+            <strong>{formatDate(dates.ready)}</strong>
+            <span>Pick it up in store or have it delivered.</span>
+          </li>
+          <li>
+            <span className="date-plan-label">Event</span>
+            <strong>{formatDate(dates.event)}</strong>
+            <span>The day you wear it.</span>
+          </li>
+          <li>
+            <span className="date-plan-label">Due back</span>
+            <strong>{formatDate(dates.returnBy)}</strong>
+            <span>Return it in store or by mail.</span>
+          </li>
+        </ol>
       )}
+      {!dates && <p className="date-prompt">Pick a date to see your timing.</p>}
       {dates?.tooSoon && (
         <p className="date-warning" role="status">
-          That's less than 4 days away. You can still reserve, but call or visit a store to make sure your look is ready in time.
+          The earliest event date we can cover is {formatDate(earliest)}. You can still continue, but call or visit a store to make sure your look is ready in time.
         </p>
       )}
-      {dates?.past && <p className="date-warning" role="status">That date has passed. Choose an upcoming date.</p>}
     </div>
   );
 }
@@ -232,8 +262,8 @@ function PiecesQuestion({ value, onChange }) {
       label="What should the look include?"
       options={RENTAL_PACKAGES.map((pack) => ({
         value: pack.id,
-        label: pack.label,
-        detail: pack.detail,
+        label: pack.optionLabel,
+        detail: pack.optionDetail,
         icon: "/icons/mw/suits-bundle.png",
       }))}
       isSelected={(id) => Number(value) === id}
@@ -242,8 +272,8 @@ function PiecesQuestion({ value, onChange }) {
   );
 }
 
-const CHEST_SIZES = [36, 38, 40, 42, 44, 46, 48, 50, 52, 54];
-const WAIST_SIZES = [28, 29, 30, 31, 32, 33, 34, 36, 38, 40, 42, 44, 46, 48];
+const CHEST_SIZES = [36, 38, 40, 42, 44, 46, 48, 50, 52, 54, 56, 58, 60, 62, 64, 66, 68, 70];
+const WAIST_SIZES = [28, 29, 30, 31, 32, 33, 34, 36, 38, 40, 42, 44, 46, 48, 50, 52, 54, 56, 58, 60];
 const HEIGHT_MIN = 58;
 const HEIGHT_MAX = 84;
 
@@ -258,9 +288,9 @@ function estimateGroups(answers) {
 function questionHelp(question, answers) {
   if (question.id === "everydaySizes" && answers.measurementKnowledge !== "no") {
     const unknown = answers.unknownSizes ?? {};
-    if (unknown.chest && !unknown.waist) return "This stands in for the jacket size.";
-    if (unknown.waist && !unknown.chest) return "This stands in for the pant size.";
-    return "These stand in for a jacket and pant size.";
+    if (unknown.chest && !unknown.waist) return "We'll use this to estimate your jacket size.";
+    if (unknown.waist && !unknown.chest) return "We'll use this to estimate your pant size.";
+    return "We'll use these to estimate your jacket and pant size.";
   }
   return answers.mode === "rent" && question.rentHelp ? question.rentHelp : question.help;
 }
@@ -345,7 +375,7 @@ function MeasurementsQuestion({
                 aria-pressed={unknown}
                 onClick={() => toggleUnknown(field.id)}
               >
-                I don't know this
+                Not sure
               </button>
             </fieldset>
           );
@@ -409,25 +439,37 @@ function HeightQuestion({ value, onChange }) {
 function SizesQuestion({ question, value = {}, onChange }) {
   return (
     <div className="size-groups">
-      {question.groups.map((group) => (
-        <fieldset className="size-group" key={group.id}>
-          <legend>{group.label}</legend>
-          <div className="size-chips">
-            {group.options.map((option) => (
-              <label className="size-chip" key={option.value}>
-                <input
-                  type="radio"
-                  name={`${question.id}-${group.id}`}
-                  value={option.value}
-                  checked={value[group.id] === option.value}
-                  onChange={() => onChange({ ...value, [group.id]: option.value })}
-                />
-                <span>{option.label}</span>
-              </label>
-            ))}
-          </div>
-        </fieldset>
-      ))}
+      {question.groups.map((group) => {
+        const flag = `${group.id}Unknown`;
+        const unknown = Boolean(value[flag]);
+        return (
+          <fieldset className="size-group" key={group.id}>
+            <legend>{group.label}</legend>
+            <div className="size-chips">
+              {group.options.map((option) => (
+                <label className="size-chip" key={option.value}>
+                  <input
+                    type="radio"
+                    name={`${question.id}-${group.id}`}
+                    value={option.value}
+                    checked={value[group.id] === option.value}
+                    onChange={() => onChange({ ...value, [group.id]: option.value, [flag]: false })}
+                  />
+                  <span>{option.label}</span>
+                </label>
+              ))}
+            </div>
+            <button
+              className={`unknown-size${unknown ? " is-on" : ""}`}
+              type="button"
+              aria-pressed={unknown}
+              onClick={() => onChange({ ...value, [group.id]: "", [flag]: !unknown })}
+            >
+              Not sure
+            </button>
+          </fieldset>
+        );
+      })}
     </div>
   );
 }
@@ -755,6 +797,11 @@ export default function App() {
           {currentIndex === flow.length - 1 ? "See recommendations" : "Next"}
         </button>
       </div>
+      {currentQuestion.type === "date" && (
+        <button className="text-link date-unsure" type="button" onClick={continueQuiz}>
+          Not sure of the date yet?
+        </button>
+      )}
     </section>
   );
 

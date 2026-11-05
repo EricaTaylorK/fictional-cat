@@ -36,9 +36,30 @@ const SIX_PIECE = ["shirt", "neckwear", "vest", "shoes"];
 const NINE_PIECE = ["shirt", "neckwear", "vest", "shoes", "pocketsilk", "cufflinks", "suspenders"];
 
 export const RENTAL_PACKAGES = [
-  { id: 2, label: "2-piece rental", pieces: [], detail: packageDetail([]) },
-  { id: 6, label: "6-piece rental", pieces: SIX_PIECE, detail: packageDetail(SIX_PIECE) },
-  { id: 9, label: "9-piece rental", pieces: NINE_PIECE, detail: packageDetail(NINE_PIECE) },
+  {
+    id: 2,
+    label: "2-piece rental",
+    optionLabel: "Jacket and pants (2-piece)",
+    optionDetail: "Just the jacket and pants. Bring your own shirt, tie, and shoes.",
+    pieces: [],
+    detail: packageDetail([]),
+  },
+  {
+    id: 6,
+    label: "6-piece rental",
+    optionLabel: "Full look (6-piece)",
+    optionDetail: "Jacket, pants, dress shirt, tie or bow tie, vest, and shoes.",
+    pieces: SIX_PIECE,
+    detail: packageDetail(SIX_PIECE),
+  },
+  {
+    id: 9,
+    label: "9-piece rental",
+    optionLabel: "Full look and finishing touches (9-piece)",
+    optionDetail: "Everything in the 6-piece, plus a pocket square, cufflinks and studs, and suspenders.",
+    pieces: NINE_PIECE,
+    detail: packageDetail(NINE_PIECE),
+  },
 ];
 
 export const FULL_LOOK = ["shirt", "neckwear", "vest", "shoes", "pocketsilk", "cufflinks"];
