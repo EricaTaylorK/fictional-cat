@@ -2,10 +2,21 @@ import { quizHref, trackEntryClick } from "./quizEntry.js";
 import "./entries.css";
 
 const COPY = {
-  eyebrow: "MEET YOUR PERSONAL STYLIST",
-  title: "SUIT FINDER",
-  cta: "FIND THE SUIT",
+  badge: "AI Style Expert",
+  headline: "Meet your personal style expert",
+  cta: "Find the suit",
 };
+
+function SparkleIcon() {
+  return (
+    <svg className="sf-entry-sparkle" viewBox="0 0 24 24" aria-hidden="true">
+      <path
+        d="M12 2.5l1.4 6.1L19.5 10 13.4 11.4 12 17.5 10.6 11.4 4.5 10l6.1-1.4L12 2.5z"
+        fill="currentColor"
+      />
+    </svg>
+  );
+}
 
 function SuitFinderEntry({ variant, entrypoint, priority = false, onActivate }) {
   return (
@@ -21,24 +32,32 @@ function SuitFinderEntry({ variant, entrypoint, priority = false, onActivate }) 
         onActivate(entrypoint);
       }}
     >
-      <span className="sf-entry-body">
-        <span className="sf-entry-mark">
-          <img
-            src="/quiz/style-expert.svg"
-            alt=""
-            width="197"
-            height="197"
-            loading={priority ? "eager" : "lazy"}
-            fetchPriority={priority ? "high" : "low"}
-            decoding={priority ? "sync" : "async"}
-          />
+      <img
+        className="sf-entry-art"
+        src="/quiz/style-expert.svg"
+        alt=""
+        width="197"
+        height="197"
+        loading={priority ? "eager" : "lazy"}
+        fetchPriority={priority ? "high" : "low"}
+        decoding={priority ? "sync" : "async"}
+      />
+      <span className="sf-entry-copy">
+        <span className="sf-entry-badge">
+          <span className="sf-entry-mark" aria-hidden="true">
+            M|W
+          </span>
+          {COPY.badge}
         </span>
-        <span className="sf-entry-copy">
-          <span className="sf-entry-eyebrow">{COPY.eyebrow}</span>
-          <span className="sf-entry-title">{COPY.title}</span>
+        <span className="sf-entry-title">{COPY.headline}</span>
+        <span className="sf-entry-lede">
+          In <strong>under a minute</strong> get suit options matched to your event and needs.
         </span>
       </span>
-      <span className="sf-entry-cta">{COPY.cta}</span>
+      <span className="sf-entry-cta">
+        <SparkleIcon />
+        {COPY.cta}
+      </span>
     </a>
   );
 }
