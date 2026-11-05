@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import IntroModal from "./components/IntroModal.jsx";
 import ProductGridEntry from "./components/ProductGridEntry.jsx";
 import ProductDetail from "./components/ProductDetail.jsx";
+import SiteFooter from "../../src/components/SiteFooter.jsx";
 import Results from "./components/Results.jsx";
 import TextInput from "./components/TextInput.jsx";
 import { RENTAL_MIN_LEAD_DAYS, RENTAL_PACKAGES } from "./data/rentals.js";
@@ -904,6 +905,7 @@ export default function App() {
           />
         )}
       </main>
+      {screen === "results" && <SiteFooter />}
     </>
   );
 }

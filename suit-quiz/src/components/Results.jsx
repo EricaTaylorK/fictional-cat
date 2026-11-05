@@ -1102,7 +1102,7 @@ function TagMark() {
   );
 }
 
-function YourLook({ suit, image, size, tailoringId, onTailoring, items, addedLooks, onOpenLook, onRemoveLook }) {
+function YourLook({ suit, image, size, tailoringId, items, addedLooks, onOpenLook, onRemoveLook }) {
   const [sheetOpen, setSheetOpen] = useState(false);
   const [bagStatus, setBagStatus] = useState("idle");
   const [flash, setFlash] = useState(false);
@@ -1240,7 +1240,6 @@ function YourLook({ suit, image, size, tailoringId, onTailoring, items, addedLoo
 
   return (
     <aside className={`your-look${sheetOpen ? " is-open" : ""}`} aria-label="Your Look">
-      <div className="your-look-accent" aria-hidden="true" />
       <div className="your-look-panel" id="your-look-details">
         <button className="your-look-close" type="button" onClick={() => setSheetOpen(false)}>Close</button>
         <div className="your-look-head">
@@ -1272,27 +1271,15 @@ function YourLook({ suit, image, size, tailoringId, onTailoring, items, addedLoo
             <p className="your-look-price">{formatPrice(suit.price)}</p>
           </div>
         </section>
-        {shownTailoring && (
+        {selectedPackage && (
           <section aria-labelledby="your-tailoring-label">
             <h3 id="your-tailoring-label" className="your-look-kicker">Tailoring</h3>
             <div className="your-look-tailor">
               <div className="your-look-copy">
-                <p className="your-look-name">{shownTailoring.name}</p>
-                <p className="your-look-meta">{shownTailoring.body}</p>
-                <label className="look-switch">
-                  <input
-                    type="checkbox"
-                    role="switch"
-                    checked={tailoringOn}
-                    onChange={(event) => onTailoring(event.target.checked ? "signature" : NO_HEM.id)}
-                  />
-                  <span>{tailoringOn ? "Added" : "Add tailoring"}</span>
-                  <span className="visually-hidden">{shownTailoring.name}</span>
-                </label>
+                <p className="your-look-name">{selectedPackage.name}</p>
+                <p className="your-look-meta">{selectedPackage.body}</p>
               </div>
-              <p className="your-look-price">
-                {tailoringOn ? formatPrice(shownTailoring.price) : `+ ${formatPrice(shownTailoring.price)}`}
-              </p>
+              <p className="your-look-price">{formatPrice(selectedPackage.price)}</p>
             </div>
           </section>
         )}
@@ -1594,7 +1581,6 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
       image={selectedVariant?.image || selected.image}
       size={size}
       tailoringId={tailoringId}
-      onTailoring={commitTailoring}
       items={selectedLook?.items ?? []}
       addedLooks={addedLooks}
       onOpenLook={openQuickView}
@@ -1602,7 +1588,6 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
     />
   ) : (
     <aside className="your-look" aria-label="Your Look">
-      <div className="your-look-accent" aria-hidden="true" />
       <div className="your-look-panel">
         <h2 className="your-look-title">Your Look</h2>
         <p className="your-look-summary">Choose a suit to build your look.</p>
@@ -1760,13 +1745,14 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
                             {product.compareAt && <p className="suit-clearance">Clearance</p>}
                           </div>
                           <button
-                            className="suit-expand-toggle"
+                            className={`suit-expand-toggle${open ? " is-open" : ""}`}
                             type="button"
                             aria-expanded={open}
                             aria-controls={`suit-expand-${product.id}`}
-                            aria-label={open ? `Hide options for ${product.name}` : `Show options for ${product.name}`}
+                            aria-label={open ? `Viewing ${product.name}` : `Choose ${product.name}`}
                             onClick={() => toggleCard(product)}
                           >
+                            <span>{open ? "Viewing this suit" : "Choose this suit"}</span>
                             <ChevronIcon open={open} />
                           </button>
                         </div>
@@ -1869,27 +1855,6 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
           </div>
         )}
       </section>
-
-      {!renting && summary.needsMeasurementHelp && (
-        <div className="results-extra">
-          <aside className="confidence-callout">
-            <img src="/icons/content_store.svg" alt="" />
-            <div>
-              <h2>Want to be sure of the size?</h2>
-              <p>
-                Your answers point to a strong starting suit. A free in-store measurement catches the
-                details a quiz can't, so you leave knowing it fits.
-              </p>
-              <button className="text-link" type="button" onClick={() => setHandoff("appointment")}>
-                Book a free measurement
-              </button>
-              {handoff === "appointment" && (
-                <p className="handoff-inline" role="status">Prototype: this would open nearby stores and times.</p>
-              )}
-            </div>
-          </aside>
-        </div>
-      )}
 
       {quickViewItem && (
         <QuickView
