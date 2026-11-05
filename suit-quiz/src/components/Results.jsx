@@ -10,6 +10,9 @@ import { lookTotals } from "../lib/lookSummary.js";
 import {
   buildResultSummary,
   formatDate,
+  shirtRange,
+  sizeList,
+  waistRange,
   formatPrice,
   getRecommendations,
   getRentalRecommendations,
@@ -31,7 +34,10 @@ const FIT_NOTE_COPY = {
   runsLong: "Sleeves and jackets usually run long",
   runsShort: "Sleeves and jackets usually run short",
   athleticBuild: "Pants gap at the waist",
-  seatThighs: "Pants are tight through the seat or thighs",
+  seatThighs: "Pants are tight through the hips or thighs",
+  waistPinch: "Pants pinch at the waist",
+  pantsLong: "Pants usually run long",
+  pantsShort: "Pants usually run short",
 };
 
 function selectedIssues(values) {
@@ -57,16 +63,18 @@ function fitProfileRows({ answers, renting, size, fitName }) {
   const jacketValue = size?.jacket ? jacketFact(size, renting) : null;
   const waistNumber = size?.pants ? String(size.pants).replace(/W$/i, "") : null;
   const fit = fitName ? titleWords(fitName) : null;
+  const shirtSizes = shirtRange(everyday.shirt);
+  const waistSizes = waistRange(everyday.waist);
   const personal = [
     height,
     jacketValue ? `Jacket ${jacketValue}` : null,
     waistNumber ? `Waist ${waistNumber}"` : null,
-    !jacketValue && everyday.shirt ? `Shirt ${everyday.shirt}` : null,
-    !waistNumber && everyday.waist ? `Waist ${everyday.waist}` : null,
+    !jacketValue && shirtSizes ? `Shirt ${shirtSizes}` : null,
+    !waistNumber && waistSizes ? `Waist ${waistSizes}` : null,
   ].filter(Boolean);
   const usual = [
-    everyday.shirt && !personal.some((part) => part.includes(`Shirt ${everyday.shirt}`)) ? `Shirt ${everyday.shirt}` : null,
-    everyday.waist && !personal.some((part) => part.includes(String(everyday.waist))) ? `Waist ${everyday.waist}` : null,
+    shirtSizes && !personal.some((part) => part.includes(`Shirt ${shirtSizes}`)) ? `Shirt ${shirtSizes}` : null,
+    waistSizes && !personal.some((part) => part.includes(waistSizes)) ? `Waist ${waistSizes}` : null,
   ].filter(Boolean);
   const notes = [
     ...selectedIssues(answers.fitIssues).map((issue) => FIT_NOTE_COPY[issue]),
@@ -183,7 +191,7 @@ function preferredLookSize(item, answers) {
   const sizes = sizesForLookItem(item);
   const everyday = answers?.everydaySizes ?? {};
   const measurements = answers?.measurements ?? {};
-  const candidates = [everyday.shirt, everyday.shoe, measurements.shirt, measurements.neck, measurements.shoe]
+  const candidates = [...sizeList(everyday.shirt), everyday.shoe, measurements.shirt, measurements.neck, measurements.shoe]
     .filter(Boolean)
     .map(String);
   return candidates.find((value) => sizes.includes(value)) || "";
@@ -608,7 +616,10 @@ const ISSUE_PRIORITY = {
   runsLong: "sleeve length",
   runsShort: "sleeve length",
   athleticBuild: "the waist",
-  seatThighs: "the seat and thighs",
+  waistPinch: "the waist",
+  pantsLong: "pant length",
+  pantsShort: "pant length",
+  seatThighs: "the hips and thighs",
 };
 
 function preferredColorPhrase(answers) {

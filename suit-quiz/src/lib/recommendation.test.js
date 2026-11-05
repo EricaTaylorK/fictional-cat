@@ -18,6 +18,9 @@ import {
   parseHeight,
   parseJacket,
   recommendTailoring,
+  shirtRange,
+  sizeList,
+  waistRange,
 } from "./recommendation.js";
 
 const baseAnswers = {
@@ -163,6 +166,32 @@ describe("rentals", () => {
   });
 });
 
+describe("usual sizes with more than one pick", () => {
+  it("reads single values and lists the same way", () => {
+    expect(sizeList("L")).toEqual(["L"]);
+    expect(sizeList(["M", "L"])).toEqual(["M", "L"]);
+    expect(sizeList(undefined)).toEqual([]);
+    expect(sizeList([])).toEqual([]);
+  });
+
+  it("shows the range the shopper picked", () => {
+    expect(shirtRange(["L", "M"])).toBe("M–L");
+    expect(shirtRange("L")).toBe("L");
+    expect(waistRange(["34", "32"])).toBe("32–34");
+    expect(shirtRange([])).toBeNull();
+  });
+
+  it("estimates from the largest shirt and waist picked", () => {
+    const estimate = getSizeEstimate({
+      measurementKnowledge: "no",
+      height: "regular",
+      everydaySizes: { shirt: ["M", "L"], waist: ["32", "34"] },
+    });
+    expect(estimate.jacket).toBe("42R");
+    expect(estimate.pants).toBe("34W");
+  });
+});
+
 describe("tailoring suggestion on results", () => {
   it("drops the suggestion when the shopper picks No, just the suit", () => {
     expect(buildResultSummary({ ...baseAnswers, tailoring: "skip" }).tailoring).toBeNull();
@@ -237,10 +266,25 @@ describe("fit signals", () => {
     expect(best.fit).toBe("roomy");
   });
 
-  it("favors room or stretch when pants are tight through the seat and thighs", () => {
-    const [best] = getRecommendations({ ...estimate, fitIssues: ["seatThighs"] });
+  it("favors room or stretch when pants are tight through the hips and thighs", () => {
+    const [best] = getRecommendations({ ...estimate, pantsFit: ["seatThighs"] });
     expect(best.fit === "roomy" || best.stretch).toBe(true);
-    expect(best.evidence.join(" ")).toMatch(/seat and thighs/);
+    expect(best.evidence.join(" ")).toMatch(/hips and thighs/);
+  });
+
+  it("keeps the jacket-button signal on fit and sends pants pinch to a waist let-out", () => {
+    expect(recommendTailoring({ pantsFit: ["waistPinch"] }).id).toBe("signature");
+    expect(recommendTailoring({ pantsFit: ["waistPinch"] }).because).toMatch(/waistband feels tight/);
+    expect(recommendTailoring({ fitIssues: ["fullerMidsection"] }).because).toMatch(/jackets pull at the button/);
+    const [best] = getRecommendations({ ...estimate, pantsFit: ["waistPinch"] });
+    expect(best.fit).not.toBe("roomy");
+  });
+
+  it("hems pants for pants that run long or short without changing the jacket length", () => {
+    expect(recommendTailoring({ pantsFit: ["pantsLong"] }).id).toBe("essentials");
+    expect(recommendTailoring({ pantsFit: ["pantsShort"] }).because).toMatch(/longer inseam/);
+    expect(inferLength({ ...estimate, pantsFit: ["pantsLong"] })).toBe(inferLength(estimate));
+    expect(inferLength({ ...estimate, pantsFit: ["pantsShort"] })).toBe(inferLength(estimate));
   });
 
   it("changes the recommendation compared with standard sizes", () => {
@@ -413,19 +457,20 @@ describe("recommendations", () => {
     }
     const buyThemes = colorThemes("buy");
     const rentThemes = colorThemes("rent");
-    expect(buyThemes.map((theme) => theme.value)).toEqual(["navy", "gray", "black", "brownTan", "burgundy", "green", "blue"]);
-    expect(rentThemes.map((theme) => theme.value)).toEqual(["navy", "gray", "black", "brownTan", "green", "blue", "white"]);
-    expect(buyThemes.map((theme) => theme.value)).not.toContain("white");
-    expect(buyThemes.map((theme) => theme.value)).not.toContain("light");
-    expect(rentThemes.map((theme) => theme.value)).toContain("white");
-    expect(rentThemes.map((theme) => theme.value)).not.toContain("light");
-    expect(buyThemes.find((theme) => theme.value === "brownTan").colors).toEqual(["brown", "tan"]);
-    expect(rentThemes.find((theme) => theme.value === "brownTan").colors).toEqual(["tan"]);
-    expect(rentThemes.find((theme) => theme.value === "brownTan").label).toBe("Brown and tan");
+    // Light and soft is white only, so the buy lane hides it.
+    expect(buyThemes.map((theme) => theme.value)).toEqual(["classics", "earthTones", "richBold"]);
+    expect(rentThemes.map((theme) => theme.value)).toEqual(["classics", "earthTones", "richBold", "lightSoft"]);
+    expect(buyThemes.map((theme) => theme.value)).not.toContain("lightSoft");
+    expect(rentThemes.find((theme) => theme.value === "lightSoft").colors).toEqual(["white"]);
+    expect(buyThemes.find((theme) => theme.value === "earthTones").colors).toEqual(["brown", "tan", "green"]);
+    expect(rentThemes.find((theme) => theme.value === "earthTones").colors).toEqual(["tan", "green"]);
+    expect(rentThemes.find((theme) => theme.value === "richBold").colors).toEqual(["blue"]);
+    expect(rentThemes.find((theme) => theme.value === "earthTones").label).toBe("Earth tones");
     expect(colorsIn(["darks"])).toEqual(["navy", "blue", "gray", "black"]);
     expect(colorsIn(["warm"])).toEqual(["tan", "brown", "burgundy", "green"]);
     expect(colorsIn(["light"])).toEqual(["white"]);
     expect(colorsIn(["navy", "brownTan"])).toEqual(["navy", "brown", "tan"]);
+    expect(colorsIn(["classics", "richBold"])).toEqual(["navy", "gray", "black", "burgundy", "blue"]);
   });
 
   it("puts in-budget suits first and says when the budget misses", () => {

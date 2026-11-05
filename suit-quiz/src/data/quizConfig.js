@@ -66,21 +66,12 @@ export const questions = {
     help: "Pick all you like and we'll show those first. Open to anything? Skip this one.",
     type: "colors",
     skippable: true,
+    // Each card stores its own value in colors.prefer and expands to these catalog colors.
     options: [
-      { value: "navy", label: "Navy", colors: ["navy"], group: "classics" },
-      { value: "gray", label: "Gray", caption: "Charcoal to light", colors: ["gray"], group: "classics" },
-      { value: "black", label: "Black", colors: ["black"], group: "classics" },
-      { value: "brownTan", label: "Brown and tan", caption: "Chocolate to khaki", colors: ["brown", "tan"], group: "earthy" },
-      { value: "burgundy", label: "Burgundy", colors: ["burgundy"], group: "earthy" },
-      { value: "green", label: "Green", caption: "Olive, sage, forest", colors: ["green"], group: "earthy" },
-      { value: "blue", label: "Blue", caption: "Royal, cobalt", colors: ["blue"], group: "bright" },
-      { value: "pink", label: "Pink", colors: ["pink"], group: "bright" },
-      { value: "white", label: "White or cream", colors: ["white"], group: "bright" },
-    ],
-    groups: [
-      { id: "classics", label: "Classics" },
-      { id: "earthy", label: "Rich and earthy" },
-      { id: "bright", label: "Light and bright" },
+      { value: "classics", label: "Classics", detail: "Navy, gray, and black.", colors: ["navy", "gray", "black"] },
+      { value: "earthTones", label: "Earth tones", detail: "Brown, tan, and sage.", colors: ["brown", "tan", "green"] },
+      { value: "richBold", label: "Rich and bold", detail: "Burgundy and royal blue.", colors: ["burgundy", "blue"] },
+      { value: "lightSoft", label: "Light and soft", detail: "White or cream.", colors: ["white"] },
     ],
   },
   measurementKnowledge: {
@@ -96,16 +87,16 @@ export const questions = {
   measurements: {
     id: "measurements",
     title: "What sizes do you know?",
-    help: "Choose your jacket size, pant size, or both. Check the tag inside a jacket you already own.",
+    help: "Pick your jacket size, pant size, or both. Not sure? It's on the tag inside a suit jacket or pants you own. Just use the number.",
     type: "measurements",
   },
   fitIssues: {
     id: "fitIssues",
-    title: "Where do jackets feel tight or long?",
-    help: "Choose any that apply, and we'll adjust the cut or the starting size.",
+    title: "Where do jackets feel off?",
+    help: "Pick any that apply. We'll use your answers to suggest a size and any tailoring.",
     type: "multi",
     skippable: true,
-    skipLabel: "They usually feel fine",
+    skipLabel: "Jackets usually feel fine",
     options: [
       {
         value: "broadShoulders",
@@ -116,44 +107,64 @@ export const questions = {
       {
         value: "fullerMidsection",
         icon: "/icons/mw/tight-button.png",
-        label: "Jackets pull at the button, or pants pinch at the waist",
+        label: "Jackets pull at the button",
         detail: "I need more room through the middle",
       },
       {
         value: "runsLong",
         icon: "/icons/mw/sleeve.png",
         label: "Sleeves and jackets usually run long",
-        detail: "Sleeves cover the cuff, or the jacket covers the seat",
+        detail: "Sleeves cover my shirt cuff, or the jacket hangs low",
         excludes: ["runsShort"],
       },
       {
         value: "runsShort",
         icon: "/icons/mw/tight-sleeves.png",
         label: "Sleeves and jackets usually run short",
-        detail: "My wrists show, or the jacket sits high",
+        detail: "My wrists show, or the jacket stops too high",
         excludes: ["runsLong"],
       },
     ],
   },
   pantsFit: {
     id: "pantsFit",
-    title: "Where do pants feel tight or loose?",
-    help: "Choose any that apply, and we'll adjust the cut or the starting size.",
+    title: "Where do pants feel off?",
+    help: "Pick any that apply. We'll use your answers to suggest a size and any tailoring.",
     type: "multi",
     skippable: true,
-    skipLabel: "They usually feel fine",
+    skipLabel: "Pants usually feel fine",
     options: [
       {
         value: "athleticBuild",
         icon: "/icons/mw/athletic.png",
-        label: "Jackets fit my chest, but pants gap at the waist",
-        detail: "A broad chest with a trimmer waist",
+        label: "Pants gap at the waist",
+        detail: "My jacket fits my chest, but my waist is trimmer",
       },
       {
         value: "seatThighs",
         icon: "/icons/mw/baggy-pants.png",
-        label: "Pants are tight through the seat or thighs",
+        label: "Pants are tight through the hips or thighs",
         detail: "Snug when I sit, take stairs, or crouch",
+      },
+      {
+        value: "waistPinch",
+        icon: "/icons/mw/tight-waist.png",
+        label: "Pants pinch at the waist",
+        detail: "The waistband feels tight, even when the jacket is fine",
+      },
+      {
+        value: "pantsLong",
+        icon: "/icons/mw/hem.png",
+        label: "Pants usually run long",
+        detail: "The hem covers my shoes or stacks on the floor",
+        excludes: ["pantsShort"],
+      },
+      {
+        value: "pantsShort",
+        icon: "/icons/mw/tailor-leg-hem.png",
+        label: "Pants usually run short",
+        detail: "The hem stops above my shoes",
+        excludes: ["pantsLong"],
       },
     ],
   },
@@ -242,10 +253,20 @@ export function resolvedOccasion(answers) {
   return BUY_OCCASION[value] ?? value;
 }
 
+// Older saved answers used per-color values and groups. Keep them working.
 const LEGACY_COLOR_GROUPS = {
   darks: ["navy", "blue", "gray", "black"],
   warm: ["tan", "brown", "burgundy", "green"],
   light: ["white"],
+  navy: ["navy"],
+  gray: ["gray"],
+  black: ["black"],
+  brownTan: ["brown", "tan"],
+  burgundy: ["burgundy"],
+  green: ["green"],
+  blue: ["blue"],
+  pink: ["pink"],
+  white: ["white"],
 };
 
 const COLOR_NAMES = {
@@ -269,7 +290,7 @@ export function colorsIn(values) {
   return [...new Set((Array.isArray(values) ? values : []).flatMap((value) => palettes.get(value) ?? [value]))];
 }
 
-// The chip keeps its own label (for example "Brown and tan") even when the lane only carries one of its colors.
+// The card keeps its own label even when the lane only carries one of its colors.
 function visibleCopy(option) {
   return { label: option.label };
 }

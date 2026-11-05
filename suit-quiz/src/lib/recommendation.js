@@ -101,7 +101,10 @@ const fitNoteLabels = {
   broadShoulders: "room through the shoulders",
   athleticBuild: "broad chest, trimmer waist",
   fullerMidsection: "room through the middle",
-  seatThighs: "room through the seat and thighs",
+  seatThighs: "room through the hips and thighs",
+  waistPinch: "a let-out at the pants waist",
+  pantsLong: "pants hemmed to your shoe",
+  pantsShort: "a longer inseam, hemmed to your shoe",
   runsLong: "shorter sleeves and jacket",
   runsShort: "longer sleeves and jacket",
 };
@@ -223,19 +226,53 @@ export const SHIRT_SIZE_CHEST = { XS: 36, S: 38, M: 40, L: 42, XL: 46, XXL: 48, 
 function buildDrop(answers) {
   const signals = getFitSignals(answers);
   if (signals.has("athleticBuild")) return 8;
-  if (signals.has("fullerMidsection")) return 4;
+  if (signals.has("fullerMidsection") || signals.has("waistPinch")) return 4;
   return STANDARD_DROP;
 }
 
+export const SHIRT_ORDER = ["XS", "S", "M", "L", "XL", "XXL", "3XL", "4XL", "5XL"];
+
+// Usual sizes can be one value (older saved answers) or a list from the multi-select step.
+export function sizeList(value) {
+  if (Array.isArray(value)) return value.filter(Boolean).map(String);
+  return value ? [String(value)] : [];
+}
+
+function sortedShirts(value) {
+  return sizeList(value)
+    .filter((size) => SHIRT_ORDER.includes(size))
+    .sort((a, b) => SHIRT_ORDER.indexOf(a) - SHIRT_ORDER.indexOf(b));
+}
+
+function sortedWaists(value) {
+  return sizeList(value).map(Number).filter(Number.isFinite).sort((a, b) => a - b);
+}
+
+// Results show the range the shopper picked, for example "M–L" or "32–34".
+export function shirtRange(value) {
+  const list = sortedShirts(value);
+  if (!list.length) return null;
+  return list[0] === list.at(-1) ? list[0] : `${list[0]}–${list.at(-1)}`;
+}
+
+export function waistRange(value) {
+  const list = sortedWaists(value);
+  if (!list.length) return null;
+  return list[0] === list.at(-1) ? String(list[0]) : `${list[0]}–${list.at(-1)}`;
+}
+
+// The estimate starts from the largest size picked, so a size that fluctuates gets room a tailor can take in.
 function knownChest(answers) {
+  const largestShirt = sortedShirts(answers.everydaySizes?.shirt).at(-1);
   return parseJacket(answers.measurements?.jacket)?.chest
     || Number(answers.measurements?.chest)
-    || SHIRT_SIZE_CHEST[answers.everydaySizes?.shirt]
+    || SHIRT_SIZE_CHEST[largestShirt]
     || null;
 }
 
 function knownWaist(answers) {
-  return Number(answers.measurements?.waist || answers.everydaySizes?.waist) || null;
+  const largestWaist = sortedWaists(answers.everydaySizes?.waist).at(-1);
+  return Number(answers.measurements?.waist) || largestWaist || null;
 }
 
 export function getSizeEstimate(answers) {
@@ -292,8 +329,15 @@ export function recommendTailoring(answers) {
   if (signals.has("fullerMidsection")) {
     return {
       id: "signature",
-      reason: "Adjusts the jacket button point and pants waist so nothing pulls.",
-      because: "You said jackets pull at the button or pants pinch at the waist, so we'll adjust both so nothing pulls.",
+      reason: "Adjusts the jacket button point so nothing pulls.",
+      because: "You said jackets pull at the button, so we'll start with more room through the middle.",
+    };
+  }
+  if (signals.has("waistPinch")) {
+    return {
+      id: "signature",
+      reason: "Lets out the pants waist so the waistband stops pinching.",
+      because: "You said the waistband feels tight, so we'll let out the pants waist.",
     };
   }
   if (signals.has("runsLong")) {
@@ -308,6 +352,20 @@ export function recommendTailoring(answers) {
       id: "essentials",
       reason: "Sets the sleeves to your arm length and hems the pants.",
       because: "You said sleeves and jackets usually run short, so we'll start in a longer length and finish the sleeves and hem.",
+    };
+  }
+  if (signals.has("pantsLong")) {
+    return {
+      id: "essentials",
+      reason: "Hems the pants so they break at your shoe.",
+      because: "You said pants usually run long, so we'll hem the pants so they break at your shoe.",
+    };
+  }
+  if (signals.has("pantsShort")) {
+    return {
+      id: "essentials",
+      reason: "Starts with a longer inseam and hems to your shoe.",
+      because: "You said pants usually run short, so we'll start with a longer inseam and hem to your shoe.",
     };
   }
   return {
@@ -376,9 +434,9 @@ function scoreFitSignals(product, answers, evidence) {
     if (product.stretch) score += 10;
     if (product.fit === "close" && !product.stretch) score -= 14;
     if (product.stretch) {
-      evidence.push("Stretch in the fabric gives through the seat and thighs when you sit or move.");
+      evidence.push("Stretch in the fabric gives through the hips and thighs when you sit or move.");
     } else if (product.fit === "roomy") {
-      evidence.push(`The ${fitName} cuts the pants fuller through the seat and thighs.`);
+      evidence.push(`The ${fitName} cuts the pants fuller through the hips and thighs.`);
     }
   }
 

@@ -3967,8 +3967,40 @@ h2 {
   margin-top: 0;
 }
 
+.quiz-slide .skip-button[aria-pressed="true"] {
+  background: #001e56;
+  border-color: #001e56;
+  color: #fff;
+}
+
 .quiz-slide .option-cards.option-cards-compact {
   width: min(1024px, 100%);
+}
+
+/* Color cards: overlapping dots in the art area. Selection adds a 2px blue border, not only a tint. */
+.quiz-slide .color-cards .color-card[aria-pressed="true"] {
+  border: 2px solid #1d52f5;
+  padding: 15px;
+}
+
+.color-dots {
+  align-items: center;
+  display: flex;
+  justify-content: center;
+}
+
+.color-dot {
+  border: 2px solid #fff;
+  border-radius: 50%;
+  box-sizing: border-box;
+  display: block;
+  height: 44px;
+  margin-left: -12px;
+  width: 44px;
+}
+
+.color-dot:first-child {
+  margin-left: 0;
 }
 
 .color-picks {
@@ -4493,7 +4525,7 @@ h2 {
 }
 
 .quiz-slide .date-question .date-field,
-.quiz-slide .date-question .date-plan,
+.quiz-slide .date-question .date-timeline,
 .quiz-slide .date-question .date-prompt {
   justify-self: center;
 }
@@ -4541,15 +4573,6 @@ h2 {
   padding: 16px;
 }
 
-.quiz-slide .date-plan {
-  gap: 16px;
-  padding: 16px;
-}
-
-.quiz-slide .date-plan li {
-  gap: 16px;
-}
-
 
 .date-field {
   display: grid;
@@ -4571,29 +4594,50 @@ h2 {
   padding: var(--spacing-vertical-md) var(--spacing-horizontal-md);
 }
 
-.date-plan {
-  border: 1px solid var(--color-divider-light-gray);
-  border-radius: var(--border-radius-lg);
+/* Three-point timeline: Ready, Event, Due back. */
+.date-timeline {
   display: grid;
-  gap: var(--spacing-vertical-md);
-  margin: 0;
-  padding: var(--spacing-vertical-lg);
-  text-align: left;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  justify-self: center;
+  list-style: none;
+  margin: 8px 0 0;
+  max-width: 640px;
+  padding: 0;
+  position: relative;
   width: 100%;
 }
 
-.date-plan ol {
-  display: grid;
-  gap: var(--spacing-vertical-md);
-  list-style: none;
-  margin: 0;
-  padding: 0;
+.date-timeline::before {
+  background: #d9d9d9;
+  content: "";
+  height: 2px;
+  left: 16.67%;
+  position: absolute;
+  right: 16.67%;
+  top: 10px;
 }
 
-.date-plan li {
+.date-stop {
   display: grid;
-  gap: 2px;
+  gap: 4px;
   justify-items: center;
+  position: relative;
+  text-align: center;
+}
+
+.date-dot {
+  background: #fff;
+  border: 1px solid #a6a6a6;
+  border-radius: 50%;
+  box-sizing: border-box;
+  display: block;
+  height: 22px;
+  width: 22px;
+}
+
+.date-stop.is-event .date-dot {
+  background: #1d52f5;
+  border-color: #1d52f5;
 }
 
 .date-plan-label {
@@ -4603,17 +4647,50 @@ h2 {
   line-height: var(--line-height-20);
 }
 
-.date-plan li strong {
+.date-stop strong {
   color: var(--color-font-black);
   font-size: var(--font-size-18);
   font-weight: var(--font-weight-bold);
   line-height: var(--line-height-24);
 }
 
-.date-plan li > span:last-child {
+.date-stop-copy {
   color: var(--color-font-dark-gray);
   font-size: var(--font-size-14);
   line-height: var(--line-height-20);
+  max-width: 200px;
+}
+
+@media (max-width: 640px) {
+  .date-timeline {
+    gap: 16px;
+    grid-template-columns: 1fr;
+  }
+
+  .date-timeline::before {
+    bottom: 11px;
+    height: auto;
+    left: 10px;
+    right: auto;
+    top: 11px;
+    width: 2px;
+  }
+
+  .date-stop {
+    column-gap: 12px;
+    grid-template-columns: 22px minmax(0, 1fr);
+    justify-items: start;
+    text-align: left;
+  }
+
+  .date-stop > * {
+    grid-column: 2;
+  }
+
+  .date-stop > .date-dot {
+    grid-column: 1;
+    grid-row: 1 / span 3;
+  }
 }
 
 .date-warning {

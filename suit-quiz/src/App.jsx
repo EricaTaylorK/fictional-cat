@@ -7,7 +7,7 @@ import TextInput from "./components/TextInput.jsx";
 import { RENTAL_MIN_LEAD_DAYS, RENTAL_PACKAGES } from "./data/rentals.js";
 import { colorThemes, getQuestionFlow, occasionOptions, questions } from "./data/quizConfig.js";
 import { matchingSteps, matchingSubtext } from "./lib/matchingSteps.js";
-import { formatDate, quizCatalogIds, quizListingFilters, rentalDates } from "./lib/recommendation.js";
+import { formatDate, quizCatalogIds, quizListingFilters, rentalDates, sizeList } from "./lib/recommendation.js";
 
 const STORAGE_KEY = "suit-quiz-wireframe-progress";
 
@@ -111,9 +111,11 @@ function ChoiceQuestion({ question, value, onChange }) {
     );
   }
 
+  // "none" means "usually feel fine". Picking a card replaces it.
   function toggleMulti(optionValue) {
-    if (selectedValues.includes(optionValue)) {
-      onChange(selectedValues.filter((item) => item !== optionValue));
+    const current = selectedValues.filter((item) => item !== "none");
+    if (current.includes(optionValue)) {
+      onChange(current.filter((item) => item !== optionValue));
       return;
     }
     const option = question.options.find((item) => item.value === optionValue);
@@ -123,7 +125,7 @@ function ChoiceQuestion({ question, value, onChange }) {
     }
     const exclusiveValues = question.options.filter((item) => item.exclusive).map((item) => item.value);
     const blocked = new Set([...exclusiveValues, ...(option.excludes ?? [])]);
-    onChange([...selectedValues.filter((item) => !blocked.has(item)), optionValue]);
+    onChange([...current.filter((item) => !blocked.has(item)), optionValue]);
   }
 
   return (
@@ -154,9 +156,8 @@ function ColorQuestion({ mode, value, onChange }) {
   const prefer = (value?.prefer ?? []).filter((item) => known.has(item));
 
   return (
-    <ColorChips
+    <ColorCards
       options={options}
-      groups={questions.colors.groups}
       isSelected={(theme) => prefer.includes(theme)}
       onPick={(theme) => onChange((current) => {
         const wearing = current?.prefer ?? [];
@@ -169,41 +170,34 @@ function ColorQuestion({ mode, value, onChange }) {
   );
 }
 
-function ColorChips({ options, groups, isSelected, onPick }) {
-  const grouped = groups
-    .map((group) => ({ ...group, options: options.filter((option) => option.group === group.id) }))
-    .filter((group) => group.options.length > 0);
+// Four cards, same shape as the other option cards. The art is overlapping dots, one per catalog color.
+function ColorCards({ options, isSelected, onPick }) {
   return (
-    <div className="color-picks" role="group" aria-label="Colors you'd wear">
-      {grouped.map((group) => (
-        <div className="color-group" key={group.id}>
-          <h3 className="color-group-label" id={`color-group-${group.id}`}>{group.label}</h3>
-          <div className="color-chip-row" role="group" aria-labelledby={`color-group-${group.id}`}>
-            {group.options.map((option) => {
-              const selected = isSelected(option.value);
-              return (
-                <button
-                  className={`color-chip${selected ? " is-selected" : ""}`}
-                  type="button"
-                  key={option.value}
-                  aria-pressed={selected}
-                  onClick={() => onPick(option.value)}
-                >
-                  <span className="color-chip-swatch" aria-hidden="true">
-                    {option.swatches.map((swatch) => (
-                      <span key={swatch.key} style={{ background: swatch.hex }} />
-                    ))}
-                  </span>
-                  <span className="color-chip-copy">
-                    <span className="color-chip-label">{option.label}</span>
-                    {option.caption && <span className="color-chip-caption">{option.caption}</span>}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-        </div>
-      ))}
+    <div className="option-cards color-cards" role="group" aria-label="Colors you'd wear">
+      {options.map((option) => {
+        const selected = isSelected(option.value);
+        return (
+          <button
+            className="option-card color-card"
+            type="button"
+            key={option.value}
+            aria-pressed={selected}
+            onClick={() => onPick(option.value)}
+          >
+            <span className="option-art">
+              <span className="color-dots" aria-hidden="true">
+                {option.swatches.map((swatch) => (
+                  <span className="color-dot" key={swatch.key} style={{ background: swatch.hex }} />
+                ))}
+              </span>
+            </span>
+            <span className="option-copy">
+              <strong>{option.label}</strong>
+              {option.detail && <span>{option.detail}</span>}
+            </span>
+          </button>
+        );
+      })}
     </div>
   );
 }
@@ -214,7 +208,7 @@ function todayIso() {
   return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
 }
 
-function DateQuestion({ value, onChange }) {
+function DateQuestion({ value, onChange, onUnsure }) {
   const dates = rentalDates(value);
   const today = new Date();
   const earliest = new Date(today.getFullYear(), today.getMonth(), today.getDate() + RENTAL_MIN_LEAD_DAYS);
@@ -227,23 +221,28 @@ function DateQuestion({ value, onChange }) {
         </span>
         <input type="date" min={todayIso()} value={value ?? ""} onChange={(event) => onChange(event.target.value)} />
       </label>
+      <button className="text-link date-unsure" type="button" onClick={onUnsure}>
+        Not sure of the date yet?
+      </button>
       {dates?.past && <p className="date-warning" role="status">That date has passed. Pick an upcoming date.</p>}
       {dates && !dates.past && (
-        <ol className="date-plan" aria-label="Your timing">
-          <li>
+        <ol className="date-timeline" aria-label="Your timing">
+          <li className="date-stop">
+            <span className="date-dot" aria-hidden="true" />
             <span className="date-plan-label">Ready</span>
             <strong>{formatDate(dates.ready)}</strong>
-            <span>Pick it up in store or have it delivered.</span>
+            <span className="date-stop-copy">Pick it up in store or have it delivered.</span>
           </li>
-          <li>
+          <li className="date-stop is-event">
+            <span className="date-dot" aria-hidden="true" />
             <span className="date-plan-label">Event</span>
             <strong>{formatDate(dates.event)}</strong>
-            <span>The day you wear it.</span>
           </li>
-          <li>
+          <li className="date-stop">
+            <span className="date-dot" aria-hidden="true" />
             <span className="date-plan-label">Due back</span>
             <strong>{formatDate(dates.returnBy)}</strong>
-            <span>Return it in store or by mail.</span>
+            <span className="date-stop-copy">Return it in store or by mail.</span>
           </li>
         </ol>
       )}
@@ -322,8 +321,8 @@ function MeasurementsQuestion({
     const field = MEASUREMENT_FIELDS.find((item) => item.id === id);
     writeMeasurements({ ...value, [id]: nextValue });
     if (unknownSizes[id]) onUnknownSizes({ ...unknownSizes, [id]: false });
-    if (everydaySizes[field.estimateId]) {
-      onEverydaySizes({ ...everydaySizes, [field.estimateId]: "" });
+    if (sizeList(everydaySizes[field.estimateId]).length) {
+      onEverydaySizes({ ...everydaySizes, [field.estimateId]: [] });
     }
   }
 
@@ -335,8 +334,8 @@ function MeasurementsQuestion({
       writeMeasurements({ ...value, [id]: "" });
       return;
     }
-    if (everydaySizes[field.estimateId]) {
-      onEverydaySizes({ ...everydaySizes, [field.estimateId]: "" });
+    if (sizeList(everydaySizes[field.estimateId]).length) {
+      onEverydaySizes({ ...everydaySizes, [field.estimateId]: [] });
     }
   }
 
@@ -443,6 +442,8 @@ function SizesQuestion({ question, value = {}, onChange }) {
       {question.groups.map((group) => {
         const flag = `${group.id}Unknown`;
         const unknown = Boolean(value[flag]);
+        // Usual sizes can be more than one (people fluctuate), so each group is a set of checkboxes.
+        const selected = sizeList(value[group.id]);
         return (
           <fieldset className="size-group" key={group.id}>
             <legend>{group.label}</legend>
@@ -450,11 +451,16 @@ function SizesQuestion({ question, value = {}, onChange }) {
               {group.options.map((option) => (
                 <label className="size-chip" key={option.value}>
                   <input
-                    type="radio"
+                    type="checkbox"
                     name={`${question.id}-${group.id}`}
                     value={option.value}
-                    checked={value[group.id] === option.value}
-                    onChange={() => onChange({ ...value, [group.id]: option.value, [flag]: false })}
+                    checked={selected.includes(option.value)}
+                    onChange={() => {
+                      const next = selected.includes(option.value)
+                        ? selected.filter((item) => item !== option.value)
+                        : [...selected, option.value];
+                      onChange({ ...value, [group.id]: next, [flag]: false });
+                    }}
                   />
                   <span>{option.label}</span>
                 </label>
@@ -464,7 +470,7 @@ function SizesQuestion({ question, value = {}, onChange }) {
               className={`unknown-size${unknown ? " is-on" : ""}`}
               type="button"
               aria-pressed={unknown}
-              onClick={() => onChange({ ...value, [group.id]: "", [flag]: !unknown })}
+              onClick={() => onChange({ ...value, [group.id]: [], [flag]: !unknown })}
             >
               Not sure
             </button>
@@ -709,6 +715,10 @@ export default function App() {
     setState((previous) => ({ ...previous, screen: "start", place: "sale" }));
   }
 
+  const usuallyFine = currentQuestion?.type === "multi"
+    && Array.isArray(answers[currentId])
+    && answers[currentId].includes("none");
+
   const questionSlide = currentQuestion && (
     <section className="quiz-slide" aria-labelledby="question-title">
       <div className="question-head">
@@ -740,7 +750,7 @@ export default function App() {
           }))}
         />
       ) : currentQuestion.type === "date" ? (
-        <DateQuestion value={answers.eventDate} onChange={setAnswer} />
+        <DateQuestion value={answers.eventDate} onChange={setAnswer} onUnsure={continueQuiz} />
       ) : currentQuestion.type === "pieces" ? (
         <PiecesQuestion value={answers.pieces} onChange={setAnswer} />
       ) : currentQuestion.type === "measurements" ? (
@@ -774,11 +784,23 @@ export default function App() {
       {currentQuestion.note && <p className="question-note">{currentQuestion.note}</p>}
 
       <div className="actions actions-pair">
-        {currentQuestion.skippable && (
+        {currentQuestion.skippable && (currentQuestion.type === "multi" ? (
+          <button
+            className="button secondary skip-button"
+            type="button"
+            aria-pressed={usuallyFine}
+            onClick={() => {
+              setAnswer(["none"]);
+              continueQuiz();
+            }}
+          >
+            {currentQuestion.skipLabel ?? "Skip"}
+          </button>
+        ) : (
           <button className="button secondary skip-button" type="button" onClick={continueQuiz}>
             {currentQuestion.skipLabel ?? "Skip"}
           </button>
-        )}
+        ))}
         <button
           className="button"
           type="button"
@@ -788,11 +810,6 @@ export default function App() {
           {currentIndex === flow.length - 1 ? "See recommendations" : "Next"}
         </button>
       </div>
-      {currentQuestion.type === "date" && (
-        <button className="text-link date-unsure" type="button" onClick={continueQuiz}>
-          Not sure of the date yet?
-        </button>
-      )}
     </section>
   );
 
