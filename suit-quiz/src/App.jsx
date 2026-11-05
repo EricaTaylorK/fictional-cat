@@ -309,17 +309,23 @@ function MeasurementsQuestion({
   onUnknownSizes,
 }) {
   function writeMeasurements(next) {
-    const chest = next.chest ? String(next.chest) : "";
+    const chest = sizeList(next.chest);
+    const waist = sizeList(next.waist);
+    const largestChest = chest.map(Number).filter(Number.isFinite).sort((a, b) => a - b).at(-1);
     onChange({
       chest,
-      waist: next.waist ? String(next.waist) : "",
-      jacket: chest,
+      waist,
+      jacket: largestChest ? String(largestChest) : "",
     });
   }
 
-  function selectKnown(id, nextValue) {
+  function selectKnown(id, sizeValue) {
     const field = MEASUREMENT_FIELDS.find((item) => item.id === id);
-    writeMeasurements({ ...value, [id]: nextValue });
+    const current = sizeList(value[id]);
+    const next = current.includes(sizeValue)
+      ? current.filter((item) => item !== sizeValue)
+      : [...current, sizeValue];
+    writeMeasurements({ ...value, [id]: next });
     if (unknownSizes[id]) onUnknownSizes({ ...unknownSizes, [id]: false });
     if (sizeList(everydaySizes[field.estimateId]).length) {
       onEverydaySizes({ ...everydaySizes, [field.estimateId]: [] });
@@ -344,24 +350,21 @@ function MeasurementsQuestion({
       <div className="size-pair">
         {MEASUREMENT_FIELDS.map((field) => {
           const unknown = Boolean(unknownSizes[field.id]);
-          const known = value[field.id] ? String(value[field.id]) : "";
+          const known = sizeList(value[field.id]);
           return (
             <fieldset className="size-group" key={field.id}>
               <legend>{field.label}</legend>
               <div className="size-chips">
                 {field.sizes.map((size) => {
                   const sizeValue = String(size);
-                  const selected = known === sizeValue;
+                  const selected = known.includes(sizeValue);
                   return (
                     <label className="size-chip" key={sizeValue}>
                       <input
-                        type="radio"
+                        type="checkbox"
                         name={field.id}
                         value={sizeValue}
                         checked={selected}
-                        onClick={() => {
-                          if (selected) selectKnown(field.id, "");
-                        }}
                         onChange={() => selectKnown(field.id, sizeValue)}
                       />
                       <span>{sizeValue}</span>
@@ -677,10 +680,6 @@ export default function App() {
     setState(leaveQuiz);
   }
 
-  function resumeQuiz() {
-    setState((previous) => ({ ...previous, screen: "question" }));
-  }
-
   const showResults = useCallback(() => {
     setState((previous) => ({ ...previous, screen: "results" }));
   }, []);
@@ -696,8 +695,6 @@ export default function App() {
   function backToResults() {
     setState((previous) => ({ ...previous, screen: "results" }));
   }
-
-  const hasSavedProgress = Object.keys(answers).length > 0;
 
   function openIntro() {
     setState((previous) => ({ ...previous, screen: "intro" }));
@@ -728,6 +725,7 @@ export default function App() {
           {questionHelp(currentQuestion, answers) && (
             <p className="helper">{questionHelp(currentQuestion, answers)}</p>
           )}
+          {currentQuestion.note && <p className="question-note">{currentQuestion.note}</p>}
         </div>
       </div>
 
@@ -780,8 +778,6 @@ export default function App() {
           onChange={setAnswer}
         />
       )}
-
-      {currentQuestion.note && <p className="question-note">{currentQuestion.note}</p>}
 
       <div className="actions actions-pair">
         {currentQuestion.skippable && (currentQuestion.type === "multi" ? (
@@ -842,7 +838,6 @@ export default function App() {
           <IntroModal
             key="quiz-modal"
             onStart={startQuiz}
-            onResume={screen === "intro" && hasSavedProgress ? resumeQuiz : undefined}
             onBack={screen === "question" ? goBack : undefined}
             onClose={screen === "question" || screen === "matching" ? saveAndExit : closeIntro}
             progress={screen === "matching" ? 1 : screen === "question" && totalQuestions > 0 ? (currentIndex + 1) / totalQuestions : undefined}

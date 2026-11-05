@@ -170,8 +170,8 @@ export function parseHeight(raw) {
 
 export function getFitSignals(answers) {
   const signals = new Set(fitIssueValues(answers));
-  const chest = parseJacket(answers.measurements?.jacket)?.chest || Number(answers.measurements?.chest);
-  const waist = Number(answers.measurements?.waist);
+  const chest = parseJacket(answers.measurements?.jacket)?.chest || largestSize(answers.measurements?.chest);
+  const waist = largestSize(answers.measurements?.waist);
   if (chest && waist) {
     const drop = chest - waist;
     if (drop >= 8) signals.add("athleticBuild");
@@ -238,6 +238,11 @@ export function sizeList(value) {
   return value ? [String(value)] : [];
 }
 
+function largestSize(value) {
+  const list = sizeList(value).map(Number).filter(Number.isFinite).sort((a, b) => a - b);
+  return list.at(-1) ?? null;
+}
+
 function sortedShirts(value) {
   return sizeList(value)
     .filter((size) => SHIRT_ORDER.includes(size))
@@ -265,14 +270,14 @@ export function waistRange(value) {
 function knownChest(answers) {
   const largestShirt = sortedShirts(answers.everydaySizes?.shirt).at(-1);
   return parseJacket(answers.measurements?.jacket)?.chest
-    || Number(answers.measurements?.chest)
+    || largestSize(answers.measurements?.chest)
     || SHIRT_SIZE_CHEST[largestShirt]
     || null;
 }
 
 function knownWaist(answers) {
   const largestWaist = sortedWaists(answers.everydaySizes?.waist).at(-1);
-  return Number(answers.measurements?.waist) || largestWaist || null;
+  return largestSize(answers.measurements?.waist) || largestWaist || null;
 }
 
 export function getSizeEstimate(answers) {
@@ -457,6 +462,41 @@ function everyColorAvoided(product, avoid) {
   return keys.length > 0 && keys.every((key) => avoid.includes(key));
 }
 
+const CLOSEST_COLORS = {
+  lightSoft: ["tan", "green"],
+};
+
+function preferredColorKeys(answers) {
+  return colorsIn(answers.colors?.prefer);
+}
+
+function colorRank(product, answers) {
+  const prefer = preferredColorKeys(answers);
+  if (!prefer.length) return 0;
+  const keys = colorKeysFor(product);
+  if (keys.some((key) => prefer.includes(key))) return 0;
+  const closest = (answers.colors?.prefer ?? []).flatMap((value) => CLOSEST_COLORS[value] ?? []);
+  const indexes = keys.map((key) => closest.indexOf(key)).filter((index) => index >= 0);
+  if (indexes.length) return 1 + Math.min(...indexes);
+  return 9;
+}
+
+function colorMissLabel(answers, pool) {
+  const prefer = preferredColorKeys(answers);
+  if (!prefer.length || pool.some((product) => colorRank(product, answers) === 0)) return null;
+  const picked = answers.colors?.prefer ?? [];
+  if (picked.length === 1 && picked[0] === "lightSoft") {
+    return "No white, cream, or pink suits right now. Closest options:";
+  }
+  return "None of the colors you picked are in this assortment. Closest options:";
+}
+
+function byColorThenScore(answers) {
+  return (a, b) => colorRank(a, answers) - colorRank(b, answers)
+    || b.score - a.score
+    || a.originalIndex - b.originalIndex;
+}
+
 function matchedColor(product, prefer) {
   if (!prefer.length) return null;
   if (prefer.includes(product.colorKey)) return product.color;
@@ -596,11 +636,15 @@ function honestPercent(score, maxScore) {
 }
 
 export function getRecommendations(answers, assortment = products) {
-  const pool = assortment.map((product, index) => scoreProduct(product, answers, index));
+  const pool = assortment.map((product, index) => ({
+    ...scoreProduct(product, answers, index),
+    colorRank: colorRank(product, answers),
+  }));
   const byScore = (a, b) => b.score - a.score || a.originalIndex - b.originalIndex;
+  const prefer = preferredColorKeys(answers);
   const inBudget = pool.filter((product) => product.inBudget).sort(byScore);
   const overBudget = pool.filter((product) => !product.inBudget).sort(byScore);
-  const ranked = [...inBudget, ...overBudget];
+  const ranked = prefer.length ? [...pool].sort(byColorThenScore(answers)) : [...inBudget, ...overBudget];
   const maxScore = maxPossibleScore(answers);
   const limitedBudget = answers.budget && answers.budget !== "flexible";
   const budgetMiss = limitedBudget && inBudget.length < 3
@@ -619,6 +663,7 @@ export function getRecommendations(answers, assortment = products) {
     };
   });
   result.budgetMiss = budgetMiss;
+  result.colorMiss = colorMissLabel(answers, pool);
   return result;
 }
 
@@ -634,9 +679,8 @@ export function quizCatalogIds(answers, limit = 9) {
       if (prefer.size && !prefer.has(option.colorKey)) return false;
       return true;
     });
-    for (const option of (chosen.length ? chosen : options)) {
-      if (option.catalogId) ids.push(option.catalogId);
-    }
+    if (prefer.size && !chosen.length) continue;
+    for (const option of chosen) ids.push(option.catalogId);
   }
   return [...new Set(ids)];
 }
@@ -828,19 +872,25 @@ function maxRentalScore(answers, pieces) {
 
 export function getRentalRecommendations(answers, assortment = rentals) {
   const pieces = rentalPieces(answers);
-  const pool = assortment.map((look, index) => scoreRental(look, answers, pieces, index));
+  const pool = assortment.map((look, index) => ({
+    ...scoreRental(look, answers, pieces, index),
+    colorRank: colorRank(look, answers),
+  }));
 
   const byScore = (a, b) => b.score - a.score || a.originalIndex - b.originalIndex;
+  const prefer = preferredColorKeys(answers);
   const inBudget = pool.filter((look) => look.inBudget).sort(byScore);
   const overBudget = pool.filter((look) => !look.inBudget).sort(byScore);
+  const ranked = prefer.length ? [...pool].sort(byColorThenScore(answers)) : [...inBudget, ...overBudget];
   const maxScore = maxRentalScore(answers, pieces);
 
-  const result = [...inBudget, ...overBudget].map((look) => ({
+  const result = ranked.map((look) => ({
     ...look,
     matchPercent: honestPercent(look.score, maxScore),
     tradeoffs: rentalTradeoffs(look, answers),
   }));
   result.budgetMiss = null;
+  result.colorMiss = colorMissLabel(answers, pool);
   return result;
 }
 

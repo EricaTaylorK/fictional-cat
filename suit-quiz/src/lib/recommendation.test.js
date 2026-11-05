@@ -8,6 +8,7 @@ import {
   getFitSignals,
   getRecommendations,
   getRentalRecommendations,
+  quizCatalogIds,
   rentalDates,
   rentalPieces,
   rentalTotal,
@@ -309,6 +310,28 @@ describe("recommendations", () => {
     expect(getSizeEstimate(baseAnswers)).toEqual({ jacket: "40R", pants: "34W", length: "Regular", lengthCode: "R" });
   });
 
+  it("estimates from the largest jacket and pant size when more than one is picked", () => {
+    expect(getSizeEstimate({
+      height: 70,
+      measurements: { chest: ["40", "42"], waist: ["34", "36"], jacket: "42" },
+    })).toMatchObject({ jacket: "42R", pants: "36W", lengthCode: "R" });
+  });
+
+  it("leads with a pink suit when the shopper picks light and soft", () => {
+    const ranked = getRecommendations({ ...baseAnswers, colors: { prefer: ["lightSoft"] } });
+    expect(ranked[0].colorKey).toBe("pink");
+    expect(ranked.slice(0, 5).every((product) => product.colorKey === "pink")).toBe(true);
+    expect(ranked.colorMiss).toBeNull();
+    const ids = quizCatalogIds({ ...baseAnswers, colors: { prefer: ["lightSoft"] } });
+    expect(ids).toContain("tommy-hilfiger-modern-fit-linen-suit-tmw-3bm9");
+    expect(ids).not.toContain("modern-fit-suit-16");
+  });
+
+  it("leads a rental with white when the shopper picks light and soft", () => {
+    const ranked = getRentalRecommendations({ mode: "rent", occasion: "wedding", colors: { prefer: ["lightSoft"] } });
+    expect(ranked[0].colorKey).toBe("white");
+  });
+
   it("keeps jacket and pant length when height is entered in inches", () => {
     expect(inferLength({ height: 66, measurements: { jacket: "40", waist: "34" } })).toBe("S");
     expect(getSizeEstimate({
@@ -447,13 +470,14 @@ describe("recommendations", () => {
       expect(themes.length).toBeGreaterThan(0);
       for (const theme of themes) {
         for (const swatch of theme.swatches) {
-          expect(keys.has(swatch.key) || swatch.key === "pink").toBe(true);
+          expect(keys.has(swatch.key) || ["pink", "white", "cream"].includes(swatch.key)).toBe(true);
           expect(swatch.hex).toBe(SWATCH_HEX[swatch.key]);
         }
       }
       const listed = themes.flatMap((theme) => theme.colors);
       expect(new Set(listed).size).toBe(listed.length);
-      expect(new Set(listed.filter((key) => key !== "pink"))).toEqual(keys);
+      expect(listed.filter((key) => !keys.has(key)).every((key) => key === "pink")).toBe(true);
+      expect(new Set(listed.filter((key) => keys.has(key)))).toEqual(keys);
     }
     const buyThemes = colorThemes("buy");
     const rentThemes = colorThemes("rent");
@@ -461,6 +485,8 @@ describe("recommendations", () => {
     expect(rentThemes.map((theme) => theme.value)).toEqual(["classics", "earthTones", "richBold", "lightSoft"]);
     expect(buyThemes.find((theme) => theme.value === "lightSoft").colors).toEqual(["pink"]);
     expect(rentThemes.find((theme) => theme.value === "lightSoft").colors).toEqual(["white", "pink"]);
+    expect(buyThemes.find((theme) => theme.value === "lightSoft").swatches.map((swatch) => swatch.key)).toEqual(["white", "cream", "pink"]);
+    expect(rentThemes.find((theme) => theme.value === "lightSoft").swatches.map((swatch) => swatch.key)).toEqual(["white", "cream", "pink"]);
     expect(buyThemes.find((theme) => theme.value === "earthTones").colors).toEqual(["brown", "tan", "green"]);
     expect(rentThemes.find((theme) => theme.value === "earthTones").colors).toEqual(["tan", "green"]);
     expect(rentThemes.find((theme) => theme.value === "richBold").colors).toEqual(["blue"]);

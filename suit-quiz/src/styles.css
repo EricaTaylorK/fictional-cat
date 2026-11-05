@@ -3990,7 +3990,7 @@ h2 {
 }
 
 .color-dot {
-  border: 2px solid #fff;
+  border: 1px solid #d0d0d0;
   border-radius: 50%;
   box-sizing: border-box;
   display: block;
@@ -4186,9 +4186,12 @@ h2 {
 
 .intro-header-title {
   border-left: 1px solid var(--color-divider-light-gray);
-  font-size: var(--font-size-16);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
   line-height: var(--line-height-24);
   padding-left: 16px;
+  text-transform: uppercase;
 }
 
 .intro-header-end {
@@ -4426,7 +4429,8 @@ h2 {
   }
 
   .intro-header-title {
-    font-size: var(--font-size-14);
+    font-size: 12px;
+    letter-spacing: 0.08em;
   }
 
   .intro-title {
@@ -4479,11 +4483,12 @@ h2 {
     display: grid;
     flex: 0 0 auto;
     grid-template-columns: repeat(auto-fill, minmax(56px, 1fr));
-    margin-bottom: 16px;
+    margin-bottom: 4px;
   }
 
   .quiz-slide .size-pair .unknown-size {
-    margin-top: auto;
+    font-weight: 500;
+    margin-top: 0;
   }
 
   .quiz-slide .size-pair .size-chip span {
@@ -4542,11 +4547,11 @@ h2 {
   margin-top: 4px;
 }
 
-.quiz-slide .question-note {
+.quiz-slide .question-head .question-note {
   color: var(--color-font-dark-gray);
-  font-size: var(--font-size-14);
-  line-height: var(--line-height-20);
-  margin: 0 auto;
+  font-size: 12px;
+  line-height: 16px;
+  margin: -4px auto 0;
   text-align: center;
   width: min(1024px, 100%);
 }

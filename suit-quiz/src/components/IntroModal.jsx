@@ -76,7 +76,7 @@ function SparkleIcon() {
   );
 }
 
-export default function IntroModal({ onStart, onResume, onClose, onBack, progress, stepLabel, children, labelledBy = "intro-title" }) {
+export default function IntroModal({ onStart, onClose, onBack, progress, stepLabel, children, labelledBy = "intro-title" }) {
   const dialogRef = useRef(null);
   const startRef = useRef(null);
   const onCloseRef = useRef(onClose);
@@ -134,7 +134,7 @@ export default function IntroModal({ onStart, onResume, onClose, onBack, progres
           ) : <span />}
           <span className="intro-brand">
             <span className="intro-badge" aria-hidden="true">MW</span>
-            <span className="intro-header-title">Find the right suit for you</span>
+            <span className="intro-header-title">AI Style Expert</span>
           </span>
           <span className="intro-header-end">
             {stepLabel && <span className="intro-step">{stepLabel}</span>}
@@ -155,17 +155,12 @@ export default function IntroModal({ onStart, onResume, onClose, onBack, progres
           <IntroIllustration />
           <h1 id="intro-title" className="intro-title">Tell us the occasion. We'll find the suit.</h1>
           <p className="intro-copy">
-            Answer a few quick questions about the event, the look you want, and what you know about your size. You'll get matches right away, with the reasons behind each.
+            Answer a few quick questions. You'll get matches right away, with the reasons behind each.
           </p>
           <button className="intro-start" type="button" ref={startRef} onClick={onStart}>
             <SparkleIcon />
             Start the quiz
           </button>
-          {onResume && (
-            <button className="text-link intro-resume" type="button" onClick={onResume}>
-              Or pick up where you left off
-            </button>
-          )}
         </div>
         )}
       </div>

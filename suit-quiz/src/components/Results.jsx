@@ -57,18 +57,26 @@ function colorAnswerLabel(values) {
   return labels.length ? labels.join(" · ") : null;
 }
 
+function numberRange(value) {
+  const list = sizeList(value).map(Number).filter(Number.isFinite).sort((a, b) => a - b);
+  if (!list.length) return null;
+  return list[0] === list.at(-1) ? String(list[0]) : `${list[0]}–${list.at(-1)}`;
+}
+
 function fitProfileRows({ answers, renting, size, fitName }) {
   const height = heightLabel(answers.height);
   const everyday = answers.everydaySizes ?? {};
   const jacketValue = size?.jacket ? jacketFact(size, renting) : null;
+  const jacketSpan = numberRange(answers.measurements?.chest);
+  const waistSpan = numberRange(answers.measurements?.waist);
   const waistNumber = size?.pants ? String(size.pants).replace(/W$/i, "") : null;
   const fit = fitName ? titleWords(fitName) : null;
   const shirtSizes = shirtRange(everyday.shirt);
   const waistSizes = waistRange(everyday.waist);
   const personal = [
     height,
-    jacketValue ? `Jacket ${jacketValue}` : null,
-    waistNumber ? `Waist ${waistNumber}"` : null,
+    jacketSpan?.includes("–") ? `Jacket ${jacketSpan}` : jacketValue ? `Jacket ${jacketValue}` : null,
+    waistSpan ? `Waist ${waistSpan}"` : waistNumber ? `Waist ${waistNumber}"` : null,
     !jacketValue && shirtSizes ? `Shirt ${shirtSizes}` : null,
     !waistNumber && waistSizes ? `Waist ${waistSizes}` : null,
   ].filter(Boolean);
@@ -1397,11 +1405,16 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
     if (!list?.length) return list;
     let topIndex = 0;
     list.forEach((item, index) => {
-      if ((item.matchPercent ?? -1) > (list[topIndex].matchPercent ?? -1)) topIndex = index;
+      const current = list[topIndex];
+      const rankBetter = (item.colorRank ?? 0) < (current.colorRank ?? 0);
+      const rankSame = (item.colorRank ?? 0) === (current.colorRank ?? 0);
+      const percentBetter = (item.matchPercent ?? -1) > (current.matchPercent ?? -1);
+      if (rankBetter || (rankSame && percentBetter)) topIndex = index;
     });
     if (topIndex === 0) return list;
     const next = [list[topIndex], ...list.filter((_, index) => index !== topIndex)];
     if (list.budgetMiss) next.budgetMiss = list.budgetMiss;
+    if (list.colorMiss) next.colorMiss = list.colorMiss;
     return next;
   }, [answers, renting]);
   const summary = useMemo(() => buildResultSummary(answers), [answers]);
@@ -1656,6 +1669,12 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
           <p className="budget-alert" role="status">
             <span className="budget-alert-mark" aria-hidden="true">!</span>
             <span>{recommendations.budgetMiss.label}</span>
+          </p>
+        )}
+        {recommendations.colorMiss && (
+          <p className="budget-alert" role="status">
+            <span className="budget-alert-mark" aria-hidden="true">!</span>
+            <span>{recommendations.colorMiss}</span>
           </p>
         )}
 
