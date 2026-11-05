@@ -11,7 +11,7 @@ html.page-white {
 }
 
 html.page-white:has(.results-layout) {
-  background: #f4f5f7;
+  background: var(--surface-primary);
 }
 
 * {
@@ -5740,7 +5740,7 @@ button.store-logo {
 }
 
 .results-layout {
-  background: #f4f5f7;
+  background: var(--surface-primary);
   padding-bottom: 0;
 }
 
@@ -5749,7 +5749,7 @@ button.store-logo {
 }
 
 .results-layout .results-main {
-  background: #f4f5f7;
+  background: var(--surface-primary);
 }
 
 .results-layout .results-hero {
@@ -5766,18 +5766,8 @@ button.store-logo {
 }
 
 .results-layout .results-hero::before {
-  background:
-    radial-gradient(40% 90% at 0% 100%, #f5e7e2 0%, rgba(245, 231, 226, 0) 100%),
-    linear-gradient(90deg, #fbf6f4 0%, #f8f7f5 40%, #f6f9fd 60%, #e6f1fc 100%);
-  bottom: 52px;
-  content: "";
-  left: 50%;
-  position: absolute;
-  right: auto;
-  top: 0;
-  transform: translateX(-50%);
-  width: 100vw;
-  z-index: 0;
+  background: none;
+  content: none;
 }
 
 .results-layout .results-hero > * {
@@ -5919,9 +5909,9 @@ button.store-logo {
 .results-layout .suit-card-face:hover {
   border: 1px solid rgba(0, 0, 0, 0.1);
   border-radius: 4px;
-  box-shadow: none;
+  box-shadow: 0 2px 4px var(--color-transparent-black10), 0 0 2px var(--color-transparent-black10);
   box-sizing: border-box;
-  padding: 16px;
+  padding: 12px;
 }
 
 .results-layout .suit-card.is-open .suit-card-face {
@@ -5930,7 +5920,7 @@ button.store-logo {
 }
 
 .results-layout .suit-card:not(.is-open) .suit-card-face {
-  min-height: 174px;
+  min-height: 166px;
 }
 
 .results-layout .suit-card:not(.is-open) .suit-row {
@@ -5941,7 +5931,7 @@ button.store-logo {
 .suit-row {
   align-items: center;
   display: flex;
-  gap: 24px;
+  gap: 16px;
   min-height: 140px;
 }
 
@@ -5957,7 +5947,7 @@ button.store-logo {
   display: flex;
   flex: 1 1 auto;
   flex-direction: column;
-  gap: 16px;
+  gap: 12px;
   justify-content: space-between;
   min-height: 140px;
   min-width: 0;
@@ -6165,9 +6155,9 @@ button.store-logo {
 
 .suit-expand-toggle.is-open,
 .suit-expand-toggle.is-open:hover {
-  background: var(--color-background-dark-blue);
-  border-color: var(--color-background-dark-blue);
-  color: var(--color-neutral-white);
+  background: var(--action-background-tertiary);
+  border-color: var(--action-background-tertiary);
+  color: var(--color-font-black);
 }
 
 .suit-expand {
@@ -6221,15 +6211,16 @@ button.store-logo {
 
 .tailor-card {
   border-radius: 6px;
+  box-shadow: 0 2px 4px var(--color-transparent-black10), 0 0 2px var(--color-transparent-black10);
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  min-height: 228px;
-  padding: 56px 16px 16px;
+  gap: 8px;
+  min-height: 0;
+  padding: 48px 12px 12px;
 }
 
 .tailor-card.is-recommended {
-  padding-top: 56px;
+  padding-top: 48px;
 }
 
 .tailor-badge {
@@ -6309,8 +6300,8 @@ button.store-logo {
 }
 
 .tailor-card p {
-  flex: 1 1 auto;
-  margin-top: -8px;
+  flex: 0 0 auto;
+  margin-top: 0;
 }
 
 .tailor-card strong,
@@ -6635,12 +6626,8 @@ button.store-logo {
 }
 
 .results-layout .fit-band::before {
-  bottom: 40px;
-  left: 0;
-  right: 0;
-  top: 40px;
-  transform: none;
-  width: auto;
+  background: none;
+  content: none;
 }
 
 .results-layout .fit-card {
@@ -7014,7 +7001,7 @@ button.store-logo {
   background: #fff;
   border: 1px solid rgba(0, 0, 0, 0.14);
   border-radius: 4px;
-  box-shadow: none;
+  box-shadow: 0 2px 4px var(--color-transparent-black10), 0 0 2px var(--color-transparent-black10);
   box-sizing: border-box;
 }
 
