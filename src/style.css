@@ -86,21 +86,43 @@ button { cursor: pointer; }
   text-decoration: underline;
 }
 
+.promo,
+.header-bar-mobile,
+.search-form {
+  position: relative;
+  z-index: 22;
+}
+
 button.logo {
   border: 0;
   background: transparent;
   padding: 0;
 }
 
+.mobile-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 19;
+  background: rgba(0, 0, 0, 0.45);
+}
+
 .mobile-nav {
+  position: relative;
+  z-index: 21;
   display: flex;
   flex-direction: column;
+  max-height: min(70vh, calc(100dvh - 140px));
+  overflow: auto;
   border-top: 1px solid #ececec;
   background: var(--color-neutral-white);
   padding: 8px 0 12px;
 }
 
-.mobile-nav button {
+.mobile-l1 {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
   border: 0;
   background: transparent;
   padding: 14px 20px;
@@ -109,11 +131,10 @@ button.logo {
   font-weight: 500;
 }
 
-.mobile-nav button.is-current {
-  color: var(--color-primary-blue);
-}
+.mobile-l1.is-current { color: var(--color-primary-blue); }
 
-.mobile-nav button.is-sale { color: #c41230; }
+.mobile-l1.is-sale,
+.mobile-l1.is-sale span { color: #c41230; }
 
 .mobile-nav .nav-feature {
   display: grid;
@@ -126,26 +147,129 @@ button.logo {
   text-align: left;
 }
 
-.mobile-suits-wrap > button { width: 100%; }
+.dept-chevron { width: 16px; height: 16px; flex: none; }
 
-.mobile-suits {
-  display: grid;
-  gap: 12px;
-  padding: 0 20px 12px 32px;
+.mobile-panel { display: flex; flex-direction: column; padding: 4px 0 12px; }
+
+.mobile-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 0;
+  background: transparent;
+  padding: 12px 20px;
+  text-align: left;
+  font-size: 16px;
+  font-weight: 500;
 }
 
-.mobile-suits p {
-  margin: 8px 0 4px;
+.mobile-group { padding: 4px 20px 10px 28px; }
+
+.mobile-group .dept-link {
+  display: block;
+  width: 100%;
+  padding: 7px 0;
+  font-size: 15px;
+}
+
+.mobile-banners {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 8px 16px 12px;
+}
+
+.mobile-banner {
+  display: block;
+  width: 100%;
+  border: 0;
+  padding: 0;
+  background: #f4f6f8;
+  color: var(--color-neutral-black);
+  text-align: left;
+}
+
+.mobile-banner img {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: none;
+}
+
+.mobile-banner-copy {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  padding: 12px;
+}
+
+.mobile-banner-copy strong { font-size: 18px; line-height: 1.25; }
+
+.mobile-utilities {
+  display: flex;
+  flex-direction: column;
+  margin-top: 8px;
+  border-top: 1px solid #ececec;
+  padding-top: 8px;
+}
+
+.mobile-utility {
+  border: 0;
+  background: transparent;
+  padding: 12px 20px;
+  text-align: left;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.dept-kicker {
+  margin: 8px 0 6px;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.dept-link {
+  border: 0;
+  background: transparent;
+  color: var(--color-neutral-black);
+  text-align: left;
+}
+
+.dept-shopall {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  width: fit-content;
+  margin: 4px 20px 12px;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  color: var(--color-neutral-black);
+  font-size: 16px;
+  font-weight: 500;
+  text-align: left;
+}
+
+.dept-shopall span {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.dept-arrow { width: 14px; height: 14px; flex: none; }
+
+.dept-banner-cta {
+  display: inline-flex;
+  align-items: center;
+  min-height: 36px;
+  margin-top: 8px;
+  padding: 0 14px;
+  background: var(--color-primary-blue);
+  color: var(--color-neutral-white);
   font-size: 12px;
   font-weight: 700;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
-}
-
-.mobile-suits button {
-  padding: 6px 0;
-  font-size: 14px;
-  font-weight: 400;
 }
 
 .header-bar-mobile {
@@ -2036,7 +2160,8 @@ h1 {
 @media (min-width: 1024px) {
   .header-bar-mobile,
   .search-form,
-  .mobile-nav { display: none; }
+  .mobile-nav,
+  .mobile-backdrop { display: none; }
 
   .header-desktop { display: block; }
 
@@ -2127,8 +2252,9 @@ h1 {
     overflow: visible;
   }
 
-  .primary-nav > button,
-  .nav-suits > button {
+  .primary-nav-wrap { position: relative; }
+
+  .primary-nav > button {
     border: 0;
     background: transparent;
     padding: 8px clamp(6px, 0.9vw, 12px) 14px;
@@ -2139,41 +2265,59 @@ h1 {
   }
 
   .primary-nav > button.is-current,
-  .nav-suits > button.is-current {
+  .primary-nav > button.is-open {
     box-shadow: inset 0 -2px 0 var(--color-primary-blue);
   }
 
   .primary-nav > button.is-sale { color: #c41230; }
 
-  .nav-suits { position: static; }
-
-  .mega-menu {
+  .dept-drawer {
     position: absolute;
-    top: 100%;
-    left: 16px;
-    right: 16px;
+    top: calc(100% - 1px);
+    left: 50%;
     z-index: 30;
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) 280px;
+    width: min(1440px, 100%);
+    min-height: 288px;
+    transform: translateX(-50%);
+    overflow: hidden;
     background: var(--color-neutral-white);
     border: 1px solid #e6e6e6;
+    border-top: 0;
+    border-radius: 0 0 4px 4px;
     box-shadow: 0 16px 40px rgba(0, 0, 0, 0.12);
   }
 
-  .mega-columns {
+  .dept-panel {
+    display: flex;
+    align-items: stretch;
+    min-height: 288px;
+    opacity: 1;
+    transition: opacity 180ms ease;
+  }
+
+  .dept-panel.is-out { opacity: 0; }
+
+  .dept-main {
+    flex: 0 1 auto;
+    min-width: 0;
+    padding: 32px 24px 32px 52px;
+  }
+
+  .dept-columns {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 8px 24px;
-    padding: 22px 24px 16px;
+    grid-template-columns: repeat(3, max-content);
+    gap: 12px 32px;
   }
 
-  .mega-columns p {
-    margin: 0 0 8px;
-    font-size: 14px;
-    font-weight: 700;
+  .dept-columns .dept-kicker { margin: 0 0 8px; }
+
+  .dept-columns ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
   }
 
-  .mega-columns button {
+  .dept-columns .dept-link {
     display: block;
     width: 100%;
     border: 0;
@@ -2183,35 +2327,80 @@ h1 {
     font-size: 14px;
     font-weight: 400;
     text-align: left;
-    white-space: normal;
+    white-space: nowrap;
   }
 
-  .mega-columns button:hover,
-  .mega-all:hover { text-decoration: underline; }
+  .dept-columns .dept-link:hover { text-decoration: underline; }
 
-  .mega-all {
-    grid-column: 1 / -1;
-    margin-top: 8px;
-    padding-top: 14px;
-    border-top: 1px solid #ececec;
-    font-weight: 600;
+  .dept-main .dept-shopall {
+    margin: 22px 0 0;
+    font-size: 14px;
   }
 
-  .mega-menu .nav-feature {
+  .dept-columns + .dept-shopall { margin-top: 22px; }
+
+  .dept-banners {
+    display: grid;
+    flex: 1 1 0;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    min-width: 0;
+    min-height: 288px;
+  }
+
+  .dept-banner {
+    position: relative;
+    display: block;
+    height: 100%;
+    min-height: 288px;
+    overflow: hidden;
+    border: 0;
+    padding: 0;
+    background: #10203f;
+    color: var(--color-neutral-white);
+    text-align: left;
+  }
+
+  .dept-banner img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 18%;
+    transform: scale(1);
+    transition: transform 180ms ease;
+  }
+
+  .dept-banner:hover img { transform: scale(1.04); }
+
+  .dept-banner-copy {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 1;
     display: flex;
     flex-direction: column;
-    align-items: stretch;
-    margin: 16px 16px 16px 0;
-    padding: 0;
-    border: 0;
-    background: #f6f8fb;
-    color: var(--color-neutral-black);
-    text-align: left;
-    white-space: normal;
+    align-items: flex-start;
+    gap: 4px;
+    padding: 48px 16px 16px;
+    background: linear-gradient(to top, rgba(0, 12, 44, 0.9), rgba(0, 12, 44, 0.08) 78%, transparent);
+    pointer-events: none;
   }
 
-  .mega-menu .nav-feature img {
-    height: 168px;
+  .dept-banner-copy strong {
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1.2;
+  }
+
+  .dept-banner-copy > span:not(.dept-banner-cta) { font-size: 14px; }
+
+  .dept-drawer button:focus-visible,
+  .primary-nav > button:focus-visible {
+    outline: 2px solid var(--color-focus-outline);
+    outline-offset: 2px;
   }
 
   .listing-head,
@@ -2479,7 +2668,7 @@ h1 {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .sheet, .chevron { animation: none; transition: none; }
+  .sheet, .chevron, .dept-panel, .dept-banner img { animation: none; transition: none; }
 }
 
 .version-mark {

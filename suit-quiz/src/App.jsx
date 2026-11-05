@@ -545,12 +545,14 @@ function isAnswered(question, answers) {
 
 const STORE_LINKS = ["Suits", "Sport Coats & Blazers", "Dress Shirts", "Pants", "Shoes", "Outerwear", "Accessories", "Casual", "Brands", "Wedding", "Featured", "Rental"];
 
-function StoreChrome() {
+function StoreChrome({ onHome }) {
   return (
     <header className="store-chrome">
       <p className="store-banner">Clearance up to 70% Off Original Prices | Shop Now &gt;</p>
       <div className="store-utility">
-        <img className="store-logo" src="/mw-logo.svg" alt="Men's Wearhouse" />
+        <button type="button" className="store-logo" aria-label="Men's Wearhouse home" onClick={onHome}>
+          <img src="/mw-logo.svg" alt="" />
+        </button>
         <form className="store-search" role="search" onSubmit={(event) => event.preventDefault()}>
           <input type="search" placeholder="What are you looking for?" aria-label="Search" />
           <button type="submit" aria-label="Search">
@@ -863,7 +865,7 @@ export default function App() {
 
   return (
     <>
-      {screen === "results" ? <StoreChrome /> : (
+      {screen === "results" ? <StoreChrome onHome={goHome} /> : (
       <p className="promo-banner">
         {screen === "product"
           ? answers.mode === "rent"
@@ -877,9 +879,9 @@ export default function App() {
       {screen !== "results" && (
       <header className="site-header">
         <div className="header-slot header-slot-start" />
-        <a className="logo" href="/" aria-label="Men's Wearhouse">
+        <button className="logo" type="button" aria-label="Men's Wearhouse home" onClick={goHome}>
           <img src="/mw-logo.svg" alt="" />
-        </a>
+        </button>
         <div className="header-slot header-slot-end" />
       </header>
       )}

@@ -98,6 +98,13 @@ select:focus-visible,
   line-height: 0;
 }
 
+button.logo {
+  border: 0;
+  background: transparent;
+  padding: 0;
+  justify-self: center;
+}
+
 .logo img {
   display: block;
   height: 16px;
@@ -5316,9 +5323,16 @@ h2 {
   width: 100%;
 }
 
-.store-logo {
+button.store-logo {
   display: block;
   flex: 0 0 auto;
+  border: 0;
+  background: transparent;
+  padding: 0;
+}
+
+.store-logo img {
+  display: block;
   height: 14px;
   width: auto;
 }
