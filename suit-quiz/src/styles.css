@@ -5771,10 +5771,12 @@ button.store-logo {
     linear-gradient(90deg, #fbf6f4 0%, #f8f7f5 40%, #f6f9fd 60%, #e6f1fc 100%);
   bottom: 52px;
   content: "";
-  left: 80px;
+  left: 50%;
   position: absolute;
-  right: 80px;
+  right: auto;
   top: 0;
+  transform: translateX(-50%);
+  width: 100vw;
   z-index: 0;
 }
 
@@ -6129,46 +6131,43 @@ button.store-logo {
 
 .suit-expand-toggle {
   align-items: center;
-  background: #fff;
-  border: 1px solid #001e56;
+  background: var(--surface-primary);
+  border: 1px solid var(--color-background-dark-blue);
+  border-radius: 0;
   box-sizing: border-box;
-  color: #001e56;
+  color: var(--action-text-secondary);
   cursor: pointer;
   display: inline-flex;
   font-family: var(--font-family-roboto);
-  font-size: 12px;
-  font-weight: 500;
-  gap: 6px;
-  height: 32px;
+  font-size: var(--font-size-button-cta);
+  font-weight: var(--font-weight-medium);
+  height: 48px;
   justify-content: center;
   letter-spacing: 0.01em;
-  line-height: 16px;
-  padding: 0 10px;
+  line-height: var(--line-height-16);
+  margin-top: 12px;
+  padding: 0 16px;
+  text-transform: uppercase;
   white-space: nowrap;
   width: 100%;
+}
+
+.suit-expand-toggle:hover {
+  background: var(--color-secondary-light-blue);
 }
 
 .suit-expand-toggle span {
   display: inline;
   font-size: inherit;
-  line-height: 16px;
+  line-height: inherit;
   white-space: nowrap;
 }
 
-.suit-expand-toggle.is-open {
-  background: #001e56;
-  color: #fff;
-}
-
-.suit-expand-toggle svg {
-  display: block;
-  flex: none;
-  height: 8px;
-  width: 14px;
-}
-
-.suit-expand-toggle svg.is-open {
-  transform: rotate(180deg);
+.suit-expand-toggle.is-open,
+.suit-expand-toggle.is-open:hover {
+  background: var(--color-background-dark-blue);
+  border-color: var(--color-background-dark-blue);
+  color: var(--color-neutral-white);
 }
 
 .suit-expand {
@@ -6745,8 +6744,10 @@ button.store-logo {
   }
 
   .results-layout .results-hero::before {
-    left: 24px;
-    right: 24px;
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+    width: 100vw;
   }
 
   .results-layout .budget-alert {
@@ -6974,7 +6975,7 @@ button.store-logo {
   }
 
   .suit-expand-toggle {
-    font-size: 11px;
+    font-size: var(--font-size-12);
     padding: 0 8px;
   }
 
@@ -7039,9 +7040,9 @@ button.store-logo {
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 24px;
   min-width: 0;
-  padding: 30px 24px 0;
+  padding: 36px 32px 8px;
 }
 
 /* Card stroke lives on the aside; keep the panel flush inside so buy/rental read as one card. */
@@ -7056,7 +7057,7 @@ button.store-logo {
   flex-direction: column;
   gap: 8px;
   min-width: 0;
-  padding: 0 24px 30px;
+  padding: 8px 32px 36px;
 }
 
 .your-look-tailoring.is-selected .your-look-selected-label {
@@ -7218,7 +7219,7 @@ button.store-logo {
 
 .your-look .order-lines li {
   border-bottom: 1px solid #e6e6e6;
-  padding: 14px 0;
+  padding: 16px 0;
 }
 
 .your-look .order-lines li:last-child {
@@ -7308,7 +7309,7 @@ button.store-logo {
 .your-look-totals {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 12px;
 }
 
 .your-look-line,
@@ -7339,14 +7340,6 @@ button.store-logo {
   font-size: 14px;
   font-weight: 700;
   line-height: 20px;
-}
-
-.your-look-tax {
-  color: #595959;
-  font-size: 12px;
-  line-height: 16px;
-  margin: 0;
-  text-align: right;
 }
 
 .your-look-banner {
@@ -7510,10 +7503,16 @@ button.store-logo {
     margin-right: var(--results-gutter);
   }
 
-  .results-layout .results-hero::before,
   .results-layout .fit-band::before {
     left: var(--results-gutter);
     right: var(--results-gutter);
+  }
+
+  .results-layout .results-hero::before {
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+    width: 100vw;
   }
 }
 

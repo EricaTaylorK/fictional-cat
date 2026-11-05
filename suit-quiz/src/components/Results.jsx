@@ -362,14 +362,6 @@ function ShuffleIcon() {
   );
 }
 
-function ChevronIcon({ open = false }) {
-  return (
-    <svg className={open ? "is-open" : undefined} width="14" height="8" viewBox="0 0 14 8" aria-hidden="true">
-      <path fill="currentColor" d="M1.2 1.3 7 6.7l5.8-5.4-1.1-1.2L7 4.4 2.3.1 1.2 1.3Z" />
-    </svg>
-  );
-}
-
 function PlusIcon() {
   return (
     <svg className="more-matches-plus" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true">
@@ -1500,7 +1492,6 @@ function YourLook({ suit, size, tailoringId, items, addedLooks, onRemoveLook, on
                   Select jacket and pants size
                 </button>
               )}
-              <button className="your-look-link" type="button" onClick={() => scrollToSuits("swap_suit_clicked")}>Swap suit</button>
             </span>
             <span className="order-amount">{formatPrice(suit.price)}</span>
           </li>
@@ -1555,7 +1546,6 @@ function YourLook({ suit, size, tailoringId, items, addedLooks, onRemoveLook, on
             <span>Est. Total</span>
             <strong>{formatPrice(totals.total)}</strong>
           </div>
-          <p className="your-look-tax">(+ applicable tax & shipping)</p>
         </div>
       </div>
       <div className="your-look-dock">
@@ -1979,7 +1969,6 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
                             onClick={() => toggleCard(product)}
                           >
                             <span>{open ? "Viewing this suit" : "Choose this suit"}</span>
-                            <ChevronIcon open={open} />
                           </button>
                         </div>
                       </div>
