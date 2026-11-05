@@ -6626,9 +6626,9 @@ button.store-logo {
 .rental-summary {
   align-self: flex-start;
   background: #fff;
-  border: 1px solid rgba(0, 0, 0, 0.1);
+  border: 0;
   border-radius: 4px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  box-shadow: none;
   box-sizing: border-box;
   color: #232323;
   display: flex;
