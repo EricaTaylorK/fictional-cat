@@ -1,0 +1,184 @@
+.sf-entry {
+  --sf-ink: var(--color-primary-blue, #001e56);
+  container-type: inline-size;
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: space-between;
+  gap: 16px;
+  width: 100%;
+  aspect-ratio: 343 / 432;
+  margin: 0;
+  padding: 28px 24px 24px;
+  overflow: hidden;
+  box-sizing: border-box;
+  background-color: var(--sf-ink);
+  color: var(--color-neutral-white, #fff);
+  font-family: var(--font-family-roboto), "Roboto", sans-serif;
+  text-decoration: none;
+}
+
+.sf-entry--card {
+  max-width: 343px;
+}
+
+.sf-entry::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background:
+    linear-gradient(105deg, rgba(0, 12, 44, 0.9) 0%, rgba(0, 30, 86, 0.72) 48%, rgba(0, 30, 86, 0.42) 100%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='84' height='84'%3E%3Crect width='84' height='84' fill='%23001a4d'/%3E%3Cg stroke='%23ffffff' stroke-opacity='0.07' stroke-width='1'%3E%3Cpath d='M0 14H84M0 42H84M0 70H84M14 0V84M42 0V84M70 0V84'/%3E%3C/g%3E%3Cg stroke='%23000c2c' stroke-opacity='0.55' stroke-width='10'%3E%3Cpath d='M-8 28L36 -8M20 92L92 28'/%3E%3C/g%3E%3C/svg%3E"),
+    radial-gradient(ellipse at 100% 0%, rgba(159, 201, 246, 0.55), transparent 52%),
+    linear-gradient(155deg, #16336f 0%, #001e56 58%, #000c2c 100%);
+  background-size: auto, 84px 84px, auto, auto;
+}
+
+.sf-entry-body,
+.sf-entry-cta {
+  position: relative;
+  z-index: 1;
+}
+
+.sf-entry-body {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 14px;
+  min-width: 0;
+}
+
+.sf-entry-mark {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: clamp(56px, 26cqw, 88px);
+  height: clamp(56px, 26cqw, 88px);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 10px 24px rgba(0, 8, 28, 0.28);
+}
+
+.sf-entry-mark img {
+  width: 78%;
+  height: 78%;
+  object-fit: contain;
+}
+
+.sf-entry-copy {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  min-width: 0;
+}
+
+.sf-entry-eyebrow {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.86);
+  font-size: clamp(9px, 3.2cqw, 12px);
+  font-weight: var(--font-weight-bold, 700);
+  letter-spacing: 0.14em;
+  line-height: 1.3;
+}
+
+.sf-entry-title {
+  margin: 0;
+  font-family: "Oswald", var(--font-family-roboto), "Roboto", sans-serif;
+  font-size: clamp(20px, 11.6cqw, 40px);
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  line-height: 0.95;
+  white-space: nowrap;
+}
+
+.sf-entry-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 44px;
+  padding: 0 18px;
+  border-radius: 2px;
+  background: var(--color-neutral-white, #fff);
+  color: var(--sf-ink);
+  font-size: clamp(11px, 3.6cqw, 13px);
+  font-weight: var(--font-weight-bold, 700);
+  letter-spacing: 0.12em;
+  line-height: 1;
+}
+
+.sf-entry:hover .sf-entry-cta {
+  background: var(--color-secondary-light-blue, #cfe0f5);
+}
+
+.sf-entry:focus-visible {
+  outline: 2px solid var(--color-focus-outline, #4b6eff);
+  outline-offset: 3px;
+}
+
+@media (min-width: 768px) {
+  .sf-entry--slim,
+  .sf-entry--hero {
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    width: 100%;
+    max-width: 1336px;
+    gap: clamp(16px, 2.2cqw, 32px);
+  }
+
+  .sf-entry--slim {
+    aspect-ratio: 1336 / 197;
+    padding: 0 clamp(20px, 3.6cqw, 48px);
+  }
+
+  .sf-entry--hero {
+    aspect-ratio: 1336 / 288;
+    padding: 0 clamp(24px, 4cqw, 56px);
+  }
+
+  .sf-entry--slim .sf-entry-body,
+  .sf-entry--hero .sf-entry-body {
+    flex-direction: row;
+    align-items: center;
+    gap: clamp(14px, 2cqw, 28px);
+  }
+
+  .sf-entry--slim .sf-entry-mark {
+    width: clamp(44px, 5.4cqw, 72px);
+    height: clamp(44px, 5.4cqw, 72px);
+  }
+
+  .sf-entry--hero .sf-entry-mark {
+    width: clamp(64px, 7.8cqw, 104px);
+    height: clamp(64px, 7.8cqw, 104px);
+  }
+
+  .sf-entry--slim .sf-entry-eyebrow,
+  .sf-entry--hero .sf-entry-eyebrow {
+    font-size: clamp(10px, 1.05cqw, 13px);
+    letter-spacing: 0.16em;
+  }
+
+  .sf-entry--slim .sf-entry-title {
+    font-size: clamp(24px, 3.35cqw, 44px);
+  }
+
+  .sf-entry--hero .sf-entry-title {
+    font-size: clamp(32px, 4.8cqw, 64px);
+  }
+
+  .sf-entry--slim .sf-entry-cta,
+  .sf-entry--hero .sf-entry-cta {
+    width: auto;
+    flex: none;
+    margin-left: auto;
+    min-height: clamp(36px, 3.4cqw, 48px);
+    padding: 0 clamp(16px, 2.2cqw, 28px);
+    font-size: clamp(11px, 1.05cqw, 14px);
+  }
+}
