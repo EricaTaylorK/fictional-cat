@@ -833,6 +833,18 @@ function RentalPackage({ pack, pieces, price }) {
   );
 }
 
+function QuickViewStars({ value }) {
+  return (
+    <span className="quick-view-stars" aria-label={`${value} out of 5 stars`} role="img">
+      {[1, 2, 3, 4, 5].map((star) => {
+        const fill = Math.max(0, Math.min(1, value - (star - 1)));
+        const pct = fill >= 0.75 ? 100 : fill >= 0.25 ? 50 : 0;
+        return <span key={star} className="quick-view-star" style={{ "--fill": `${pct}%` }} />;
+      })}
+    </span>
+  );
+}
+
 function QuickView({ item, initial, onConfirm, onClose }) {
   const dialogRef = useRef(null);
   const errorRef = useRef(null);
@@ -861,7 +873,7 @@ function QuickView({ item, initial, onConfirm, onClose }) {
   const images = color?.image ? [color.image] : [];
 
   useEffect(() => {
-    dialogRef.current?.querySelector(".quick-view-close")?.focus();
+    dialogRef.current?.focus();
   }, []);
 
   useEffect(() => {
@@ -1005,15 +1017,18 @@ function QuickView({ item, initial, onConfirm, onClose }) {
             )}
           </div>
           <div className="quick-view-details">
+            <div className="quick-view-top">
+            <div className="quick-view-info-block">
             <div className="quick-view-brandline">
               <p className="quick-view-brand">{lookPieceBrand(item)}</p>
               {profile.onlineExclusive && <span className="quick-view-exclusive">Online Exclusive</span>}
             </div>
             <h2 id="quick-view-title" className="quick-view-name">{lookPieceTitle(item)}</h2>
             <p className="quick-view-rating">
-              <Stars value={profile.rating} />
+              <QuickViewStars value={profile.rating} />
               <span>({profile.rating.toFixed(1)})</span>
             </p>
+            </div>
             <div className="quick-view-priceblock">
               <p className="quick-view-price">
                 <span>{formatPrice(unitPrice)}</span>
@@ -1038,7 +1053,8 @@ function QuickView({ item, initial, onConfirm, onClose }) {
                 <button type="button" className="quick-view-promo">{color?.promo || profile.promo}</button>
               )}
             </div>
-            <div className="quick-view-field">
+            </div>
+            <div className="quick-view-field quick-view-color">
               <p className="quick-view-label" id="quick-view-color-label">
                 Color: <span>{color?.color}</span>
               </p>
@@ -1061,12 +1077,13 @@ function QuickView({ item, initial, onConfirm, onClose }) {
                       onClick={() => chooseColor(choice)}
                     >
                       <span style={{ background: SWATCH_HEX[choice.colorKey] ?? "#888" }} />
-                      {choice.onSale && <em>Sale</em>}
+                      {choice.onSale && <em className="quick-view-sale">Sale</em>}
                     </button>
                   );
                 })}
               </div>
             </div>
+            <div className="quick-view-selectors">
             <div className="quick-view-field" ref={errors.size ? errorRef : undefined}>
               <p className="quick-view-label" id="quick-view-size-label">Size</p>
               <div className="quick-view-choices" role="group" aria-labelledby="quick-view-size-label">
@@ -1137,6 +1154,7 @@ function QuickView({ item, initial, onConfirm, onClose }) {
                 </div>
               </>
             )}
+            <div className="quick-view-purchase">
             <div className="quick-view-buy">
               <select
                 className="quick-view-qty"
@@ -1148,11 +1166,13 @@ function QuickView({ item, initial, onConfirm, onClose }) {
                   <option key={qty} value={qty}>{qty}</option>
                 ))}
               </select>
-              <button className="button quick-view-add" type="button" onClick={submit}>
+              <button className="quick-view-add" type="button" onClick={submit}>
                 {alreadyAdded ? "Update Product" : "Add Product to Look"}
               </button>
             </div>
             <button type="button" className="quick-view-details-link">View full product details</button>
+            </div>
+            </div>
             {firstError ? <span className="quick-view-error-live" role="status">{firstError}</span> : null}
           </div>
         </div>
