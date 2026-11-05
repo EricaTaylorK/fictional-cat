@@ -85,7 +85,6 @@ export default function SalePage({
         search={search}
         onSearch={setSearch}
         onNavigate={onNavigate}
-        onTakeQuiz={onTakeQuiz}
         current={view === "home" ? undefined : crumb === "Sale" ? "Sale" : "Suits"}
       />
       {view === "home" ? (
@@ -107,7 +106,6 @@ export default function SalePage({
             </span>
           </h1>
         </div>
-        {onTakeQuiz && <QuizBanner onTakeQuiz={onTakeQuiz} />}
         {onBackToQuiz && (
           <div className="quiz-matches-bar">
             <p>Showing suits that match your quiz. Your matches are marked.</p>
@@ -158,21 +156,21 @@ function HomeScreen({ onTakeQuiz, onNavigate }) {
     { label: "Outerwear", product: suitIn("brown") },
     { label: "Shoes", image: "/outfit/black-dress-shoes.jpg" },
   ];
-  const deals = [149.99, 299.99, 399.99, 499.99];
+  const promos = [
+    { label: "30% off", detail: "Suits", product: suitIn("navy") },
+    { label: "30% off", detail: "Sport coats", product: suitIn("gray") },
+    { label: "Buy 1, get 1 50% off", detail: "Dress shirts", product: suitIn("blue") },
+    { label: "30% off", detail: "Shoes", image: "/outfit/black-dress-shoes.jpg" },
+  ];
+  const deals = [
+    ["Suits & tuxedos", "149.99"],
+    ["Sport coats", "99.99"],
+    ["Dress shirts", "19.99"],
+    ["Shoes", "59.99"],
+  ];
 
   return (
     <main id="home">
-      <section className="sale-hero" aria-labelledby="sale-hero-title">
-        <div className="sale-hero-copy">
-          <p className="sale-kicker">Limited time only</p>
-          <h1 id="sale-hero-title">Weekend sale up to 30% off</h1>
-          <button className="sale-hero-button" type="button" onClick={shop}>Shop now</button>
-        </div>
-        <div className="sale-hero-photo">
-          <img src={suitIn("tan")?.imageUrl || "/suits/suit-tan.jpg"} alt="" />
-        </div>
-      </section>
-
       <section className="cat-row" aria-label="Departments">
         {categories.map((category) => (
           <button key={category.label} className="cat-card" type="button" onClick={shop}>
@@ -182,16 +180,54 @@ function HomeScreen({ onTakeQuiz, onNavigate }) {
               className={category.focus ? `is-${category.focus}` : undefined}
             />
             <strong>{category.label}</strong>
-            {category.product && <span>From {money(category.product.price)}</span>}
           </button>
         ))}
       </section>
 
+      <section className="sale-hero" aria-labelledby="sale-hero-title">
+        <div className="sale-hero-copy">
+          <p className="sale-kicker">Veterans Day sale</p>
+          <h1 id="sale-hero-title">Up to 30% off</h1>
+          <button className="sale-hero-button" type="button" onClick={shop}>Shop now</button>
+        </div>
+        <div className="sale-hero-photo">
+          <img src={suitIn("tan")?.imageUrl || "/suits/suit-tan.jpg"} alt="" />
+        </div>
+      </section>
+
+      <section className="promo-row" aria-label="Promotions">
+        {promos.map((promo) => (
+          <button key={promo.detail} className="promo-card" type="button" onClick={shop}>
+            <img src={promo.image || promo.product?.imageUrl} alt="" />
+            <span>
+              <strong>{promo.label}</strong>
+              {promo.detail}
+            </span>
+          </button>
+        ))}
+      </section>
+
+      <QuizEntry onTakeQuiz={onTakeQuiz} />
+
+      <section className="deal-bar" aria-label="Everyday deals">
+        <div className="deal-bar-title">
+          <h2>Everyday deals</h2>
+          <p>Online only</p>
+        </div>
+        <div className="deal-bar-prices">
+          {deals.map(([label, price]) => (
+            <button key={label} type="button" onClick={shop}>
+              <span>{label}</span>
+              {money(price)}
+            </button>
+          ))}
+        </div>
+      </section>
+
       <section className="clearance-bar" aria-label="Clearance">
-        <strong>Clearance</strong>
-        <span>Extra 60% off</span>
-        <span className="clearance-code">Use code: EXTRA60</span>
-        <button type="button" onClick={shop}>Details</button>
+        <strong>Clearance up to 70% off</strong>
+        <span>Original prices</span>
+        <button type="button" onClick={shop}>Shop now</button>
       </section>
 
       <section className="home-rail" aria-labelledby="featured-title">
@@ -209,42 +245,14 @@ function HomeScreen({ onTakeQuiz, onNavigate }) {
         </div>
       </section>
 
-      <section className="finder-hero" aria-labelledby="finder-title">
-        <div className="finder-hero-photo">
-          <img src="/quiz/suit-finder-hero.jpg" alt="" />
-          <img className="finder-hero-inset" src="/quiz/suit-finder-inset.jpg" alt="" />
-        </div>
-        <div className="finder-hero-copy">
-          <p className="finder-eyebrow">
-            <span className="finder-mark" aria-hidden="true">MW</span>
-            AI Style Expert
-          </p>
-          <h2 id="finder-title">What&apos;s the occasion? We&apos;ll find the suit.</h2>
-          <p>Answer a few questions and get suit picks in under a minute.</p>
-          <button className="finder-hero-button" type="button" onClick={onTakeQuiz}>
-            <SparkleIcon />
-            Take the suit quiz
-          </button>
-        </div>
-      </section>
-
-      <section className="deal-bar" aria-label="Everyday deals">
-        <h2>Everyday deals</h2>
-        <div>
-          {deals.map((price) => (
-            <button key={price} type="button" onClick={shop}>{money(price)}</button>
-          ))}
-        </div>
-      </section>
-
       <section className="split-promos" aria-label="More to shop">
         <button className="split-promo" type="button" onClick={shop}>
           <img src={suitIn("navy")?.imageUrl} alt="" />
           <span>Shop suits</span>
         </button>
-        <button className="split-promo" type="button" onClick={onTakeQuiz}>
+        <button className="split-promo" type="button" onClick={shop}>
           <img src={suitIn("blue")?.imageUrl} alt="" />
-          <span>Find your suit</span>
+          <span>Shop sport coats</span>
         </button>
       </section>
 
@@ -266,6 +274,26 @@ function HomeScreen({ onTakeQuiz, onNavigate }) {
   );
 }
 
+function QuizEntry({ onTakeQuiz }) {
+  return (
+    <section className="quiz-entry" aria-labelledby="quiz-entry-title">
+      <img className="quiz-entry-art" src="/quiz/style-expert.svg" alt="" />
+      <div className="quiz-entry-copy">
+        <p className="quiz-entry-badge">
+          <span className="quiz-entry-mark" aria-hidden="true">MW</span>
+          AI Style Expert
+        </p>
+        <h2 id="quiz-entry-title">Meet your personal style expert</h2>
+        <p><strong>In under a minute</strong> get suit options matched to your event and needs.</p>
+      </div>
+      <button className="quiz-entry-button" type="button" onClick={onTakeQuiz}>
+        <SparkleIcon />
+        Find the suit
+      </button>
+    </section>
+  );
+}
+
 function SparkleIcon() {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -277,16 +305,3 @@ function SparkleIcon() {
   );
 }
 
-function QuizBanner({ onTakeQuiz }) {
-  return (
-    <div className="quiz-banner">
-      <div>
-        <p className="quiz-banner-kicker">Suit Finder</p>
-        <p className="quiz-banner-title">Not sure which suit? Answer a few questions and get 3 suit picks in under a minute.</p>
-      </div>
-      <button className="quiz-banner-button" type="button" onClick={onTakeQuiz}>
-        Take the quiz
-      </button>
-    </div>
-  );
-}

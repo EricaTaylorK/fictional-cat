@@ -28,7 +28,7 @@ const SUITS_MENU = [
   },
 ];
 
-export default function SiteHeader({ search, onSearch, onNavigate, onTakeQuiz, current }) {
+export default function SiteHeader({ search, onSearch, onNavigate, current }) {
   const [searchOpen, setSearchOpen] = useState(Boolean(search));
   const [menuOpen, setMenuOpen] = useState(false);
   const [suitsOpen, setSuitsOpen] = useState(false);
@@ -47,12 +47,6 @@ export default function SiteHeader({ search, onSearch, onNavigate, onTakeQuiz, c
     setSuitsOpen(false);
     if (item === "Suits" || item === "Sale") onNavigate?.("sale");
     if (item === "Rental") onNavigate?.("look");
-  }
-
-  function openQuiz() {
-    setMenuOpen(false);
-    setSuitsOpen(false);
-    onTakeQuiz?.();
   }
 
   return (
@@ -96,7 +90,6 @@ export default function SiteHeader({ search, onSearch, onNavigate, onTakeQuiz, c
 
       {menuOpen && (
         <nav className="mobile-nav" id="site-menu" aria-label="Departments">
-          <SuitFinderFeature onTakeQuiz={openQuiz} />
           {NAV.map((item) => (
             item === "Suits" ? (
               <div key={item} className="mobile-suits-wrap">
@@ -199,7 +192,6 @@ export default function SiteHeader({ search, onSearch, onNavigate, onTakeQuiz, c
                       ))}
                       <button className="mega-all" type="button" onClick={() => choose("Suits")}>Shop all suits →</button>
                     </div>
-                    <SuitFinderFeature onTakeQuiz={openQuiz} />
                   </div>
                 )}
               </div>
@@ -233,19 +225,6 @@ export default function SiteHeader({ search, onSearch, onNavigate, onTakeQuiz, c
         </form>
       )}
     </header>
-  );
-}
-
-function SuitFinderFeature({ onTakeQuiz }) {
-  return (
-    <button className="nav-feature" type="button" onClick={onTakeQuiz}>
-      <img src="/quiz/suit-finder-hero.jpg" alt="" />
-      <span className="nav-feature-copy">
-        <span className="nav-feature-kicker">AI Style Expert</span>
-        <strong>What&apos;s the occasion? We&apos;ll find the suit.</strong>
-        <span className="nav-feature-link">Take the suit quiz</span>
-      </span>
-    </button>
   );
 }
 
