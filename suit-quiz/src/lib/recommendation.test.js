@@ -447,21 +447,20 @@ describe("recommendations", () => {
       expect(themes.length).toBeGreaterThan(0);
       for (const theme of themes) {
         for (const swatch of theme.swatches) {
-          expect(keys.has(swatch.key)).toBe(true);
+          expect(keys.has(swatch.key) || swatch.key === "pink").toBe(true);
           expect(swatch.hex).toBe(SWATCH_HEX[swatch.key]);
         }
       }
       const listed = themes.flatMap((theme) => theme.colors);
       expect(new Set(listed).size).toBe(listed.length);
-      expect(new Set(listed)).toEqual(keys);
+      expect(new Set(listed.filter((key) => key !== "pink"))).toEqual(keys);
     }
     const buyThemes = colorThemes("buy");
     const rentThemes = colorThemes("rent");
-    // Light and soft is white only, so the buy lane hides it.
-    expect(buyThemes.map((theme) => theme.value)).toEqual(["classics", "earthTones", "richBold"]);
+    expect(buyThemes.map((theme) => theme.value)).toEqual(["classics", "earthTones", "richBold", "lightSoft"]);
     expect(rentThemes.map((theme) => theme.value)).toEqual(["classics", "earthTones", "richBold", "lightSoft"]);
-    expect(buyThemes.map((theme) => theme.value)).not.toContain("lightSoft");
-    expect(rentThemes.find((theme) => theme.value === "lightSoft").colors).toEqual(["white"]);
+    expect(buyThemes.find((theme) => theme.value === "lightSoft").colors).toEqual(["pink"]);
+    expect(rentThemes.find((theme) => theme.value === "lightSoft").colors).toEqual(["white", "pink"]);
     expect(buyThemes.find((theme) => theme.value === "earthTones").colors).toEqual(["brown", "tan", "green"]);
     expect(rentThemes.find((theme) => theme.value === "earthTones").colors).toEqual(["tan", "green"]);
     expect(rentThemes.find((theme) => theme.value === "richBold").colors).toEqual(["blue"]);

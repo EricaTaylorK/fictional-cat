@@ -71,7 +71,7 @@ export const questions = {
       { value: "classics", label: "Classics", detail: "Navy, gray, and black.", colors: ["navy", "gray", "black"] },
       { value: "earthTones", label: "Earth tones", detail: "Brown, tan, and sage.", colors: ["brown", "tan", "green"] },
       { value: "richBold", label: "Rich and bold", detail: "Burgundy and royal blue.", colors: ["burgundy", "blue"] },
-      { value: "lightSoft", label: "Light and soft", detail: "White or cream.", colors: ["white"] },
+      { value: "lightSoft", label: "Light and soft", detail: "White, cream, or pink.", colors: ["white", "pink"] },
     ],
   },
   measurementKnowledge: {
@@ -304,7 +304,8 @@ export function colorThemes(mode) {
   const available = catalogColors(mode);
   return questions.colors.options
     .map((option) => {
-      const colors = option.colors.filter((key) => available.has(key));
+      // Pink stays visible even though no suit in the catalog is pink yet.
+      const colors = option.colors.filter((key) => available.has(key) || key === "pink");
       return {
         ...option,
         ...visibleCopy(option),
