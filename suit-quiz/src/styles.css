@@ -6643,13 +6643,13 @@ button.store-logo {
   align-self: flex-start;
   color: #232323;
   display: flex;
-  flex: 0 0 320px;
+  flex: 0 0 383px;
   flex-direction: column;
   max-width: 100%;
   overflow: hidden;
   position: sticky;
   top: 24px;
-  width: 320px;
+  width: 383px;
 }
 
 .your-look-accent {
@@ -6660,9 +6660,9 @@ button.store-logo {
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 16px;
   min-width: 0;
-  padding: 20px 20px 8px;
+  padding: 30px 24px 0;
 }
 
 /* Card stroke lives on the aside; keep the panel flush inside so buy/rental read as one card. */
@@ -6677,7 +6677,7 @@ button.store-logo {
   flex-direction: column;
   gap: 8px;
   min-width: 0;
-  padding: 8px 20px 20px;
+  padding: 0 24px 30px;
 }
 
 .your-look-tailoring.is-selected .your-look-selected-label {
@@ -6837,12 +6837,42 @@ button.store-logo {
   padding-top: 2px;
 }
 
+.your-look .order-lines li {
+  border-bottom: 1px solid #e6e6e6;
+  padding: 14px 0;
+}
+
+.your-look .order-lines li:last-child {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+
 .your-look .order-lines > li > span:first-child {
   align-items: flex-start;
   display: flex;
   flex-direction: column;
   gap: 4px;
   min-width: 0;
+}
+
+.order-line-meta {
+  color: #595959;
+  font-size: 13px;
+  line-height: 18px;
+}
+
+.your-look .look-remove {
+  align-items: center;
+  background: none;
+  border: 0;
+  color: #232323;
+  cursor: pointer;
+  display: inline-flex;
+  flex: 0 0 24px;
+  height: 24px;
+  justify-content: center;
+  padding: 0;
+  width: 24px;
 }
 
 .your-look .order-lines li.is-off {
