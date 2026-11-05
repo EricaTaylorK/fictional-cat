@@ -86,6 +86,7 @@ export default function SalePage({
         search={search}
         onSearch={setSearch}
         onNavigate={onNavigate}
+        onFindSuit={onTakeQuiz}
         current={view === "home" ? undefined : view === "look" ? "Rental" : crumb === "Sale" ? "Sale" : "Suits"}
       />
       {view === "home" ? (
@@ -129,7 +130,7 @@ export default function SalePage({
           products={visible}
           quizMatchIds={quizMatchIds}
           onClear={clearApplied}
-          entry={crumb === "Suits" ? <CompactCard entrypoint="pgp-suits" /> : null}
+          entry={crumb === "Suits" ? <CompactCard entrypoint="pgp-suits" onActivate={onTakeQuiz} /> : null}
         />
       </main>
       )}
@@ -180,7 +181,7 @@ function HomeScreen({ onTakeQuiz, onNavigate }) {
   return (
     <main id="home">
       <div className="sf-hero-slot">
-        <LargeHeroBanner entrypoint="home-hero" priority />
+        <LargeHeroBanner entrypoint="home-hero" priority onActivate={onTakeQuiz} />
       </div>
       <section className="cat-row" aria-label="Departments">
         {categories.map((category) => (
