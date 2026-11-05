@@ -1102,7 +1102,7 @@ function TagMark() {
   );
 }
 
-function YourLook({ suit, image, size, tailoringId, items, addedLooks, onOpenLook, onRemoveLook }) {
+function YourLook({ suit, size, tailoringId, items, addedLooks, onOpenLook, onRemoveLook }) {
   const [sheetOpen, setSheetOpen] = useState(false);
   const [bagStatus, setBagStatus] = useState("idle");
   const [flash, setFlash] = useState(false);
@@ -1259,54 +1259,43 @@ function YourLook({ suit, image, size, tailoringId, items, addedLooks, onOpenLoo
             </>
           )}
         </button>
-        <section aria-labelledby="your-suit-label">
-          <h3 id="your-suit-label" className="your-look-kicker">Your suit</h3>
-          <div className="your-look-suit">
-            <img className="your-look-thumb" src={image} alt="" />
-            <div className="your-look-copy">
-              <p className="your-look-name">{suit.name}</p>
-              {suit.fitName && <p className="your-look-meta">{suit.fitName}</p>}
+        <ul className="order-lines" aria-label="Your suit">
+          <li>
+            <span>
+              {suit.name}
               <button className="your-look-link" type="button" onClick={() => scrollToSuits("swap_suit_clicked")}>Swap suit</button>
-            </div>
-            <p className="your-look-price">{formatPrice(suit.price)}</p>
-          </div>
-        </section>
-        {selectedPackage && (
-          <section aria-labelledby="your-tailoring-label">
-            <h3 id="your-tailoring-label" className="your-look-kicker">Tailoring</h3>
-            <div className="your-look-tailor">
-              <div className="your-look-copy">
-                <p className="your-look-name">{selectedPackage.name}</p>
-                <p className="your-look-meta">{selectedPackage.body}</p>
-              </div>
-              <p className="your-look-price">{formatPrice(selectedPackage.price)}</p>
-            </div>
-          </section>
-        )}
+            </span>
+            <span className="order-amount">{formatPrice(suit.price)}</span>
+          </li>
+          {selectedPackage && selectedPackage.price > 0 && (
+            <li>
+              <span>{selectedPackage.name}</span>
+              <span className="order-amount">{formatPrice(selectedPackage.price)}</span>
+            </li>
+          )}
+        </ul>
         <section aria-labelledby="your-pieces-label">
           <h3 id="your-pieces-label" className="your-look-kicker">Complete the look</h3>
-          <ul className="your-look-pieces">
+          <ul className="order-lines your-look-pieces">
             {rows.map((item) => {
               const title = lookPieceTitle(item);
               return (
-                <li className={`your-look-piece${item.added ? "" : " is-off"}`} key={item.id}>
-                  <img className="your-look-thumb" src={item.image} alt="" />
-                  <div className="your-look-copy">
-                    <p className="your-look-name">{title}</p>
-                    <p className="your-look-meta">{item.type}</p>
-                  </div>
-                  <p className="your-look-price">{item.added ? formatPrice(item.price) : `+ ${formatPrice(item.price)}`}</p>
-                  <button
-                    className={item.added ? "look-remove" : "look-add"}
-                    type="button"
-                    aria-label={item.added ? `Remove ${title}` : `Add ${title}`}
-                    onClick={(event) => {
-                      if (item.added) onRemoveLook(item.id);
-                      else onOpenLook(item, event);
-                    }}
-                  >
-                    <span>{item.added ? <RemoveMark /> : <CirclePlus />}</span>
-                  </button>
+                <li className={item.added ? undefined : "is-off"} key={item.id}>
+                  <span>{title}</span>
+                  <span className="order-amount">
+                    {item.added ? formatPrice(item.price) : `+ ${formatPrice(item.price)}`}
+                    <button
+                      className={item.added ? "look-remove" : "look-add"}
+                      type="button"
+                      aria-label={item.added ? `Remove ${title}` : `Add ${title}`}
+                      onClick={(event) => {
+                        if (item.added) onRemoveLook(item.id);
+                        else onOpenLook(item, event);
+                      }}
+                    >
+                      <span>{item.added ? <RemoveMark /> : <CirclePlus />}</span>
+                    </button>
+                  </span>
                 </li>
               );
             })}
@@ -1363,8 +1352,8 @@ function YourLook({ suit, image, size, tailoringId, items, addedLooks, onOpenLoo
 
 function RentalAside({ suit, pieces, onReserve, reserved, note }) {
   return (
-    <aside className="rental-summary" aria-label="Your rental">
-      <h2 className="rental-summary-title">Your rental</h2>
+    <aside className="rental-summary order-summary" aria-label="Your rental">
+      <h2 className="rental-summary-title order-summary-title">Your rental</h2>
       {!suit && <p className="your-look-summary">Choose a look to reserve.</p>}
       {suit && (
         <ul className="order-lines">
@@ -1377,7 +1366,7 @@ function RentalAside({ suit, pieces, onReserve, reserved, note }) {
           ))}
         </ul>
       )}
-      <button className="your-look-cta" type="button" disabled={!suit} onClick={onReserve}>
+      <button className="your-look-cta order-checkout" type="button" disabled={!suit} onClick={onReserve}>
         Reserve this look
       </button>
       {reserved && <p className="handoff-inline" role="status">{note}</p>}
@@ -1578,7 +1567,6 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
   ) : selected ? (
     <YourLook
       suit={selected}
-      image={selectedVariant?.image || selected.image}
       size={size}
       tailoringId={tailoringId}
       items={selectedLook?.items ?? []}

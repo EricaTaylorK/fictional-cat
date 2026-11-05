@@ -7,14 +7,19 @@ const COPY = {
   cta: "FIND THE SUIT",
 };
 
-function SuitFinderEntry({ variant, entrypoint, priority = false }) {
+function SuitFinderEntry({ variant, entrypoint, priority = false, onActivate }) {
   return (
     <a
       className={`sf-entry sf-entry--${variant}`}
       href={quizHref(entrypoint)}
       data-variant={variant}
       data-entrypoint={entrypoint}
-      onClick={() => trackEntryClick(entrypoint)}
+      onClick={(event) => {
+        trackEntryClick(entrypoint);
+        if (!onActivate) return;
+        event.preventDefault();
+        onActivate(entrypoint);
+      }}
     >
       <span className="sf-entry-body">
         <span className="sf-entry-mark">
@@ -38,14 +43,14 @@ function SuitFinderEntry({ variant, entrypoint, priority = false }) {
   );
 }
 
-export function CompactCard({ entrypoint }) {
-  return <SuitFinderEntry variant="card" entrypoint={entrypoint} />;
+export function CompactCard({ entrypoint, onActivate }) {
+  return <SuitFinderEntry variant="card" entrypoint={entrypoint} onActivate={onActivate} />;
 }
 
-export function WideSlimBanner({ entrypoint }) {
-  return <SuitFinderEntry variant="slim" entrypoint={entrypoint} />;
+export function WideSlimBanner({ entrypoint, onActivate }) {
+  return <SuitFinderEntry variant="slim" entrypoint={entrypoint} onActivate={onActivate} />;
 }
 
-export function LargeHeroBanner({ entrypoint, priority = false }) {
-  return <SuitFinderEntry variant="hero" entrypoint={entrypoint} priority={priority} />;
+export function LargeHeroBanner({ entrypoint, priority = false, onActivate }) {
+  return <SuitFinderEntry variant="hero" entrypoint={entrypoint} priority={priority} onActivate={onActivate} />;
 }

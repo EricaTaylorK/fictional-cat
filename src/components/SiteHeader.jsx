@@ -34,24 +34,12 @@ const SUITS_MENU = [
   },
 ];
 
-const SUIT_BANNERS = [
-  {
-    headline: "Made for Every “I Do”",
-    subheadline: "Shop Wedding Suits",
-    image: "/suits/suit-navy.jpg",
-    width: 675,
-    height: 900,
-    destination: "sale",
-  },
-  {
-    headline: "Wedding Party Looks",
-    subheadline: "Shop Tuxedos",
-    image: "/suits/suit-black.jpg",
-    width: 675,
-    height: 900,
-    destination: "sale",
-  },
-].filter((card) => card.image && card.destination);
+const SUIT_PROMO = {
+  headline: "Made for Every “I Do”",
+  link: "Shop Wedding Suits",
+  image: "/suits/suit-navy.jpg",
+  destination: "sale",
+};
 
 const UTILITIES = ["Find a Store", "Sign In"];
 
@@ -67,7 +55,7 @@ function focusableIn(root) {
   });
 }
 
-export default function SiteHeader({ search, onSearch, onNavigate, current }) {
+export default function SiteHeader({ search, onSearch, onNavigate, onFindSuit, current }) {
   const desktop = useDesktop();
   const [searchOpen, setSearchOpen] = useState(Boolean(search));
   const [menuOpen, setMenuOpen] = useState(false);
@@ -105,6 +93,17 @@ export default function SiteHeader({ search, onSearch, onNavigate, current }) {
   function go(destination) {
     closeMenus();
     onNavigate?.(destination);
+  }
+
+  function openQuiz() {
+    closeMenus();
+    if (onFindSuit) onFindSuit();
+    else window.location.assign(quizHref("nav-mega"));
+  }
+
+  function startQuiz() {
+    trackEntryClick("nav-mega");
+    openQuiz();
   }
 
   useEffect(() => () => clearTimeout(hoverTimer.current), []);
@@ -392,6 +391,11 @@ export default function SiteHeader({ search, onSearch, onNavigate, current }) {
                           <div key={column.title}>
                             <p className="dept-kicker">{column.title}</p>
                             <ul>
+                              {column.title === "Suiting" && (
+                                <li>
+                                  <button type="button" className="dept-link dept-link-quiz" onClick={startQuiz}>Suit Finder</button>
+                                </li>
+                              )}
                               {column.links.map((link) => (
                                 <li key={link}>
                                   <button type="button" className="dept-link" onClick={() => go("sale")}>{link}</button>
@@ -407,27 +411,20 @@ export default function SiteHeader({ search, onSearch, onNavigate, current }) {
                       <ArrowIcon />
                     </button>
                   </div>
-                  {active.id === "suits" && SUIT_BANNERS.length > 0 && (
+                  {active.id === "suits" && (
                     <div className="dept-promos">
-                    <div className="dept-banners">
-                      {SUIT_BANNERS.map((card) => (
-                        <button
-                          key={card.headline}
-                          type="button"
-                          className="dept-banner"
-                          aria-label={`${card.headline}. ${card.subheadline}. Shop Now`}
-                          onClick={() => go(card.destination)}
-                        >
-                          <img src={card.image} alt="" width={card.width} height={card.height} loading="lazy" />
-                          <span className="dept-banner-copy">
-                            <strong>{card.headline}</strong>
-                            <span>{card.subheadline}</span>
-                            <span className="dept-banner-cta">Shop Now</span>
-                          </span>
-                        </button>
-                      ))}
-                    </div>
-                    <CompactCard entrypoint="nav-mega" />
+                      <CompactCard entrypoint="nav-mega" onActivate={openQuiz} />
+                      <button
+                        type="button"
+                        className="dept-feature"
+                        onClick={() => go(SUIT_PROMO.destination)}
+                      >
+                        <img src={SUIT_PROMO.image} alt="" />
+                        <span className="dept-feature-copy">
+                          <strong>{SUIT_PROMO.headline}</strong>
+                          <span>{SUIT_PROMO.link}</span>
+                        </span>
+                      </button>
                     </div>
                   )}
                 </div>
@@ -505,6 +502,7 @@ export default function SiteHeader({ search, onSearch, onNavigate, current }) {
                       setMobilePanel(null);
                     }}
                     onGo={go}
+                    onFindSuit={startQuiz}
                   />
                 )}
               </nav>
@@ -532,7 +530,7 @@ export default function SiteHeader({ search, onSearch, onNavigate, current }) {
   );
 }
 
-function MobilePanel({ department, backRef, onBack, onGo }) {
+function MobilePanel({ department, backRef, onBack, onGo, onFindSuit }) {
   const suits = department.id === "suits";
   return (
     <div className="mobile-panel" id="mobile-dept-panel" role="region" aria-label={department.label}>
@@ -545,15 +543,9 @@ function MobilePanel({ department, backRef, onBack, onGo }) {
         <ArrowIcon />
       </button>
       {suits && (
-        <a
-          className="suit-finder-link"
-          href={quizHref("nav-mega")}
-          data-entrypoint="nav-mega"
-          data-variant="text"
-          onClick={() => trackEntryClick("nav-mega")}
-        >
+        <button type="button" className="suit-finder-link" onClick={onFindSuit}>
           Suit Finder
-        </a>
+        </button>
       )}
       {suits && SUITS_MENU.map((column) => (
         <div key={column.title} className="mobile-group">
@@ -563,25 +555,14 @@ function MobilePanel({ department, backRef, onBack, onGo }) {
           ))}
         </div>
       ))}
-      {suits && SUIT_BANNERS.length > 0 && (
-        <div className="mobile-banners">
-          {SUIT_BANNERS.map((card) => (
-            <button
-              key={card.headline}
-              type="button"
-              className="mobile-banner"
-              aria-label={`${card.headline}. ${card.subheadline}. Shop Now`}
-              onClick={() => onGo(card.destination)}
-            >
-              <img src={card.image} alt="" width={card.width} height={card.height} loading="lazy" />
-              <span className="mobile-banner-copy">
-                <strong>{card.headline}</strong>
-                <span>{card.subheadline}</span>
-                <span className="dept-banner-cta">Shop Now</span>
-              </span>
-            </button>
-          ))}
-        </div>
+      {suits && (
+        <button type="button" className="mobile-feature" onClick={() => onGo(SUIT_PROMO.destination)}>
+          <img src={SUIT_PROMO.image} alt="" />
+          <span className="dept-feature-copy">
+            <strong>{SUIT_PROMO.headline}</strong>
+            <span>{SUIT_PROMO.link}</span>
+          </span>
+        </button>
       )}
       <div className="mobile-utilities">
         {UTILITIES.map((label) => (
