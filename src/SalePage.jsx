@@ -13,6 +13,7 @@ import FilterSheet from "./components/FilterSheet.jsx";
 import ProductGrid from "./components/ProductGrid.jsx";
 import SiteFooter from "./components/SiteFooter.jsx";
 import SiteHeader from "./components/SiteHeader.jsx";
+import { CompactCard, LargeHeroBanner } from "../suit-quiz/src/components/entries/SuitFinderEntries.jsx";
 import useDesktop from "./hooks/useDesktop.js";
 
 function money(amount) {
@@ -124,7 +125,12 @@ export default function SalePage({
           sort={sort}
           onSort={setSort}
         />
-        <ProductGrid products={visible} quizMatchIds={quizMatchIds} onClear={clearApplied} />
+        <ProductGrid
+          products={visible}
+          quizMatchIds={quizMatchIds}
+          onClear={clearApplied}
+          entry={crumb === "Suits" ? <CompactCard entrypoint="pgp-suits" /> : null}
+        />
       </main>
       )}
       <SiteFooter />
@@ -173,6 +179,9 @@ function HomeScreen({ onTakeQuiz, onNavigate }) {
 
   return (
     <main id="home">
+      <div className="sf-hero-slot">
+        <LargeHeroBanner entrypoint="home-hero" priority />
+      </div>
       <section className="cat-row" aria-label="Departments">
         {categories.map((category) => (
           <button key={category.label} className="cat-card" type="button" onClick={shop}>

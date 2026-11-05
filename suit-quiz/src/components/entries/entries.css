@@ -120,6 +120,10 @@
   outline-offset: 3px;
 }
 
+.sf-espot .sf-entry--card {
+  max-width: none;
+}
+
 @media (min-width: 768px) {
   .sf-entry--slim,
   .sf-entry--hero {

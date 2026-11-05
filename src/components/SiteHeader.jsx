@@ -1,5 +1,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import useDesktop from "../hooks/useDesktop.js";
+import { CompactCard } from "../../suit-quiz/src/components/entries/SuitFinderEntries.jsx";
+import { quizHref, trackEntryClick } from "../../suit-quiz/src/components/entries/quizEntry.js";
 
 const HOVER_MS = 150;
 const FADE_MS = 170;
@@ -406,6 +408,7 @@ export default function SiteHeader({ search, onSearch, onNavigate, current }) {
                     </button>
                   </div>
                   {active.id === "suits" && SUIT_BANNERS.length > 0 && (
+                    <div className="dept-promos">
                     <div className="dept-banners">
                       {SUIT_BANNERS.map((card) => (
                         <button
@@ -423,6 +426,8 @@ export default function SiteHeader({ search, onSearch, onNavigate, current }) {
                           </span>
                         </button>
                       ))}
+                    </div>
+                    <CompactCard entrypoint="nav-mega" />
                     </div>
                   )}
                 </div>
@@ -539,6 +544,17 @@ function MobilePanel({ department, backRef, onBack, onGo }) {
         <span>{department.shopAll}</span>
         <ArrowIcon />
       </button>
+      {suits && (
+        <a
+          className="suit-finder-link"
+          href={quizHref("nav-mega")}
+          data-entrypoint="nav-mega"
+          data-variant="text"
+          onClick={() => trackEntryClick("nav-mega")}
+        >
+          Suit Finder
+        </a>
+      )}
       {suits && SUITS_MENU.map((column) => (
         <div key={column.title} className="mobile-group">
           <p className="dept-kicker">{column.title}</p>

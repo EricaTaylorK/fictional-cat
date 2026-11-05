@@ -1224,6 +1224,48 @@ h1 {
   row-gap: 0;
 }
 
+.sf-espot {
+  min-width: 0;
+}
+
+.sf-hero-slot {
+  box-sizing: border-box;
+  width: min(1336px, 100%);
+  margin: 0 auto;
+  padding: 16px 16px 0;
+}
+
+.suit-finder-link {
+  display: block;
+  margin: 4px 20px 8px 28px;
+  padding: 7px 0;
+  color: var(--color-primary-blue);
+  font-size: 15px;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.dept-promos {
+  display: flex;
+  flex: 1 1 0;
+  gap: 8px;
+  align-items: stretch;
+  min-width: 0;
+  padding: 16px 16px 16px 0;
+}
+
+.dept-promos .dept-banners {
+  flex: 1 1 0;
+}
+
+.dept-promos .sf-entry--card {
+  align-self: flex-start;
+  flex: 0 1 343px;
+  width: 100%;
+  max-width: 343px;
+}
+
 .card {
   display: flex;
   flex-direction: column;
@@ -2665,6 +2707,18 @@ h1 {
 
   .rental-lineup h2,
   .rental-lineup-lede { padding-left: 0; padding-right: 0; }
+}
+
+@media (min-width: 768px) {
+  .sf-hero-slot { padding: 16px 24px 0; }
+}
+
+@media (min-width: 1440px) {
+  .sf-hero-slot {
+    width: 1336px;
+    padding-right: 0;
+    padding-left: 0;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

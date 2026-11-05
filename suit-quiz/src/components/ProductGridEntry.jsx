@@ -2,6 +2,7 @@ import { useEffect, useRef } from "react";
 import { createRoot } from "react-dom/client";
 import SalePage from "../../../src/SalePage.jsx";
 import pgpCss from "../../../src/style.css?inline";
+import entryCss from "./entries/entries.css?inline";
 
 export default function ProductGridEntry({
   view = "sale",
@@ -26,7 +27,7 @@ export default function ProductGridEntry({
     const host = hostRef.current;
     const shadow = host.shadowRoot ?? host.attachShadow({ mode: "open" });
     const sheet = new CSSStyleSheet();
-    sheet.replaceSync(pgpCss.replaceAll(":root", ":host"));
+    sheet.replaceSync(`${pgpCss.replaceAll(":root", ":host")}\n${entryCss}`);
     shadow.adoptedStyleSheets = [sheet];
 
     const mount = document.createElement("div");

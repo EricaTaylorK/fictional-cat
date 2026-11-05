@@ -1,7 +1,25 @@
+import { Fragment, useEffect, useState } from "react";
 import { COLORS, PROMO_BADGES, SUIT_IMAGES } from "../data/catalog.js";
 import { money } from "../filters.js";
 
-export default function ProductGrid({ products, onClear, quizMatchIds = [] }) {
+function useGridColumns() {
+  const query = "(min-width: 1024px)";
+  const [wide, setWide] = useState(() => window.matchMedia(query).matches);
+
+  useEffect(() => {
+    const media = window.matchMedia(query);
+    const onChange = () => setWide(media.matches);
+    onChange();
+    media.addEventListener("change", onChange);
+    return () => media.removeEventListener("change", onChange);
+  }, []);
+
+  return wide ? 4 : 2;
+}
+
+export default function ProductGrid({ products, onClear, quizMatchIds = [], entry = null, entryAfterRows = 2 }) {
+  const perRow = useGridColumns();
+  const insertAt = entry ? Math.min(products.length, perRow * entryAfterRows) : -1;
   if (products.length === 0) {
     return (
       <div className="empty">
@@ -15,8 +33,10 @@ export default function ProductGrid({ products, onClear, quizMatchIds = [] }) {
 
   return (
     <ul className="grid">
-      {products.map((product) => (
-        <li key={product.id}>
+      {products.map((product, index) => (
+        <Fragment key={product.id}>
+          {index === insertAt && <li className="sf-espot">{entry}</li>}
+        <li>
           <article className="card" data-testid="product-card">
             <div className="card-media">
               <img
@@ -56,7 +76,9 @@ export default function ProductGrid({ products, onClear, quizMatchIds = [] }) {
             </div>
           </article>
         </li>
+        </Fragment>
       ))}
+      {insertAt === products.length && <li className="sf-espot">{entry}</li>}
     </ul>
   );
 }
