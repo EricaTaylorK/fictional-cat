@@ -39,9 +39,9 @@ function loadProgress() {
       const answers = { ...saved.answers };
       delete answers.rentalBudget;
       const next = { ...saved, answers };
-      const place = next.place === "sale" || next.place === "home"
+      const place = next.place === "sale" || next.place === "home" || next.place === "look"
         ? next.place
-        : (next.screen === "start" || next.screen === "matches" ? "sale" : "home");
+        : (next.screen === "start" || next.screen === "matches" ? "sale" : next.screen === "look" ? "look" : "home");
       if (next.currentId === "rentalBudget" && next.screen === "question") {
         return openLinkedProduct({ ...next, place, screen: "matching" });
       }
@@ -54,7 +54,8 @@ function loadProgress() {
 }
 
 function leaveQuiz(previous) {
-  return { ...previous, screen: previous.place === "sale" ? "start" : "home" };
+  const screen = previous.place === "sale" ? "start" : previous.place === "look" ? "look" : "home";
+  return { ...previous, screen };
 }
 
 function OptionCards({ options, isSelected, onPick, label, compact = false, className = "" }) {
@@ -619,7 +620,7 @@ export default function App() {
   }, [screen, currentId]);
 
   useEffect(() => {
-    const lightPage = screen === "start" || screen === "home" || screen === "results" || screen === "product";
+    const lightPage = screen === "start" || screen === "home" || screen === "look" || screen === "results" || screen === "product";
     document.documentElement.classList.toggle("page-white", lightPage);
     return () => document.documentElement.classList.remove("page-white");
   }, [screen]);
@@ -710,6 +711,10 @@ export default function App() {
 
   function goSale() {
     setState((previous) => ({ ...previous, screen: "start", place: "sale" }));
+  }
+
+  function goLook() {
+    setState((previous) => ({ ...previous, screen: "look", place: "look" }));
   }
 
   const usuallyFine = currentQuestion?.type === "multi"
@@ -811,11 +816,13 @@ export default function App() {
 
   const view = screen === "home"
     ? "home"
-    : (screen === "start" || screen === "matches" || state.place === "sale")
-      ? "sale"
-      : "home";
+    : screen === "look" || (state.place === "look" && screen !== "start" && screen !== "matches")
+      ? "look"
+      : (screen === "start" || screen === "matches" || state.place === "sale")
+        ? "sale"
+        : "home";
 
-  if (screen === "home" || screen === "start" || screen === "intro" || screen === "matches" || screen === "question" || screen === "matching") {
+  if (screen === "home" || screen === "look" || screen === "start" || screen === "intro" || screen === "matches" || screen === "question" || screen === "matching") {
     return (
       <>
         <ProductGridEntry
@@ -828,7 +835,8 @@ export default function App() {
           onTakeQuiz={openIntro}
           onNavigate={(next) => {
             if (next === "home") goHome();
-            else if (next === "sale" || next === "look") goSale();
+            else if (next === "look") goLook();
+            else if (next === "sale") goSale();
           }}
           onBackToQuiz={screen === "matches"
             ? () => setState((previous) => ({ ...previous, screen: "results" }))

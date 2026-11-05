@@ -85,10 +85,12 @@ export default function SalePage({
         search={search}
         onSearch={setSearch}
         onNavigate={onNavigate}
-        current={view === "home" ? undefined : crumb === "Sale" ? "Sale" : "Suits"}
+        current={view === "home" ? undefined : view === "look" ? "Rental" : crumb === "Sale" ? "Sale" : "Suits"}
       />
       {view === "home" ? (
         <HomeScreen onTakeQuiz={onTakeQuiz} onNavigate={onNavigate} />
+      ) : view === "look" ? (
+        <RentalShop onTakeQuiz={onTakeQuiz} />
       ) : (
       <main id="sale">
         <div className="listing-head">
@@ -291,6 +293,50 @@ function QuizEntry({ onTakeQuiz }) {
         Find the suit
       </button>
     </section>
+  );
+}
+
+function RentalShop({ onTakeQuiz }) {
+  const lineup = ["black", "navy", "gray", "blue"].map(suitIn).filter(Boolean);
+
+  return (
+    <main className="rental-shop" id="rental-shop">
+      <section className="rental-hero" aria-labelledby="rental-hero-title">
+        <div className="rental-hero-copy">
+          <p className="sale-kicker">Suit &amp; tux rentals</p>
+          <h1 id="rental-hero-title">RSVP? We heard VIP.</h1>
+          <p>Whether it&apos;s a wedding, work, or black-tie event, our rentals put you center stage.</p>
+        </div>
+        <div className="rental-hero-photo">
+          <img src={suitIn("black")?.imageUrl || "/suits/suit-black.jpg"} alt="" />
+        </div>
+      </section>
+
+      <section className="rental-match" aria-labelledby="rental-match-title">
+        <div className="rental-match-copy">
+          <h2 id="rental-match-title">Your wedding, our rentals—it&apos;s a match.</h2>
+          <p>Welcome to the easiest part of your wedding plan. We&apos;ll outfit the whole party.</p>
+        </div>
+        <img src={suitIn("navy")?.imageUrl || "/suits/suit-navy.jpg"} alt="" />
+      </section>
+
+      <QuizEntry onTakeQuiz={onTakeQuiz} />
+
+      <section className="home-rail rental-lineup" aria-labelledby="rental-lineup-title">
+        <h2 id="rental-lineup-title">Our most-loved lineup</h2>
+        <p className="rental-lineup-lede">Unforgettable entrances start here.</p>
+        <div className="home-rail-track">
+          {lineup.map((product) => (
+            <article key={product.id} className="home-card">
+              <img src={product.imageUrl} alt="" />
+              <p className="home-card-brand">{product.brandName}</p>
+              <p className="home-card-name">{product.name}</p>
+              <p className="home-card-price">{money(product.price)}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+    </main>
   );
 }
 

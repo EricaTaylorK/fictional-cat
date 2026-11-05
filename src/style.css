@@ -737,6 +737,81 @@ main { padding: 0 0 48px; }
 
 .rental-looks button { flex: 0 0 140px; background: var(--color-neutral-white); }
 
+.rental-hero {
+  display: flex;
+  flex-direction: column;
+  background: var(--color-primary-blue);
+  color: var(--color-neutral-white);
+}
+
+.rental-hero-copy { padding: 32px 20px 28px; }
+
+.rental-hero .sale-kicker { color: var(--color-neutral-white); }
+
+.rental-hero h1 {
+  display: block;
+  max-width: 14ch;
+  margin: 0 0 12px;
+  color: var(--color-neutral-white);
+  font-size: 36px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 0.95;
+  text-transform: uppercase;
+}
+
+.rental-hero-copy p {
+  max-width: 36ch;
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.45;
+}
+
+.rental-hero-photo img {
+  display: block;
+  width: 100%;
+  height: 280px;
+  object-fit: cover;
+  object-position: center 18%;
+}
+
+.rental-match {
+  display: flex;
+  flex-direction: column;
+  margin: 16px;
+  background: #f4efe8;
+}
+
+.rental-match-copy { padding: 20px 20px 8px; }
+
+.rental-match h2 {
+  margin: 0 0 8px;
+  color: var(--color-primary-blue);
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+.rental-match p {
+  margin: 0 0 16px;
+  color: var(--color-neutral-dark-gray);
+}
+
+.rental-match img {
+  display: block;
+  width: 100%;
+  height: 220px;
+  object-fit: cover;
+  object-position: center 15%;
+}
+
+.rental-lineup-lede {
+  margin: 0;
+  padding: 4px 16px 0;
+  color: var(--color-neutral-dark-gray);
+}
+
 .quiz-matches-bar {
   align-items: center;
   display: flex;
@@ -2330,6 +2405,77 @@ h1 {
 
   .facet-toggle,
   .facet-body { padding-left: 24px; padding-right: 24px; }
+
+  .rental-hero {
+    flex-direction: row;
+    align-items: stretch;
+    height: 480px;
+    min-height: 0;
+  }
+
+  .rental-hero-copy {
+    flex: 0.9;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 48px 56px;
+  }
+
+  .rental-hero h1 {
+    margin: 0 0 16px;
+    font-size: 56px;
+    line-height: 0.95;
+  }
+
+  .rental-hero-photo {
+    flex: 1.15;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .rental-hero-photo img {
+    height: 100%;
+    min-height: 0;
+    object-fit: cover;
+  }
+
+  .rental-match {
+    flex-direction: row;
+    align-items: stretch;
+    width: min(1380px, calc(100% - 32px));
+    height: 320px;
+    min-height: 0;
+    margin: 24px auto 0;
+  }
+
+  .rental-match-copy {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 40px 48px;
+  }
+
+  .rental-match p { margin: 0; }
+
+  .rental-match img {
+    flex: 1;
+    width: 50%;
+    height: 320px;
+    min-height: 0;
+    object-fit: cover;
+  }
+
+  .rental-shop .quiz-entry { margin-top: 24px; }
+
+  .rental-lineup {
+    width: min(1380px, calc(100% - 32px));
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .rental-lineup h2,
+  .rental-lineup-lede { padding-left: 0; padding-right: 0; }
 }
 
 @media (prefers-reduced-motion: reduce) {
