@@ -1,0 +1,258 @@
+/* Results hero: copy on the left, fit profile card on the right.
+   The peach-to-blue wash stays; this file only rearranges the hero. */
+
+.results-layout .results-hero-copy {
+  align-items: flex-start;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-left: 0;
+  min-width: 0;
+  width: 100%;
+}
+
+.results-layout .results-hero-copy .results-lede {
+  font-size: 18px;
+  line-height: 26px;
+  max-width: 42em;
+}
+
+.results-layout .results-hero-subhead {
+  color: #001e56;
+  font-family: var(--font-family-roboto);
+  font-size: 22px;
+  font-weight: 500;
+  letter-spacing: 0;
+  line-height: 28px;
+  margin: 8px 0 0;
+  text-transform: none;
+}
+
+.results-layout .results-hero-support {
+  color: #3a3a3a;
+  font-family: var(--font-family-roboto);
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 24px;
+  margin: 0;
+  max-width: 46em;
+}
+
+.results-layout .results-hero-copy .fit-profile-benefits {
+  margin: 4px 0 8px;
+}
+
+.results-layout .results-hero-copy .fit-profile-actions {
+  margin: 0;
+  width: 100%;
+}
+
+.results-layout .results-hero-copy .fit-profile-actions .button,
+.results-layout .results-hero-copy .fit-profile-actions .button.secondary {
+  align-items: center;
+  display: inline-flex;
+  flex: 1 1 160px;
+  justify-content: center;
+  max-width: 220px;
+  min-width: 0;
+  text-align: center;
+  text-decoration: none;
+  width: auto;
+}
+
+.results-layout .results-hero-ring {
+  justify-self: start;
+}
+
+.results-layout .results-hero-ring .match-ring {
+  align-self: flex-start;
+  margin: 0;
+}
+
+.results-layout .hero-fit-card {
+  align-self: start;
+  margin: 0;
+  max-width: none;
+  width: 100%;
+}
+
+.results-layout .hero-fit-card .fit-group-head {
+  align-items: flex-start;
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+}
+
+.results-layout .hero-fit-card .fit-group-main {
+  min-width: 0;
+}
+
+.results-layout .hero-fit-card .fit-group-head .fit-group-label {
+  margin-bottom: 4px;
+}
+
+.results-layout .hero-fit-card .fit-line-label {
+  color: #232323;
+  font-weight: 700;
+}
+
+.results-layout .hero-fit-card .fit-group-line + .fit-group-line {
+  margin-top: 2px;
+}
+
+.results-layout .hero-fit-card .fit-group-edit {
+  background: transparent;
+  border: 0;
+  color: #3a3a3a;
+  cursor: pointer;
+  flex: 0 0 auto;
+  line-height: 0;
+  padding: 2px;
+}
+
+.results-layout .hero-fit-card .fit-group-edit svg {
+  display: block;
+  height: 18px;
+  width: 18px;
+}
+
+.results-layout .hero-fit-card .fit-group-edit:hover {
+  color: #001e56;
+}
+
+@media (min-width: 768px) {
+  .results-layout .results-hero {
+    align-items: start;
+    column-gap: 40px;
+    grid-template-columns: minmax(0, 1fr) minmax(240px, 380px);
+    row-gap: 16px;
+  }
+
+  .results-layout .results-hero-intro {
+    display: contents;
+  }
+
+  .results-layout .results-expert {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .results-layout .results-hero-actions {
+    grid-column: 2;
+    grid-row: 1;
+    justify-self: end;
+  }
+
+  .results-layout .results-hero-ring {
+    grid-column: 1;
+    grid-row: 2;
+  }
+
+  .results-layout .results-hero-copy {
+    grid-column: 1;
+    grid-row: 3;
+  }
+
+  .results-layout .hero-fit-card {
+    grid-column: 2;
+    grid-row: 2 / 4;
+  }
+
+  .results-layout .results-hero::before {
+    bottom: calc(-1 * var(--results-hero-overhang));
+    grid-column: 1 / -1;
+    grid-row: 1 / -1;
+  }
+}
+
+@media (max-width: 767px) {
+  .results-layout .results-hero {
+    --results-hero-overhang: 144px;
+    align-items: stretch;
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    padding: 0 16px;
+  }
+
+  .results-layout .results-hero::before {
+    content: none;
+  }
+
+  .results-layout .results-hero-intro {
+    align-items: flex-start;
+    background-color: #fff;
+    background-image:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.35), rgba(255, 255, 255, 0.2)),
+      linear-gradient(100deg, #f4e8e2 0%, #f7f3ee 46%, #e4f0fc 100%);
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    margin-left: -16px;
+    margin-right: -16px;
+    padding: 24px 16px calc(24px + var(--results-hero-overhang));
+    width: calc(100% + 32px);
+  }
+
+  .results-layout .results-expert {
+    order: 1;
+  }
+
+  .results-layout .results-hero-ring {
+    order: 2;
+    align-self: flex-start;
+  }
+
+  .results-layout .results-hero-copy {
+    order: 3;
+  }
+
+  .results-layout .results-hero-actions {
+    align-self: flex-start;
+    justify-content: flex-start;
+    order: 4;
+  }
+
+  .results-layout .results-hero-ring .match-ring,
+  .results-layout .results-hero-ring .match-ring-art {
+    height: 120px;
+    width: 120px;
+  }
+
+  .results-layout .results-hero-ring .match-ring {
+    background: #fff;
+    border-radius: 50%;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1), 0 0 2px rgba(0, 0, 0, 0.1);
+  }
+
+  .results-layout .results-main .results-hero h1 {
+    font-size: 30px;
+    line-height: 1.4;
+  }
+
+  .results-layout .results-hero-copy .results-lede,
+  .results-layout .results-hero-support {
+    font-size: 16px;
+    line-height: 24px;
+  }
+
+  .results-layout .results-hero-subhead {
+    font-size: 20px;
+    line-height: 26px;
+  }
+
+  .results-layout .hero-fit-card {
+    margin-top: calc(-1 * var(--results-hero-overhang));
+    position: relative;
+    width: 100%;
+    z-index: 1;
+  }
+
+  .results-layout .results-hero-copy .fit-profile-actions .button,
+  .results-layout .results-hero-copy .fit-profile-actions .button.secondary {
+    flex-basis: 100%;
+    max-width: none;
+    width: 100%;
+  }
+}

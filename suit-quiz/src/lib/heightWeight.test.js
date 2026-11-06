@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { getQuestionFlow, questions } from "../data/quizConfig.js";
-import { fitProfileRows } from "../components/Results.jsx";
+import { fitProfileRows, heroProfileGroups } from "../components/Results.jsx";
 import { answerFromDisplay, displayValues, weightLabel } from "./heightWeight.js";
 import { inferLength } from "./recommendation.js";
 
@@ -60,5 +60,38 @@ describe("height and weight in the quiz", () => {
     expect(rows[0]).toEqual({ label: "Personal info", value: `5'10" · 180 lb` });
     const heightOnly = fitProfileRows({ answers: { height: 70 }, renting: false, size: null, fitName: null });
     expect(heightOnly[0].value).toBe(`5'10"`);
+  });
+
+  it("builds the hero profile from saved answers and leaves out age and unsaved categories", () => {
+    const groups = heroProfileGroups({
+      answers: {
+        height: 50,
+        weight: 180,
+        feel: "roomy",
+        occasion: "funeral",
+        budget: "400-600",
+        tailoring: "consider",
+        colors: { prefer: ["earthTones"] },
+        measurements: { jacket: "40R", waist: "50" },
+      },
+      renting: false,
+      size: { jacket: "40R", pants: "50W", length: "Regular", lengthCode: "R" },
+      fitName: "classic fit",
+    });
+    const personal = groups.find((group) => group.id === "personal");
+    expect(personal.lines[0].value).toBe(`4'2" · 180 lb · Waist 50"`);
+    expect(personal.lines[0].value).not.toMatch(/Age/);
+    const measured = groups.find((group) => group.id === "size-fit");
+    expect(measured.lines).toEqual([
+      { label: "Size", value: "40" },
+      { label: "Fit Preference", value: "Classic Fit" },
+      { label: "Length", value: "Regular" },
+    ]);
+    expect(groups.some((group) => group.id === "categories")).toBe(false);
+    expect(groups.find((group) => group.label === "Occasion")?.lines[0].value).toBe("Funeral");
+    expect(groups.find((group) => group.label === "Colors")?.lines[0].value).toBe("Earth tones");
+    expect(groups.find((group) => group.label === "Budget")?.lines[0].value).toBe("$400–$600");
+    expect(groups.find((group) => group.label === "Tailoring")?.lines[0].value).toBe("Yes, suggest tailoring");
+    expect(groups.some((group) => /shirt|outerwear|casual/i.test(`${group.label} ${group.lines.map((line) => line.value).join(" ")}`))).toBe(false);
   });
 });
