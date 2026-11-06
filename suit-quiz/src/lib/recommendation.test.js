@@ -595,7 +595,7 @@ describe("match badges", () => {
   it("names the fit miss on a partial match", async () => {
     const { getRecommendations } = await import("./recommendation.js");
     const partial = getRecommendations(base).find((product) => product.badge.tier === "partial");
-    if (partial) expect(partial.badge.miss).toMatch(/than your|you asked for|isn't saved/);
+    if (partial) expect(partial.badge.miss).toMatch(/Slimmer than|Roomier than|Slim cut|missing/);
   });
 
   it("treats under budget as a price miss", async () => {

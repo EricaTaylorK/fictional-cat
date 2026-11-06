@@ -616,12 +616,12 @@ function sizeCheck(answers) {
   const jacket = estimate.jacket ? String(estimate.jacket).replace(/[SRL]$/i, "") : sizeList(everyday.jacket)[0] ?? null;
   const length = inferLength(answers) ? LENGTH_NAMES[inferLength(answers)] : null;
   const waist = knownWaist(answers) ?? (sizeList(everyday.pants)[0] || null);
-  const missing = !jacket ? "Jacket size isn't saved" : !length ? "Jacket length isn't saved" : !waist ? "Waist size isn't saved" : null;
+  const missing = !jacket ? "Jacket size missing" : !length ? "Length missing" : !waist ? "Waist missing" : null;
   return {
     id: "size",
     label: "Size",
     pass: !missing,
-    line: missing ?? `${jacket} ${length} jacket and ${waist} waist`,
+    line: missing ?? `${jacket} ${length} · ${waist} waist`,
   };
 }
 
@@ -632,14 +632,19 @@ function fitCheck(product, answers) {
   const wanted = titleCase(fitNameLabels[feel] ?? fitNameLabels[target] ?? "your fit");
   if (product.fit !== target) {
     const slimmer = FIT_ORDER.indexOf(product.fit) < FIT_ORDER.indexOf(target);
-    return { id: "fit", label: "Fit", pass: false, line: `${slimmer ? "Slimmer" : "Roomier"} than your ${wanted}` };
+    return { id: "fit", label: "Fit", pass: false, line: `${slimmer ? "Slimmer" : "Roomier"} than ${wanted}` };
   }
   const signals = getFitSignals(answers);
   const tightNote = ["broadShoulders", "fullerMidsection", "seatThighs"].find((signal) => signals.has(signal));
+  const tightNotes = {
+    broadShoulders: "broad shoulders",
+    fullerMidsection: "fuller middle",
+    seatThighs: "seat and thighs",
+  };
   if (tightNote && product.fit === "close" && !product.stretch) {
-    return { id: "fit", label: "Fit", pass: false, line: `Slim cut, and you asked for ${fitNoteLabels[tightNote]}` };
+    return { id: "fit", label: "Fit", pass: false, line: `Slim cut · ${tightNotes[tightNote]}` };
   }
-  const line = CLOSEST_FIT_ONLY[feel] ? `Closest we carry to ${wanted}` : `${wanted}, your fit preference`;
+  const line = CLOSEST_FIT_ONLY[feel] ? `Closest to ${wanted}` : wanted;
   return { id: "fit", label: "Fit", pass: true, line };
 }
 
@@ -648,29 +653,38 @@ function colorCheck(product, answers) {
   if (!prefer.length) return null;
   const avoid = colorsIn(answers.colors?.avoid);
   const picked = matchedColor(product, prefer);
-  if (picked) return { id: "color", label: "Color", pass: true, line: `${picked}, a color you picked` };
+  if (picked) return { id: "color", label: "Color", pass: true, line: `${picked}, your color` };
   if (everyColorAvoided(product, avoid)) {
-    return { id: "color", label: "Color", pass: false, line: `${product.color} is a color you avoid` };
+    return { id: "color", label: "Color", pass: false, line: "A color you avoid" };
   }
-  return { id: "color", label: "Color", pass: false, line: "Not in the colors you picked" };
+  return { id: "color", label: "Color", pass: false, line: "Not your colors" };
 }
 
 function priceCheck(price, budget) {
   if (!budget) return null;
-  if (budget === "flexible") return { id: "price", label: "Price", pass: true, line: "Fits your flexible budget" };
+  if (budget === "flexible") return { id: "price", label: "Price", pass: true, line: "Flexible budget" };
   const [budgetMin, budgetMax] = getBudgetRange(budget);
-  const label = budgetLabels[budget] ?? "budget";
-  if (price > budgetMax) return { id: "price", label: "Price", pass: false, line: `Over your ${label}` };
-  if (price < budgetMin) return { id: "price", label: "Price", pass: false, line: `Under your ${label}` };
-  return { id: "price", label: "Price", pass: true, line: `Inside your ${label}` };
+  const range = {
+    "under-250": "under $250",
+    "250-400": "$250–$400",
+    "400-600": "$400–$600",
+    "over-600": "$600+",
+    "under-150": "under $150",
+    "150-200": "$150–$200",
+    "200-250": "$200–$250",
+    "over-250": "$250+",
+  }[budget] ?? "budget";
+  if (price > budgetMax) return { id: "price", label: "Price", pass: false, line: `Over ${range}` };
+  if (price < budgetMin) return { id: "price", label: "Price", pass: false, line: `Under ${range}` };
+  return { id: "price", label: "Price", pass: true, line: `In your ${range}` };
 }
 
 function occasionCheck(product, answers) {
   const occasion = resolvedOccasion(answers);
   if (!occasion) return null;
-  const name = occasionLabels[answers.occasion] ?? occasionLabels[occasion] ?? "your event";
+  const name = occasionLabels[occasion] ?? occasionLabels[answers.occasion] ?? "your event";
   const pass = (product.formality ?? []).includes(occasion);
-  return { id: "occasion", label: "Occasion", pass, line: pass ? `Right for ${name}` : `Not the usual choice for ${name}` };
+  return { id: "occasion", label: "Occasion", pass, line: pass ? `For ${name}` : `Not for ${name}` };
 }
 
 // Size and fit must match. Color, price, and occasion are nice-to-haves; unanswered ones are left out.

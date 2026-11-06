@@ -61,7 +61,7 @@ describe("look totals", () => {
     expect(totals().canAddToBag).toBe(true);
   });
 
-  it("counts the suit, paid tailoring, and each added piece once", () => {
+  it("counts jacket and pants as two and leaves tailoring out", () => {
     const result = totals({
       tailoringPrice: 55,
       items: [
@@ -71,8 +71,9 @@ describe("look totals", () => {
       ],
     });
     expect(result.itemCount).toBe(4);
-    expect(totals({ tailoringPrice: 0, items: [shirt] }).itemCount).toBe(2);
-    expect(totals({ tailoringPrice: 0, items: [] }).itemCount).toBe(1);
+    expect(totals({ tailoringPrice: 0, items: [shirt] }).itemCount).toBe(3);
+    expect(totals({ tailoringPrice: 0, items: [] }).itemCount).toBe(2);
+    expect(totals({ tailoringPrice: 55, items: [] }).itemCount).toBe(2);
   });
 
   it("never lets the discount exceed the subtotal", () => {

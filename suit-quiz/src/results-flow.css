@@ -211,6 +211,16 @@
   padding: 16px;
 }
 
+.customize-sheet-close {
+  align-items: center;
+  display: inline-flex;
+  flex: 0 0 auto;
+  height: 32px;
+  justify-content: center;
+  text-decoration: none;
+  width: 32px;
+}
+
 .customize-sheet-head .product-brand {
   color: #5c5c5c;
   font: 500 12px/16px var(--font-family-roboto);
@@ -229,13 +239,31 @@
   min-height: 0;
   overflow-y: auto;
   overscroll-behavior: contain;
-  padding: 0 16px 16px;
+  padding: 24px 16px 16px;
 }
 
 .customize-sheet-panel .customize-bar {
   margin-top: 0;
   padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
-  position: static;
+  position: sticky;
+  bottom: 0;
+}
+
+/* Desktop: same sheet, anchored to the right instead of the bottom. */
+@media (min-width: 1025px) {
+  .customize-sheet-panel {
+    border-radius: 0;
+    bottom: 0;
+    box-shadow: -4px 0 16px rgba(0, 0, 0, 0.15);
+    left: auto;
+    max-height: none;
+    top: 0;
+    width: min(560px, 100%);
+  }
+
+  .customize-sheet .pair-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 @media (max-width: 767px) {
@@ -274,13 +302,398 @@
   margin: 0;
 }
 
+.results-layout .results-hero-copy {
+  gap: 12px;
+}
+
+.results-layout .results-main .results-hero h1 {
+  color: #001e56;
+  font-family: var(--font-family-oswald);
+  font-weight: 500;
+  line-height: 1.15;
+  margin: 0;
+  max-width: 12em;
+  text-transform: uppercase;
+}
+
+.results-hero-toolbar {
+  align-items: center;
+  display: flex;
+  gap: 12px;
+  width: 100%;
+}
+
+.results-layout .results-hero-account .fit-profile-actions .button.secondary {
+  background: transparent;
+}
+
+.results-layout .results-hero-account .fit-profile-actions .button.secondary:hover:not(:disabled) {
+  background: transparent;
+}
+
+.results-layout .results-hero-copy .results-lede {
+  color: #232323;
+  max-width: 42em;
+}
+
+.results-hero-account {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.results-hero-subhead {
+  color: #001e56;
+  font-family: var(--font-family-roboto);
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 28px;
+  margin: 0;
+}
+
+.match-why {
+  display: none;
+  margin: 8px 0 0;
+  color: #232323;
+  font-family: var(--font-family-roboto);
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 20px;
+}
+
+.results-layout .suit-card .color-swatches {
+  order: -2;
+}
+
+.results-layout .suit-card-names {
+  order: -1;
+}
+
+.results-layout .suit-card-copy .product-meta,
+.results-layout .suit-card-copy .suit-rating {
+  order: 0;
+}
+
+.results-layout .suit-card-copy .match-checks {
+  order: 1;
+}
+
+@media (max-width: 767px) {
+  .results-hero-account {
+    display: none;
+  }
+}
+
 @media (min-width: 768px) {
+  .results-layout .results-hero-toolbar {
+    grid-column: 1 / -1;
+    grid-row: 1;
+  }
+
+  .results-layout .results-hero-toolbar .results-hero-actions {
+    margin-left: auto;
+  }
+
   .results-layout .results-hero-copy {
+    align-self: start;
+    grid-column: 1;
     grid-row: 2;
   }
 
   .results-layout .hero-fit-card {
-    grid-row: 2 / 4;
+    align-self: start;
+    grid-column: 2;
+    grid-row: 2;
     padding: 16px 20px;
   }
+
+  .results-layout .suit-row {
+    align-items: stretch;
+  }
+
+  .results-layout .suit-card-body {
+    height: auto;
+    justify-content: flex-start;
+  }
+
+  .results-layout .suit-card-info {
+    align-items: stretch;
+    display: flex;
+    flex: 1 1 auto;
+  }
+
+  .results-layout .suit-price-col {
+    align-self: stretch;
+    display: flex;
+    height: auto;
+    justify-content: space-between;
+    min-height: 0;
+  }
+
+  .results-layout .suit-expand-toggle {
+    margin-top: auto;
+    width: 100%;
+  }
+
+  .results-layout .suit-details-link {
+    justify-self: auto;
+    left: auto;
+    margin: 0;
+    position: absolute;
+    right: 12px;
+    top: 12px;
+    width: 113px;
+  }
+}
+
+/* Desktop cards: photo, reasons, and actions in one row that fills the card. */
+@media (min-width: 1025px) {
+  .results-layout .suit-row {
+    align-items: stretch;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .results-layout .suit-card-media {
+    align-self: stretch;
+    aspect-ratio: 3 / 4;
+    height: 100%;
+    max-width: none;
+    min-height: 100%;
+    overflow: hidden;
+    position: relative;
+    width: auto;
+  }
+
+  .results-layout .suit-card-media .product-image,
+  .results-layout .suit-card-media .product-image img {
+    height: 100%;
+    inset: 0;
+    max-width: none;
+    min-width: 0;
+    object-fit: cover;
+    position: absolute;
+    width: 100%;
+  }
+
+  .results-layout .suit-card-names {
+    height: auto;
+  }
+
+  .results-layout .suit-card-body {
+    align-items: stretch;
+    display: grid;
+    flex: 1 1 auto;
+    gap: 8px 20px;
+    grid-template-columns: minmax(0, 1fr) 188px;
+    grid-template-rows: auto auto;
+    height: auto;
+    min-height: min-content;
+  }
+
+  .results-layout .suit-card-topbar {
+    grid-column: 1;
+    grid-row: 1;
+    margin: 0;
+    width: auto;
+  }
+
+  .results-layout .suit-card-info {
+    display: contents;
+  }
+
+  .results-layout .suit-card:not(.is-open) .suit-card-face,
+  .results-layout .suit-card-face {
+    height: auto;
+    overflow: hidden;
+  }
+
+  .results-layout .suit-card:not(.is-open) .suit-card-face > .suit-row,
+  .results-layout .suit-row {
+    height: auto;
+    min-height: 0;
+  }
+
+  .results-layout .suit-card-copy {
+    align-self: start;
+    grid-column: 1;
+    grid-row: 2;
+    min-width: 0;
+    width: 100%;
+  }
+
+  .results-layout .suit-card-names {
+    order: 0;
+  }
+
+  .results-layout .suit-card .color-swatches {
+    height: auto;
+    order: 1;
+    width: auto;
+  }
+
+  .results-layout .suit-card-copy .suit-rating {
+    order: 2;
+  }
+
+  .results-layout .match-why {
+    display: block;
+    order: 3;
+  }
+
+  .results-layout .suit-card-copy .match-checks {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 4px;
+    max-width: 100%;
+    order: 4;
+    width: 100%;
+  }
+
+  .results-layout .suit-card .match-checks li {
+    align-items: center;
+    background: #fff;
+    border: 1px solid rgba(0, 0, 0, 0.28);
+    border-radius: 999px;
+    box-sizing: border-box;
+    flex: 0 0 auto;
+    height: 32px;
+    padding: 0 12px;
+    white-space: nowrap;
+  }
+
+  .results-layout .suit-card .match-checks li.is-miss {
+    background: #f6f6f6;
+    border-color: rgba(0, 0, 0, 0.12);
+    color: #8a8a8a;
+  }
+
+  .results-layout .suit-card .match-check-mark {
+    display: none;
+  }
+
+  .results-layout .suit-details-link {
+    align-self: start;
+    grid-column: 2;
+    grid-row: 1;
+    justify-self: end;
+    margin: 0;
+    position: static;
+    right: auto;
+    top: auto;
+    width: auto;
+  }
+
+  .results-layout .suit-price-col {
+    align-items: flex-end;
+    align-self: stretch;
+    display: flex;
+    flex-direction: column;
+    grid-column: 2;
+    grid-row: 2;
+    height: auto;
+    justify-content: space-between;
+    margin-left: 0;
+    min-height: 0;
+    width: 100%;
+  }
+
+  .results-layout .suit-expand-toggle {
+    margin-top: auto;
+    width: 100%;
+  }
+}
+
+/* Committed look: a total and bag button, stuck in view while the list scrolls. */
+@media (min-width: 768px) {
+  .your-look-dock {
+    gap: 12px;
+    padding: 20px;
+  }
+}
+
+.your-look-dock .your-look-total {
+  border-top: 0;
+  margin: 0;
+  padding-top: 0;
+}
+
+.your-look-dock .your-look-account {
+  align-self: center;
+  margin-top: 0;
+  text-align: center;
+}
+
+@media (min-width: 768px) {
+  .results-layout .results-hero-account .fit-profile-actions {
+    align-items: stretch;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    gap: 12px;
+    width: auto;
+  }
+
+  .results-layout .results-hero-account .fit-profile-actions .button,
+  .results-layout .results-hero-account .fit-profile-actions .button.secondary {
+    flex: 0 0 auto;
+    height: 48px;
+    max-width: none;
+    white-space: nowrap;
+    width: auto;
+  }
+}
+
+/* Committed buy look, or a chosen rental: one bar fixed to the bottom of the viewport. */
+.results-layout .results-dock {
+  align-self: auto;
+  background: #fff;
+  border: 0;
+  border-radius: 0;
+  border-top: 1px solid rgba(0, 0, 0, 0.12);
+  bottom: 0;
+  box-shadow: 0 -4px 16px rgba(0, 30, 86, 0.08);
+  flex: none;
+  left: 0;
+  max-width: none;
+  position: fixed;
+  right: 0;
+  top: auto;
+  width: 100%;
+  z-index: 40;
+}
+
+.results-layout .results-dock .your-look-dock {
+  align-items: center;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 12px 24px;
+  justify-content: space-between;
+  padding: 12px 24px calc(12px + env(safe-area-inset-bottom, 0px));
+}
+
+.results-layout .results-dock .your-look-total {
+  border-top: 0;
+  flex: 0 1 auto;
+  justify-content: flex-start;
+  margin: 0;
+  padding-top: 0;
+  width: auto;
+}
+
+.results-layout .results-dock .your-look-status {
+  flex: 1 0 100%;
+  margin: 0;
+}
+
+.results-layout .results-dock .your-look-cta {
+  flex: 0 0 auto;
+  min-width: 200px;
+  padding: 0 24px;
+  width: auto;
+}
+
+.results-layout:has(.results-dock) {
+  padding-bottom: calc(88px + env(safe-area-inset-bottom, 0px));
 }

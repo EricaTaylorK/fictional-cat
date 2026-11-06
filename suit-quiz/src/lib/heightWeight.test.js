@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { getQuestionFlow, questions } from "../data/quizConfig.js";
-import { fitProfileRows, heroHeadline, heroProfileGroups } from "../components/Results.jsx";
+import { fitProfileRows, heroCopy, heroProfileGroups } from "../components/Results.jsx";
 import { answerFromDisplay, displayValues, weightLabel } from "./heightWeight.js";
 import { inferLength } from "./recommendation.js";
 
@@ -86,14 +86,92 @@ describe("height and weight in the quiz", () => {
       { label: "Jacket", value: "40 Regular" },
       { label: "Fit Preference", value: "Classic Fit" },
     ]);
-    expect(heroHeadline(12)).toBe("We found 12 Best Matches for you");
-    expect(heroHeadline(1)).toBe("We found 1 Best Match for you");
-    expect(heroHeadline(0)).toBe("We found matches for you");
     expect(groups.some((group) => group.id === "categories")).toBe(false);
     expect(groups.find((group) => group.label === "Occasion")?.lines[0].value).toBe("Funeral");
     expect(groups.find((group) => group.label === "Colors")?.lines[0].value).toBe("Earth tones");
     expect(groups.find((group) => group.label === "Budget")?.lines[0].value).toBe("$400–$600");
     expect(groups.find((group) => group.label === "Tailoring")?.lines[0].value).toBe("Yes, suggest tailoring");
     expect(groups.some((group) => /shirt|outerwear|casual/i.test(`${group.label} ${group.lines.map((line) => line.value).join(" ")}`))).toBe(false);
+  });
+
+  it("writes a headline and subhead for each results case", () => {
+    const fit = "Classic Fit";
+    const size = "40 Regular";
+    const card = (tier, extra = {}) => ({
+      badge: {
+        tier,
+        miss: extra.miss ?? null,
+        checks: extra.checks ?? [{ id: "price", pass: extra.price !== false }],
+      },
+    });
+
+    expect(heroCopy({
+      products: [card("best"), card("good"), card("good")],
+      fit,
+      size,
+      occasion: "work",
+      occasionKey: "business",
+    })).toEqual({
+      headline: "The right fit for the right day.",
+      subhead: "Your best match is a Classic Fit in 40 Regular, right for work, and inside your budget. 2 more good options are below.",
+    });
+
+    expect(heroCopy({
+      products: [card("best", { price: false })],
+      fit,
+      size,
+      occasion: "a wedding",
+      occasionKey: "wedding",
+    })).toEqual({
+      headline: "Your best match is here.",
+      subhead: "Your best match is a Classic Fit in 40 Regular, right for a wedding.",
+    });
+
+    expect(heroCopy({
+      products: [card("best", { price: false })],
+      fit,
+      size,
+      occasion: "a funeral or memorial",
+      occasionKey: "funeral",
+    }).headline).toBe("The right fit for the right day.");
+
+    expect(heroCopy({
+      products: [card("best"), card("best")],
+      fit,
+      size,
+      occasion: "work",
+      occasionKey: "business",
+    })).toEqual({
+      headline: "2 suits made for your fit.",
+      subhead: "Both are Classic Fit in 40 Regular and right for work. Compare them below.",
+    });
+
+    expect(heroCopy({
+      products: [card("best"), card("best"), card("best")],
+      renting: true,
+      fit,
+      size,
+      occasion: "work",
+    }).headline).toBe("3 looks made for your fit.");
+
+    expect(heroCopy({
+      products: [card("good")],
+      fit,
+      size,
+      occasion: "work",
+    })).toEqual({
+      headline: "These come closest to your fit.",
+      subhead: "No suit matches every answer, so we show how each lines up and where tailoring can close the gap.",
+    });
+
+    expect(heroCopy({
+      products: [card("partial", { checks: [], miss: "Slimmer than your Classic Fit" })],
+      fit,
+      size,
+      occasion: "work",
+    })).toEqual({
+      headline: "Let's get you closer.",
+      subhead: "We didn't find a full match for slimmer than your classic fit. Edit your answers or see how tailoring helps.",
+    });
   });
 });

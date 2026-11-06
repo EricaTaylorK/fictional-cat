@@ -41,7 +41,7 @@ export function lookTotals({
   else if (missingLabels.length === 1 && missingLabels[0] === "tie") nudge = "Add a tie to save $100";
 
   return {
-    itemCount: 1 + (tailoringCents > 0 ? 1 : 0) + added.length,
+    itemCount: 2 + added.length,
     subtotal: dollars(subtotalCents),
     discount: dollars(discountCents),
     total: dollars(subtotalCents - discountCents),
