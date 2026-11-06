@@ -6544,6 +6544,8 @@ button.store-logo {
 }
 
 .card-plus svg {
+  display: block;
+  flex: 0 0 auto;
   height: 14px;
   width: 14px;
 }
@@ -6555,7 +6557,8 @@ button.store-logo {
 }
 
 .tailor-icon,
-.tailor-copy {
+.tailor-copy,
+.tailor-title {
   display: contents;
 }
 
@@ -6576,6 +6579,10 @@ button.store-logo {
   margin: 0;
 }
 
+.tailor-card h4 {
+  order: 1;
+}
+
 .tailor-card p,
 .pair-brand {
   color: #232323;
@@ -6590,6 +6597,7 @@ button.store-logo {
 .tailor-card p {
   flex: 0 0 auto;
   margin-top: -4px;
+  order: 2;
 }
 
 .tailor-card strong,
@@ -6601,6 +6609,10 @@ button.store-logo {
   letter-spacing: 0;
   line-height: 20px;
   margin: 0;
+}
+
+.tailor-card strong {
+  order: 3;
 }
 
 .expand-divider {
@@ -7305,9 +7317,8 @@ button.store-logo {
   }
 
   .tailor-card .tailor-badge {
+    align-self: flex-start;
     border-radius: 4px;
-    grid-area: badge;
-    justify-self: start;
     left: auto;
     padding: 2px 8px;
     position: static;
@@ -7316,44 +7327,52 @@ button.store-logo {
   }
 
   .tailor-card .tailor-copy {
-    align-items: baseline;
-    column-gap: 0;
-    display: grid;
+    align-items: stretch;
+    display: flex;
     flex: 1 1 auto;
-    grid-template-areas:
-      "title price"
-      "body body";
-    grid-template-columns: auto auto;
-    justify-content: start;
+    flex-direction: column;
+    gap: 2px;
+    justify-content: center;
     min-width: 0;
-    row-gap: 2px;
   }
 
-  .tailor-card.is-recommended .tailor-copy {
-    grid-template-areas:
-      "badge badge"
-      "title price"
-      "body body";
+  .tailor-card .tailor-title {
+    align-items: baseline;
+    column-gap: 8px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    max-width: 100%;
+    min-width: 0;
+    row-gap: 0;
   }
 
-  .tailor-card .tailor-copy h4 {
-    grid-area: title;
+  .tailor-card .tailor-copy h4,
+  .tailor-card .tailor-copy strong,
+  .tailor-card .tailor-copy p {
+    order: 0;
   }
 
-  .tailor-card .tailor-copy strong {
-    grid-area: price;
-    justify-self: start;
+  .tailor-card .tailor-title h4 {
+    flex: 0 0 auto;
+    max-width: 100%;
+    min-width: 0;
+  }
+
+  .tailor-card .tailor-title strong {
+    flex: 0 0 auto;
+    max-width: 100%;
     white-space: nowrap;
   }
 
   .tailor-card .tailor-copy strong::before {
-    content: " – ";
+    content: "– ";
     font-weight: 500;
   }
 
   .tailor-card .tailor-copy p {
-    grid-area: body;
     margin-top: 0;
+    min-width: 0;
   }
 }
 
@@ -8458,6 +8477,7 @@ button.store-logo {
     box-shadow: 0 2px 4px var(--color-transparent-black10), 0 0 2px var(--color-transparent-black10);
     flex-direction: row;
     min-height: 120px;
+    padding-right: 12px;
   }
 
   .pair-photo {
@@ -8472,7 +8492,7 @@ button.store-logo {
     flex: 1 1 auto;
     gap: 6px;
     justify-content: center;
-    padding: 16px;
+    padding: 16px 12px 16px 16px;
   }
 
   .pair-name {
@@ -8492,10 +8512,13 @@ button.store-logo {
     line-height: 22px;
   }
 
-  .card-plus.tailor-add,
-  .card-plus.pair-add,
+  .tailor-card .card-plus.tailor-add,
+  .pair-card .card-plus.pair-add,
   .pair-card .pair-add.is-on {
+    align-self: center;
+    flex: 0 0 32px;
     height: 32px;
+    position: static;
     width: 32px;
   }
 }

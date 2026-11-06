@@ -489,9 +489,11 @@ function SuitOptions({ tailoringId, onTailoring, look, addedLooks, onOpenLook, o
               </span>
               <div className="tailor-copy">
                 {option.recommended && showSuggestion && <span className="tailor-badge">Recommended</span>}
-                <h4>{option.name}</h4>
+                <div className="tailor-title">
+                  <h4>{option.name}</h4>
+                  <strong>{formatPrice(option.price)}</strong>
+                </div>
                 <p>{option.body}</p>
-                <strong>{formatPrice(option.price)}</strong>
               </div>
               <button
                 className={`card-plus tailor-add${selected ? " is-on" : ""}`}
@@ -542,27 +544,6 @@ function SuitOptions({ tailoringId, onTailoring, look, addedLooks, onOpenLook, o
                 >
                   <div className="pair-photo">
                     <img src={item.image} alt="" />
-                    <button
-                      className={`card-plus pair-add${added ? " is-on" : ""}`}
-                      type="button"
-                      aria-pressed={added}
-                      aria-label={added ? `Remove ${title}` : `Add ${title}`}
-                      onClick={(event) => {
-                        event.stopPropagation();
-                        if (added) onRemoveLook(item.id);
-                        else onOpenLook(item, event);
-                      }}
-                    >
-                      {added ? (
-                        <svg viewBox="0 0 14 14" aria-hidden="true">
-                          <path fill="currentColor" d="M5.2 10.4 2.1 7.3 1 8.4l4.2 4.2L13 4.8 11.9 3.7 5.2 10.4Z" />
-                        </svg>
-                      ) : (
-                        <svg viewBox="0 0 14 14" aria-hidden="true">
-                          <path fill="currentColor" d="M6 1h2v5h5v2H8v5H6V8H1V6h5V1Z" />
-                        </svg>
-                      )}
-                    </button>
                   </div>
                   <div className="pair-copy">
                     <span className="pair-brand">{lookPieceBrand(item)}</span>
@@ -593,6 +574,27 @@ function SuitOptions({ tailoringId, onTailoring, look, addedLooks, onOpenLook, o
                       </p>
                     )}
                   </div>
+                  <button
+                    className={`card-plus pair-add${added ? " is-on" : ""}`}
+                    type="button"
+                    aria-pressed={added}
+                    aria-label={added ? `Remove ${title}` : `Add ${title}`}
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      if (added) onRemoveLook(item.id);
+                      else onOpenLook(item, event);
+                    }}
+                  >
+                    {added ? (
+                      <svg viewBox="0 0 14 14" aria-hidden="true">
+                        <path fill="currentColor" d="M5.2 10.4 2.1 7.3 1 8.4l4.2 4.2L13 4.8 11.9 3.7 5.2 10.4Z" />
+                      </svg>
+                    ) : (
+                      <svg viewBox="0 0 14 14" aria-hidden="true">
+                        <path fill="currentColor" d="M6 1h2v5h5v2H8v5H6V8H1V6h5V1Z" />
+                      </svg>
+                    )}
+                  </button>
                 </article>
               );
             })}
