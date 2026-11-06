@@ -7748,8 +7748,8 @@ button.store-logo {
 
 .your-look-total {
   align-items: baseline;
+  border-radius: 0;
   border-top: 1px solid #232323;
-  border-radius: 4px;
   padding-top: 8px;
 }
 
