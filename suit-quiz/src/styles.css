@@ -7338,7 +7338,7 @@ button.store-logo {
 
   .tailor-card .tailor-title {
     align-items: baseline;
-    column-gap: 8px;
+    column-gap: 0;
     display: flex;
     flex-wrap: wrap;
     justify-content: flex-start;
@@ -7366,8 +7366,9 @@ button.store-logo {
   }
 
   .tailor-card .tailor-copy strong::before {
-    content: "– ";
+    content: " – ";
     font-weight: 500;
+    white-space: pre;
   }
 
   .tailor-card .tailor-copy p {
