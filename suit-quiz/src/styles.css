@@ -7943,20 +7943,33 @@ button.store-logo {
 /* Phone results summary. Desktop keeps the side-by-side hero. */
 @media (max-width: 640px) {
   .results-layout .results-hero {
+    --results-hero-overhang: 144px;
     align-items: stretch;
+    background: #fff;
     display: flex;
     flex-direction: column;
-    gap: 24px;
-    padding: 24px 16px 0;
+    gap: 0;
+    isolation: isolate;
+    padding: 0 16px;
+    position: relative;
     text-align: left;
   }
 
+  /* Full-bleed quiz wash. Bottom padding is the 24px link-to-card gap plus
+     the overhang, and the facts card pulls up over that overhang. */
   .results-layout .results-hero-intro {
     align-items: flex-start;
+    background-color: #fff;
+    background-image:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.35), rgba(255, 255, 255, 0.2)),
+      linear-gradient(100deg, #f4e8e2 0%, #f7f3ee 46%, #e4f0fc 100%);
     display: flex;
     flex-direction: column;
-    gap: 16px;
-    width: 100%;
+    gap: 24px;
+    margin-left: -16px;
+    margin-right: -16px;
+    padding: 24px 16px calc(24px + var(--results-hero-overhang));
+    width: calc(100% + 32px);
   }
 
   .results-layout .results-expert {
@@ -7984,7 +7997,7 @@ button.store-logo {
     align-items: flex-start;
     align-self: stretch;
     flex-direction: column;
-    gap: 16px;
+    gap: 24px;
     width: 100%;
   }
 
@@ -8077,8 +8090,11 @@ button.store-logo {
     flex-direction: column;
     flex-wrap: nowrap;
     gap: 12px;
+    margin-top: calc(-1 * var(--results-hero-overhang));
     padding: 32px 24px;
+    position: relative;
     width: 100%;
+    z-index: 1;
   }
 
   .results-layout .hero-fact {
@@ -8325,17 +8341,8 @@ button.store-logo {
   }
 }
 
-/* Phone results column: airier size card, smaller matches title, full-width pair cards, one inset. */
+/* Phone results column: smaller matches title, full-width pair cards, one inset. */
 @media (max-width: 640px) {
-  .results-layout .hero-facts {
-    gap: 16px;
-    padding: 40px 32px;
-  }
-
-  .results-layout .hero-fact::before {
-    top: -8.5px;
-  }
-
   .results-layout .results-list-title {
     font-size: 20px;
     line-height: 28px;
