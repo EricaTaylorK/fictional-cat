@@ -209,7 +209,7 @@ function todayIso() {
   return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
 }
 
-function DateQuestion({ value, onChange, onUnsure }) {
+function DateQuestion({ value, onChange }) {
   const dates = rentalDates(value);
   const today = new Date();
   const earliest = new Date(today.getFullYear(), today.getMonth(), today.getDate() + RENTAL_MIN_LEAD_DAYS);
@@ -222,9 +222,6 @@ function DateQuestion({ value, onChange, onUnsure }) {
         </span>
         <input type="date" min={todayIso()} value={value ?? ""} onChange={(event) => onChange(event.target.value)} />
       </label>
-      <button className="button secondary date-unsure" type="button" onClick={onUnsure}>
-        Not sure of the date yet?
-      </button>
       {dates?.past && <p className="date-warning" role="status">That date has passed. Pick an upcoming date.</p>}
       {dates && !dates.past && (
         <ol className="date-timeline" aria-label="Your timing">
@@ -670,7 +667,7 @@ export default function App() {
           }))}
         />
       ) : currentQuestion.type === "date" ? (
-        <DateQuestion value={answers.eventDate} onChange={setAnswer} onUnsure={continueQuiz} />
+        <DateQuestion value={answers.eventDate} onChange={setAnswer} />
       ) : currentQuestion.type === "pieces" ? (
         <PiecesQuestion value={answers.pieces} onChange={setAnswer} />
       ) : currentQuestion.type === "measurements" ? (

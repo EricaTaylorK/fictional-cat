@@ -55,6 +55,8 @@ export const questions = {
     title: "When is the event?",
     help: "Your look is ready 3 days before the event and due back the day after.",
     type: "date",
+    skippable: true,
+    skipLabel: "Not sure of the date yet?",
   },
   pieces: {
     id: "pieces",
