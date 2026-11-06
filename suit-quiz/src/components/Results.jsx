@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import SiteFooter from "../../../src/components/SiteFooter.jsx";
+import { MatchBadge, MatchChecks } from "./MatchBadge.jsx";
 import {
   lookForColor,
   SWATCH_HEX,
@@ -119,6 +120,9 @@ const HERO_FIT_NAMES = {
   balanced: "Modern Fit",
   roomy: "Classic Fit",
   executive: "Executive Fit",
+  slim: "Slim Fit",
+  modern: "Modern Fit",
+  classic: "Classic Fit",
 };
 
 function savedAge(answers) {
@@ -428,10 +432,6 @@ function Stars({ value }) {
   );
 }
 
-function matchTone(percent) {
-  return percent >= 90 ? "best" : "mid";
-}
-
 function ShareIcon() {
   return (
     <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true">
@@ -472,13 +472,6 @@ const CARD_TAILORING = [
     recommended: true,
     body: "Everything in Essentials, plus we shape the jacket and waist so you look sharper.",
     icon: "jacket",
-  },
-  {
-    id: "signature-shield",
-    name: "Signature Fit",
-    price: 100,
-    body: "Everything in Essentials, plus we shape the jacket and waist so you look sharper.",
-    icon: "shield",
   },
 ];
 
@@ -556,7 +549,7 @@ function lookPieceTitle(item) {
 
 function SuitOptions({ tailoringId, onTailoring, look, addedLooks, onOpenLook, onRemoveLook, showSuggestion = true }) {
   const items = look?.items ?? [];
-  return (
+  const tailoringBlock = (
     <>
       <div className="expand-head">
         <h3>Add Tailoring</h3>
@@ -565,8 +558,13 @@ function SuitOptions({ tailoringId, onTailoring, look, addedLooks, onOpenLook, o
       <div className="tailor-row">
         {CARD_TAILORING.map((option) => {
           const selected = tailoringId === option.id;
+          const classes = [
+            "tailor-card",
+            option.recommended && showSuggestion ? "is-recommended" : "",
+            selected ? "is-selected" : "",
+          ].filter(Boolean).join(" ");
           return (
-            <article className={`tailor-card${option.recommended && showSuggestion ? " is-recommended" : ""}`} key={option.id}>
+            <article className={classes} key={option.id}>
               {option.recommended && showSuggestion && <span className="tailor-badge">Recommended</span>}
               <span className="tailor-icon">
                 <TailorGlyph name={option.icon} />
@@ -599,12 +597,13 @@ function SuitOptions({ tailoringId, onTailoring, look, addedLooks, onOpenLook, o
           );
         })}
       </div>
-      {items.length > 0 && (
+    </>
+  );
+  const lookBlock = items.length > 0 ? (
         <>
-          <div className="expand-divider" />
           <div className="pair-head">
             <h3>Your look, pulled together</h3>
-            <p>We chose these pieces to complement this suit, based on your quiz answers.</p>
+            <p>{look.fromOccasion ? look.occasionNote : "Pieces that work with this suit."}</p>
           </div>
           <div className="pair-row">
             {items.map((item) => {
@@ -683,74 +682,14 @@ function SuitOptions({ tailoringId, onTailoring, look, addedLooks, onOpenLook, o
             })}
           </div>
         </>
-      )}
-    </>
-  );
-}
-
-function MatchRing({ percent }) {
-  const scored = Number.isFinite(percent);
-  const turn = scored ? Math.max(0, Math.min(100, percent)) : 0;
-  // Centerline of the Figma 178 donut: outer radius ~84.7, inner ~60, stroke ~24.7.
-  const cx = 89.21;
-  const cy = 87.21;
-  const radius = 72.32;
-  const stroke = 24.71;
-  const circumference = 2 * Math.PI * radius;
-  const capPortion = stroke / circumference;
-  const visual = turn / 100;
-  const dashPortion = visual >= 1 ? 1 : Math.max(0, visual - capPortion);
-  const dash = dashPortion >= 1 ? circumference + 1 : dashPortion * circumference;
+  ) : null;
+  const [first, second] = showSuggestion ? [tailoringBlock, lookBlock] : [lookBlock, tailoringBlock];
   return (
-    <div className="match-ring" aria-hidden="true">
-      <svg className="match-ring-art" viewBox="0 0 178 178" width="178" height="178">
-        <defs>
-          <filter id="match-ring-shadow" x="-12" y="-12" width="202" height="206" filterUnits="userSpaceOnUse" colorInterpolationFilters="sRGB">
-            <feFlood floodOpacity="0" result="BackgroundImageFix" />
-            <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha" />
-            <feOffset />
-            <feGaussianBlur stdDeviation="1" />
-            <feComposite in2="hardAlpha" operator="out" />
-            <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.1 0" />
-            <feBlend in2="BackgroundImageFix" mode="normal" result="effect1" />
-            <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha" />
-            <feOffset dy="2" />
-            <feGaussianBlur stdDeviation="2" />
-            <feComposite in2="hardAlpha" operator="out" />
-            <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.1 0" />
-            <feBlend in2="effect1" mode="normal" result="effect2" />
-            <feBlend in="SourceGraphic" in2="effect2" mode="normal" />
-          </filter>
-        </defs>
-        <g className="match-ring-track" opacity="0.8">
-          <circle cx={cx} cy={cy} r={radius} fill="none" stroke="#D9D9D9" strokeWidth={stroke} />
-        </g>
-        {turn > 0 && (
-          <circle
-            cx={cx}
-            cy={cy}
-            r={radius}
-            fill="none"
-            stroke="#046DE9"
-            strokeWidth={stroke}
-            strokeLinecap="round"
-            strokeDasharray={`${dash} ${circumference}`}
-            transform={`rotate(-90 ${cx} ${cy})`}
-            filter="url(#match-ring-shadow)"
-          />
-        )}
-      </svg>
-      <div className="match-ring-copy">
-        {scored ? (
-          <>
-            <span className="match-ring-value">{percent}%</span>
-            <span className="match-ring-label">Match</span>
-          </>
-        ) : (
-          <span className="match-ring-label">Great match</span>
-        )}
-      </div>
-    </div>
+    <>
+      {first}
+      {first && second && <div className="expand-divider" />}
+      {second}
+    </>
   );
 }
 
@@ -1354,16 +1293,17 @@ function CompleteLook({ id, look, suitColor, suitName, addedLooks, onOpen, onRem
   );
 }
 
-const HERO_FIT_BENEFITS = [
-  "Suits that fit without extra tailoring",
-  "Shirts with the right sleeve and neck",
-  "Pants that fit your waist and leg",
-  "Outerwear cut for your proportions",
-];
+export function heroHeadline(bestCount) {
+  if (bestCount > 0) return `We found ${bestCount} Best ${bestCount === 1 ? "Match" : "Matches"} for you`;
+  return "We found matches for you";
+}
 
-export function heroHeadline(percent) {
-  if (Number.isFinite(percent) && percent < 50) return "Let's finish your fit.";
-  return "You've found your fit!";
+export function profileChipText(groups, colors) {
+  const lines = groups.flatMap((group) => group.lines);
+  const value = (label) => lines.find((line) => line.label === label)?.value;
+  const picked = Array.isArray(colors) ? colors : colors?.prefer;
+  const colorText = colorAnswerLabel(picked)?.split(" · ").join(", ");
+  return [value("Jacket"), value("Fit Preference"), colorText].filter(Boolean).join(" · ");
 }
 
 function usePhoneHero() {
@@ -1426,13 +1366,13 @@ function summaryGroups(groups) {
     .filter(Boolean);
 }
 
-function HeroFitCard({ groups, onEditAnswers }) {
+function HeroFitCard({ groups, chip, onEditAnswers }) {
   const phone = usePhoneHero();
   const [open, setOpen] = useState(false);
   const preview = summaryGroups(groups);
   const collapsed = phone && !open;
-  const shown = collapsed ? preview : groups;
-  const canExpand = phone && preview.length < groups.length;
+  const shown = collapsed ? (chip ? [] : preview) : groups;
+  const canExpand = phone && (Boolean(chip) || preview.length < groups.length);
   return (
     <section className="fit-card hero-fit-card" id="your-sizes" tabIndex={-1} aria-labelledby="fit-profile-title">
       <div className="fit-card-head">
@@ -1444,6 +1384,7 @@ function HeroFitCard({ groups, onEditAnswers }) {
           </button>
         )}
       </div>
+      {collapsed && chip && <p className="hero-profile-chip">{chip}</p>}
       {shown.map((group) => (
         <HeroFitGroup group={group} key={group.id} />
       ))}
@@ -1489,7 +1430,7 @@ function TrashIcon() {
   );
 }
 
-function YourLook({ suit, size, tailoringId, items, addedLooks, onRemoveLook, onRemoveTailoring }) {
+function YourLook({ suit, size, tailoringId, items, addedLooks, onRemoveLook, onRemoveTailoring, onEditLook, footer }) {
   const [sheetOpen, setSheetOpen] = useState(false);
   const [bagStatus, setBagStatus] = useState("idle");
   const [flash, setFlash] = useState(false);
@@ -1620,7 +1561,21 @@ function YourLook({ suit, size, tailoringId, items, addedLooks, onRemoveLook, on
         <button className="your-look-close" type="button" onClick={() => setSheetOpen(false)}>Close</button>
         <div className="your-look-head">
           <h2 className="your-look-title">Your Look</h2>
-          <button className="your-look-link" type="button" onClick={() => scrollToSuits("edit_look_clicked")}>Edit look</button>
+          <button
+            className="your-look-link"
+            type="button"
+            onClick={() => {
+              setSheetOpen(false);
+              if (onEditLook) {
+                pushLook({ event: "edit_look_clicked", ...context });
+                onEditLook();
+              } else {
+                scrollToSuits("edit_look_clicked");
+              }
+            }}
+          >
+            Edit look
+          </button>
         </div>
         <ul className="order-lines" aria-label="Your suit">
           <li>
@@ -1681,6 +1636,7 @@ function YourLook({ suit, size, tailoringId, items, addedLooks, onRemoveLook, on
             <strong>{formatPrice(totals.total)}</strong>
           </div>
         </div>
+        {footer}
       </div>
       <div className="your-look-dock">
         <button
@@ -1738,29 +1694,18 @@ function RentalAside({ suit, pieces, onReserve, reserved, note }) {
 
 export default function Results({ answers, moreMode = "toggle", onSeeAll, onEditAnswers, onRestart, onViewDetails }) {
   const renting = answers.mode === "rent";
-  const recommendations = useMemo(() => {
-    const list = renting ? getRentalRecommendations(answers) : getRecommendations(answers);
-    if (!list?.length) return list;
-    let topIndex = 0;
-    list.forEach((item, index) => {
-      const current = list[topIndex];
-      const rankBetter = (item.colorRank ?? 0) < (current.colorRank ?? 0);
-      const rankSame = (item.colorRank ?? 0) === (current.colorRank ?? 0);
-      const percentBetter = (item.matchPercent ?? -1) > (current.matchPercent ?? -1);
-      if (rankBetter || (rankSame && percentBetter)) topIndex = index;
-    });
-    if (topIndex === 0) return list;
-    const next = [list[topIndex], ...list.filter((_, index) => index !== topIndex)];
-    if (list.budgetMiss) next.budgetMiss = list.budgetMiss;
-    if (list.colorMiss) next.colorMiss = list.colorMiss;
-    return next;
-  }, [answers, renting]);
+  const recommendations = useMemo(
+    () => (renting ? getRentalRecommendations(answers) : getRecommendations(answers)),
+    [answers, renting],
+  );
   const summary = useMemo(() => buildResultSummary(answers), [answers]);
   const suggestedTierId = TAILORING_TIERS.some((tier) => tier.id === summary.tailoring?.id)
     ? summary.tailoring.id
     : NO_HEM.id;
   const defaultTierId = answers.tailoring === "bundle" && suggestedTierId !== NO_HEM.id ? suggestedTierId : NO_HEM.id;
   const [openId, setOpenId] = useState(null);
+  const [chosen, setChosen] = useState(null);
+  const phone = usePhoneHero();
   const [expanded, setExpanded] = useState(false);
   const [variantIndexes, setVariantIndexes] = useState({});
   const [tailoringId, setTailoringId] = useState(defaultTierId);
@@ -1770,7 +1715,7 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
   const [quickViewId, setQuickViewId] = useState(null);
   const quickViewTrigger = useRef(null);
   const [handoff, setHandoff] = useState("");
-  const followedId = openId ?? recommendations[0]?.id ?? null;
+  const followedId = openId;
 
   useEffect(() => {
     if (!expanded || !focusNewCard.current) return;
@@ -1779,29 +1724,47 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
   }, [expanded]);
 
   useEffect(() => {
-    setTailoringId(defaultTierId);
-    setAddedLooks({});
+    const resume = chosen && chosen.id === followedId;
+    setTailoringId(resume ? chosen.tailoringId : defaultTierId);
+    setAddedLooks(resume ? chosen.addedLooks : {});
     setQuickViewId(null);
   }, [followedId, defaultTierId]);
 
+  useEffect(() => {
+    setOpenId(null);
+    setChosen(null);
+  }, [recommendations]);
+
+  useEffect(() => {
+    if (!phone || !openId) return undefined;
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = previous;
+    };
+  }, [phone, openId]);
+
   const selected = recommendations.find((product) => product.id === followedId) ?? null;
+  const chosenSuit = chosen ? recommendations.find((product) => product.id === chosen.id) ?? null : null;
+  const bestCount = recommendations.filter((product) => product.badge?.tier === "best").length;
   const size = summary.sizeEstimate;
   const dates = summary.dates;
   const pieces = summary.pieces;
   const tailoring = CARD_TAILORING.find((item) => item.id === tailoringId) ?? null;
   const visibleCount = expanded ? Math.min(recommendations.length, 9) : Math.min(3, recommendations.length);
   const visibleRecommendations = recommendations.slice(0, visibleCount);
-  const shownRecommendations = selected && !visibleRecommendations.some((product) => product.id === selected.id)
-    ? [...visibleRecommendations, selected]
-    : visibleRecommendations;
+  const pinned = [chosenSuit, selected].filter((product, index, list) => (
+    product && list.indexOf(product) === index && !visibleRecommendations.some((item) => item.id === product.id)
+  ));
+  const shownRecommendations = [...visibleRecommendations, ...pinned];
   const occasion = resolvedOccasion(answers);
-  const ringPercent = Number.isFinite(selected?.matchPercent) ? selected.matchPercent : null;
   const profileGroups = heroProfileGroups({
     answers,
     renting,
     size,
     fitName: summary.fitName,
   });
+  const profileChip = profileChipText(profileGroups, answers.colors);
 
   const selectedOptions = selected ? variantOptions(selected) : [];
   const selectedVariant = selected
@@ -1846,7 +1809,49 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
   }
 
   function toggleCard(product) {
+    if (renting) {
+      setChosen({ id: product.id });
+      return;
+    }
     setOpenId((current) => (current === product.id ? null : product.id));
+  }
+
+  function closeCustomize() {
+    setOpenId(null);
+    setQuickViewId(null);
+  }
+
+  function commitLook() {
+    if (!selected) return;
+    const options = variantOptions(selected);
+    const variant = options[variantIndexes[selected.id] ?? defaultVariantIndex(selected, answers)] ?? options[0];
+    setChosen({ id: selected.id, colorKey: variant?.colorKey ?? selected.colorKey, tailoringId, addedLooks });
+    pushLook({ event: "look_confirmed", suitId: selected.id, ...lookPreview(addedLooks, tailoring?.price ?? 0) });
+    closeCustomize();
+  }
+
+  function editChosen() {
+    if (!chosenSuit) return;
+    setOpenId(chosenSuit.id);
+  }
+
+  function removeChosenLook(id) {
+    setChosen((current) => {
+      if (!current?.addedLooks?.[id]) return current;
+      const nextAdded = { ...current.addedLooks };
+      delete nextAdded[id];
+      return { ...current, addedLooks: nextAdded };
+    });
+  }
+
+  function removeChosenTailoring() {
+    setChosen((current) => (current ? { ...current, tailoringId: NO_HEM.id } : current));
+  }
+
+  function toggleLabel(product) {
+    if (chosen?.id === product.id) return "Selected";
+    if (chosen) return "Change suit";
+    return "Choose this suit";
   }
 
   function commitTailoring(nextId) {
@@ -1922,31 +1927,66 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
   }
 
   const rentalNote = "Prototype: this would reserve the look and its pieces for your event date.";
+  const chosenLook = !renting && chosen ? lookForColor(chosen.colorKey, occasion) : null;
+  const draftTotals = lookPreview(addedLooks, tailoring?.price ?? 0);
+  const accountLink = (
+    <a className="your-look-account" href="/myAccount">Create an account to save this profile</a>
+  );
   const purchaseAside = renting ? (
     <RentalAside
-      suit={selected}
+      suit={chosenSuit}
       pieces={pieces}
       reserved={handoff === "reserve"}
       note={rentalNote}
       onReserve={() => setHandoff("reserve")}
     />
-  ) : selected ? (
+  ) : chosenSuit ? (
     <YourLook
-      suit={selected}
+      suit={chosenSuit}
       size={size}
-      tailoringId={tailoringId}
-      items={selectedLook?.items ?? []}
-      addedLooks={addedLooks}
-      onRemoveLook={removeLook}
-      onRemoveTailoring={() => commitTailoring(NO_HEM.id)}
+      tailoringId={chosen.tailoringId}
+      items={chosenLook?.items ?? []}
+      addedLooks={chosen.addedLooks ?? {}}
+      onRemoveLook={removeChosenLook}
+      onRemoveTailoring={removeChosenTailoring}
+      onEditLook={editChosen}
+      footer={accountLink}
     />
   ) : (
-    <aside className="your-look" aria-label="Your Look">
+    <aside className="your-look is-empty" aria-label="Your Look">
       <div className="your-look-panel">
         <h2 className="your-look-title">Your Look</h2>
         <p className="your-look-summary">Choose a suit to build your look.</p>
+        {accountLink}
       </div>
     </aside>
+  );
+
+  const customizeBar = selected && (
+    <div className="customize-bar">
+      <p className="customize-total" aria-live="polite">
+        <span>{draftTotals.itemCount} {draftTotals.itemCount === 1 ? "item" : "items"}</span>
+        <strong>{formatPrice(draftTotals.total)}</strong>
+      </p>
+      <div className="customize-actions">
+        <button className="customize-cancel" type="button" onClick={closeCustomize}>Cancel</button>
+        <button className="button customize-commit" type="button" onClick={commitLook}>
+          {chosen?.id === selected.id ? "Update look" : "Add to look"}
+        </button>
+      </div>
+    </div>
+  );
+
+  const customizeOptions = selected && (
+    <SuitOptions
+      showSuggestion={answers.tailoring !== "skip"}
+      tailoringId={tailoringId}
+      onTailoring={chooseTailoring}
+      look={selectedLook}
+      addedLooks={addedLooks}
+      onOpenLook={openQuickView}
+      onRemoveLook={removeLook}
+    />
   );
 
   return (
@@ -1968,32 +2008,12 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
                 <span>Restart quiz</span>
               </button>
             </div>
-            <div className="results-hero-ring">
-              <MatchRing percent={ringPercent} />
-              <p className="match-ring-explain">How closely your top suit matches your answers.</p>
-            </div>
             <div className="results-hero-copy">
-              <h1 id="results-title">{heroHeadline(ringPercent)}</h1>
-              <p className="results-lede">Save your suit profile to see styles that work for you.</p>
-              <div className="fit-profile-actions">
-                <a className="button" href="/myAccount">Create an Account</a>
-                <button className="button secondary" type="button" onClick={() => setHandoff("sign-in")}>
-                  Sign In
-                </button>
-              </div>
-              {handoff === "sign-in" && (
-                <p className="handoff-inline" role="status">
-                  Prototype: this would sign you in and keep this fit profile for later recommendations.
-                </p>
-              )}
+              <h1 id="results-title">{heroHeadline(bestCount)}</h1>
+              <p className="results-lede">Each {renting ? "look" : "suit"} shows how it lines up with your answers.</p>
             </div>
           </div>
-          <HeroFitCard groups={profileGroups} onEditAnswers={onEditAnswers} />
-          <ul className="fit-profile-benefits">
-            {HERO_FIT_BENEFITS.map((line) => (
-              <li key={line}>{line}</li>
-            ))}
-          </ul>
+          <HeroFitCard groups={profileGroups} chip={profileChip} onEditAnswers={onEditAnswers} />
         </div>
 
         {recommendations.budgetMiss && (
@@ -2010,7 +2030,7 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
         )}
 
         <p className="visually-hidden" aria-live="polite">
-          {selected ? `${renting ? "Selected look" : "Selected suit"}, ${selected.brand} ${selected.name}` : ""}
+          {chosenSuit ? `${renting ? "Selected look" : "Selected suit"}, ${chosenSuit.brand} ${chosenSuit.name}` : ""}
         </p>
         <div className="results-stage">
           <div className="results-list" id="results-list">
@@ -2018,32 +2038,41 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
           {shownRecommendations.map((product, index) => {
             const { options, variantIndex, shown } = shownFor(product);
             const open = product.id === openId;
-            const scored = Number.isFinite(product.matchPercent);
+            const inline = open && !phone;
+            const isChosen = chosen?.id === product.id;
+            const label = toggleLabel(product);
             const suitToggle = (
               <button
-                className={`suit-expand-toggle${open ? " is-open" : ""}`}
+                className={`suit-expand-toggle${isChosen ? " is-selected" : ""}${open ? " is-open" : ""}`}
                 type="button"
-                aria-expanded={open}
-                aria-controls={`suit-expand-${product.id}`}
-                aria-label={open ? `Viewing ${product.name}` : `Choose ${product.name}`}
+                aria-expanded={renting ? undefined : open}
+                aria-controls={renting ? undefined : `suit-expand-${product.id}`}
+                aria-pressed={renting ? isChosen : undefined}
+                aria-label={`${label}: ${product.brand} ${product.name}`}
                 onClick={() => toggleCard(product)}
               >
-                <span>{open ? "Viewing this suit" : "Choose this suit"}</span>
-                <svg className="suit-expand-chevron" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
-                  <path
-                    d={open ? "M3.5 10.5 8 6 12.5 10.5" : "M3.5 6 8 10.5 12.5 6"}
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="1.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
+                <span>{label}</span>
+                {isChosen && !open ? (
+                  <svg className="suit-expand-chevron" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+                    <path d="M3.5 8.5 6.5 11.5 12.5 5" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                ) : (
+                  <svg className="suit-expand-chevron" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+                    <path
+                      d={open ? "M3.5 10.5 8 6 12.5 10.5" : "M3.5 6 8 10.5 12.5 6"}
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                )}
               </button>
             );
             return (
               <article
-                className={`suit-card${open ? " is-open" : ""}`}
+                className={`suit-card${inline ? " is-open" : ""}${isChosen ? " is-chosen" : ""}`}
                 key={product.id}
                 tabIndex={index === 3 ? -1 : undefined}
                 ref={index === 3 ? firstNewCardRef : undefined}
@@ -2055,17 +2084,13 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
                         <img src={shown.image} alt="" />
                       </div>
                       <div className="suit-badges suit-badges-on-photo">
-                        <span className="match-score">
-                          {scored ? `${product.matchPercent}% match` : "Great match"}
-                        </span>
+                        <MatchBadge badge={product.badge} />
                       </div>
                     </div>
                     <div className="suit-card-body">
                       <div className="suit-card-topbar">
                         <div className="suit-badges">
-                          <span className="match-score">
-                            {scored ? `${product.matchPercent}% match` : "Great match"}
-                          </span>
+                          <MatchBadge badge={product.badge} />
                         </div>
                       </div>
                       <div className="suit-card-info">
@@ -2101,6 +2126,7 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
                               <span>{product.rating.toFixed(1)} ({product.reviews.toLocaleString("en-US")})</span>
                             </p>
                           )}
+                          <MatchChecks badge={product.badge} />
                         </div>
                         <div className="suit-price-col">
                           <div className="suit-price-stack">
@@ -2110,7 +2136,7 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
                             </p>
                             {product.compareAt && <p className="suit-clearance">Clearance</p>}
                           </div>
-                          {!open && suitToggle}
+                          {!inline && suitToggle}
                         </div>
                         <button
                           className="suit-details-link"
@@ -2122,24 +2148,12 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
                       </div>
                     </div>
                   </div>
-                  {open && (
+                  {inline && (
                     <div className="suit-expand" id={`suit-expand-${product.id}`}>
-                      {renting ? (
-                        <p className="expand-rent-note">Sizes for this look are confirmed at your fitting.</p>
-                      ) : (
-                        <SuitOptions
-                          showSuggestion={answers.tailoring !== "skip"}
-                          tailoringId={tailoringId}
-                          onTailoring={chooseTailoring}
-                          look={lookForColor(shown?.colorKey, occasion)}
-                          addedLooks={addedLooks}
-                          onOpenLook={openQuickView}
-                          onRemoveLook={removeLook}
-                        />
-                      )}
+                      {customizeOptions}
+                      {customizeBar}
                     </div>
                   )}
-                  {open && suitToggle}
                 </div>
               </article>
             );
@@ -2173,7 +2187,7 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
           {purchaseAside}
         </div>
 
-        {selected && renting && (
+        {chosenSuit && renting && (
           <div className="results-card">
             <section className="card-section" aria-labelledby="rent-steps-title">
               <h2 id="rent-steps-title" className="section-title">How to rent</h2>
@@ -2205,6 +2219,22 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
         )}
       </section>
 
+      {phone && selected && !renting && (
+        <div className="customize-sheet" role="dialog" aria-modal="true" aria-labelledby="customize-sheet-title">
+          <button className="customize-sheet-scrim" type="button" aria-label="Close" onClick={closeCustomize} />
+          <div className="customize-sheet-panel" id={`suit-expand-${selected.id}`}>
+            <div className="customize-sheet-head">
+              <div>
+                <p className="product-brand">{selected.brand}</p>
+                <h2 id="customize-sheet-title" className="customize-sheet-title">{selected.name}</h2>
+              </div>
+              <button className="customize-sheet-close" type="button" onClick={closeCustomize}>Close</button>
+            </div>
+            <div className="customize-sheet-body">{customizeOptions}</div>
+            {customizeBar}
+          </div>
+        </div>
+      )}
       {quickViewItem && (
         <QuickView
           key={quickViewItem.id}

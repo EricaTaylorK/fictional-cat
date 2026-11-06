@@ -231,7 +231,16 @@ export function lookForColor(colorKey, occasion) {
   const note = occasion === "formal" && colorKey === "black"
     ? `${guidance.note} This is the black-tie pick.`
     : guidance.note;
-  return { colorKey, note, items: [set.shirt, set.tie, set.shoes] };
+  if (occasion === "funeral") {
+    return {
+      colorKey,
+      note,
+      fromOccasion: true,
+      occasionNote: "For a funeral, black oxfords and a black tie keep the look quiet.",
+      items: [set.shirt, LOOK_PAIRINGS.black.tie, LOOK_PAIRINGS.black.shoes],
+    };
+  }
+  return { colorKey, note, fromOccasion: false, items: [set.shirt, set.tie, set.shoes] };
 }
 
 export const TAILORING_ESTIMATE = 85;

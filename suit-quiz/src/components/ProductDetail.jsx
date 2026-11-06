@@ -1,10 +1,11 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { RENTAL_TYPE_NAMES } from "../data/rentals.js";
 import {
   formatPrice,
   getRecommendations,
   getRentalRecommendations,
 } from "../lib/recommendation.js";
+import { MatchBadge, MatchChecks } from "./MatchBadge.jsx";
 
 function shownVariant(product, colorKey) {
   const options = product.variants?.length
@@ -20,12 +21,7 @@ export default function ProductDetail({ answers, productId, colorKey, onBack }) 
     return recommendations.find((item) => item.id === productId) ?? null;
   }, [answers, productId, renting]);
   const shown = product ? shownVariant(product, colorKey) : null;
-  const why = product?.evidence ?? [];
-  const reason = product && product.matchPercent != null && product.matchPercent < 80
-    ? (product.tradeoffs?.length
-      ? product.tradeoffs.join(" ")
-      : "A partial match. It lines up on some of your answers, not every one.")
-    : "";
+  const [whyOpen, setWhyOpen] = useState(false);
 
   return (
     <section className="product-detail" aria-labelledby="product-detail-title">
@@ -62,17 +58,21 @@ export default function ProductDetail({ answers, productId, colorKey, onBack }) 
                 <span>{product.rating.toFixed(1)} ({product.reviews.toLocaleString("en-US")})</span>
               </p>
             )}
-            {why.length > 0 && (
-              <div className="match-why">
-                <p className="why-label">{renting ? "Why this look" : "Why this suit"}</p>
-                <ul className="why-list">
-                  {why.map((line) => (
-                    <li key={line}>{line}</li>
-                  ))}
-                </ul>
+            {product.badge && (
+              <div className="product-detail-match">
+                <MatchBadge badge={product.badge} />
+                <button
+                  className="text-link match-why-toggle"
+                  type="button"
+                  aria-expanded={whyOpen}
+                  aria-controls="product-detail-checks"
+                  onClick={() => setWhyOpen((current) => !current)}
+                >
+                  Why this match
+                </button>
+                {whyOpen && <MatchChecks badge={product.badge} id="product-detail-checks" />}
               </div>
             )}
-            {reason && <p className="match-reason">{reason}</p>}
           </div>
         </div>
       )}

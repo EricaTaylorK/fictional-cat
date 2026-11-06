@@ -86,9 +86,9 @@ describe("height and weight in the quiz", () => {
       { label: "Jacket", value: "40 Regular" },
       { label: "Fit Preference", value: "Classic Fit" },
     ]);
-    expect(heroHeadline(47)).toBe("Let's finish your fit.");
-    expect(heroHeadline(50)).toBe("You've found your fit!");
-    expect(heroHeadline(null)).toBe("You've found your fit!");
+    expect(heroHeadline(12)).toBe("We found 12 Best Matches for you");
+    expect(heroHeadline(1)).toBe("We found 1 Best Match for you");
+    expect(heroHeadline(0)).toBe("We found matches for you");
     expect(groups.some((group) => group.id === "categories")).toBe(false);
     expect(groups.find((group) => group.label === "Occasion")?.lines[0].value).toBe("Funeral");
     expect(groups.find((group) => group.label === "Colors")?.lines[0].value).toBe("Earth tones");

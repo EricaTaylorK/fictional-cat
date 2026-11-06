@@ -601,6 +601,104 @@ function buildTradeoffs(product, answers) {
   return notes;
 }
 
+const FEEL_ALIASES = { classic: "roomy", modern: "balanced", slim: "close" };
+const FIT_ORDER = ["close", "balanced", "roomy"];
+const TIER_LABELS = { best: "Best Match", good: "Good Match", partial: "Partial Match" };
+const TIER_RANK = { best: 0, good: 1, partial: 2 };
+
+function titleCase(text) {
+  return String(text).replace(/\b\w/g, (letter) => letter.toUpperCase());
+}
+
+function sizeCheck(answers) {
+  const everyday = answers.everydaySizes ?? {};
+  const estimate = getSizeEstimate(answers);
+  const jacket = estimate.jacket ? String(estimate.jacket).replace(/[SRL]$/i, "") : sizeList(everyday.jacket)[0] ?? null;
+  const length = inferLength(answers) ? LENGTH_NAMES[inferLength(answers)] : null;
+  const waist = knownWaist(answers) ?? (sizeList(everyday.pants)[0] || null);
+  const missing = !jacket ? "Jacket size isn't saved" : !length ? "Jacket length isn't saved" : !waist ? "Waist size isn't saved" : null;
+  return {
+    id: "size",
+    label: "Size",
+    pass: !missing,
+    line: missing ?? `${jacket} ${length} jacket and ${waist} waist`,
+  };
+}
+
+function fitCheck(product, answers) {
+  const feel = FEEL_ALIASES[answers.feel] ?? answers.feel;
+  if (!feel || !product.fit) return null;
+  const target = scoringFeel(feel);
+  const wanted = titleCase(fitNameLabels[feel] ?? fitNameLabels[target] ?? "your fit");
+  if (product.fit !== target) {
+    const slimmer = FIT_ORDER.indexOf(product.fit) < FIT_ORDER.indexOf(target);
+    return { id: "fit", label: "Fit", pass: false, line: `${slimmer ? "Slimmer" : "Roomier"} than your ${wanted}` };
+  }
+  const signals = getFitSignals(answers);
+  const tightNote = ["broadShoulders", "fullerMidsection", "seatThighs"].find((signal) => signals.has(signal));
+  if (tightNote && product.fit === "close" && !product.stretch) {
+    return { id: "fit", label: "Fit", pass: false, line: `Slim cut, and you asked for ${fitNoteLabels[tightNote]}` };
+  }
+  const line = CLOSEST_FIT_ONLY[feel] ? `Closest we carry to ${wanted}` : `${wanted}, your fit preference`;
+  return { id: "fit", label: "Fit", pass: true, line };
+}
+
+function colorCheck(product, answers) {
+  const prefer = colorsIn(answers.colors?.prefer);
+  if (!prefer.length) return null;
+  const avoid = colorsIn(answers.colors?.avoid);
+  const picked = matchedColor(product, prefer);
+  if (picked) return { id: "color", label: "Color", pass: true, line: `${picked}, a color you picked` };
+  if (everyColorAvoided(product, avoid)) {
+    return { id: "color", label: "Color", pass: false, line: `${product.color} is a color you avoid` };
+  }
+  return { id: "color", label: "Color", pass: false, line: "Not in the colors you picked" };
+}
+
+function priceCheck(price, budget) {
+  if (!budget) return null;
+  if (budget === "flexible") return { id: "price", label: "Price", pass: true, line: "Fits your flexible budget" };
+  const [budgetMin, budgetMax] = getBudgetRange(budget);
+  const label = budgetLabels[budget] ?? "budget";
+  if (price > budgetMax) return { id: "price", label: "Price", pass: false, line: `Over your ${label}` };
+  if (price < budgetMin) return { id: "price", label: "Price", pass: false, line: `Under your ${label}` };
+  return { id: "price", label: "Price", pass: true, line: `Inside your ${label}` };
+}
+
+function occasionCheck(product, answers) {
+  const occasion = resolvedOccasion(answers);
+  if (!occasion) return null;
+  const name = occasionLabels[answers.occasion] ?? occasionLabels[occasion] ?? "your event";
+  const pass = (product.formality ?? []).includes(occasion);
+  return { id: "occasion", label: "Occasion", pass, line: pass ? `Right for ${name}` : `Not the usual choice for ${name}` };
+}
+
+// Size and fit must match. Color, price, and occasion are nice-to-haves; unanswered ones are left out.
+export function matchBadge(product, answers, { renting = false } = {}) {
+  const must = renting ? [] : [sizeCheck(answers), fitCheck(product, answers)].filter(Boolean);
+  const nice = [
+    colorCheck(product, answers),
+    renting ? priceCheck(product.total ?? product.price, answers.rentalBudget) : priceCheck(product.price, answers.budget),
+    occasionCheck(product, answers),
+  ].filter(Boolean);
+  const miss = must.find((check) => !check.pass) ?? null;
+  const niceCount = nice.filter((check) => check.pass).length;
+  const tier = miss ? "partial" : niceCount >= 2 ? "best" : "good";
+  return {
+    tier,
+    label: TIER_LABELS[tier],
+    miss: miss?.line ?? null,
+    checks: [...must, ...nice],
+  };
+}
+
+function byTier(list) {
+  return list
+    .map((item, index) => ({ item, index }))
+    .sort((a, b) => TIER_RANK[a.item.badge.tier] - TIER_RANK[b.item.badge.tier] || a.index - b.index)
+    .map(({ item }) => item);
+}
+
 function maxPossibleScore(answers) {
   const prefer = colorsIn(answers.colors?.prefer)[0];
   const occasion = resolvedOccasion(answers);
@@ -651,17 +749,18 @@ export function getRecommendations(answers, assortment = products) {
     ? { label: budgetMissLabel(answers.budget, inBudget.length), count: inBudget.length }
     : null;
 
-  const result = ranked.map((product) => {
+  const result = byTier(ranked.map((product) => {
     const [budgetMin, budgetMax] = getBudgetRange(answers.budget);
     return {
       ...product,
       matchPercent: honestPercent(product.score, maxScore),
+      badge: matchBadge(product, answers),
       bundlePrice: product.price + (answers.tailoring === "bundle" ? TAILORING_ESTIMATE : 0),
       budgetOver: limitedBudget && product.price > budgetMax ? product.price - budgetMax : null,
       belowBudget: limitedBudget && product.price < budgetMin,
       tradeoffs: buildTradeoffs(product, answers),
     };
-  });
+  }));
   result.budgetMiss = budgetMiss;
   result.colorMiss = colorMissLabel(answers, pool);
   return result;
@@ -884,11 +983,12 @@ export function getRentalRecommendations(answers, assortment = rentals) {
   const ranked = prefer.length ? [...pool].sort(byColorThenScore(answers)) : [...inBudget, ...overBudget];
   const maxScore = maxRentalScore(answers, pieces);
 
-  const result = ranked.map((look) => ({
+  const result = byTier(ranked.map((look) => ({
     ...look,
     matchPercent: honestPercent(look.score, maxScore),
+    badge: matchBadge(look, answers, { renting: true }),
     tradeoffs: rentalTradeoffs(look, answers),
-  }));
+  })));
   result.budgetMiss = null;
   result.colorMiss = colorMissLabel(answers, pool);
   return result;

@@ -6,6 +6,7 @@ import PlacementsDemo from "./placements/PlacementsDemo.jsx";
 import "./kairos/themes/index.scss";
 import "./styles.css";
 import "./hero-profile.css";
+import "./results-flow.css";
 
 const path = window.location.pathname.replace(/\/+$/, "");
 const placements = path === "/placements";

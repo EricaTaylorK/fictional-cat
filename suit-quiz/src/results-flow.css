@@ -1,0 +1,286 @@
+/* Compare, then customize, then review. */
+
+/* Match badges: only Best reads as green. */
+.match-score.is-best,
+.suit-badges .match-score.is-best {
+  background: #008052;
+  color: #fff;
+}
+
+.match-score.is-good,
+.suit-badges .match-score.is-good {
+  background: #001e56;
+  color: #fff;
+}
+
+.match-score.is-partial,
+.suit-badges .match-score.is-partial {
+  background: #e6e6e6;
+  color: #232323;
+}
+
+.match-checks {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+}
+
+.match-checks li {
+  align-items: baseline;
+  color: #232323;
+  display: flex;
+  font-family: var(--font-family-roboto);
+  font-size: 12px;
+  gap: 6px;
+  line-height: 18px;
+}
+
+.match-checks li.is-miss {
+  color: #5c5c5c;
+}
+
+.match-check-mark {
+  flex: 0 0 12px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.match-checks li.is-pass .match-check-mark {
+  color: #008052;
+}
+
+.product-detail-match {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  margin-top: 16px;
+}
+
+.product-detail-match .match-score {
+  align-items: center;
+  border-radius: 25px;
+  display: inline-flex;
+  font: 700 10px/12px var(--font-family-roboto);
+  height: 20px;
+  letter-spacing: 0.02em;
+  padding: 4px 8px;
+  text-transform: uppercase;
+}
+
+.product-detail-match .match-checks {
+  flex: 1 1 100%;
+}
+
+/* Compare: closed cards line up, the chosen card is outlined. */
+.results-layout .suit-list {
+  align-items: stretch;
+}
+
+.results-layout .suit-card:not(.is-open) .suit-card-face {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.results-layout .suit-card:not(.is-open) .suit-card-face > .suit-row {
+  flex: 1 1 auto;
+}
+
+.results-layout .suit-card.is-chosen .suit-card-face {
+  border: 2px solid #001e56;
+}
+
+.suit-expand-toggle.is-selected,
+.suit-expand-toggle.is-selected:hover {
+  background: #001e56;
+  border-color: #001e56;
+  color: #fff;
+}
+
+/* Customize: selected states, two tailoring options, running total. */
+.results-layout .tailor-row {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.tailor-card.is-selected,
+.pair-card.is-on {
+  border-color: #001e56;
+  box-shadow: inset 0 0 0 1px #001e56;
+}
+
+.customize-bar {
+  align-items: center;
+  background: #fff;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+  bottom: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 24px;
+  justify-content: space-between;
+  margin-top: 24px;
+  padding: 16px 0;
+  position: sticky;
+  z-index: 2;
+}
+
+.customize-total {
+  align-items: baseline;
+  display: flex;
+  font-family: var(--font-family-roboto);
+  gap: 12px;
+  margin: 0;
+}
+
+.customize-total span {
+  color: #5c5c5c;
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.customize-total strong {
+  color: #000;
+  font-size: 18px;
+  line-height: 24px;
+}
+
+.customize-actions {
+  align-items: center;
+  display: flex;
+  gap: 24px;
+}
+
+.customize-cancel,
+.customize-sheet-close,
+.your-look-account {
+  background: none;
+  border: 0;
+  color: #001e56;
+  cursor: pointer;
+  font: 500 14px/20px var(--font-family-roboto);
+  padding: 0;
+  text-decoration: underline;
+}
+
+.customize-commit {
+  min-width: 200px;
+}
+
+.your-look-account {
+  align-self: flex-start;
+  display: inline-block;
+  margin-top: 16px;
+}
+
+.customize-sheet {
+  inset: 0;
+  position: fixed;
+  z-index: 60;
+}
+
+.customize-sheet-scrim {
+  background: rgba(0, 0, 0, 0.4);
+  border: 0;
+  inset: 0;
+  padding: 0;
+  position: absolute;
+}
+
+.customize-sheet-panel {
+  background: #fff;
+  border-radius: 16px 16px 0 0;
+  bottom: 0;
+  box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: column;
+  left: 0;
+  max-height: 90vh;
+  position: absolute;
+  right: 0;
+}
+
+.customize-sheet-head {
+  align-items: flex-start;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  display: flex;
+  gap: 16px;
+  justify-content: space-between;
+  padding: 16px;
+}
+
+.customize-sheet-head .product-brand {
+  color: #5c5c5c;
+  font: 500 12px/16px var(--font-family-roboto);
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.customize-sheet-title {
+  color: #000;
+  font: 500 18px/24px var(--font-family-roboto);
+  margin: 2px 0 0;
+}
+
+.customize-sheet-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 0 16px 16px;
+}
+
+.customize-sheet-panel .customize-bar {
+  margin-top: 0;
+  padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
+  position: static;
+}
+
+@media (max-width: 767px) {
+  .customize-bar {
+    flex-wrap: nowrap;
+  }
+
+  .customize-actions {
+    gap: 16px;
+  }
+
+  .customize-commit {
+    min-width: 0;
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+
+  .results-layout .tailor-row,
+  .customize-sheet .tailor-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* Compact hero: count headline beside a smaller profile card. */
+.results-layout .results-hero {
+  padding-bottom: 24px;
+}
+
+.results-layout .results-hero-copy {
+  gap: 4px;
+}
+
+.hero-profile-chip {
+  color: #232323;
+  font: 500 14px/20px var(--font-family-roboto);
+  margin: 0;
+}
+
+@media (min-width: 768px) {
+  .results-layout .results-hero-copy {
+    grid-row: 2;
+  }
+
+  .results-layout .hero-fit-card {
+    grid-row: 2 / 4;
+    padding: 16px 20px;
+  }
+}

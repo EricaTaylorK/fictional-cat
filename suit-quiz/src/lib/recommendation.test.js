@@ -328,7 +328,11 @@ describe("recommendations", () => {
   it("leads with a pink suit when the shopper picks light and soft", () => {
     const ranked = getRecommendations({ ...baseAnswers, colors: { prefer: ["lightSoft"] } });
     expect(ranked[0].colorKey).toBe("pink");
-    expect(ranked.slice(0, 5).every((product) => product.colorKey === "pink")).toBe(true);
+    for (const tier of ["best", "good", "partial"]) {
+      const group = ranked.filter((product) => product.badge.tier === tier);
+      const firstOther = group.findIndex((product) => product.colorKey !== "pink");
+      if (firstOther >= 0) expect(group.slice(firstOther).some((product) => product.colorKey === "pink")).toBe(false);
+    }
     expect(ranked.colorMiss).toBeNull();
     const ids = quizCatalogIds({ ...baseAnswers, colors: { prefer: ["lightSoft"] } });
     expect(ids).toContain("tommy-hilfiger-modern-fit-linen-suit-tmw-3bm9");
@@ -564,5 +568,40 @@ describe("recommendations", () => {
     expect(ranked[0].id).toBe("strong");
     expect(ranked[1].matchPercent).toBeLessThan(72);
     expect(ranked[1].tradeoffs.length).toBeGreaterThan(0);
+  });
+});
+
+describe("match badges", () => {
+  const base = {
+    mode: "buy",
+    occasion: "funeral",
+    feel: "classic",
+    colors: { prefer: ["black"], avoid: [] },
+    height: 70,
+    weight: 180,
+    measurementKnowledge: "yes",
+    measurements: { jacket: "40", length: "R", waist: "34" },
+    fitIssues: ["none"],
+    budget: "400-600",
+  };
+
+  it("sorts best, then good, then partial", async () => {
+    const { getRecommendations } = await import("./recommendation.js");
+    const rank = { best: 0, good: 1, partial: 2 };
+    const tiers = getRecommendations(base).map((product) => rank[product.badge.tier]);
+    expect(tiers).toEqual([...tiers].sort((a, b) => a - b));
+  });
+
+  it("names the fit miss on a partial match", async () => {
+    const { getRecommendations } = await import("./recommendation.js");
+    const partial = getRecommendations(base).find((product) => product.badge.tier === "partial");
+    if (partial) expect(partial.badge.miss).toMatch(/than your|you asked for|isn't saved/);
+  });
+
+  it("treats under budget as a price miss", async () => {
+    const { matchBadge } = await import("./recommendation.js");
+    const product = { id: "x", price: 199, colorKey: "black", fit: "roomy", occasions: ["funeral"] };
+    const price = matchBadge(product, base).checks.find((check) => check.id === "price");
+    expect(price?.pass).toBe(false);
   });
 });
