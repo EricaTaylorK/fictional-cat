@@ -8271,8 +8271,9 @@ button.store-logo {
   }
 }
 
-/* Phone suit cards: the photo leads, full width, then the details underneath. */
-@media (max-width: 640px) {
+/* Suit cards through tablet: the photo leads, full width, then the details underneath.
+   Above 1024px the photo stays beside the details. */
+@media (max-width: 1024px) {
   .results-layout .suit-card:not(.is-open) .suit-card-face,
   .results-layout .suit-card:not(.is-open) .suit-row {
     height: auto;
@@ -8575,9 +8576,15 @@ button.store-logo {
   }
 }
 
-/* Phone suit list: one column. A light-grey bar separates suits.
-   The bar is the space; cards do not float with a gap or a shadow. */
-@media (max-width: 640px) {
+/* Suit list through tablet: one column. A light-grey bar separates suits.
+   The bar is the space; cards do not float with a gap or a shadow.
+   The 16px stage inset matches the card bleed so the bar reaches the edges. */
+@media (max-width: 1024px) {
+  .results-layout .results-stage {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
   .results-layout .results-list {
     gap: 0;
   }
@@ -8619,12 +8626,12 @@ button.store-logo {
   }
 }
 
-/* Match pill stays in the details above 640px. On the phone it sits on the photo. */
+/* Match pill stays in the details above 1024px. Through tablet it sits on the photo. */
 .results-layout .suit-badges-on-photo {
   display: none;
 }
 
-@media (max-width: 640px) {
+@media (max-width: 1024px) {
   .results-layout .suit-card-media {
     overflow: visible;
     position: relative;
