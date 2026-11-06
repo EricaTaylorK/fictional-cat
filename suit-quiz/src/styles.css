@@ -5094,6 +5094,17 @@ h2 {
   width: min(1024px, 100%);
 }
 
+/* After the base note rule so phones keep the same left inset as the title. */
+@media (max-width: 640px) {
+  .quiz-slide .question-head .question-note {
+    align-self: stretch;
+    margin-left: 0;
+    margin-right: 0;
+    text-align: left;
+    width: 100%;
+  }
+}
+
 .date-hint {
   color: var(--color-font-dark-gray);
   font-size: var(--font-size-12);
