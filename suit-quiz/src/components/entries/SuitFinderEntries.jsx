@@ -51,7 +51,7 @@ function SuitFinderEntry({ variant, entrypoint, priority = false, onActivate }) 
         </span>
         <span className="sf-entry-title">{COPY.headline}</span>
         <span className="sf-entry-lede">
-          In <strong>under a minute</strong> get suit options matched to your event and needs.
+          In <strong>under a minute</strong> we&apos;ll find the perfect suit for your event, for you.
         </span>
       </span>
       <span className="sf-entry-cta">
