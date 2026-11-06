@@ -8257,7 +8257,7 @@ button.store-logo {
   }
 }
 
-/* Phone suit cards: photo beside the details, then link, price, and the choose button. */
+/* Phone suit cards: the photo leads, full width, then the details underneath. */
 @media (max-width: 640px) {
   .results-layout .suit-card:not(.is-open) .suit-card-face,
   .results-layout .suit-card:not(.is-open) .suit-row {
@@ -8270,38 +8270,60 @@ button.store-logo {
   }
 
   .results-layout .suit-row {
-    display: flow-root;
+    align-items: stretch;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
     height: auto;
     min-height: 0;
   }
 
   .results-layout .suit-card-media {
-    aspect-ratio: 1;
-    float: left;
+    aspect-ratio: 3 / 2;
+    float: none;
     flex: none;
     flex-basis: auto;
     height: auto;
-    margin: 0 12px 8px 0;
-    max-width: 40%;
+    margin: -16px -32px 0;
+    max-width: none;
     min-height: 0;
-    width: 40%;
+    overflow: hidden;
+    width: calc(100% + 64px);
   }
 
   .results-layout .suit-card-media .product-image {
-    border-radius: 2px;
+    border-radius: 0;
+  }
+
+  .results-layout .suit-card-media .product-image img {
+    height: 100%;
+    object-fit: cover;
+    object-position: top center;
+    width: 100%;
   }
 
   .results-layout .suit-card-body,
   .results-layout .suit-card-info {
-    display: block;
     min-height: 0;
     overflow: visible;
     width: auto;
   }
 
   .results-layout .suit-card-body {
-    gap: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
     justify-content: flex-start;
+    width: 100%;
+  }
+
+  .results-layout .suit-card-info {
+    align-items: end;
+    column-gap: 12px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    row-gap: 8px;
+    width: 100%;
   }
 
   .results-layout .suit-card-topbar {
@@ -8333,6 +8355,8 @@ button.store-logo {
     display: flex;
     flex-direction: column;
     gap: 8px;
+    grid-column: 1;
+    grid-row: 1;
     justify-content: flex-start;
     max-width: 100%;
     min-width: 0;
@@ -8382,9 +8406,11 @@ button.store-logo {
   }
 
   .results-layout .suit-details-link {
-    clear: both;
+    clear: none;
+    grid-column: 1 / -1;
+    grid-row: 2;
     height: auto;
-    margin: 8px 0 0;
+    margin: 4px 0 0;
     position: static;
     right: auto;
     top: auto;
@@ -8392,58 +8418,59 @@ button.store-logo {
   }
 
   .results-layout .suit-price-col {
-    align-items: stretch;
-    align-self: stretch;
-    clear: both;
-    flex: none;
-    flex-basis: auto;
-    height: auto;
-    justify-content: flex-start;
-    margin: 8px 0 0;
-    min-height: 0;
-    width: 100%;
+    display: contents;
   }
 
   .results-layout .suit-price-stack {
-    align-items: flex-start;
-    text-align: left;
+    align-items: flex-end;
+    align-self: end;
+    grid-column: 2;
+    grid-row: 1;
+    justify-self: end;
+    margin: 0;
+    max-width: 42%;
+    text-align: right;
   }
 
   .results-layout .suit-price {
-    align-items: baseline;
-    font-size: 22px;
-    justify-content: flex-start;
+    align-items: flex-end;
+    flex-direction: column;
+    font-size: 24px;
+    gap: 0;
+    justify-content: flex-end;
     line-height: 28px;
     width: auto;
   }
 
   .results-layout .suit-price strong {
     color: #232323;
-    font-size: 22px;
+    font-size: 24px;
     font-weight: 700;
     line-height: 28px;
   }
 
   .results-layout .suit-price s {
     color: #747474;
-    font-size: 16px;
+    font-size: 14px;
     font-weight: 400;
-    line-height: 22px;
+    line-height: 18px;
   }
 
   .results-layout .suit-clearance {
-    align-self: flex-start;
+    align-self: flex-end;
     color: #747474;
     font-size: 12px;
     line-height: 16px;
-    margin: 4px 0 0;
-    text-align: left;
+    margin: 2px 0 0;
+    text-align: right;
     width: auto;
   }
 
   .results-layout .suit-expand-toggle {
     font-size: var(--font-size-button-cta);
-    margin-top: 12px;
+    grid-column: 1 / -1;
+    grid-row: 3;
+    margin-top: 4px;
     padding: 0 16px;
     width: 100%;
   }
