@@ -631,6 +631,7 @@ export default function App() {
 
   const questionSlide = currentQuestion && (
     <section className="quiz-slide" aria-labelledby="question-title">
+      <div className="quiz-slide-body">
       <div className="question-head">
         {currentQuestion.icon && <img className="question-icon" src={currentQuestion.icon} alt="" />}
         <div>
@@ -700,6 +701,8 @@ export default function App() {
         />
       )}
 
+      </div>
+      <div className="quiz-dock">
       <div className="actions actions-pair">
         {currentQuestion.skippable && (currentQuestion.type === "multi" ? (
           <button
@@ -733,6 +736,7 @@ export default function App() {
         >
           {currentIndex === flow.length - 1 ? "See recommendations" : "Next"}
         </button>
+      </div>
       </div>
     </section>
   );

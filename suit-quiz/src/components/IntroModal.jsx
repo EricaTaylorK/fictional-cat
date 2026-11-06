@@ -96,15 +96,19 @@ export default function IntroModal({ onStart, onClose, onBack, progress, stepLab
         </header>
         {children ?? (
         <div className="intro-body">
-          <IntroIllustration />
-          <h1 id="intro-title" className="intro-title">Tell us the occasion. We'll find the suit.</h1>
-          <p className="intro-copy">
-            Answer a few quick questions. You'll get matches right away, with the reasons behind each.
-          </p>
-          <button className="intro-start" type="button" ref={startRef} onClick={onStart}>
-            <SparkleIcon />
-            Start the quiz
-          </button>
+          <div className="intro-main">
+            <IntroIllustration />
+            <h1 id="intro-title" className="intro-title">Tell us the occasion. We'll find the suit.</h1>
+            <p className="intro-copy">
+              Answer a few quick questions. You'll get matches right away, with the reasons behind each.
+            </p>
+          </div>
+          <div className="quiz-dock">
+            <button className="intro-start" type="button" ref={startRef} onClick={onStart}>
+              <SparkleIcon />
+              Start the quiz
+            </button>
+          </div>
         </div>
         )}
       </div>
