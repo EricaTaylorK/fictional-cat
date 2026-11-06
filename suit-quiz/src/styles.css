@@ -4139,7 +4139,7 @@ h2 {
 .question-eyebrow {
   align-items: baseline;
   display: none;
-  gap: 8px;
+  gap: 12px;
   margin: 0;
 }
 
@@ -4151,7 +4151,7 @@ h2 {
 }
 
 .question-required {
-  color: #1d52f5;
+  color: var(--color-font-medium-gray);
   font-size: 13px;
   font-weight: 500;
   line-height: 18px;
