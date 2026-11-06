@@ -4136,6 +4136,27 @@ h2 {
   width: 100%;
 }
 
+.question-eyebrow {
+  align-items: baseline;
+  display: none;
+  gap: 8px;
+  margin: 0;
+}
+
+.question-step-count {
+  color: #3a3a3a;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 18px;
+}
+
+.question-required {
+  color: #1d52f5;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 18px;
+}
+
 .quiz-slide .question-head .helper {
   color: #3a3a3a;
   font-size: 20px;
@@ -4746,9 +4767,43 @@ h2 {
     width: 100%;
   }
 
+  .intro-header {
+    column-gap: 12px;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    padding-inline: 12px;
+  }
+
+  .intro-back {
+    white-space: nowrap;
+  }
+
+  .intro-brand {
+    gap: 10px;
+    justify-self: center;
+    max-width: 100%;
+    min-width: 0;
+  }
+
   .intro-header-title {
     font-size: 12px;
     letter-spacing: 0.08em;
+    min-width: 0;
+    overflow: hidden;
+    padding-left: 10px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .intro-header-end {
+    gap: 0;
+  }
+
+  .intro-step {
+    display: none;
+  }
+
+  .quiz-slide .question-eyebrow {
+    display: flex;
   }
 
   .intro-title {
@@ -4766,7 +4821,17 @@ h2 {
   }
 }
 
+@media (max-width: 360px) {
+  .intro-header-title {
+    display: none;
+  }
+}
+
 @media (min-width: 641px) {
+  .question-eyebrow {
+    display: none;
+  }
+
   .quiz-slide .size-pair {
     align-items: stretch;
     column-gap: 48px;

@@ -670,12 +670,21 @@ export default function App() {
   const usuallyFine = currentQuestion?.type === "multi"
     && Array.isArray(answers[currentId])
     && answers[currentId].includes("none");
+  const stepLabel = screen === "question" && totalQuestions > 0
+    ? `Step ${currentIndex + 1} of ${totalQuestions}`
+    : undefined;
 
   const questionSlide = currentQuestion && (
     <section className="quiz-slide" aria-labelledby="question-title">
       <div className="question-head">
         {currentQuestion.icon && <img className="question-icon" src={currentQuestion.icon} alt="" />}
         <div>
+          {stepLabel && (
+            <p className="question-eyebrow">
+              <span className="question-step-count">{stepLabel}</span>
+              {!currentQuestion.skippable && <span className="question-required">Required</span>}
+            </p>
+          )}
           <h2 id="question-title">{currentQuestion.title}</h2>
           {questionHelp(currentQuestion, answers) && (
             <p className="helper">{questionHelp(currentQuestion, answers)}</p>
@@ -801,7 +810,7 @@ export default function App() {
             onBack={screen === "question" ? goBack : undefined}
             onClose={screen === "question" || screen === "matching" ? saveAndExit : closeIntro}
             progress={screen === "matching" ? 1 : screen === "question" && totalQuestions > 0 ? (currentIndex + 1) / totalQuestions : undefined}
-            stepLabel={screen === "question" && totalQuestions > 0 ? `Step ${currentIndex + 1} of ${totalQuestions}` : undefined}
+            stepLabel={stepLabel}
             labelledBy={screen === "matching" ? "matching-title" : screen === "question" ? "question-title" : "intro-title"}
           >
             {screen === "matching" ? (
