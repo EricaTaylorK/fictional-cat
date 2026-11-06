@@ -484,11 +484,11 @@ function SuitOptions({ tailoringId, onTailoring, look, addedLooks, onOpenLook, o
           const selected = tailoringId === option.id;
           return (
             <article className={`tailor-card${option.recommended && showSuggestion ? " is-recommended" : ""}`} key={option.id}>
+              {option.recommended && showSuggestion && <span className="tailor-badge">Recommended</span>}
               <span className="tailor-icon">
                 <TailorGlyph name={option.icon} />
               </span>
               <div className="tailor-copy">
-                {option.recommended && showSuggestion && <span className="tailor-badge">Recommended</span>}
                 <div className="tailor-title">
                   <h4>{option.name}</h4>
                   <strong>{formatPrice(option.price)}</strong>

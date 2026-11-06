@@ -7293,6 +7293,10 @@ button.store-logo {
     padding: 12px;
   }
 
+  .tailor-card.is-recommended {
+    padding-top: 36px;
+  }
+
   .tailor-card .tailor-icon {
     align-items: center;
     background: #f4f1ea;
@@ -7317,12 +7321,16 @@ button.store-logo {
   }
 
   .tailor-card .tailor-badge {
-    align-self: flex-start;
+    align-items: center;
     border-radius: 4px;
+    display: inline-flex;
+    justify-content: center;
     left: auto;
     padding: 2px 8px;
-    position: static;
-    top: auto;
+    position: absolute;
+    right: 12px;
+    text-align: center;
+    top: 8px;
     width: max-content;
   }
 
