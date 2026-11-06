@@ -180,9 +180,6 @@ function HomeScreen({ onTakeQuiz, onNavigate }) {
 
   return (
     <main id="home">
-      <div className="sf-hero-slot">
-        <LargeHeroBanner entrypoint="home-hero" priority onActivate={onTakeQuiz} />
-      </div>
       <section className="cat-row" aria-label="Departments">
         {categories.map((category) => (
           <button key={category.label} className="cat-card" type="button" onClick={shop}>
@@ -206,6 +203,10 @@ function HomeScreen({ onTakeQuiz, onNavigate }) {
           <img src={suitIn("tan")?.imageUrl || "/suits/suit-tan.jpg"} alt="" />
         </div>
       </section>
+
+      <div className="sf-hero-slot">
+        <LargeHeroBanner entrypoint="home-hero" priority onActivate={onTakeQuiz} />
+      </div>
 
       <section className="promo-row" aria-label="Promotions">
         {promos.map((promo) => (
@@ -284,26 +285,6 @@ function HomeScreen({ onTakeQuiz, onNavigate }) {
   );
 }
 
-function QuizEntry({ onTakeQuiz }) {
-  return (
-    <section className="quiz-entry" aria-labelledby="quiz-entry-title">
-      <img className="quiz-entry-art" src="/quiz/style-expert.svg" alt="" />
-      <div className="quiz-entry-copy">
-        <p className="quiz-entry-badge">
-          <span className="quiz-entry-mark" aria-hidden="true">MW</span>
-          AI Style Expert
-        </p>
-        <h2 id="quiz-entry-title">Meet your personal style expert</h2>
-        <p><strong>In under a minute</strong> get suit options matched to your event and needs.</p>
-      </div>
-      <button className="quiz-entry-button" type="button" onClick={onTakeQuiz}>
-        <SparkleIcon />
-        Find the suit
-      </button>
-    </section>
-  );
-}
-
 function RentalShop({ onTakeQuiz }) {
   const lineup = ["black", "navy", "gray", "blue"].map(suitIn).filter(Boolean);
 
@@ -320,6 +301,10 @@ function RentalShop({ onTakeQuiz }) {
         </div>
       </section>
 
+      <div className="sf-hero-slot">
+        <LargeHeroBanner entrypoint="lp-wedding" priority onActivate={onTakeQuiz} />
+      </div>
+
       <section className="rental-match" aria-labelledby="rental-match-title">
         <div className="rental-match-copy">
           <h2 id="rental-match-title">Your wedding, our rentals—it&apos;s a match.</h2>
@@ -327,8 +312,6 @@ function RentalShop({ onTakeQuiz }) {
         </div>
         <img src={suitIn("navy")?.imageUrl || "/suits/suit-navy.jpg"} alt="" />
       </section>
-
-      <QuizEntry onTakeQuiz={onTakeQuiz} />
 
       <section className="home-rail rental-lineup" aria-labelledby="rental-lineup-title">
         <h2 id="rental-lineup-title">Our most-loved lineup</h2>
@@ -347,15 +330,3 @@ function RentalShop({ onTakeQuiz }) {
     </main>
   );
 }
-
-function SparkleIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path
-        d="M12 2.5l1.4 6.1L19.5 10 13.4 11.4 12 17.5 10.6 11.4 4.5 10l6.1-1.4L12 2.5z"
-        fill="currentColor"
-      />
-    </svg>
-  );
-}
-

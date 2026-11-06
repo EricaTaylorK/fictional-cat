@@ -879,7 +879,7 @@ h2 {
 
 .results-monogram {
   align-items: center;
-  background: #010962;
+  background: var(--color-primary-blue);
   border-radius: var(--border-radius-circle);
   color: var(--color-neutral-white);
   display: inline-flex;
@@ -4481,7 +4481,7 @@ h2 {
 
 .intro-badge {
   align-items: center;
-  background: #1b1c20;
+  background: var(--color-primary-blue);
   border-radius: 50%;
   color: #fff;
   display: inline-flex;
@@ -4495,6 +4495,7 @@ h2 {
 
 .intro-header-title {
   border-left: 1px solid var(--color-divider-light-gray);
+  color: var(--color-primary-blue);
   font-size: 13px;
   font-weight: 600;
   letter-spacing: 0.12em;
@@ -4628,10 +4629,18 @@ h2 {
   }
 
   .intro-modal {
-    background: linear-gradient(0deg, rgba(255, 255, 255, 0.25), rgba(255, 255, 255, 0.25)), url("/quiz/quiz-fabric.png") center / cover no-repeat, #f7f9fd;
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.35), rgba(255, 255, 255, 0.2)),
+      linear-gradient(100deg, #f4e8e2 0%, #f7f3ee 46%, #e4f0fc 100%);
     border-radius: 0;
     height: 100%;
     width: 100%;
+  }
+
+  .intro-body,
+  .quiz-slide,
+  .intro-modal .matching {
+    background: transparent;
   }
 
   .quiz-slide {

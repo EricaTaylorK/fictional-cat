@@ -258,7 +258,7 @@
     order: 2;
     align-self: center;
     width: 160px;
-    margin: 0 auto 20px;
+    margin: 0 auto -12px;
   }
 
   .sf-entry--hero .sf-entry-title {
