@@ -4289,7 +4289,7 @@ h2 {
 .quiz-slide .option-copy {
   align-items: center;
   flex: 0 0 auto;
-  gap: 8px;
+  gap: 4px;
   justify-content: center;
   text-align: center;
   width: 100%;
@@ -4311,9 +4311,9 @@ h2 {
 
 .quiz-slide .option-copy span {
   color: #747474;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 400;
-  line-height: 1.5;
+  line-height: 18px;
   text-align: center;
   width: 100%;
 }
@@ -4801,7 +4801,7 @@ h2 {
 
   .quiz-slide .option-copy span {
     color: var(--color-neutral-medium-gray);
-    font-size: 12px;
+    font-size: 14px;
   }
 
   .quiz-slide .option-cards.option-cards-compact {
