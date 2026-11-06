@@ -1828,10 +1828,7 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
             <div className="results-hero-headline">
               <MatchRing percent={ringPercent} />
               <div className="results-hero-copy">
-                <h1 id="results-title">
-                  <span className="results-title-wide">We found your best matches!</span>
-                  <span className="results-title-phone">We&apos;ve found your suit!</span>
-                </h1>
+                <h1 id="results-title">We found your best matches!</h1>
                 <p className="results-lede">{lede}</p>
               </div>
             </div>

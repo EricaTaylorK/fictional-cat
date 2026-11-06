@@ -6018,10 +6018,6 @@ button.store-logo {
   display: contents;
 }
 
-.results-title-phone {
-  display: none;
-}
-
 .results-layout .results-expert {
   grid-column: 1;
   grid-row: 1;
@@ -7378,7 +7374,7 @@ button.store-logo {
 
   .tailor-card .tailor-title {
     align-items: baseline;
-    column-gap: 0;
+    column-gap: 6px;
     display: flex;
     flex-wrap: wrap;
     justify-content: flex-start;
@@ -7403,12 +7399,6 @@ button.store-logo {
     flex: 0 0 auto;
     max-width: 100%;
     white-space: nowrap;
-  }
-
-  .tailor-card .tailor-copy strong::before {
-    content: " – ";
-    font-weight: 500;
-    white-space: pre;
   }
 
   .tailor-card .tailor-copy p {
@@ -8150,14 +8140,6 @@ button.store-logo {
     gap: 4px;
     text-align: left;
     width: 100%;
-  }
-
-  .results-layout .results-title-wide {
-    display: none;
-  }
-
-  .results-layout .results-title-phone {
-    display: inline;
   }
 
   .results-layout .results-main .results-hero h1 {
