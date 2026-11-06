@@ -6419,12 +6419,13 @@ button.store-logo {
   font-family: var(--font-family-roboto);
   font-size: var(--font-size-button-cta);
   font-weight: var(--font-weight-medium);
+  gap: 8px;
   height: 48px;
   justify-content: center;
   letter-spacing: 0.01em;
   line-height: var(--line-height-16);
   margin-top: 12px;
-  padding: 0 16px;
+  padding: 0 8px;
   text-transform: uppercase;
   white-space: nowrap;
   width: 100%;
@@ -6436,9 +6437,17 @@ button.store-logo {
 
 .suit-expand-toggle span {
   display: inline;
+  flex: 0 0 auto;
   font-size: inherit;
   line-height: inherit;
   white-space: nowrap;
+}
+
+.suit-expand-chevron {
+  display: block;
+  flex: 0 0 16px;
+  height: 16px;
+  width: 16px;
 }
 
 .suit-expand-toggle.is-open,
