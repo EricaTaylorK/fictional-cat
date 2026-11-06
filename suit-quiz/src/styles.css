@@ -4809,7 +4809,8 @@ h2 {
 
   .intro-modal .matching {
     align-items: flex-start;
-    padding: 64px 16px 32px;
+    justify-content: flex-start;
+    padding: 32px 16px 32px;
     text-align: left;
   }
 
