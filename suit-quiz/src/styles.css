@@ -7353,10 +7353,10 @@ button.store-logo {
     border-radius: 4px;
     display: inline-flex;
     justify-content: center;
-    left: 12px;
+    left: auto;
     padding: 2px 8px;
     position: absolute;
-    right: auto;
+    right: 12px;
     text-align: center;
     top: 8px;
     width: max-content;
