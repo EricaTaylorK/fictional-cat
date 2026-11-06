@@ -4829,9 +4829,19 @@ h2 {
     display: flex;
   }
 
+  .intro-body {
+    justify-content: flex-start;
+    padding-top: 32px;
+  }
+
+  .intro-illustration {
+    margin-bottom: 12px;
+  }
+
   .intro-title {
     font-size: 26px;
     line-height: 32px;
+    margin-top: 0;
   }
 
   .intro-copy {
