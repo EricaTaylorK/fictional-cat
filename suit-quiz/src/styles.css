@@ -6173,7 +6173,7 @@ button.store-logo {
   display: flex;
   flex: 1 1 auto;
   flex-direction: column;
-  gap: 16px;
+  gap: 24px;
   min-width: 0;
 }
 
@@ -6200,7 +6200,7 @@ button.store-logo {
 .results-layout .suit-card.is-selected .suit-card-face:hover,
 .results-layout .suit-card-face:hover {
   border: 1px solid rgba(0, 0, 0, 0.1);
-  border-radius: 4px;
+  border-radius: 12px;
   box-shadow: 0 2px 4px var(--color-transparent-black10), 0 0 2px var(--color-transparent-black10);
   box-sizing: border-box;
   padding: 12px;
@@ -6469,6 +6469,12 @@ button.store-logo {
   background: var(--action-background-tertiary);
   border-color: var(--action-background-tertiary);
   color: var(--color-font-black);
+}
+
+.results-layout .suit-card.is-open .suit-expand + .suit-expand-toggle {
+  display: flex;
+  margin-top: 24px;
+  width: 100%;
 }
 
 .suit-expand {
@@ -7460,6 +7466,7 @@ button.store-logo {
 .your-look > .your-look-panel {
   border: 0;
   border-radius: 0;
+  box-shadow: none;
 }
 
 .your-look-dock {
@@ -8341,6 +8348,11 @@ button.store-logo {
     margin: 0 16px 16px;
   }
 
+  .results-layout .suit-card.is-open .suit-expand + .suit-expand-toggle {
+    margin: 0 16px 16px;
+    width: calc(100% - 32px);
+  }
+
   .results-layout .suit-card-info {
     align-items: start;
     column-gap: 12px;
@@ -8610,7 +8622,7 @@ button.store-logo {
   }
 
   .results-layout .results-list {
-    gap: 16px;
+    gap: 24px;
   }
 
   .results-layout .results-list-title {
@@ -8643,7 +8655,7 @@ button.store-logo {
   .results-layout .suit-card.is-open .suit-card-face {
     background: #fff;
     border: 1px solid rgba(0, 0, 0, 0.1);
-    border-radius: 8px;
+    border-radius: 12px;
     box-shadow: 0 2px 4px var(--color-transparent-black10), 0 0 2px var(--color-transparent-black10);
     overflow: hidden;
     padding: 0;
