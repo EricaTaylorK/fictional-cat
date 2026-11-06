@@ -190,33 +190,30 @@ function UnitToggle({ unit, onChange }) {
 function WheelPicker({ unit, values, onField }) {
   const metric = unit === "metric";
   return (
-    <div className="hw-picker" key={unit}>
-      <div className="hw-columns hw-headings">
+    <div className={`hw-picker${metric ? " hw-picker-metric" : ""}`} key={unit}>
+      <div className="hw-control" role="group" aria-labelledby="hw-height-heading">
         <h2 className="hw-heading" id="hw-height-heading">Height</h2>
-        <h2 className="hw-heading" id="hw-weight-heading">Weight</h2>
-      </div>
-      <div className="hw-columns hw-wheel-row">
-        <div className="hw-picker-band" aria-hidden="true" />
-        <div className="hw-group" role="group" aria-labelledby="hw-height-heading">
-          <div className="hw-wheels">
-            {metric ? (
-              <Wheel label="Height in centimeters" items={CM_ITEMS} value={values.cm} unitLabel="cm" unitWord="centimeters" wide onSelect={(next) => onField("cm", next)} />
-            ) : (
-              <>
-                <Wheel label="Height, feet" items={FEET_ITEMS} value={values.feet} unitLabel="ft" unitWord="feet" onSelect={(next) => onField("feet", next)} />
-                <Wheel label="Height, inches" items={INCH_ITEMS} value={values.inches} unitLabel="in" unitWord="inches" onSelect={(next) => onField("inches", next)} />
-              </>
-            )}
-          </div>
+        <div className="hw-wheels">
+          <div className="hw-band" aria-hidden="true" />
+          {metric ? (
+            <Wheel label="Height in centimeters" items={CM_ITEMS} value={values.cm} unitLabel="cm" unitWord="centimeters" wide onSelect={(next) => onField("cm", next)} />
+          ) : (
+            <>
+              <Wheel label="Height, feet" items={FEET_ITEMS} value={values.feet} unitLabel="ft" unitWord="feet" onSelect={(next) => onField("feet", next)} />
+              <Wheel label="Height, inches" items={INCH_ITEMS} value={values.inches} unitLabel="in" unitWord="inches" onSelect={(next) => onField("inches", next)} />
+            </>
+          )}
         </div>
-        <div className="hw-group" role="group" aria-labelledby="hw-weight-heading">
-          <div className="hw-wheels">
-            {metric ? (
-              <Wheel label="Weight in kilograms" items={KG_ITEMS} value={values.kg} unitLabel="kg" unitWord="kilograms" wide onSelect={(next) => onField("kg", next)} />
-            ) : (
-              <Wheel label="Weight in pounds" items={POUND_ITEMS} value={values.lb} unitLabel="lb" unitWord="pounds" wide onSelect={(next) => onField("lb", next)} />
-            )}
-          </div>
+      </div>
+      <div className="hw-control" role="group" aria-labelledby="hw-weight-heading">
+        <h2 className="hw-heading" id="hw-weight-heading">Weight</h2>
+        <div className="hw-wheels">
+          <div className="hw-band" aria-hidden="true" />
+          {metric ? (
+            <Wheel label="Weight in kilograms" items={KG_ITEMS} value={values.kg} unitLabel="kg" unitWord="kilograms" wide onSelect={(next) => onField("kg", next)} />
+          ) : (
+            <Wheel label="Weight in pounds" items={POUND_ITEMS} value={values.lb} unitLabel="lbs" unitWord="pounds" wide onSelect={(next) => onField("lb", next)} />
+          )}
         </div>
       </div>
     </div>

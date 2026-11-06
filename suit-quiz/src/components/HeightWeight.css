@@ -63,51 +63,53 @@
 .hw-picker {
   --hw-item: 44px;
   --hw-rows: 5;
-  display: grid;
-  gap: 8px;
-  max-width: 360px;
+  display: flex;
+  gap: 20px;
+  max-width: 420px;
   width: 100%;
 }
 
-.hw-columns {
-  display: grid;
-  gap: 0 24px;
-  grid-template-columns: 2fr 1fr;
-}
-
-.hw-wheel-row {
-  position: relative;
-}
-
-.hw-group {
+/* Height holds feet and inches; weight is its own control. */
+.hw-control {
+  display: flex;
+  flex: 1 1 0;
+  flex-direction: column;
+  gap: 8px;
   min-width: 0;
-  position: relative;
+}
+
+.hw-picker:not(.hw-picker-metric) .hw-control:first-child {
+  flex: 1.85 1 0;
 }
 
 .hw-heading {
-  color: var(--text-secondary);
-  font-size: var(--font-size-14);
-  font-weight: 500;
+  color: var(--color-font-medium-gray);
+  font-size: var(--font-size-12);
+  font-weight: var(--font-weight-medium);
+  letter-spacing: 0.08em;
+  line-height: 16px;
   margin: 0;
   text-align: center;
+  text-transform: uppercase;
 }
 
 .hw-wheels {
   display: flex;
   gap: 0;
+  position: relative;
 }
 
 .hw-col {
   flex: 1 1 0;
   min-width: 0;
   position: relative;
+  z-index: 1;
 }
 
-/* The highlighted band the selected values sit in. */
-.hw-picker-band {
-  background: var(--color-info-light-blue);
-  border: 1px solid var(--color-info-blue);
-  border-radius: var(--border-radius-md);
+/* Each control has its own bar behind the selected row. */
+.hw-band {
+  background: #e0e0e0;
+  border-radius: 12px;
   box-sizing: border-box;
   height: var(--hw-item);
   left: 0;
