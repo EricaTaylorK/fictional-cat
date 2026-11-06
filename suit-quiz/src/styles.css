@@ -8522,3 +8522,47 @@ button.store-logo {
     width: 32px;
   }
 }
+
+/* Phone suit list: one column. A light-grey bar separates suits.
+   The bar is the space; cards do not float with a gap or a shadow. */
+@media (max-width: 640px) {
+  .results-layout .results-list {
+    gap: 0;
+  }
+
+  .results-layout .results-list-title {
+    margin-bottom: 16px;
+  }
+
+  .results-layout .results-list > .more-matches-row,
+  .results-layout .results-list > .more-matches {
+    margin-top: 16px;
+  }
+
+  .results-layout .results-list > .suit-card {
+    background: #fff;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    margin-left: -16px;
+    margin-right: -16px;
+    padding: 16px;
+  }
+
+  .results-layout .results-list > .suit-card + .suit-card {
+    border-top: 8px solid #eee;
+  }
+
+  .results-layout .suit-card-face,
+  .results-layout .suit-card.is-selected .suit-card-face,
+  .results-layout .suit-card.is-selected .suit-card-face:hover,
+  .results-layout .suit-card-face:hover,
+  .results-layout .suit-card.is-open .suit-card-face {
+    background: transparent;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    padding-bottom: 0;
+    padding-top: 0;
+  }
+}
