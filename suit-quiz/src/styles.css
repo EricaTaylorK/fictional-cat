@@ -8333,11 +8333,11 @@ button.store-logo {
   }
 
   .results-layout .suit-card-info {
-    align-items: end;
+    align-items: start;
     column-gap: 12px;
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto;
-    row-gap: 8px;
+    row-gap: 12px;
     width: 100%;
   }
 
@@ -8380,7 +8380,7 @@ button.store-logo {
   .results-layout .suit-card-names {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 0;
     height: auto;
     order: -1;
   }
@@ -8424,12 +8424,14 @@ button.store-logo {
     clear: none;
     font-size: 12px;
     grid-column: 1 / -1;
-    grid-row: 2;
+    grid-row: 3;
     height: auto;
+    justify-self: center;
     line-height: 16px;
-    margin: 4px 0 0;
+    margin: 0 auto;
     position: static;
     right: auto;
+    text-align: center;
     top: auto;
     width: fit-content;
   }
@@ -8440,12 +8442,12 @@ button.store-logo {
 
   .results-layout .suit-price-stack {
     align-items: flex-end;
-    align-self: end;
+    align-self: start;
+    gap: 0;
     grid-column: 2;
     grid-row: 1;
     justify-self: end;
     margin: 0;
-    max-width: 42%;
     text-align: right;
   }
 
@@ -8476,9 +8478,10 @@ button.store-logo {
   .results-layout .suit-clearance {
     align-self: flex-end;
     color: #747474;
-    font-size: 12px;
-    line-height: 16px;
-    margin: 2px 0 0;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 18px;
+    margin: 0;
     text-align: right;
     width: auto;
   }
@@ -8486,8 +8489,8 @@ button.store-logo {
   .results-layout .suit-expand-toggle {
     font-size: var(--font-size-button-cta);
     grid-column: 1 / -1;
-    grid-row: 3;
-    margin-top: 4px;
+    grid-row: 2;
+    margin-top: 0;
     padding: 0 16px;
     width: 100%;
   }
