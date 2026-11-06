@@ -4686,7 +4686,7 @@ h2 {
   .quiz-slide .option-copy,
   .quiz-slide .option-copy strong,
   .quiz-slide .option-copy span {
-    text-align: center;
+    text-align: left;
   }
 
   .color-picks {
@@ -4695,42 +4695,65 @@ h2 {
 
   .quiz-slide .option-cards {
     display: grid;
-    gap: 16px;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    grid-template-columns: minmax(0, 1fr);
     justify-content: stretch;
     width: 100%;
   }
 
   .quiz-slide .option-card {
     align-items: center;
+    background: var(--surface-primary);
+    border: 1px solid var(--color-transparent-black10);
+    border-radius: var(--border-radius-lg);
     flex-basis: auto;
-    flex-direction: column;
+    flex-direction: row;
+    gap: 16px;
     height: auto;
-    justify-content: center;
+    justify-content: flex-start;
     max-width: none;
-    min-height: 208px;
+    min-height: 0;
     min-width: 0;
     padding: 16px;
-    text-align: center;
+    text-align: left;
     width: 100%;
   }
 
   .quiz-slide .option-art {
-    height: 64px;
-    min-height: 64px;
-    width: 64px;
+    height: 56px;
+    min-height: 56px;
+    width: 56px;
+  }
+
+  .quiz-slide .color-card .option-art {
+    height: auto;
+    min-height: 44px;
+    width: auto;
   }
 
   .quiz-slide .option-icon,
   .quiz-slide .option-icon-slot,
   .quiz-slide .option-palette {
-    height: 64px;
-    width: 64px;
+    height: 56px;
+    width: 56px;
   }
 
   .quiz-slide .option-copy {
-    align-items: center;
+    align-items: flex-start;
+    flex: 1 1 auto;
     justify-content: center;
+    min-width: 0;
+    width: auto;
+  }
+
+  .quiz-slide .option-copy strong {
+    color: var(--color-neutral-black);
+    font-weight: var(--font-weight-semibold);
+  }
+
+  .quiz-slide .option-copy span {
+    color: var(--color-neutral-medium-gray);
+    font-size: 12px;
   }
 
   .quiz-slide .option-cards.option-cards-compact {
