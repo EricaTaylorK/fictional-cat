@@ -332,24 +332,10 @@ function MeasurementsQuestion({
     }
   }
 
-  function toggleUnknown(id) {
-    const field = MEASUREMENT_FIELDS.find((item) => item.id === id);
-    const nextUnknown = !unknownSizes[id];
-    onUnknownSizes({ ...unknownSizes, [id]: nextUnknown });
-    if (nextUnknown) {
-      writeMeasurements({ ...value, [id]: "" });
-      return;
-    }
-    if (sizeList(everydaySizes[field.estimateId]).length) {
-      onEverydaySizes({ ...everydaySizes, [field.estimateId]: [] });
-    }
-  }
-
   return (
     <div className="size-groups">
       <div className="size-pair">
         {MEASUREMENT_FIELDS.map((field) => {
-          const unknown = Boolean(unknownSizes[field.id]);
           const known = sizeList(value[field.id]);
           return (
             <fieldset className="size-group" key={field.id}>
@@ -374,14 +360,6 @@ function MeasurementsQuestion({
                   );
                 })}
               </div>
-              <button
-                className={`unknown-size${unknown ? " is-on" : ""}`}
-                type="button"
-                aria-pressed={unknown}
-                onClick={() => toggleUnknown(field.id)}
-              >
-                Not sure
-              </button>
             </fieldset>
           );
         })}
