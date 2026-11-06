@@ -1818,10 +1818,20 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
     <div className="results-layout">
       <section className="results-main" aria-labelledby="results-title">
         <div className="results-hero">
-          <div className="results-hero-top">
+          <div className="results-hero-intro">
             <div className="results-expert">
               <span className="results-monogram" aria-hidden="true">M|W</span>
               <span className="results-expert-label">AI Style Expert</span>
+            </div>
+            <div className="results-hero-headline">
+              <MatchRing percent={ringPercent} />
+              <div className="results-hero-copy">
+                <h1 id="results-title">
+                  <span className="results-title-wide">We found your best matches!</span>
+                  <span className="results-title-phone">We&apos;ve found your suit!</span>
+                </h1>
+                <p className="results-lede">{lede}</p>
+              </div>
             </div>
             <div className="results-hero-actions">
               <button className="results-hero-action" type="button">
@@ -1834,13 +1844,6 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
               </button>
             </div>
           </div>
-          <div className="results-hero-headline">
-            <MatchRing percent={ringPercent} />
-            <div className="results-hero-copy">
-              <h1 id="results-title">We found your best matches!</h1>
-              <p className="results-lede">{lede}</p>
-            </div>
-          </div>
           <div className="hero-facts">
             <div className="hero-fact" id="your-sizes" tabIndex={-1}>
               <div>
@@ -1848,14 +1851,14 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
                 <p className="hero-fact-value">Jacket: {jacketFact(size, renting)} · Pants: {pantsFact(size, renting)}</p>
               </div>
             </div>
-            <div className="hero-fact">
+            <div className={`hero-fact${answers.feel ? "" : " is-desktop-only"}`}>
               <div>
                 <p className="hero-fact-label">Your fit</p>
                 <p className="hero-fact-value">{answers.feel ? titleWords(summary.fitName) : "Not selected"}</p>
               </div>
             </div>
             {(renting || summary.tailoring) && (
-            <div className="hero-fact">
+            <div className={`hero-fact${renting ? " is-desktop-only" : ""}`}>
               <div>
                 <p className="hero-fact-label">{renting ? "Package" : "Suggested tailoring"}</p>
                 <p className="hero-fact-value">
