@@ -6185,6 +6185,7 @@ button.store-logo {
   box-shadow: 0 2px 4px var(--color-transparent-black10), 0 0 2px var(--color-transparent-black10);
   box-sizing: border-box;
   padding: 12px;
+  position: relative;
 }
 
 .results-layout .suit-card.is-open .suit-card-face {
@@ -6331,8 +6332,12 @@ button.store-logo {
   height: 20px;
   line-height: 20px;
   padding: 0;
+  position: absolute;
+  right: 12px;
   text-decoration: none;
+  top: 12px;
   width: 113px;
+  z-index: 1;
 }
 
 .suit-price-col {
@@ -8120,6 +8125,198 @@ button.store-logo {
     font-size: 16px;
     font-weight: 500;
     line-height: 24px;
+  }
+}
+
+/* Phone suit cards: photo beside the details, then link, price, and the choose button. */
+@media (max-width: 640px) {
+  .results-layout .suit-card:not(.is-open) .suit-card-face,
+  .results-layout .suit-card:not(.is-open) .suit-row {
+    height: auto;
+    min-height: 0;
+  }
+
+  .results-layout .suit-card-face {
+    padding: 16px;
+  }
+
+  .results-layout .suit-row {
+    display: flow-root;
+    height: auto;
+    min-height: 0;
+  }
+
+  .results-layout .suit-card-media {
+    aspect-ratio: 1;
+    float: left;
+    flex: none;
+    flex-basis: auto;
+    height: auto;
+    margin: 0 12px 8px 0;
+    max-width: 40%;
+    min-height: 0;
+    width: 40%;
+  }
+
+  .results-layout .suit-card-media .product-image {
+    border-radius: 2px;
+  }
+
+  .results-layout .suit-card-body,
+  .results-layout .suit-card-info {
+    display: block;
+    min-height: 0;
+    overflow: visible;
+    width: auto;
+  }
+
+  .results-layout .suit-card-body {
+    gap: 0;
+    justify-content: flex-start;
+  }
+
+  .results-layout .suit-card-topbar {
+    align-items: flex-start;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    margin: 0 0 8px;
+    min-width: 0;
+    width: auto;
+  }
+
+  .results-layout .suit-badges {
+    margin: 0;
+  }
+
+  .results-layout .suit-badges .match-score {
+    background: #1f8a4c;
+    border-radius: 999px;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    height: auto;
+    letter-spacing: 0.04em;
+    line-height: 14px;
+    padding: 4px 10px;
+  }
+
+  .results-layout .suit-card-copy {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    justify-content: flex-start;
+    max-width: 100%;
+    min-width: 0;
+  }
+
+  .results-layout .suit-card-names {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    height: auto;
+    order: -1;
+  }
+
+  .results-layout .suit-card .product-brand,
+  .results-layout .suit-card .product-title {
+    font-size: 16px;
+    line-height: 22px;
+    overflow: visible;
+    white-space: normal;
+  }
+
+  .results-layout .suit-card .product-brand {
+    font-weight: 600;
+  }
+
+  .results-layout .suit-card .product-title {
+    -webkit-line-clamp: unset;
+    display: block;
+    text-overflow: unset;
+  }
+
+  .results-layout .suit-card .color-swatches {
+    flex-wrap: wrap;
+    height: auto;
+    order: 0;
+    width: auto;
+  }
+
+  .results-layout .suit-card-copy .product-meta {
+    order: 3;
+  }
+
+  .results-layout .suit-card-copy .suit-rating,
+  .results-layout .suit-rating {
+    margin: 0;
+    order: 1;
+  }
+
+  .results-layout .suit-details-link {
+    clear: both;
+    height: auto;
+    margin: 8px 0 0;
+    position: static;
+    right: auto;
+    top: auto;
+    width: fit-content;
+  }
+
+  .results-layout .suit-price-col {
+    align-items: stretch;
+    align-self: stretch;
+    clear: both;
+    flex: none;
+    flex-basis: auto;
+    height: auto;
+    justify-content: flex-start;
+    margin: 8px 0 0;
+    min-height: 0;
+    width: 100%;
+  }
+
+  .results-layout .suit-price-stack {
+    align-items: flex-start;
+    text-align: left;
+  }
+
+  .results-layout .suit-price {
+    align-items: baseline;
+    font-size: 22px;
+    justify-content: flex-start;
+    line-height: 28px;
+    width: auto;
+  }
+
+  .results-layout .suit-price strong {
+    color: #232323;
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 28px;
+  }
+
+  .results-layout .suit-price s {
+    color: #747474;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 22px;
+  }
+
+  .results-layout .suit-clearance {
+    align-self: flex-start;
+    color: #747474;
+    font-size: 12px;
+    line-height: 16px;
+    margin: 4px 0 0;
+    text-align: left;
+    width: auto;
+  }
+
+  .results-layout .suit-expand-toggle {
+    font-size: var(--font-size-button-cta);
+    margin-top: 12px;
+    padding: 0 16px;
+    width: 100%;
   }
 }
 

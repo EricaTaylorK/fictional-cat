@@ -1916,13 +1916,6 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
                             {scored ? `${product.matchPercent}% match` : "Great match"}
                           </span>
                         </div>
-                        <button
-                          className="suit-details-link"
-                          type="button"
-                          onClick={() => onViewDetails?.(product.id, shown?.colorKey)}
-                        >
-                          View More Details
-                        </button>
                       </div>
                       <div className="suit-card-info">
                         <div className="suit-card-copy">
@@ -1958,6 +1951,13 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
                             </p>
                           )}
                         </div>
+                        <button
+                          className="suit-details-link"
+                          type="button"
+                          onClick={() => onViewDetails?.(product.id, shown?.colorKey)}
+                        >
+                          View More Details
+                        </button>
                         <div className="suit-price-col">
                           <div className="suit-price-stack">
                             <p className="suit-price">
