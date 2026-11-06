@@ -7352,12 +7352,12 @@ button.store-logo {
     align-items: center;
     border-radius: 4px;
     display: inline-flex;
-    justify-content: center;
-    left: auto;
+    justify-content: flex-start;
+    left: 12px;
     padding: 2px 8px;
     position: absolute;
-    right: 12px;
-    text-align: center;
+    right: auto;
+    text-align: left;
     top: 8px;
     width: max-content;
   }
@@ -8275,7 +8275,7 @@ button.store-logo {
   }
 }
 
-/* Suit cards through tablet: the photo leads, full width, then the details underneath.
+/* Suit cards through tablet: a wide photo leads, full width of the card, then the details.
    Above 1024px the photo stays beside the details. */
 @media (max-width: 1024px) {
   .results-layout .suit-card:not(.is-open) .suit-card-face,
@@ -8285,29 +8285,29 @@ button.store-logo {
   }
 
   .results-layout .suit-card-face {
-    padding: 16px;
+    padding: 0;
   }
 
   .results-layout .suit-row {
     align-items: stretch;
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 0;
     height: auto;
     min-height: 0;
   }
 
   .results-layout .suit-card-media {
-    aspect-ratio: 4 / 5;
+    aspect-ratio: 4 / 3;
     float: none;
     flex: none;
     flex-basis: auto;
     height: auto;
-    margin: -16px -32px 0;
+    margin: 0;
     max-width: none;
     min-height: 0;
     overflow: hidden;
-    width: calc(100% + 64px);
+    width: 100%;
   }
 
   .results-layout .suit-card-media .product-image {
@@ -8333,7 +8333,12 @@ button.store-logo {
     flex-direction: column;
     gap: 8px;
     justify-content: flex-start;
+    padding: 16px;
     width: 100%;
+  }
+
+  .results-layout .suit-expand {
+    margin: 0 16px 16px;
   }
 
   .results-layout .suit-card-info {
@@ -8597,9 +8602,7 @@ button.store-logo {
   }
 }
 
-/* Suit list through tablet: one column. A light-grey bar separates suits.
-   The bar is the space; cards do not float with a gap or a shadow.
-   The 16px stage inset matches the card bleed so the bar reaches the edges. */
+/* Suit list through tablet: inset cards with a gap. No edge-to-edge bars. */
 @media (max-width: 1024px) {
   .results-layout .results-stage {
     padding-left: 16px;
@@ -8607,30 +8610,30 @@ button.store-logo {
   }
 
   .results-layout .results-list {
-    gap: 0;
+    gap: 16px;
   }
 
   .results-layout .results-list-title {
-    margin-bottom: 16px;
+    margin-bottom: 0;
   }
 
   .results-layout .results-list > .more-matches-row,
   .results-layout .results-list > .more-matches {
-    margin-top: 16px;
+    margin-top: 0;
   }
 
   .results-layout .results-list > .suit-card {
-    background: #fff;
+    background: transparent;
     border: 0;
     border-radius: 0;
     box-shadow: none;
-    margin-left: -16px;
-    margin-right: -16px;
-    padding: 16px;
+    margin-left: 0;
+    margin-right: 0;
+    padding: 0;
   }
 
   .results-layout .results-list > .suit-card + .suit-card {
-    border-top: 8px solid #eee;
+    border-top: 0;
   }
 
   .results-layout .suit-card-face,
@@ -8638,12 +8641,17 @@ button.store-logo {
   .results-layout .suit-card.is-selected .suit-card-face:hover,
   .results-layout .suit-card-face:hover,
   .results-layout .suit-card.is-open .suit-card-face {
-    background: transparent;
-    border: 0;
-    border-radius: 0;
-    box-shadow: none;
-    padding-bottom: 0;
-    padding-top: 0;
+    background: #fff;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    box-shadow: 0 2px 4px var(--color-transparent-black10), 0 0 2px var(--color-transparent-black10);
+    overflow: hidden;
+    padding: 0;
+  }
+
+  .results-layout .suit-card.is-open .suit-card-face {
+    border-color: #001e56;
+    border-width: 1.5px;
   }
 }
 
