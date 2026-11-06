@@ -225,16 +225,16 @@ export const questions = {
 export function getQuestionFlow(answers) {
   const renting = answers.mode === "rent";
   const start = renting
-    ? ["mode", "occasion", "eventDate", "pieces", "feel", "colors", "measurementKnowledge"]
-    : ["mode", "occasion", "feel", "colors", "measurementKnowledge"];
+    ? ["mode", "occasion", "eventDate", "pieces", "feel", "colors", "height", "measurementKnowledge"]
+    : ["mode", "occasion", "feel", "colors", "height", "measurementKnowledge"];
   const end = renting ? [] : ["tailoring", "budget"];
   const unknown = answers.unknownSizes ?? {};
   const estimate = unknown.chest || unknown.waist ? ["everydaySizes"] : [];
   if (answers.measurementKnowledge === "yes" || answers.measurementKnowledge === "some") {
-    return [...start, "height", "measurements", ...estimate, "fitIssues", "pantsFit", ...end];
+    return [...start, "measurements", ...estimate, "fitIssues", "pantsFit", ...end];
   }
   if (answers.measurementKnowledge === "no") {
-    return [...start, "height", "everydaySizes", "fitIssues", "pantsFit", ...end];
+    return [...start, "everydaySizes", "fitIssues", "pantsFit", ...end];
   }
   return start;
 }

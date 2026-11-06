@@ -50,8 +50,8 @@ describe("quiz routing", () => {
       "occasion",
       "feel",
       "colors",
-      "measurementKnowledge",
       "height",
+      "measurementKnowledge",
       "measurements",
       "fitIssues",
       "pantsFit",
@@ -62,12 +62,20 @@ describe("quiz routing", () => {
 
   it("asks height before any size questions, then where suits feel off", () => {
     const some = getQuestionFlow({ measurementKnowledge: "some" });
-    expect(some.indexOf("measurements")).toBe(some.indexOf("height") + 1);
+    expect(some.indexOf("measurementKnowledge")).toBe(some.indexOf("height") + 1);
+    expect(some.indexOf("measurements")).toBe(some.indexOf("measurementKnowledge") + 1);
     expect(some.indexOf("fitIssues")).toBe(some.indexOf("measurements") + 1);
     const estimate = getQuestionFlow({ measurementKnowledge: "no" });
-    expect(estimate.indexOf("everydaySizes")).toBe(estimate.indexOf("height") + 1);
+    expect(estimate.indexOf("measurementKnowledge")).toBe(estimate.indexOf("height") + 1);
+    expect(estimate.indexOf("everydaySizes")).toBe(estimate.indexOf("measurementKnowledge") + 1);
     expect(estimate.indexOf("fitIssues")).toBe(estimate.indexOf("everydaySizes") + 1);
     expect(estimate.indexOf("pantsFit")).toBe(estimate.indexOf("fitIssues") + 1);
+    const unanswered = getQuestionFlow({});
+    expect(unanswered).toContain("height");
+    expect(unanswered.indexOf("measurementKnowledge")).toBe(unanswered.indexOf("height") + 1);
+    const unansweredRent = getQuestionFlow({ mode: "rent" });
+    expect(unansweredRent).toContain("height");
+    expect(unansweredRent.indexOf("measurementKnowledge")).toBe(unansweredRent.indexOf("height") + 1);
     expect(getQuestionFlow({ mode: "rent", measurementKnowledge: "no" })).toContain("height");
     expect(getQuestionFlow({ mode: "rent", measurementKnowledge: "yes" })).toContain("height");
   });
@@ -78,8 +86,8 @@ describe("quiz routing", () => {
       "occasion",
       "feel",
       "colors",
-      "measurementKnowledge",
       "height",
+      "measurementKnowledge",
       "everydaySizes",
       "fitIssues",
       "pantsFit",
@@ -97,8 +105,8 @@ describe("quiz routing", () => {
       "pieces",
       "feel",
       "colors",
-      "measurementKnowledge",
       "height",
+      "measurementKnowledge",
       "measurements",
       "fitIssues",
       "pantsFit",
