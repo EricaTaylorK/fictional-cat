@@ -6554,6 +6554,11 @@ button.store-logo {
   color: #fff;
 }
 
+.tailor-icon,
+.tailor-copy {
+  display: contents;
+}
+
 .tailor-glyph {
   display: block;
   height: 40px;
@@ -7263,17 +7268,92 @@ button.store-logo {
 
 @media (max-width: 640px) {
   .tailor-row {
+    gap: 8px;
     grid-template-columns: minmax(0, 1fr);
   }
 
-  .tailor-card .tailor-glyph {
+  .tailor-card,
+  .tailor-card.is-recommended {
+    align-items: center;
+    display: flex;
+    flex-direction: row;
+    gap: 12px;
+    padding: 12px;
+  }
+
+  .tailor-card .tailor-icon {
+    align-items: center;
+    background: #f4f1ea;
+    border-radius: 8px;
+    display: flex;
+    flex: 0 0 48px;
     height: 48px;
+    justify-content: center;
     width: 48px;
   }
 
-  .card-plus.tailor-add {
+  .tailor-card .tailor-glyph {
+    height: 40px;
+    width: 40px;
+  }
+
+  .tailor-card .card-plus.tailor-add {
+    flex: 0 0 32px;
     height: 32px;
+    position: static;
     width: 32px;
+  }
+
+  .tailor-card .tailor-badge {
+    border-radius: 4px;
+    grid-area: badge;
+    justify-self: start;
+    left: auto;
+    padding: 2px 8px;
+    position: static;
+    top: auto;
+    width: max-content;
+  }
+
+  .tailor-card .tailor-copy {
+    align-items: baseline;
+    column-gap: 0;
+    display: grid;
+    flex: 1 1 auto;
+    grid-template-areas:
+      "title price"
+      "body body";
+    grid-template-columns: auto auto;
+    justify-content: start;
+    min-width: 0;
+    row-gap: 2px;
+  }
+
+  .tailor-card.is-recommended .tailor-copy {
+    grid-template-areas:
+      "badge badge"
+      "title price"
+      "body body";
+  }
+
+  .tailor-card .tailor-copy h4 {
+    grid-area: title;
+  }
+
+  .tailor-card .tailor-copy strong {
+    grid-area: price;
+    justify-self: start;
+    white-space: nowrap;
+  }
+
+  .tailor-card .tailor-copy strong::before {
+    content: " – ";
+    font-weight: 500;
+  }
+
+  .tailor-card .tailor-copy p {
+    grid-area: body;
+    margin-top: 0;
   }
 }
 

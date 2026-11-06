@@ -484,7 +484,15 @@ function SuitOptions({ tailoringId, onTailoring, look, addedLooks, onOpenLook, o
           const selected = tailoringId === option.id;
           return (
             <article className={`tailor-card${option.recommended && showSuggestion ? " is-recommended" : ""}`} key={option.id}>
-              {option.recommended && showSuggestion && <span className="tailor-badge">Recommended</span>}
+              <span className="tailor-icon">
+                <TailorGlyph name={option.icon} />
+              </span>
+              <div className="tailor-copy">
+                {option.recommended && showSuggestion && <span className="tailor-badge">Recommended</span>}
+                <h4>{option.name}</h4>
+                <p>{option.body}</p>
+                <strong>{formatPrice(option.price)}</strong>
+              </div>
               <button
                 className={`card-plus tailor-add${selected ? " is-on" : ""}`}
                 type="button"
@@ -502,10 +510,6 @@ function SuitOptions({ tailoringId, onTailoring, look, addedLooks, onOpenLook, o
                   </svg>
                 )}
               </button>
-              <TailorGlyph name={option.icon} />
-              <h4>{option.name}</h4>
-              <p>{option.body}</p>
-              <strong>{formatPrice(option.price)}</strong>
             </article>
           );
         })}
