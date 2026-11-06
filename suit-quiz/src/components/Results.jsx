@@ -1477,11 +1477,7 @@ function YourLook({ suit, size, tailoringId, items, addedLooks, onRemoveLook, on
     }, 650);
   }
 
-  const ctaLabel = !totals.canAddToBag
-    ? "Select sizes to continue"
-    : bagStatus === "adding"
-      ? "Adding..."
-      : "Add look to bag";
+  const ctaLabel = bagStatus === "adding" ? "Adding..." : "Add look to bag";
 
   return (
     <aside className={`your-look${sheetOpen ? " is-open" : ""}`} aria-label="Your Look">

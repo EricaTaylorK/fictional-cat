@@ -8510,6 +8510,10 @@ button.store-logo {
     margin-right: 16px;
   }
 
+  .results-layout:has(.your-look) {
+    padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px));
+  }
+
   .your-look:not(.is-open) {
     left: 16px;
     right: 16px;
@@ -8517,8 +8521,18 @@ button.store-logo {
   }
 
   .your-look-dock {
-    padding-left: 16px;
-    padding-right: 16px;
+    gap: 4px;
+    padding: 8px 16px calc(8px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .your-look-bar {
+    font-size: 14px;
+    line-height: 18px;
+    min-height: 0;
+  }
+
+  .your-look-cta {
+    height: 44px;
   }
 
   .pair-row {
