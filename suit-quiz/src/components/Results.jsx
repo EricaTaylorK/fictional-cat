@@ -1914,6 +1914,11 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
                       <div className="product-image">
                         <img src={shown.image} alt="" />
                       </div>
+                      <div className="suit-badges suit-badges-on-photo">
+                        <span className="match-score">
+                          {scored ? `${product.matchPercent}% match` : "Great match"}
+                        </span>
+                      </div>
                     </div>
                     <div className="suit-card-body">
                       <div className="suit-card-topbar">

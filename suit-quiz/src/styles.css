@@ -8602,3 +8602,28 @@ button.store-logo {
     padding-top: 0;
   }
 }
+
+/* Match pill stays in the details above 640px. On the phone it sits on the photo. */
+.results-layout .suit-badges-on-photo {
+  display: none;
+}
+
+@media (max-width: 640px) {
+  .results-layout .suit-card-media {
+    overflow: visible;
+    position: relative;
+  }
+
+  .results-layout .suit-badges-on-photo {
+    display: flex;
+    left: 10px;
+    margin: 0;
+    position: absolute;
+    top: 10px;
+    z-index: 2;
+  }
+
+  .results-layout .suit-card-topbar {
+    display: none;
+  }
+}
