@@ -276,6 +276,10 @@ function PiecesQuestion({ value, onChange }) {
 const CHEST_SIZES = [36, 38, 40, 42, 44, 46, 48, 50, 52, 54, 56, 58, 60, 62, 64, 66, 68, 70];
 const WAIST_SIZES = [28, 29, 30, 31, 32, 33, 34, 36, 38, 40, 42, 44, 46, 48, 50, 52, 54, 56, 58, 60];
 
+function sizeIsUnavailable(size) {
+  return Boolean(size && typeof size === "object" && (size.unavailable || size.disabled));
+}
+
 function estimateGroups(answers) {
   if (answers.measurementKnowledge === "no") return questions.everydaySizes.groups;
   const unknown = answers.unknownSizes ?? {};
@@ -355,15 +359,17 @@ function MeasurementsQuestion({
               <legend>{field.label}</legend>
               <div className="size-chips">
                 {field.sizes.map((size) => {
-                  const sizeValue = String(size);
+                  const sizeValue = String(size?.value ?? size);
+                  const unavailable = sizeIsUnavailable(size);
                   const selected = known.includes(sizeValue);
                   return (
-                    <label className="size-chip" key={sizeValue}>
+                    <label className={unavailable ? "size-chip is-unavailable" : "size-chip"} key={sizeValue}>
                       <input
                         type="checkbox"
                         name={field.id}
                         value={sizeValue}
                         checked={selected}
+                        disabled={unavailable}
                         onChange={() => selectKnown(field.id, sizeValue)}
                       />
                       <span>{sizeValue}</span>
@@ -399,23 +405,27 @@ function SizesQuestion({ question, value = {}, onChange }) {
           <fieldset className="size-group" key={group.id}>
             <legend>{group.label}</legend>
             <div className="size-chips">
-              {group.options.map((option) => (
-                <label className="size-chip" key={option.value}>
-                  <input
-                    type="checkbox"
-                    name={`${question.id}-${group.id}`}
-                    value={option.value}
-                    checked={selected.includes(option.value)}
-                    onChange={() => {
-                      const next = selected.includes(option.value)
-                        ? selected.filter((item) => item !== option.value)
-                        : [...selected, option.value];
-                      onChange({ ...value, [group.id]: next, [flag]: false });
-                    }}
-                  />
-                  <span>{option.label}</span>
-                </label>
-              ))}
+              {group.options.map((option) => {
+                const unavailable = sizeIsUnavailable(option);
+                return (
+                  <label className={unavailable ? "size-chip is-unavailable" : "size-chip"} key={option.value}>
+                    <input
+                      type="checkbox"
+                      name={`${question.id}-${group.id}`}
+                      value={option.value}
+                      checked={selected.includes(option.value)}
+                      disabled={unavailable}
+                      onChange={() => {
+                        const next = selected.includes(option.value)
+                          ? selected.filter((item) => item !== option.value)
+                          : [...selected, option.value];
+                        onChange({ ...value, [group.id]: next, [flag]: false });
+                      }}
+                    />
+                    <span>{option.label}</span>
+                  </label>
+                );
+              })}
             </div>
             <button
               className={`unknown-size${unknown ? " is-on" : ""}`}

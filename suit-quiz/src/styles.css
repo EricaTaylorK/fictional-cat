@@ -662,6 +662,8 @@ h2 {
 
 .size-chip {
   cursor: pointer;
+  display: inline-flex;
+  flex: 0 0 auto;
   position: relative;
 }
 
@@ -674,21 +676,50 @@ h2 {
 
 .size-chip span {
   align-items: center;
-  background: var(--surface-primary);
-  border: 2px solid var(--color-divider-light-gray);
+  background: var(--selection-background);
+  border: var(--border-width-thin) var(--border-style-solid) var(--selection-border);
   border-radius: var(--border-radius-md);
+  color: var(--selection-text);
   display: inline-flex;
   font-size: var(--font-size-14);
-  height: 44px;
+  font-weight: var(--font-weight-regular);
+  height: var(--spacing-vertical-xxxxxxl);
   justify-content: center;
-  min-width: 56px;
-  padding: 0 var(--spacing-horizontal-md);
+  line-height: var(--line-height-20);
+  width: var(--spacing-horizontal-xxxxxxl);
 }
 
 .size-chip input:checked + span {
-  background: var(--color-info-light-blue);
-  border-color: var(--color-info-blue);
+  background: var(--selection-background);
+  border-color: var(--color-neutral-black);
+  border-style: var(--border-style-solid);
+  box-shadow: inset 0 0 0 var(--border-width-thin) var(--color-neutral-black);
   color: var(--color-font-black);
+}
+
+.size-chip:hover input:not(:disabled):not(:checked) + span {
+  border-color: var(--input-border-hover);
+}
+
+.size-chip.is-unavailable,
+.size-chip:has(input:disabled) {
+  cursor: not-allowed;
+}
+
+.size-chip.is-unavailable span,
+.size-chip:has(input:disabled) span {
+  background-color: var(--selection-background);
+  background-image: linear-gradient(
+    to top right,
+    transparent calc(50% - 0.5px),
+    var(--input-border-unavailable) calc(50% - 0.5px),
+    var(--input-border-unavailable) calc(50% + 0.5px),
+    transparent calc(50% + 0.5px)
+  );
+  border-color: var(--input-border-unavailable);
+  border-style: var(--border-style-dashed);
+  box-shadow: none;
+  color: var(--input-text-disabled);
 }
 
 .size-chip input:focus-visible + span {
@@ -4907,9 +4938,9 @@ h2 {
 
   .quiz-slide .size-pair .size-chips {
     align-content: start;
-    display: grid;
+    display: flex;
     flex: 0 0 auto;
-    grid-template-columns: repeat(auto-fill, minmax(56px, 1fr));
+    flex-wrap: wrap;
     margin-bottom: 4px;
   }
 
@@ -4919,7 +4950,7 @@ h2 {
   }
 
   .quiz-slide .size-pair .size-chip span {
-    width: 100%;
+    width: var(--spacing-horizontal-xxxxxxl);
   }
 }
 
@@ -5222,7 +5253,8 @@ h2 {
 }
 
 .quiz-slide .size-chip span {
-  height: 48px;
+  height: var(--spacing-vertical-xxxxxxl);
+  width: var(--spacing-horizontal-xxxxxxl);
 }
 
 .height-question {
