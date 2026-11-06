@@ -332,10 +332,24 @@ function MeasurementsQuestion({
     }
   }
 
+  function toggleUnknown(id) {
+    const field = MEASUREMENT_FIELDS.find((item) => item.id === id);
+    const nextUnknown = !unknownSizes[id];
+    onUnknownSizes({ ...unknownSizes, [id]: nextUnknown });
+    if (nextUnknown) {
+      writeMeasurements({ ...value, [id]: "" });
+      return;
+    }
+    if (sizeList(everydaySizes[field.estimateId]).length) {
+      onEverydaySizes({ ...everydaySizes, [field.estimateId]: [] });
+    }
+  }
+
   return (
     <div className="size-groups">
       <div className="size-pair">
         {MEASUREMENT_FIELDS.map((field) => {
+          const unknown = Boolean(unknownSizes[field.id]);
           const known = sizeList(value[field.id]);
           return (
             <fieldset className="size-group" key={field.id}>
@@ -360,6 +374,14 @@ function MeasurementsQuestion({
                   );
                 })}
               </div>
+              <button
+                className={`unknown-size${unknown ? " is-on" : ""}`}
+                type="button"
+                aria-pressed={unknown}
+                onClick={() => toggleUnknown(field.id)}
+              >
+                Not sure
+              </button>
             </fieldset>
           );
         })}
@@ -373,7 +395,6 @@ function SizesQuestion({ question, value = {}, onChange }) {
     <div className="size-groups">
       {question.groups.map((group) => {
         const flag = `${group.id}Unknown`;
-        const unknown = Boolean(value[flag]);
         // Usual sizes can be more than one (people fluctuate), so each group is a set of checkboxes.
         const selected = sizeList(value[group.id]);
         return (
@@ -402,14 +423,6 @@ function SizesQuestion({ question, value = {}, onChange }) {
                 );
               })}
             </div>
-            <button
-              className={`unknown-size${unknown ? " is-on" : ""}`}
-              type="button"
-              aria-pressed={unknown}
-              onClick={() => onChange({ ...value, [group.id]: [], [flag]: !unknown })}
-            >
-              Not sure
-            </button>
           </fieldset>
         );
       })}

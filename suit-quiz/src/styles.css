@@ -5022,6 +5022,11 @@ h2 {
     margin-bottom: 4px;
   }
 
+  .quiz-slide .size-pair .unknown-size {
+    font-weight: 500;
+    margin-top: 0;
+  }
+
   .quiz-slide .size-pair .size-chip span {
     width: var(--spacing-horizontal-xxxxxxl);
   }
