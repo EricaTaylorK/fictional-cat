@@ -4227,6 +4227,17 @@ h2 {
   width: 80px;
 }
 
+/* Clip square icon canvases to the rounded tile so selected cards don't show white corners. */
+.quiz-slide .option-art:has(.option-icon),
+.quiz-slide .option-icon,
+.quiz-slide .option-icon-slot {
+  border-radius: 20%;
+}
+
+.quiz-slide .option-art:has(.option-icon) {
+  overflow: hidden;
+}
+
 .quiz-slide .option-palette {
   border: 1px solid rgba(0, 0, 0, 0.1);
   border-radius: 50%;
