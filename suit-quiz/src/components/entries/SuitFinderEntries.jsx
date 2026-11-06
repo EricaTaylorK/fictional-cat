@@ -9,10 +9,10 @@ const COPY = {
 
 function SparkleIcon() {
   return (
-    <svg className="sf-entry-sparkle" viewBox="0 0 24 24" aria-hidden="true">
+    <svg className="sf-entry-sparkle" viewBox="0 0 16 16" aria-hidden="true">
       <path
-        d="M12 2.5l1.4 6.1L19.5 10 13.4 11.4 12 17.5 10.6 11.4 4.5 10l6.1-1.4L12 2.5z"
         fill="currentColor"
+        d="M6.5 1.5 7.8 5.2l3.7 1.3-3.7 1.3-1.3 3.7-1.3-3.7L1.5 6.5l3.7-1.3zM12 9l.7 1.8 1.8.7-1.8.7-.7 1.8-.7-1.8-1.8-.7 1.8-.7z"
       />
     </svg>
   );
