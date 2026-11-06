@@ -296,8 +296,8 @@ function questionHelp(question, answers) {
 }
 
 const MEASUREMENT_FIELDS = [
-  { id: "chest", label: "Jacket size", sizes: CHEST_SIZES, estimateId: "shirt" },
-  { id: "waist", label: "Pant size", sizes: WAIST_SIZES, estimateId: "waist" },
+  { id: "chest", label: "Jacket Size", sizes: CHEST_SIZES, estimateId: "shirt" },
+  { id: "waist", label: "Pant Size", sizes: WAIST_SIZES, estimateId: "waist" },
 ];
 
 function MeasurementsQuestion({
