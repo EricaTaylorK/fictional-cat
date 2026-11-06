@@ -8325,3 +8325,90 @@ button.store-logo {
   }
 }
 
+/* Phone results column: airier size card, smaller matches title, full-width pair cards, one inset. */
+@media (max-width: 640px) {
+  .results-layout .hero-facts {
+    gap: 16px;
+    padding: 40px 32px;
+  }
+
+  .results-layout .hero-fact::before {
+    top: -8.5px;
+  }
+
+  .results-layout .results-list-title {
+    font-size: 20px;
+    line-height: 28px;
+  }
+
+  .results-layout .results-stage {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .results-layout .budget-alert {
+    margin-left: 16px;
+    margin-right: 16px;
+  }
+
+  .your-look:not(.is-open) {
+    left: 16px;
+    right: 16px;
+    width: auto;
+  }
+
+  .your-look-dock {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .pair-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .pair-card {
+    align-items: stretch;
+    box-shadow: 0 2px 4px var(--color-transparent-black10), 0 0 2px var(--color-transparent-black10);
+    flex-direction: row;
+    min-height: 120px;
+  }
+
+  .pair-photo {
+    aspect-ratio: auto;
+    flex: 0 0 120px;
+    height: auto;
+    min-height: 120px;
+    width: 120px;
+  }
+
+  .pair-copy {
+    flex: 1 1 auto;
+    gap: 6px;
+    justify-content: center;
+    padding: 16px;
+  }
+
+  .pair-name {
+    -webkit-line-clamp: 2;
+    font-size: 16px;
+    line-height: 22px;
+    margin-top: 0;
+  }
+
+  .pair-brand {
+    font-size: 14px;
+    line-height: 20px;
+  }
+
+  .pair-price {
+    font-size: 16px;
+    line-height: 22px;
+  }
+
+  .card-plus.tailor-add,
+  .card-plus.pair-add,
+  .pair-card .pair-add.is-on {
+    height: 32px;
+    width: 32px;
+  }
+}
