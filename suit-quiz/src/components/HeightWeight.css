@@ -1,0 +1,293 @@
+/* Height and weight question. Scoped to .hw so it does not touch other quiz styles. */
+
+.hw {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  margin: 0 auto;
+  width: min(1024px, 100%);
+}
+
+/* Imperial / Metric toggle */
+
+.hw-units {
+  background: var(--surface-secondary, #f3f3f3);
+  border: 0;
+  border-radius: 999px;
+  display: inline-flex;
+  margin: 0;
+  min-width: 0;
+  padding: 4px;
+}
+
+.hw-unit-option {
+  cursor: pointer;
+  display: block;
+  position: relative;
+}
+
+.hw-unit-option input {
+  appearance: none;
+  inset: 0;
+  margin: 0;
+  position: absolute;
+}
+
+.hw-unit-option span {
+  align-items: center;
+  border-radius: 999px;
+  color: var(--text-secondary);
+  display: inline-flex;
+  font-size: var(--font-size-14);
+  font-weight: 500;
+  height: 40px;
+  justify-content: center;
+  min-width: 104px;
+  padding: 0 20px;
+}
+
+.hw-unit-option input:checked + span {
+  background: var(--surface-primary, #fff);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.18);
+  color: var(--color-font-black);
+}
+
+.hw-unit-option input:focus-visible + span {
+  outline: 2px solid var(--color-focus-outline);
+  outline-offset: 2px;
+}
+
+/* Wheels (touch) */
+
+.hw-picker {
+  --hw-item: 44px;
+  --hw-rows: 5;
+  display: grid;
+  gap: 8px;
+  max-width: 360px;
+  width: 100%;
+}
+
+.hw-columns {
+  display: grid;
+  gap: 0 24px;
+  grid-template-columns: 2fr 1fr;
+}
+
+.hw-wheel-row {
+  position: relative;
+}
+
+.hw-group {
+  min-width: 0;
+  position: relative;
+}
+
+.hw-heading {
+  color: var(--text-secondary);
+  font-size: var(--font-size-14);
+  font-weight: 500;
+  margin: 0;
+  text-align: center;
+}
+
+.hw-wheels {
+  display: flex;
+  gap: 0;
+}
+
+.hw-col {
+  flex: 1 1 0;
+  min-width: 0;
+  position: relative;
+}
+
+/* The highlighted band the selected values sit in. */
+.hw-picker-band {
+  background: var(--color-info-light-blue);
+  border: 1px solid var(--color-info-blue);
+  border-radius: var(--border-radius-md);
+  box-sizing: border-box;
+  height: var(--hw-item);
+  left: 0;
+  pointer-events: none;
+  position: absolute;
+  right: 0;
+  top: calc(var(--hw-item) * 2);
+}
+
+.hw-wheel {
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 28%, #000 72%, transparent 100%);
+  mask-image: linear-gradient(to bottom, transparent 0, #000 28%, #000 72%, transparent 100%);
+  height: calc(var(--hw-item) * var(--hw-rows));
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: calc(var(--hw-item) * 2) 0;
+  scroll-snap-type: y mandatory;
+  scrollbar-width: none;
+  touch-action: pan-y;
+  -webkit-overflow-scrolling: touch;
+}
+
+.hw-wheel::-webkit-scrollbar {
+  display: none;
+}
+
+.hw-wheel:focus-visible {
+  border-radius: var(--border-radius-md);
+  outline: 2px solid var(--color-focus-outline);
+  outline-offset: -2px;
+}
+
+.hw-item {
+  align-items: center;
+  color: var(--color-font-black);
+  cursor: pointer;
+  display: flex;
+  font-size: 24px;
+  height: var(--hw-item);
+  justify-content: center;
+  padding-right: 18px;
+  scroll-snap-align: center;
+  scroll-snap-stop: always;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.hw-d0 {
+  font-size: 26px;
+  font-weight: 500;
+  opacity: 1;
+}
+
+.hw-d1 {
+  opacity: 0.5;
+}
+
+.hw-d2 {
+  opacity: 0.25;
+}
+
+.hw-d3 {
+  opacity: 0.12;
+}
+
+/* Unit label sits in the band, beside the selected number. */
+.hw-unit {
+  color: var(--text-secondary);
+  font-size: var(--font-size-14);
+  font-weight: 500;
+  left: 50%;
+  margin-left: 14px;
+  margin-top: calc(var(--hw-item) * 2 + (var(--hw-item) - 20px) / 2);
+  pointer-events: none;
+  position: absolute;
+  top: 0;
+  line-height: 20px;
+}
+
+.hw-wide .hw-item {
+  padding-right: 32px;
+}
+
+.hw-wide .hw-unit {
+  margin-left: 28px;
+}
+
+/* Desktop fields */
+
+.hw-fields {
+  align-items: flex-start;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 32px;
+  justify-content: center;
+  width: 100%;
+}
+
+.hw-field-group {
+  border: 0;
+  margin: 0;
+  min-width: 0;
+  padding: 0;
+  text-align: left;
+}
+
+.hw-field-group legend {
+  color: var(--color-font-black);
+  font-size: var(--font-size-16);
+  font-weight: 500;
+  margin-bottom: 12px;
+  padding: 0;
+}
+
+.hw-field-row {
+  display: flex;
+  gap: 16px;
+}
+
+.hw-field {
+  display: grid;
+  gap: 8px;
+}
+
+.hw-field label {
+  color: var(--text-secondary);
+  font-size: var(--font-size-14);
+}
+
+.hw-input-wrap {
+  position: relative;
+}
+
+.hw-input-wrap input {
+  background: var(--surface-primary, #fff);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--border-radius-md);
+  box-sizing: border-box;
+  color: var(--color-font-black);
+  font: inherit;
+  font-size: 16px;
+  height: 48px;
+  padding: 0 44px 0 16px;
+  width: 120px;
+}
+
+.hw-input-wrap input:hover {
+  border-color: var(--color-font-black);
+}
+
+.hw-input-wrap input:focus-visible {
+  outline: 2px solid var(--color-focus-outline);
+  outline-offset: 2px;
+}
+
+.hw-input-wrap input[aria-invalid="true"] {
+  border-color: #b3261e;
+}
+
+.hw-suffix {
+  color: var(--text-secondary);
+  font-size: var(--font-size-14);
+  pointer-events: none;
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.hw-error {
+  color: #b3261e;
+  font-size: var(--font-size-14);
+  margin: 8px 0 0;
+  max-width: 264px;
+  min-height: 20px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hw-wheel {
+    scroll-behavior: auto;
+  }
+}

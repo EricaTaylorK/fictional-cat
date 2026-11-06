@@ -7,6 +7,7 @@ import {
 } from "../data/products.js";
 import { colorsIn, occasionOptions, questions, resolvedOccasion } from "../data/quizConfig.js";
 import { RENTAL_PACKAGES, RENTAL_STEPS, RENTAL_TYPE_NAMES } from "../data/rentals.js";
+import { weightLabel } from "../lib/heightWeight.js";
 import { lookTotals } from "../lib/lookSummary.js";
 import {
   buildResultSummary,
@@ -66,6 +67,7 @@ function numberRange(value) {
 
 export function fitProfileRows({ answers, renting, size, fitName }) {
   const height = heightLabel(answers.height);
+  const weight = weightLabel(answers.weight);
   const everyday = answers.everydaySizes ?? {};
   const jacketValue = size?.jacket ? jacketFact(size, renting) : null;
   const jacketSpan = numberRange(answers.measurements?.chest);
@@ -76,6 +78,7 @@ export function fitProfileRows({ answers, renting, size, fitName }) {
   const waistSizes = waistRange(everyday.waist);
   const personal = [
     height,
+    weight,
     jacketSpan?.includes("–") ? `Jacket ${jacketSpan}` : jacketValue ? `Jacket ${jacketValue}` : null,
     waistSpan ? `Waist ${waistSpan}"` : waistNumber ? `Waist ${waistNumber}"` : null,
     !jacketValue && shirtSizes ? `Shirt ${shirtSizes}` : null,

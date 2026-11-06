@@ -191,8 +191,8 @@ export const questions = {
   },
   height: {
     id: "height",
-    title: "How tall are you?",
-    help: "Your height helps us pick the right jacket and pant length. A close guess is fine.",
+    title: "What are your height and weight?",
+    help: "We ask so we can pick the right jacket and pant length and give you a better size estimate. A close guess is fine.",
     type: "height",
     skippable: true,
   },

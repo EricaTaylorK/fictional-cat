@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
+import HeightWeight from "./components/HeightWeight.jsx";
 import IntroModal from "./components/IntroModal.jsx";
 import ProductGridEntry from "./components/ProductGridEntry.jsx";
 import ProductDetail from "./components/ProductDetail.jsx";
@@ -221,7 +222,7 @@ function DateQuestion({ value, onChange, onUnsure }) {
         </span>
         <input type="date" min={todayIso()} value={value ?? ""} onChange={(event) => onChange(event.target.value)} />
       </label>
-      <button className="text-link date-unsure" type="button" onClick={onUnsure}>
+      <button className="button secondary date-unsure" type="button" onClick={onUnsure}>
         Not sure of the date yet?
       </button>
       {dates?.past && <p className="date-warning" role="status">That date has passed. Pick an upcoming date.</p>}
@@ -274,8 +275,6 @@ function PiecesQuestion({ value, onChange }) {
 
 const CHEST_SIZES = [36, 38, 40, 42, 44, 46, 48, 50, 52, 54, 56, 58, 60, 62, 64, 66, 68, 70];
 const WAIST_SIZES = [28, 29, 30, 31, 32, 33, 34, 36, 38, 40, 42, 44, 46, 48, 50, 52, 54, 56, 58, 60];
-const HEIGHT_MIN = 58;
-const HEIGHT_MAX = 84;
 
 function estimateGroups(answers) {
   if (answers.measurementKnowledge === "no") return questions.everydaySizes.groups;
@@ -383,57 +382,6 @@ function MeasurementsQuestion({
             </fieldset>
           );
         })}
-      </div>
-    </div>
-  );
-}
-
-function HeightQuestion({ value, onChange }) {
-  const total = Number(value);
-  const valid = Number.isFinite(total) && total >= HEIGHT_MIN && total <= HEIGHT_MAX;
-  const [feet, setFeet] = useState(valid ? String(Math.floor(total / 12)) : "");
-  const [inches, setInches] = useState(valid ? String(total % 12) : "");
-
-  function commit(nextFeet, nextInches) {
-    setFeet(nextFeet);
-    setInches(nextInches);
-    if (nextFeet === "" || nextInches === "") {
-      if (value !== "" && value != null) onChange("");
-      return;
-    }
-    const combined = Number(nextFeet) * 12 + Number(nextInches);
-    if (!Number.isInteger(combined) || combined < HEIGHT_MIN || combined > HEIGHT_MAX) {
-      if (value !== "" && value != null) onChange("");
-      return;
-    }
-    if (combined !== total) onChange(combined);
-  }
-
-  return (
-    <div className="height-question">
-      <div className="height-inputs">
-        <label>
-          <span>Feet</span>
-          <input
-            type="number"
-            inputMode="numeric"
-            min="4"
-            max="7"
-            value={feet}
-            onChange={(event) => commit(event.target.value, inches)}
-          />
-        </label>
-        <label>
-          <span>Inches</span>
-          <input
-            type="number"
-            inputMode="numeric"
-            min="0"
-            max="11"
-            value={inches}
-            onChange={(event) => commit(feet, event.target.value)}
-          />
-        </label>
       </div>
     </div>
   );
@@ -725,9 +673,11 @@ export default function App() {
           onUnknownSizes={(unknownSizes) => mergeAnswers({ unknownSizes })}
         />
       ) : currentQuestion.type === "height" ? (
-        <HeightQuestion
-          value={answers.height}
-          onChange={(height) => mergeAnswers({ height })}
+        <HeightWeight
+          height={answers.height}
+          weight={answers.weight}
+          unit={answers.heightWeightUnit}
+          onChange={mergeAnswers}
         />
       ) : currentQuestion.type === "sizes" ? (
         <SizesQuestion
@@ -757,7 +707,14 @@ export default function App() {
             {currentQuestion.skipLabel ?? "Skip"}
           </button>
         ) : (
-          <button className="button secondary skip-button" type="button" onClick={continueQuiz}>
+          <button
+            className="button secondary skip-button"
+            type="button"
+            onClick={() => {
+              if (currentQuestion.type === "height") mergeAnswers({ height: "", weight: "" });
+              continueQuiz();
+            }}
+          >
             {currentQuestion.skipLabel ?? "Skip"}
           </button>
         ))}
