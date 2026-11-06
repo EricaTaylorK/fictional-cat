@@ -5338,7 +5338,7 @@ h2 {
 }
 
 .quiz-slide .size-chips {
-  gap: 16px;
+  gap: var(--spacing-horizontal-sm);
 }
 
 .quiz-slide .size-chip span {
