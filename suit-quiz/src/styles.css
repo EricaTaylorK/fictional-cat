@@ -6574,7 +6574,7 @@ button.store-logo {
 
 .tailor-card p {
   flex: 0 0 auto;
-  margin-top: 0;
+  margin-top: -4px;
 }
 
 .tailor-card strong,
@@ -7254,6 +7254,16 @@ button.store-logo {
 @media (max-width: 640px) {
   .tailor-row {
     grid-template-columns: minmax(0, 1fr);
+  }
+
+  .tailor-card .tailor-glyph {
+    height: 48px;
+    width: 48px;
+  }
+
+  .card-plus.tailor-add {
+    height: 32px;
+    width: 32px;
   }
 }
 
