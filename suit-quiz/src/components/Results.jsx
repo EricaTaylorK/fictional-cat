@@ -44,7 +44,8 @@ const FIT_NOTE_COPY = {
 };
 
 function selectedIssues(values) {
-  return (values ?? []).filter((issue) => issue && issue !== "none");
+  const list = Array.isArray(values) ? values : values ? [values] : [];
+  return list.filter((issue) => issue && issue !== "none");
 }
 
 function quizOptionLabel(question, value, answers) {
@@ -161,15 +162,18 @@ export function heroProfileGroups({ answers, renting, size, fitName }) {
 
   const chest = size?.jacket ? String(size.jacket).replace(/[SRL]$/i, "") : null;
   const jacketSpan = numberRange(answers.measurements?.chest);
+  const everydayJacket = everyday.jacket ? String(everyday.jacket).replace(/[SRL]$/i, "") : null;
   const shirtSizes = shirtRange(everyday.shirt);
-  const sizeValue = chest || jacketSpan || null;
+  const jacketNumber = chest || jacketSpan || everydayJacket || null;
+  const lengthWord = size?.length ? titleWords(size.length) : null;
+  const jacketValue = jacketNumber ? [jacketNumber, lengthWord].filter(Boolean).join(" ") : null;
   const fitValue = HERO_FIT_NAMES[answers.feel] ?? null;
-  const lengthValue = inferLength(answers) && size?.length ? titleWords(size.length) : null;
+  const lengthValue = inferLength(answers) && lengthWord ? lengthWord : null;
   const measureLines = [
-    sizeValue ? { label: "Size", value: sizeValue } : null,
+    jacketValue ? { label: "Jacket", value: jacketValue } : null,
     shirtSizes ? { label: "Shirt", value: shirtSizes } : null,
     fitValue ? { label: "Fit Preference", value: fitValue } : null,
-    lengthValue ? { label: "Length", value: lengthValue } : null,
+    !jacketNumber && lengthValue ? { label: "Length", value: lengthValue } : null,
   ].filter(Boolean);
   if (measureLines.length) groups.push({ id: "size-fit", lines: measureLines });
 
@@ -187,7 +191,7 @@ export function heroProfileGroups({ answers, renting, size, fitName }) {
     groups.push({
       id: row.label,
       label: row.label,
-      lines: [{ value: row.value }],
+      lines: [{ value: row.value, clamp: row.label === "Fit notes" }],
     });
   }
   return groups;
@@ -1351,22 +1355,50 @@ function CompleteLook({ id, look, suitColor, suitName, addedLooks, onOpen, onRem
 }
 
 const HERO_FIT_BENEFITS = [
-  "Suits that don\u2019t need tailoring",
-  "Shirts with the right sleeve and neck sizes",
-  "Pants that actually fit your waist and leg",
-  "Outerwear made for your proportions",
+  "Suits that fit without extra tailoring",
+  "Shirts with the right sleeve and neck",
+  "Pants that fit your waist and leg",
+  "Outerwear cut for your proportions",
 ];
 
+export function heroHeadline(percent) {
+  if (Number.isFinite(percent) && percent < 50) return "Let's finish your fit.";
+  return "You've found your fit!";
+}
+
+function usePhoneHero() {
+  const query = "(max-width: 767px)";
+  const [phone, setPhone] = useState(() => window.matchMedia(query).matches);
+  useEffect(() => {
+    const media = window.matchMedia(query);
+    const update = () => setPhone(media.matches);
+    update();
+    media.addEventListener("change", update);
+    return () => media.removeEventListener("change", update);
+  }, []);
+  return phone;
+}
+
 function HeroFitLine({ line }) {
-  return (
-    <p className="fit-group-line">
+  const [open, setOpen] = useState(false);
+  const text = (
+    <>
       {line.label ? <span className="fit-line-label">{line.label}: </span> : null}
       {line.value}
-    </p>
+    </>
+  );
+  if (!line.clamp) return <p className="fit-group-line">{text}</p>;
+  return (
+    <div className="fit-notes">
+      <p className={open ? "fit-group-line" : "fit-group-line is-clamped"}>{text}</p>
+      <button className="fit-notes-toggle" type="button" onClick={() => setOpen((current) => !current)}>
+        {open ? "Show less" : "Show more"}
+      </button>
+    </div>
   );
 }
 
-function HeroFitGroup({ group, onEditAnswers }) {
+function HeroFitGroup({ group }) {
   const [first, ...rest] = group.lines;
   return (
     <div className="fit-group">
@@ -1375,12 +1407,6 @@ function HeroFitGroup({ group, onEditAnswers }) {
           {group.label && <p className="fit-group-label">{group.label}</p>}
           {first && <HeroFitLine line={first} />}
         </div>
-        {onEditAnswers && (
-          <button className="fit-group-edit" type="button" onClick={() => onEditAnswers()}>
-            <PencilIcon />
-            <span className="visually-hidden">Edit answers</span>
-          </button>
-        )}
       </div>
       {rest.map((line) => (
         <HeroFitLine line={line} key={`${line.label ?? "line"}-${line.value}`} />
@@ -1389,21 +1415,43 @@ function HeroFitGroup({ group, onEditAnswers }) {
   );
 }
 
+function summaryGroups(groups) {
+  return groups
+    .map((group) => {
+      if (group.id === "personal") return group;
+      if (group.id !== "size-fit") return null;
+      const jacket = group.lines.filter((line) => line.label === "Jacket");
+      return jacket.length ? { ...group, lines: jacket } : null;
+    })
+    .filter(Boolean);
+}
+
 function HeroFitCard({ groups, onEditAnswers }) {
+  const phone = usePhoneHero();
+  const [open, setOpen] = useState(false);
+  const preview = summaryGroups(groups);
+  const collapsed = phone && !open;
+  const shown = collapsed ? preview : groups;
+  const canExpand = phone && preview.length < groups.length;
   return (
     <section className="fit-card hero-fit-card" id="your-sizes" tabIndex={-1} aria-labelledby="fit-profile-title">
       <div className="fit-card-head">
-        <h2 id="fit-profile-title" className="fit-card-title">Your fit profile</h2>
-        {groups.length === 0 && onEditAnswers && (
+        <h2 id="fit-profile-title" className="fit-card-title">Your Suit Profile</h2>
+        {onEditAnswers && (
           <button className="results-hero-action" type="button" onClick={() => onEditAnswers()}>
             <PencilIcon />
             Edit answers
           </button>
         )}
       </div>
-      {groups.map((group) => (
-        <HeroFitGroup group={group} key={group.id} onEditAnswers={onEditAnswers} />
+      {shown.map((group) => (
+        <HeroFitGroup group={group} key={group.id} />
       ))}
+      {canExpand && (
+        <button className="fit-profile-expand" type="button" aria-expanded={open} onClick={() => setOpen((current) => !current)}>
+          {open ? "Hide full profile" : "View full profile"}
+        </button>
+      )}
     </section>
   );
 }
@@ -1911,37 +1959,27 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
               <span className="results-expert-label">AI Style Expert</span>
             </div>
             <div className="results-hero-actions">
-              <button className="results-hero-action" type="button">
+              <button className="results-hero-action" type="button" aria-label="Share results">
                 <ShareIcon />
-                Share results
+                <span>Share results</span>
               </button>
-              <button className="results-hero-action" type="button" onClick={() => onRestart?.()}>
+              <button className="results-hero-action" type="button" aria-label="Restart quiz" onClick={() => onRestart?.()}>
                 <ShuffleIcon />
-                Restart quiz
+                <span>Restart quiz</span>
               </button>
             </div>
             <div className="results-hero-ring">
               <MatchRing percent={ringPercent} />
+              <p className="match-ring-explain">How closely your top suit matches your answers.</p>
             </div>
             <div className="results-hero-copy">
-              <h1 id="results-title">You&apos;ve found your fit!</h1>
-              <p className="results-lede">
-                We&apos;ve matched you with the right sizes and fits—across every product we offer. From suits to shirts, we&apos;ll use your preferences to show you what fits (and feels) right.
-              </p>
-              <h2 className="results-hero-subhead">Want the Best Fit—Every Time?</h2>
-              <p className="results-hero-support">
-                Saving your profile helps us personalize your experience—so you&apos;ll only see styles that work for your fit, across every category:
-              </p>
-              <ul className="fit-profile-benefits">
-                {HERO_FIT_BENEFITS.map((line) => (
-                  <li key={line}>{line}</li>
-                ))}
-              </ul>
+              <h1 id="results-title">{heroHeadline(ringPercent)}</h1>
+              <p className="results-lede">Save your suit profile to see styles that work for you.</p>
               <div className="fit-profile-actions">
+                <a className="button" href="/myAccount">Create an Account</a>
                 <button className="button secondary" type="button" onClick={() => setHandoff("sign-in")}>
                   Sign In
                 </button>
-                <a className="button" href="/myAccount">Create an Account</a>
               </div>
               {handoff === "sign-in" && (
                 <p className="handoff-inline" role="status">
@@ -1951,6 +1989,11 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
             </div>
           </div>
           <HeroFitCard groups={profileGroups} onEditAnswers={onEditAnswers} />
+          <ul className="fit-profile-benefits">
+            {HERO_FIT_BENEFITS.map((line) => (
+              <li key={line}>{line}</li>
+            ))}
+          </ul>
         </div>
 
         {recommendations.budgetMiss && (

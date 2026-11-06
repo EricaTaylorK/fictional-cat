@@ -1,5 +1,25 @@
-/* Results hero: copy on the left, fit profile card on the right.
-   The peach-to-blue wash stays; this file only rearranges the hero. */
+/* Results hero: copy on the left, suit profile card on the right.
+   The peach-to-blue wash covers the whole hero and stops at its bottom edge. */
+
+.results-layout .results-hero {
+  background-color: #fff;
+  background-image:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.35), rgba(255, 255, 255, 0.2)),
+    linear-gradient(100deg, #f4e8e2 0%, #f7f3ee 46%, #e4f0fc 100%);
+  padding-bottom: 32px;
+  position: relative;
+}
+
+.results-layout .results-hero::before {
+  content: none;
+}
+
+.results-layout .results-hero-intro,
+.results-layout .results-hero-copy,
+.results-layout .results-hero-ring,
+.results-layout .fit-profile-benefits {
+  background: none;
+}
 
 .results-layout .results-hero-copy {
   align-items: flex-start;
@@ -12,38 +32,38 @@
 }
 
 .results-layout .results-hero-copy .results-lede {
-  font-size: 18px;
-  line-height: 26px;
-  max-width: 42em;
-}
-
-.results-layout .results-hero-subhead {
-  color: #001e56;
-  font-family: var(--font-family-roboto);
-  font-size: 22px;
-  font-weight: 500;
-  letter-spacing: 0;
-  line-height: 28px;
-  margin: 8px 0 0;
-  text-transform: none;
-}
-
-.results-layout .results-hero-support {
-  color: #3a3a3a;
-  font-family: var(--font-family-roboto);
   font-size: 16px;
-  font-weight: 400;
   line-height: 24px;
   margin: 0;
-  max-width: 46em;
+  max-width: 36em;
 }
 
-.results-layout .results-hero-copy .fit-profile-benefits {
-  margin: 4px 0 8px;
+.results-layout .results-hero-ring {
+  align-items: flex-start;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  justify-self: start;
+}
+
+.results-layout .match-ring-explain {
+  color: #232323;
+  font-family: var(--font-family-roboto);
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 20px;
+  margin: 0;
+  max-width: 16em;
+}
+
+.results-layout .results-hero-ring .match-ring {
+  align-self: flex-start;
+  margin: 0;
 }
 
 .results-layout .results-hero-copy .fit-profile-actions {
-  margin: 0;
+  flex-direction: row;
+  margin: 4px 0 0;
   width: 100%;
 }
 
@@ -60,35 +80,30 @@
   width: auto;
 }
 
-.results-layout .results-hero-ring {
-  justify-self: start;
+.results-layout .fit-profile-benefits {
+  font-size: 14px;
+  line-height: 20px;
+  margin: 4px 0 0;
 }
 
-.results-layout .results-hero-ring .match-ring {
-  align-self: flex-start;
-  margin: 0;
+.results-layout .fit-profile-benefits li {
+  font-size: 14px;
+  line-height: 20px;
 }
 
 .results-layout .hero-fit-card {
   align-self: start;
+  background: #fff;
   margin: 0;
   max-width: none;
   width: 100%;
 }
 
-.results-layout .hero-fit-card .fit-group-head {
-  align-items: flex-start;
-  display: flex;
-  gap: 12px;
-  justify-content: space-between;
-}
-
-.results-layout .hero-fit-card .fit-group-main {
-  min-width: 0;
-}
-
-.results-layout .hero-fit-card .fit-group-head .fit-group-label {
-  margin-bottom: 4px;
+.results-layout .hero-fit-card .fit-group-line,
+.results-layout .hero-fit-card .fit-group-label {
+  color: #232323;
+  font-size: 14px;
+  line-height: 20px;
 }
 
 .results-layout .hero-fit-card .fit-line-label {
@@ -96,28 +111,35 @@
   font-weight: 700;
 }
 
-.results-layout .hero-fit-card .fit-group-line + .fit-group-line {
+.results-layout .hero-fit-card .fit-group-line + .fit-group-line,
+.results-layout .hero-fit-card .fit-notes + .fit-group-line {
   margin-top: 2px;
 }
 
-.results-layout .hero-fit-card .fit-group-edit {
-  background: transparent;
+.results-layout .hero-fit-card .fit-group-line.is-clamped {
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  display: -webkit-box;
+  overflow: hidden;
+}
+
+.results-layout .fit-notes-toggle,
+.results-layout .fit-profile-expand {
+  background: none;
   border: 0;
-  color: #3a3a3a;
-  cursor: pointer;
-  flex: 0 0 auto;
-  line-height: 0;
-  padding: 2px;
-}
-
-.results-layout .hero-fit-card .fit-group-edit svg {
-  display: block;
-  height: 18px;
-  width: 18px;
-}
-
-.results-layout .hero-fit-card .fit-group-edit:hover {
   color: #001e56;
+  cursor: pointer;
+  font-family: var(--font-family-roboto);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 20px;
+  padding: 4px 0 0;
+  text-align: left;
+  text-decoration: underline;
+}
+
+.results-layout .fit-profile-expand {
+  margin-top: 8px;
 }
 
 @media (min-width: 768px) {
@@ -125,7 +147,7 @@
     align-items: start;
     column-gap: 40px;
     grid-template-columns: minmax(0, 1fr) minmax(240px, 380px);
-    row-gap: 16px;
+    row-gap: 8px;
   }
 
   .results-layout .results-hero-intro {
@@ -153,65 +175,99 @@
     grid-row: 3;
   }
 
-  .results-layout .hero-fit-card {
-    grid-column: 2;
-    grid-row: 2 / 4;
+  .results-layout .fit-profile-benefits {
+    grid-column: 1;
+    grid-row: 4;
   }
 
-  .results-layout .results-hero::before {
-    bottom: calc(-1 * var(--results-hero-overhang));
-    grid-column: 1 / -1;
-    grid-row: 1 / -1;
+  .results-layout .hero-fit-card {
+    grid-column: 2;
+    grid-row: 2 / 5;
   }
 }
 
 @media (max-width: 767px) {
   .results-layout .results-hero {
-    --results-hero-overhang: 144px;
     align-items: stretch;
-    background: #fff;
     display: flex;
     flex-direction: column;
-    gap: 0;
-    padding: 0 16px;
-  }
-
-  .results-layout .results-hero::before {
-    content: none;
+    gap: 16px;
+    padding: 24px 16px 32px;
   }
 
   .results-layout .results-hero-intro {
-    align-items: flex-start;
-    background-color: #fff;
-    background-image:
-      linear-gradient(180deg, rgba(255, 255, 255, 0.35), rgba(255, 255, 255, 0.2)),
-      linear-gradient(100deg, #f4e8e2 0%, #f7f3ee 46%, #e4f0fc 100%);
+    align-items: center;
     display: flex;
-    flex-direction: column;
-    gap: 24px;
-    margin-left: -16px;
-    margin-right: -16px;
-    padding: 24px 16px calc(24px + var(--results-hero-overhang));
-    width: calc(100% + 32px);
+    flex-flow: row wrap;
+    gap: 8px 12px;
+    margin: 0;
+    padding: 0;
+    width: 100%;
   }
 
   .results-layout .results-expert {
+    flex: 1 1 auto;
+    min-width: 0;
     order: 1;
-  }
-
-  .results-layout .results-hero-ring {
-    order: 2;
-    align-self: flex-start;
-  }
-
-  .results-layout .results-hero-copy {
-    order: 3;
+    width: auto;
   }
 
   .results-layout .results-hero-actions {
-    align-self: flex-start;
-    justify-content: flex-start;
+    align-self: center;
+    flex: 0 0 auto;
+    flex-wrap: nowrap;
+    gap: 12px;
+    justify-content: flex-end;
+    margin-left: auto;
+    order: 2;
+  }
+
+  .results-layout .results-hero-actions .results-hero-action span {
+    border: 0;
+    clip: rect(0 0 0 0);
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    padding: 0;
+    position: absolute;
+    white-space: nowrap;
+    width: 1px;
+  }
+
+  .results-layout .results-hero .results-hero-action {
+    font-size: 12px;
+    gap: 4px;
+    line-height: 16px;
+    min-height: 24px;
+    white-space: nowrap;
+  }
+
+  .results-layout .results-hero .results-hero-actions .results-hero-action svg {
+    height: 16px;
+    width: 16px;
+  }
+
+  .results-layout .results-hero-ring {
+    align-self: stretch;
+    flex: 1 1 100%;
+    gap: 8px;
+    order: 3;
+  }
+
+  .results-layout .results-hero-copy {
+    flex: 1 1 100%;
+    gap: 8px;
     order: 4;
+  }
+
+  .results-layout .hero-fit-card {
+    margin-top: 0;
+    order: 2;
+    width: 100%;
+  }
+
+  .results-layout .fit-profile-benefits {
+    order: 3;
   }
 
   .results-layout .results-hero-ring .match-ring,
@@ -228,30 +284,18 @@
 
   .results-layout .results-main .results-hero h1 {
     font-size: 30px;
-    line-height: 1.4;
+    line-height: 1.2;
+    margin: 0;
   }
 
-  .results-layout .results-hero-copy .results-lede,
-  .results-layout .results-hero-support {
-    font-size: 16px;
-    line-height: 24px;
-  }
-
-  .results-layout .results-hero-subhead {
-    font-size: 20px;
-    line-height: 26px;
-  }
-
-  .results-layout .hero-fit-card {
-    margin-top: calc(-1 * var(--results-hero-overhang));
-    position: relative;
-    width: 100%;
-    z-index: 1;
+  .results-layout .results-hero-copy .fit-profile-actions {
+    align-items: stretch;
+    flex-direction: column;
   }
 
   .results-layout .results-hero-copy .fit-profile-actions .button,
   .results-layout .results-hero-copy .fit-profile-actions .button.secondary {
-    flex-basis: 100%;
+    flex-basis: auto;
     max-width: none;
     width: 100%;
   }

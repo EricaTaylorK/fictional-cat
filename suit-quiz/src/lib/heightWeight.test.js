@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { getQuestionFlow, questions } from "../data/quizConfig.js";
-import { fitProfileRows, heroProfileGroups } from "../components/Results.jsx";
+import { fitProfileRows, heroHeadline, heroProfileGroups } from "../components/Results.jsx";
 import { answerFromDisplay, displayValues, weightLabel } from "./heightWeight.js";
 import { inferLength } from "./recommendation.js";
 
@@ -83,10 +83,12 @@ describe("height and weight in the quiz", () => {
     expect(personal.lines[0].value).not.toMatch(/Age/);
     const measured = groups.find((group) => group.id === "size-fit");
     expect(measured.lines).toEqual([
-      { label: "Size", value: "40" },
+      { label: "Jacket", value: "40 Regular" },
       { label: "Fit Preference", value: "Classic Fit" },
-      { label: "Length", value: "Regular" },
     ]);
+    expect(heroHeadline(47)).toBe("Let's finish your fit.");
+    expect(heroHeadline(50)).toBe("You've found your fit!");
+    expect(heroHeadline(null)).toBe("You've found your fit!");
     expect(groups.some((group) => group.id === "categories")).toBe(false);
     expect(groups.find((group) => group.label === "Occasion")?.lines[0].value).toBe("Funeral");
     expect(groups.find((group) => group.label === "Colors")?.lines[0].value).toBe("Earth tones");
