@@ -4960,7 +4960,9 @@ h2 {
 }
 
 .quiz-slide .date-unsure {
-  margin-top: 4px;
+  margin-top: 0;
+  min-width: 200px;
+  width: auto;
 }
 
 .quiz-slide .question-head .question-note {
@@ -5508,6 +5510,10 @@ h2 {
 
   .quiz-slide .date-question {
     justify-items: center;
+    width: 100%;
+  }
+
+  .quiz-slide .date-unsure {
     width: 100%;
   }
 
