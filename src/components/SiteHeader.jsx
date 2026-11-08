@@ -1,7 +1,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import useDesktop from "../hooks/useDesktop.js";
 import { CompactCard } from "../../suit-quiz/src/components/entries/SuitFinderEntries.jsx";
-import { quizHref, trackEntryClick } from "../../suit-quiz/src/components/entries/quizEntry.js";
+import { quizHref } from "../../suit-quiz/src/components/entries/quizEntry.js";
 
 const HOVER_MS = 150;
 const FADE_MS = 170;
@@ -34,12 +34,8 @@ const SUITS_MENU = [
   },
 ];
 
-const SUIT_PROMO = {
-  headline: "Made for Every “I Do”",
-  link: "Shop Wedding Suits",
-  image: "/suits/suit-navy.jpg",
-  destination: "sale",
-};
+const MENU_MAX_WIDTH = 1280;
+const COLUMN_PAD = 52;
 
 const UTILITIES = ["Find a Store", "Sign In"];
 
@@ -69,7 +65,6 @@ export default function SiteHeader({ search, onSearch, onNavigate, onFindSuit, c
   const [mobilePanel, setMobilePanel] = useState(null);
   const [shownId, setShownId] = useState(null);
   const [phase, setPhase] = useState("in");
-  const [columnShift, setColumnShift] = useState(0);
 
   const menuRef = useRef(null);
   const drawerRef = useRef(null);
@@ -105,11 +100,6 @@ export default function SiteHeader({ search, onSearch, onNavigate, onFindSuit, c
     closeMenus();
     if (onFindSuit) onFindSuit();
     else window.location.assign(quizHref("nav-mega"));
-  }
-
-  function startQuiz() {
-    trackEntryClick("nav-mega");
-    openQuiz();
   }
 
   useEffect(() => () => clearTimeout(hoverTimer.current), []);
@@ -163,16 +153,28 @@ export default function SiteHeader({ search, onSearch, onNavigate, onFindSuit, c
 
   useLayoutEffect(() => {
     if (!desktop || !openId) return undefined;
+    const drawer = drawerRef.current;
     function align() {
       const suits = buttonRefs.current.suits;
-      const drawer = drawerRef.current;
-      if (!suits || !drawer) return;
-      const next = Math.max(0, Math.round(suits.getBoundingClientRect().left - drawer.getBoundingClientRect().left - 52));
-      setColumnShift((currentShift) => (currentShift === next ? currentShift : next));
+      const panel = drawerRef.current;
+      const wrap = menuRef.current;
+      if (!suits || !panel || !wrap) return;
+      const wrapBox = wrap.getBoundingClientRect();
+      const suitsBox = suits.getBoundingClientRect();
+      const left = Math.max(0, Math.round(suitsBox.left - wrapBox.left - COLUMN_PAD));
+      const available = Math.max(0, Math.round(wrapBox.width - left));
+      panel.style.left = `${left}px`;
+      panel.style.maxWidth = `${Math.min(MENU_MAX_WIDTH, available)}px`;
     }
     align();
     window.addEventListener("resize", align);
-    return () => window.removeEventListener("resize", align);
+    return () => {
+      window.removeEventListener("resize", align);
+      if (drawer) {
+        drawer.style.left = "";
+        drawer.style.maxWidth = "";
+      }
+    };
   }, [desktop, openId, shownId]);
 
   useEffect(() => {
@@ -396,18 +398,13 @@ export default function SiteHeader({ search, onSearch, onNavigate, onFindSuit, c
             {openId && active && (
               <div className="dept-drawer" id="dept-drawer" role="region" aria-label={active.label} ref={drawerRef}>
                 <div className={`dept-panel${phase === "out" ? " is-out" : ""}`}>
-                  <div className="dept-main" style={{ marginLeft: columnShift }}>
+                  <div className="dept-main">
                     {active.id === "suits" && (
                       <div className="dept-columns">
                         {SUITS_MENU.map((column) => (
                           <div key={column.title}>
                             <p className="dept-kicker">{column.title}</p>
                             <ul>
-                              {column.title === "Suiting" && (
-                                <li>
-                                  <button type="button" className="dept-link dept-link-quiz" onClick={startQuiz}>Suit Finder</button>
-                                </li>
-                              )}
                               {column.links.map((link) => (
                                 <li key={link}>
                                   <button type="button" className="dept-link" onClick={() => go("sale")}>{link}</button>
@@ -426,17 +423,6 @@ export default function SiteHeader({ search, onSearch, onNavigate, onFindSuit, c
                   {active.id === "suits" && (
                     <div className="dept-promos">
                       <CompactCard entrypoint="nav-mega" onActivate={openQuiz} />
-                      <button
-                        type="button"
-                        className="dept-feature"
-                        onClick={() => go(SUIT_PROMO.destination)}
-                      >
-                        <img src={SUIT_PROMO.image} alt="" />
-                        <span className="dept-feature-copy">
-                          <strong>{SUIT_PROMO.headline}</strong>
-                          <span>{SUIT_PROMO.link}</span>
-                        </span>
-                      </button>
                     </div>
                   )}
                 </div>
@@ -515,7 +501,7 @@ export default function SiteHeader({ search, onSearch, onNavigate, onFindSuit, c
                       setMobilePanel(null);
                     }}
                     onGo={go}
-                    onFindSuit={startQuiz}
+                    onFindSuit={openQuiz}
                     accountName={accountName}
                   />
                 )}
@@ -556,11 +542,6 @@ function MobilePanel({ department, backRef, onBack, onGo, onFindSuit, accountNam
         <span>{department.shopAll}</span>
         <ArrowIcon />
       </button>
-      {suits && (
-        <button type="button" className="suit-finder-link" onClick={onFindSuit}>
-          Suit Finder
-        </button>
-      )}
       {suits && SUITS_MENU.map((column) => (
         <div key={column.title} className="mobile-group">
           <p className="dept-kicker">{column.title}</p>
@@ -570,13 +551,9 @@ function MobilePanel({ department, backRef, onBack, onGo, onFindSuit, accountNam
         </div>
       ))}
       {suits && (
-        <button type="button" className="mobile-feature" onClick={() => onGo(SUIT_PROMO.destination)}>
-          <img src={SUIT_PROMO.image} alt="" />
-          <span className="dept-feature-copy">
-            <strong>{SUIT_PROMO.headline}</strong>
-            <span>{SUIT_PROMO.link}</span>
-          </span>
-        </button>
+        <div className="mobile-finder">
+          <CompactCard entrypoint="nav-mega" onActivate={onFindSuit} />
+        </div>
       )}
       <MobileUtilities accountName={accountName} />
     </div>
