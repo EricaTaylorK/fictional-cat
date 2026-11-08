@@ -19,37 +19,50 @@
   color: #232323;
 }
 
+/* Why it's a match: light gray pills at every width (cards and product page).
+   The check/dash mark is hidden; "Matches:" / "Differs:" stays for screen readers. */
 .match-checks {
+  align-content: flex-start;
   display: flex;
-  flex-direction: column;
-  gap: 2px;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 8px;
   list-style: none;
   margin: 8px 0 0;
+  max-width: 100%;
+  min-width: 0;
   padding: 0;
 }
 
 .match-checks li {
-  align-items: baseline;
+  background: #f2f2f2;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  box-sizing: border-box;
   color: #232323;
-  display: flex;
+  display: block;
+  flex: 0 1 auto;
   font-family: var(--font-family-roboto);
-  font-size: 12px;
-  gap: 6px;
-  line-height: 18px;
+  font-size: 14px;
+  font-weight: 400;
+  height: 32px;
+  line-height: 20px;
+  max-width: 100%;
+  min-width: 0;
+  overflow: hidden;
+  padding: 5px 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .match-checks li.is-miss {
-  color: #5c5c5c;
+  background: #fff;
+  border-color: rgba(0, 0, 0, 0.16);
+  color: #6e6e6e;
 }
 
 .match-check-mark {
-  flex: 0 0 12px;
-  font-weight: 700;
-  text-align: center;
-}
-
-.match-checks li.is-pass .match-check-mark {
-  color: #008052;
+  display: none;
 }
 
 .product-detail-match {
@@ -353,8 +366,9 @@
 }
 
 .match-why {
-  display: none;
+  display: block;
   margin: 8px 0 0;
+  order: 1;
   color: #232323;
   font-family: var(--font-family-roboto);
   font-size: 14px;
@@ -376,12 +390,72 @@
 }
 
 .results-layout .suit-card-copy .match-checks {
-  order: 1;
+  margin-top: 4px;
+  order: 2;
 }
 
 @media (max-width: 767px) {
   .results-hero-account {
     display: none;
+  }
+
+  /* Phone: the reasons run the full card width under the name, instead of
+     squeezing into the column beside the price. Copy children join the info grid. */
+  .results-layout .suit-card-info {
+    row-gap: 0;
+  }
+
+  .results-layout .suit-card-copy {
+    display: contents;
+  }
+
+  .results-layout .suit-card .color-swatches {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .results-layout .suit-card-names {
+    grid-column: 1;
+    grid-row: 2;
+    margin-top: 8px;
+  }
+
+  .results-layout .suit-card-copy .product-meta {
+    grid-column: 1;
+    grid-row: 3;
+    margin: 8px 0 0;
+  }
+
+  .results-layout .suit-card-copy .suit-rating {
+    grid-column: 1;
+    grid-row: 4;
+    margin: 8px 0 0;
+  }
+
+  .results-layout .suit-price-stack {
+    grid-row: 1 / span 4;
+  }
+
+  .results-layout .match-why {
+    grid-column: 1 / -1;
+    grid-row: 5;
+    margin: 16px 0 0;
+  }
+
+  .results-layout .suit-card-copy .match-checks {
+    grid-column: 1 / -1;
+    grid-row: 6;
+    margin-top: 8px;
+  }
+
+  .results-layout .suit-expand-toggle {
+    grid-row: 7;
+    margin-top: 16px;
+  }
+
+  .results-layout .suit-details-link {
+    grid-row: 8;
+    margin: 12px auto 0;
   }
 }
 
@@ -552,33 +626,6 @@
     min-width: 0;
     order: 4;
     width: 100%;
-  }
-
-  .results-layout .suit-card .match-checks li {
-    align-items: center;
-    background: #f2f2f2;
-    border: 1px solid transparent;
-    border-radius: 4px;
-    box-sizing: border-box;
-    color: #3a3a3a;
-    flex: 0 1 auto;
-    font-size: 14px;
-    font-weight: 400;
-    height: 32px;
-    line-height: 20px;
-    max-width: 100%;
-    padding: 5px 11px;
-    white-space: nowrap;
-  }
-
-  .results-layout .suit-card .match-checks li.is-miss {
-    background: #f6f6f6;
-    border-color: rgba(0, 0, 0, 0.12);
-    color: #8a8a8a;
-  }
-
-  .results-layout .suit-card .match-check-mark {
-    display: none;
   }
 
   .results-layout .suit-details-link {
