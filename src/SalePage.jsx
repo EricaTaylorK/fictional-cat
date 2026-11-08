@@ -123,6 +123,7 @@ export default function SalePage({
           onOpen={openSheet}
           onRemove={(token) => setApplied((current) => removeAppliedToken(current, token))}
           onClear={() => setApplied(emptyFilters())}
+          onFindSuit={onTakeQuiz}
           sort={sort}
           onSort={setSort}
         />

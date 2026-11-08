@@ -543,24 +543,31 @@
   }
 
   .results-layout .suit-card-copy .match-checks {
+    align-content: flex-start;
     flex-direction: row;
     flex-wrap: wrap;
     gap: 8px;
     margin-top: 4px;
     max-width: 100%;
+    min-width: 0;
     order: 4;
     width: 100%;
   }
 
   .results-layout .suit-card .match-checks li {
     align-items: center;
-    background: #fff;
-    border: 1px solid rgba(0, 0, 0, 0.28);
-    border-radius: 999px;
+    background: #f2f2f2;
+    border: 1px solid transparent;
+    border-radius: 4px;
     box-sizing: border-box;
-    flex: 0 0 auto;
+    color: #3a3a3a;
+    flex: 0 1 auto;
+    font-size: 14px;
+    font-weight: 400;
     height: 32px;
-    padding: 0 12px;
+    line-height: 20px;
+    max-width: 100%;
+    padding: 5px 11px;
     white-space: nowrap;
   }
 

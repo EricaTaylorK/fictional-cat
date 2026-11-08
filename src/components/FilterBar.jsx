@@ -9,6 +9,7 @@ export default function FilterBar({
   onOpen,
   onRemove,
   onClear,
+  onFindSuit,
   sort,
   onSort,
 }) {
@@ -108,6 +109,12 @@ export default function FilterBar({
             </button>
           );
         })}
+        {onFindSuit && (
+          <button type="button" className="chip chip-find-suit" onClick={onFindSuit}>
+            <SparkleIcon />
+            Find My Suit
+          </button>
+        )}
       </div>
       {selected.length > 0 && (
         <div className="selected-filters" data-testid="selected-filters">
@@ -140,6 +147,14 @@ export default function FilterBar({
         </div>
       )}
     </div>
+  );
+}
+
+function SparkleIcon() {
+  return (
+    <svg className="chip-find-icon" viewBox="0 0 16 16" aria-hidden="true">
+      <path fill="currentColor" d="M6.2 1.2 7.3 4.4 10.6 5.4 7.3 6.5 6.2 9.8 5.1 6.5 1.8 5.4 5.1 4.4 6.2 1.2Zm5.2 6.1.7 2 2.1.7-2.1.7-.7 2-.7-2-2.1-.7 2.1-.7.7-2Z" />
+    </svg>
   );
 }
 
