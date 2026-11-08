@@ -19,8 +19,10 @@
   color: #232323;
 }
 
-/* Why it's a match: light gray pills at every width (cards and product page).
-   The check/dash mark is hidden; "Matches:" / "Differs:" stays for screen readers. */
+/* Why it's a match: matching reasons are white pills with a dark gray stroke.
+   Misses stay quieter and look disabled. Same treatment on cards and the product
+   page, at every width. The check/dash mark is hidden; "Matches:" / "Differs:"
+   stays for screen readers. */
 .match-checks {
   align-content: flex-start;
   display: flex;
@@ -35,11 +37,11 @@
 }
 
 .match-checks li {
-  background: #f2f2f2;
+  background: #ebebeb;
   border: 1px solid transparent;
   border-radius: 999px;
   box-sizing: border-box;
-  color: #232323;
+  color: #9a9a9a;
   display: block;
   flex: 0 1 auto;
   font-family: var(--font-family-roboto);
@@ -55,10 +57,17 @@
   white-space: nowrap;
 }
 
+.match-checks li.is-pass {
+  background: #ffffff;
+  border-color: #3a3a3a;
+  color: #232323;
+}
+
 .match-checks li.is-miss {
-  background: #fff;
-  border-color: rgba(0, 0, 0, 0.16);
-  color: #6e6e6e;
+  background: #ebebeb;
+  border-color: transparent;
+  color: #9a9a9a;
+  opacity: 0.72;
 }
 
 .match-check-mark {
