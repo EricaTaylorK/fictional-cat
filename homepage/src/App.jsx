@@ -124,7 +124,7 @@ function BrandMark({ tile }) {
   return <span className={`brand-mark is-${tile.mark}`}>{tile.name}</span>;
 }
 
-function LookModule({ occasion }) {
+function LookModule({ occasion, occasionName, onSelect }) {
   const reduce = usePrefersReducedMotion();
   const [shown, setShown] = useState(occasion);
   const [leaving, setLeaving] = useState(null);
@@ -146,7 +146,27 @@ function LookModule({ occasion }) {
   useEffect(() => setActivePiece(null), [shown.name]);
 
   return (
-    <section className="look-module" aria-label="Shoppable looks">
+    <section className="occasion-module" aria-label="Shop by occasion">
+      <h2 className="type-h2" id="occasion-heading">{occasionHeading}</h2>
+      <div className="occasion-row" role="tablist" aria-labelledby="occasion-heading">
+        {occasionLooks.map((item) => (
+          <button
+            key={item.name}
+            type="button"
+            role="tab"
+            id={tabId(item.name)}
+            aria-selected={item.name === occasionName}
+            aria-controls="occasion-panel"
+            className={item.name === occasionName ? "is-selected" : undefined}
+            onClick={() => onSelect(item.name)}
+            onMouseEnter={() => preloadLook(item)}
+            onFocus={() => preloadLook(item)}
+          >
+            {item.name}
+          </button>
+        ))}
+      </div>
+      <div className="look-stage">
       <FadeSlot
         className="look-photo-stack"
         slotRef={photoRef}
@@ -229,6 +249,7 @@ function LookModule({ occasion }) {
           </div>
         )}
       />
+      </div>
     </section>
   );
 }
@@ -319,30 +340,7 @@ export default function App() {
 
           <FlourishRule />
 
-          <section className="occasion-module" aria-label="Shop by occasion">
-            <h2 className="type-h2" id="occasion-heading">{occasionHeading}</h2>
-            <Flourish className="occasion-flourish" />
-            <div className="occasion-row" role="tablist" aria-labelledby="occasion-heading">
-              {occasionLooks.map((item) => (
-                <button
-                  key={item.name}
-                  type="button"
-                  role="tab"
-                  id={tabId(item.name)}
-                  aria-selected={item.name === occasionName}
-                  aria-controls="occasion-panel"
-                  className={item.name === occasionName ? "is-selected" : undefined}
-                  onClick={() => setOccasionName(item.name)}
-                  onMouseEnter={() => preloadLook(item)}
-                  onFocus={() => preloadLook(item)}
-                >
-                  {item.name}
-                </button>
-              ))}
-            </div>
-          </section>
-
-          <LookModule occasion={occasion} />
+          <LookModule occasion={occasion} occasionName={occasionName} onSelect={setOccasionName} />
 
           <FlourishRule />
 
@@ -353,13 +351,15 @@ export default function App() {
                 <button
                   key={tile.name}
                   type="button"
-                  className="brand-tile editorial-frame"
+                  className="brand-card"
                   aria-label={tile.cta}
-                  style={{ "--scrim": tile.scrim, "--view": tile.view }}
                 >
-                  <img className="editorial" src={tile.image} alt="" style={{ objectPosition: tile.focus }} />
-                  <span className="brand-scrim" aria-hidden="true" />
-                  <BrandMark tile={tile} />
+                  <span className="brand-tile editorial-frame" style={{ "--scrim": tile.scrim, "--view": tile.view }}>
+                    <img className="editorial" src={tile.image} alt="" style={{ objectPosition: tile.focus }} />
+                    <span className="brand-scrim" aria-hidden="true" />
+                    <BrandMark tile={tile} />
+                  </span>
+                  <span className="brand-bar" style={{ background: tile.bar }} aria-hidden="true" />
                 </button>
               ))}
             </div>

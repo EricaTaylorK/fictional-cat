@@ -15,11 +15,11 @@ export const returning = {
 };
 
 export const brands = [
-  { name: "Calvin Klein", mark: "ck", descriptor: "Clean, modern essentials", cta: "Shop Calvin Klein", image: "/editorial/white-shirt-walnut.jpg", focus: "50% 28%", scrim: 0.62 },
-  { name: "Kenneth Cole", mark: "kc", descriptor: "Smart, comfortable suiting", cta: "Shop Kenneth Cole", image: "/editorial/charcoal-velvet.jpg", focus: "58% 36%", scrim: 0.32 },
-  { name: "Cole Haan", mark: "ch", descriptor: "Shoes that finish the look", cta: "Shop Cole Haan", image: "/editorial/blue-sling-cream.jpg", focus: "30% 90%", scrim: 0.55, view: "inset(74% 42% 2% 0%)" },
-  { name: "Tommy Hilfiger", mark: "th", descriptor: "Classic American style", cta: "Shop Tommy Hilfiger", image: "/editorial/navy-check-holiday.jpg", focus: "36% 32%", scrim: 0.36 },
-  { name: "Michael Kors", mark: "mk", descriptor: "Polished, modern looks", cta: "Shop Michael Kors", image: "/editorial/graphite-blazer-cream.jpg", focus: "50% 34%", scrim: 0.5 },
+  { name: "Calvin Klein", mark: "ck", descriptor: "Clean, modern essentials", cta: "Shop Calvin Klein", image: "/editorial/white-shirt-walnut.jpg", focus: "50% 28%", scrim: 0.62, bar: "#4a3122" },
+  { name: "Kenneth Cole", mark: "kc", descriptor: "Smart, comfortable suiting", cta: "Shop Kenneth Cole", image: "/editorial/charcoal-velvet.jpg", focus: "58% 36%", scrim: 0.32, bar: "#1a2438" },
+  { name: "Cole Haan", mark: "ch", descriptor: "Shoes that finish the look", cta: "Shop Cole Haan", image: "/editorial/blue-sling-cream.jpg", focus: "30% 90%", scrim: 0.55, view: "inset(74% 42% 2% 0%)", bar: "#7a3b32" },
+  { name: "Tommy Hilfiger", mark: "th", descriptor: "Classic American style", cta: "Shop Tommy Hilfiger", image: "/editorial/navy-check-holiday.jpg", focus: "36% 32%", scrim: 0.36, bar: "#8a8178" },
+  { name: "Michael Kors", mark: "mk", descriptor: "Polished, modern looks", cta: "Shop Michael Kors", image: "/editorial/graphite-blazer-cream.jpg", focus: "50% 34%", scrim: 0.5, bar: "#4a3122" },
 ];
 
 export const brandHeading = "Shop by brand";
