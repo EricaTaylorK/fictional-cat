@@ -67,11 +67,7 @@ function OccasionModule({ occasion, onSelect }) {
   }, [leaving]);
 
   return (
-    <section className="occasion-module" aria-labelledby="occasion-heading">
-      <p className="wire-caption" id="mod-occasion">
-        3 · Shop by occasion
-        <span className="wire-caption-side">4 · Shoppable looks</span>
-      </p>
+    <section className="occasion-module" aria-label="Shop by occasion">
       <div className="stories">
         <div className="stories-bg-stack" aria-hidden="true">
           {leaving ? (
@@ -189,12 +185,7 @@ export default function App() {
     <div className="page" id="top">
       <SiteHeader search={search} onSearch={setSearch} />
       <main>
-        <section className="category-module" aria-labelledby="mod-categories">
-          <div className="category-caption">
-            <p className="wire-caption" id="mod-categories">
-              5 · Category entry tiles
-            </p>
-          </div>
+        <section className="category-module" aria-label="Category entry tiles">
           <div className="category-band">
             <div className="category-band-bg" aria-hidden="true" />
             <div className="category-band-copy">
@@ -212,10 +203,7 @@ export default function App() {
 
         <div className="home">
           <div className="pair pair-hero">
-            <section aria-labelledby="mod-hero">
-              <p className="wire-caption" id="mod-hero">
-                1 · Primary hero
-              </p>
+            <section aria-label="Primary hero">
               <div className="wire-box wire-hero">
                 <p className="eyebrow"><span>{hero.eyebrow}</span></p>
                 <h1 className="type-h1">{hero.title}</h1>
@@ -225,10 +213,7 @@ export default function App() {
                 </button>
               </div>
             </section>
-            <section aria-labelledby="mod-seasonal">
-              <p className="wire-caption" id="mod-seasonal">
-                2 · Seasonal campaign slots
-              </p>
+            <section aria-label="Seasonal campaign slots">
               <div className="wire-box wire-slot">
                 <p className="wire-kicker">{seasonal.name}</p>
                 <p>{seasonal.line}</p>
@@ -240,9 +225,8 @@ export default function App() {
 
           <OccasionModule occasion={occasion} onSelect={setOccasionName} />
 
-          <section aria-labelledby="mod-brands">
-            <p className="wire-caption">6 · Brand tiles</p>
-            <h2 className="type-h2" id="mod-brands">
+          <section aria-label="Brand tiles">
+            <h2 className="type-h2">
               {brandHeading}
             </h2>
             <div className="brand-row">
@@ -256,10 +240,7 @@ export default function App() {
             </div>
           </section>
 
-          <section aria-labelledby="mod-returning">
-            <p className="wire-caption" id="mod-returning">
-              7 · Returning visitor
-            </p>
+          <section aria-label="Returning visitor">
             <div className="wire-box">
               <p className="wire-note">Shown only to returning visitors</p>
               <h2>{returning.headline}</h2>
@@ -276,10 +257,7 @@ export default function App() {
           </section>
         </div>
 
-        <section className="reassure" aria-labelledby="mod-reassure">
-          <p className="wire-caption" id="mod-reassure">
-            8 · Reassurance strip
-          </p>
+        <section className="reassure" aria-label="Reassurance strip">
           <p>{reassurance.visible}</p>
         </section>
       </main>

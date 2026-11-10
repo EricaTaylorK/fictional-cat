@@ -317,15 +317,6 @@ button { cursor: pointer; }
 
 .pair { display: grid; gap: 16px; }
 
-.wire-caption {
-  margin: 0 0 8px;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--color-muted);
-}
-
 .wire-box {
   background: #f3f3f3;
   border: 1px solid #c8c8c8;
@@ -472,12 +463,6 @@ button { cursor: pointer; }
   text-transform: none;
 }
 
-.category-caption {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 14px var(--space-3) var(--space-2);
-}
-
 .category-band {
   position: relative;
   isolation: isolate;
@@ -580,8 +565,6 @@ button { cursor: pointer; }
 .wire-hero .type-cta:focus-visible { outline-color: var(--color-focus-outline); }
 
 .occasion-module { display: grid; gap: var(--space-2); }
-
-.wire-caption-side { margin-left: var(--space-3); }
 
 .stories {
   position: relative;
@@ -950,8 +933,6 @@ button { cursor: pointer; }
   .pair-hero { grid-template-columns: 1.4fr 0.8fr; }
 
   .wire-hero { min-height: 440px; padding: var(--space-5); }
-
-  .category-caption { padding-left: 24px; padding-right: 24px; }
 
   .category-band-copy { padding-left: 24px; padding-right: 24px; }
 
