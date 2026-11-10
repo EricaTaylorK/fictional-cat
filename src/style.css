@@ -1124,6 +1124,8 @@ h1 {
 .chip-find-suit {
   box-shadow: inset 0 0 0 1px #046de9;
   gap: 6px;
+  color: #046de9;
+  font-weight: 500;
 }
 
 .chip-find-suit:hover {
