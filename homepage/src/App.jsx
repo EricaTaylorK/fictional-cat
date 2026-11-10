@@ -217,7 +217,7 @@ export default function App() {
               <div className="wire-box wire-slot">
                 <p className="wire-kicker">{seasonal.name}</p>
                 <p>{seasonal.line}</p>
-                <button type="button">{seasonal.cta}</button>
+                <button type="button" className="type-cta">{seasonal.cta}</button>
               </div>
               <div className="wire-box wire-slot is-empty">Rotating slot</div>
             </section>
@@ -252,7 +252,7 @@ export default function App() {
                   </div>
                 ))}
               </div>
-              <button type="button">{returning.link}</button>
+              <button type="button" className="type-cta">{returning.link}</button>
             </div>
           </section>
         </div>

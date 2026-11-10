@@ -212,17 +212,7 @@ button { cursor: pointer; }
 }
 
 .footer-band button {
-  justify-self: start;
   margin-top: 8px;
-  height: 40px;
-  padding: 0 18px;
-  border: 1px solid var(--color-neutral-white);
-  background: transparent;
-  color: var(--color-neutral-white);
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  font-size: 12px;
-  font-weight: 500;
 }
 
 .footer-referral {
@@ -273,15 +263,7 @@ button { cursor: pointer; }
 }
 
 .footer-signup button {
-  justify-self: start;
-  height: 44px;
-  padding: 0 20px;
-  border: 1px solid var(--color-neutral-black);
-  background: var(--color-neutral-black);
-  color: var(--color-neutral-white);
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  font-size: 13px;
+  width: 100%;
 }
 
 .footer-columns {
@@ -359,20 +341,9 @@ button { cursor: pointer; }
 
 .wire-cta { font-size: 13px; text-decoration: underline; text-underline-offset: 2px; }
 
-.wire-slot button,
-.wire-box:not(.wire-hero) > button {
-  border: 1px solid #232323;
-  background: transparent;
-  padding: 8px 12px;
-  font-size: 13px;
-}
-
-.home .wire-hero .type-cta {
+.home .wire-hero .type-cta,
+.home .wire-box > .type-cta {
   margin-top: var(--space-3);
-  border: 1px solid var(--color-neutral-black);
-  background: transparent;
-  padding: 12px var(--space-3);
-  color: var(--color-neutral-black);
 }
 
 .eyebrow {
@@ -386,7 +357,7 @@ button { cursor: pointer; }
   font-weight: 400;
   font-synthesis: none;
   line-height: 1;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--blue-dark);
 }
@@ -429,7 +400,7 @@ button { cursor: pointer; }
   font-synthesis: none;
   font-size: var(--step-3);
   line-height: 0.95;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   text-wrap: balance;
   overflow: visible;
@@ -455,12 +426,25 @@ button { cursor: pointer; }
 }
 
 .type-cta {
-  font-family: var(--font-text);
-  font-weight: 700;
-  font-size: var(--step-0);
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 40px;
+  min-height: 40px;
+  padding: 0 16px;
+  border: 0;
+  background: #111;
+  color: #fff;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-synthesis: none;
+  font-size: 16px;
   line-height: 1;
-  letter-spacing: 0;
-  text-transform: none;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-decoration: none;
 }
 
 .category-band {
@@ -655,13 +639,10 @@ button { cursor: pointer; }
 .stories .type-h2 { color: #fff; }
 
 .stories-cta {
-  justify-self: start;
-  align-self: flex-start;
-  border: 0;
-  border-bottom: 2px solid currentColor;
-  background: transparent;
-  padding: 0 0 3px;
-  color: #fff;
+  justify-self: stretch;
+  align-self: stretch;
+  background: #d5d5d5;
+  color: #111;
 }
 
 .occasion-row {
@@ -740,9 +721,6 @@ button { cursor: pointer; }
 
 .product-shop {
   margin-top: auto;
-  color: var(--color-neutral-black);
-  text-decoration: underline;
-  text-underline-offset: 3px;
 }
 
 .is-out {

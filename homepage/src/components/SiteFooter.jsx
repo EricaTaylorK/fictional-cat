@@ -9,7 +9,7 @@ export default function SiteFooter() {
         <div className="footer-band-inner">
           <h2>Perfect Fit® Rewards</h2>
           <p>Earn points on every purchase and get free shipping, exclusive offers, and more.</p>
-          <button type="button">Join for free</button>
+          <button type="button" className="type-cta">Join for free</button>
         </div>
       </div>
       <div className="footer-referral">
@@ -53,7 +53,7 @@ export default function SiteFooter() {
             <span className="visually-hidden">Email address</span>
             <input type="email" required placeholder="Email Address" />
           </label>
-          <button type="submit">{joined ? "You're on the list" : "Sign up"}</button>
+          <button type="submit" className="type-cta">{joined ? "You're on the list" : "Sign up"}</button>
         </form>
         <p className="footer-legal">© 2000-2026 The Men’s Wearhouse, LLC. All Rights Reserved.</p>
       </div>
