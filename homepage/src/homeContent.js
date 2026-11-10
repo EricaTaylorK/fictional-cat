@@ -22,6 +22,8 @@ export const brands = [
   { name: "Michael Kors", descriptor: "Polished, modern looks", cta: "Shop Michael Kors" },
 ];
 
+export const brandHeading = "Shop by brand";
+
 export const categories = [
   { name: "Suits", descriptor: "Slim, modern and classic fits", cta: "Shop suits" },
   { name: "Dress shirts", descriptor: "Every cut, collar and color", cta: "Shop dress shirts" },
@@ -32,43 +34,78 @@ export const categories = [
   { name: "Sale", descriptor: "Savings on styles you'll actually wear", cta: "Shop sale" },
 ];
 
+export const categoryEyebrow = "Shop by category";
+
+export const occasionHeading = "What are you dressing for?";
+
 export const occasionLooks = [
   {
     name: "Wedding",
+    eyebrow: "Wedding",
     line: "Guest, groom or groomsman, find your look.",
-    cta: "Shop wedding",
-    pieces: ["Tuxedo", "Dress shirt", "Bow tie"],
+    cta: "Shop Wedding",
+    image: "/looks/look-wedding.jpg",
+    pieces: [
+      { name: "Navy suit", image: "/products/suit-navy.jpg" },
+      { name: "White dress shirt", image: "/products/white-dress-shirt.jpg" },
+      { name: "Navy tie", image: "/products/navy-tie.jpg" },
+    ],
   },
   {
     name: "Work",
+    eyebrow: "Work",
     line: "The suit for the office.",
-    cta: "Shop work",
-    pieces: ["Suit jacket", "Dress shirt", "Dress pants"],
+    cta: "Shop Work",
+    image: "/looks/look-work.jpg",
+    pieces: [
+      { name: "Gray suit", image: "/products/suit-gray.jpg" },
+      { name: "White dress shirt", image: "/products/white-dress-shirt.jpg" },
+      { name: "Black dress shoes", image: "/products/black-dress-shoes.jpg" },
+    ],
   },
   {
     name: "Prom/Black tie",
+    eyebrow: "Prom",
     line: "Black tie, from the jacket to the shoes.",
-    cta: "Shop prom",
-    pieces: ["Tuxedo", "Bow tie", "Dress shoes"],
+    cta: "Shop Prom",
+    image: "/looks/look-prom.jpg",
+    pieces: [
+      { name: "Black tuxedo", image: "/products/suit-black.jpg" },
+      { name: "White dress shirt", image: "/products/white-dress-shirt.jpg" },
+      { name: "Black dress shoes", image: "/products/black-dress-shoes.jpg" },
+    ],
   },
   {
     name: "Rental",
-    line: "Rent the tux. Keep the look.",
-    cta: "Shop rental",
-    pieces: ["Rental jacket", "Tuxedo shirt", "Dress shoes"],
+    eyebrow: "Rental",
+    line: "Rent the suit for the day.",
+    cta: "Shop Rental",
+    image: "/looks/look-rental.jpg",
+    pieces: [
+      { name: "Tan suit", image: "/products/suit-tan.jpg" },
+      { name: "White dress shirt", image: "/products/white-dress-shirt.jpg" },
+      { name: "Navy tie", image: "/products/navy-tie.jpg" },
+    ],
   },
   {
     name: "Sale",
+    eyebrow: "Sale",
     line: "The same look, for less.",
-    cta: "Shop sale",
-    pieces: ["Suit", "Dress shirt", "Dress shoes"],
+    cta: "Shop Sale",
+    image: "/looks/look-sale.jpg",
+    pieces: [
+      { name: "Brown suit", image: "/products/suit-brown.jpg" },
+      { name: "White dress shirt", image: "/products/white-dress-shirt.jpg" },
+      { name: "Black dress shoes", image: "/products/black-dress-shoes.jpg" },
+    ],
   },
 ];
 
 export const hero = {
-  label: "Complete outfit",
-  detail: "Suit or tuxedo, shirt, bow tie, pocket square, shoes",
-  cta: "Curated outfit",
+  eyebrow: "Formalwear",
+  title: "Black tie, decoded.",
+  body: "The whole look, picked to work together, from jacket to shoes.",
+  cta: "Shop the Full Look",
 };
 
 export const seasonal = {
