@@ -1,16 +1,16 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import SiteFooter from "./components/SiteFooter.jsx";
 import SiteHeader from "./components/SiteHeader.jsx";
+import { Flourish, FlourishRule } from "./flourish.jsx";
 import {
   brandHeading,
   brands,
-  categories,
-  categoryEyebrow,
   hero,
   occasionHeading,
   occasionLooks,
   reassurance,
   returning,
+  rotating,
   seasonal,
 } from "./homeContent.js";
 
@@ -35,15 +35,58 @@ function tabId(name) {
 }
 
 function preloadLook(look) {
-  [look.image, ...look.pieces.map((piece) => piece.image)].forEach((src) => {
-    const image = new Image();
-    image.src = src;
-  });
+  const image = new Image();
+  image.src = look.image;
 }
 
-function FadeSlot({ current, previous, className, render }) {
+const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
+
+// Maps a point on an object-fit: cover image to a fraction of its frame.
+function coverPoint(point, aspect, frame, focus) {
+  if (aspect < frame) {
+    const visible = aspect / frame;
+    return { x: point.x, y: (point.y - focus.y * (1 - visible)) / visible };
+  }
+  const visible = frame / aspect;
+  return { x: (point.x - focus.x * (1 - visible)) / visible, y: point.y };
+}
+
+const CARD_ASPECT = 4 / 5;
+
+function cropStyle(crop, aspect) {
+  const visible = aspect < CARD_ASPECT ? aspect / CARD_ASPECT : CARD_ASPECT / aspect;
+  const axis = aspect < CARD_ASPECT ? "y" : "x";
+  const focus = { x: 0.5, y: 0.5, [axis]: clamp((crop[axis] - visible / 2) / (1 - visible), 0, 1) };
+  const p = coverPoint(crop, aspect, CARD_ASPECT, focus);
+  const shift = (v) => clamp(0.5 - v, 1 - (v + (1 - v) * crop.zoom), -v * (1 - crop.zoom));
+  return {
+    objectPosition: `${focus.x * 100}% ${focus.y * 100}%`,
+    transformOrigin: `${p.x * 100}% ${p.y * 100}%`,
+    transform: `translate(${shift(p.x) * 100}%, ${shift(p.y) * 100}%) scale(${crop.zoom})`,
+  };
+}
+
+function useFrameAspect() {
+  const ref = useRef(null);
+  const [aspect, setAspect] = useState(CARD_ASPECT);
+
+  useEffect(() => {
+    const node = ref.current;
+    if (!node) return undefined;
+    const observer = new ResizeObserver(([entry]) => {
+      const { width, height } = entry.contentRect;
+      if (width && height) setAspect(width / height);
+    });
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, []);
+
+  return [ref, aspect];
+}
+
+function FadeSlot({ current, previous, className, render, slotRef }) {
   return (
-    <div className={className}>
+    <div className={className} ref={slotRef}>
       {previous ? render(previous, "is-out") : null}
       {render(current, previous ? "is-in" : "")}
     </div>
@@ -60,11 +103,16 @@ function OccasionModule({ occasion, onSelect }) {
     setLeaving(reduce ? null : shown);
   }
 
+  const [photoRef, frameAspect] = useFrameAspect();
+  const [activePiece, setActivePiece] = useState(null);
+
   useEffect(() => {
     if (!leaving) return undefined;
     const timeout = window.setTimeout(() => setLeaving(null), 560);
     return () => window.clearTimeout(timeout);
   }, [leaving]);
+
+  useEffect(() => setActivePiece(null), [shown.name]);
 
   return (
     <section className="occasion-module" aria-label="Shop by occasion">
@@ -85,18 +133,46 @@ function OccasionModule({ occasion, onSelect }) {
         </div>
         <div className="stories-scrim" aria-hidden="true" />
         <div className="stories-inner">
+          <div className="stories-heading">
+            <h2 className="type-h2" id="occasion-heading">
+              {occasionHeading}
+            </h2>
+            <Flourish className="occasion-flourish" />
+          </div>
+          <div className="stories-stage">
           <FadeSlot
             className="stories-photo-stack"
+            slotRef={photoRef}
             current={shown}
             previous={leaving}
             render={(look, phase) => (
               <figure
                 key={phase === "is-out" ? `${look.name}-out` : look.name}
-                className={phase ? `stories-photo ${phase}` : "stories-photo"}
+                className={phase ? `stories-photo editorial-frame lined ${phase}` : "stories-photo editorial-frame lined"}
+                style={{ "--shell": look.shell }}
                 inert={phase === "is-out" ? true : undefined}
                 aria-hidden={phase === "is-out" ? true : undefined}
               >
-                <img src={look.image} alt="" />
+                <img
+                  className="editorial"
+                  src={look.image}
+                  alt=""
+                  style={{ objectPosition: `${look.focus.x * 100}% ${look.focus.y * 100}%` }}
+                />
+                <div className="look-markers" aria-hidden="true">
+                  {look.pieces.map((piece, index) => {
+                    const point = coverPoint(piece.at, look.aspect, frameAspect, look.focus);
+                    return (
+                      <span
+                        key={piece.name}
+                        className={activePiece === index && phase !== "is-out" ? "look-marker is-active" : "look-marker"}
+                        style={{ left: `${point.x * 100}%`, top: `${point.y * 100}%` }}
+                      >
+                        {index + 1}
+                      </span>
+                    );
+                  })}
+                </div>
                 <figcaption>
                   <p className="eyebrow eyebrow-on-dark"><span>{look.eyebrow}</span></p>
                   <h1 className="type-h1">{look.line}</h1>
@@ -105,25 +181,6 @@ function OccasionModule({ occasion, onSelect }) {
             )}
           />
           <div className="stories-panel">
-            <h2 className="type-h2" id="occasion-heading">
-              {occasionHeading}
-            </h2>
-            <FadeSlot
-              className="stories-cta-stack"
-              current={shown}
-              previous={leaving}
-              render={(look, phase) => (
-                <button
-                  key={phase === "is-out" ? `${look.name}-cta-out` : `${look.name}-cta`}
-                  type="button"
-                  className={phase ? `type-cta stories-cta ${phase}` : "type-cta stories-cta"}
-                  inert={phase === "is-out" ? true : undefined}
-                  aria-hidden={phase === "is-out" ? true : undefined}
-                >
-                  {look.cta}
-                </button>
-              )}
-            />
             <div className="occasion-row" role="tablist" aria-labelledby="occasion-heading">
               {occasionLooks.map((item) => (
                 <button
@@ -143,32 +200,51 @@ function OccasionModule({ occasion, onSelect }) {
               ))}
             </div>
             <FadeSlot
-              className="stories-products-stack"
+              className="stories-look-stack"
               current={shown}
               previous={leaving}
               render={(look, phase) => (
                 <div
-                  key={phase === "is-out" ? `${look.name}-pieces-out` : `${look.name}-pieces`}
-                  className={phase ? `stories-products ${phase}` : "stories-products"}
+                  key={phase === "is-out" ? `${look.name}-look-out` : `${look.name}-look`}
+                  className={phase ? `stories-look ${phase}` : "stories-look"}
                   id={phase === "is-out" ? undefined : "occasion-panel"}
                   role={phase === "is-out" ? undefined : "tabpanel"}
                   aria-labelledby={phase === "is-out" ? undefined : tabId(look.name)}
                   inert={phase === "is-out" ? true : undefined}
                   aria-hidden={phase === "is-out" ? true : undefined}
                 >
-                  {look.pieces.map((piece) => (
-                    <button key={piece.name} type="button" className="product-card">
-                      <span className="product-photo">
-                        <img src={piece.image} alt="" />
-                      </span>
-                      <span className="eyebrow"><span>On this look</span></span>
-                      <span className="type-h3">{piece.name}</span>
-                      <span className="type-cta product-shop">Shop</span>
-                    </button>
-                  ))}
+                  <p className="eyebrow eyebrow-on-dark look-label">
+                    <span>The {look.name} look, {look.pieces.length} pieces</span>
+                  </p>
+                  <div className="stories-products">
+                    {look.pieces.map((piece, index) => (
+                      <button
+                        key={piece.name}
+                        type="button"
+                        className="product-card"
+                        aria-label={`${piece.name}, view product`}
+                        onMouseEnter={() => setActivePiece(index)}
+                        onMouseLeave={() => setActivePiece(null)}
+                        onFocus={() => setActivePiece(index)}
+                        onBlur={() => setActivePiece(null)}
+                      >
+                        <span className="product-photo editorial-frame">
+                          <img className="editorial" src={look.image} alt="" style={cropStyle(piece.crop, look.aspect)} />
+                          <span className="look-marker" aria-hidden="true">{index + 1}</span>
+                        </span>
+                        <span className="type-h3">{piece.name}</span>
+                        <span className="product-price">{piece.price}</span>
+                        <span className="type-cta product-shop">Shop</span>
+                      </button>
+                    ))}
+                  </div>
+                  <button type="button" className="type-cta is-light stories-cta">
+                    Shop the full {look.name} look
+                  </button>
                 </div>
               )}
             />
+          </div>
           </div>
         </div>
       </div>
@@ -185,45 +261,38 @@ export default function App() {
     <div className="page" id="top">
       <SiteHeader search={search} onSearch={setSearch} />
       <main>
-        <section className="category-module" aria-label="Category entry tiles">
-          <div className="category-band">
-            <div className="category-band-bg" aria-hidden="true" />
-            <div className="category-band-copy">
-              <p className="eyebrow eyebrow-on-dark"><span>{categoryEyebrow}</span></p>
-            </div>
-            <div className="category-strip" role="navigation" aria-label={categoryEyebrow}>
-              {categories.map((tile) => (
-                <button key={tile.name} type="button" aria-label={tile.cta}>
-                  {tile.name}
-                </button>
-              ))}
-            </div>
-          </div>
-        </section>
-
         <div className="home">
           <div className="pair pair-hero">
-            <section aria-label="Primary hero">
-              <div className="wire-box wire-hero">
-                <p className="eyebrow"><span>{hero.eyebrow}</span></p>
-                <h1 className="type-h1">{hero.title}</h1>
-                <p className="type-body">{hero.body}</p>
-                <button type="button" className="type-cta">
-                  {hero.cta}
-                </button>
-              </div>
+            <section className="hero" aria-label="Primary hero">
+              <figure className="hero-photo editorial-frame lined" style={{ "--shell": hero.shell }}>
+                <img className="editorial" src={hero.image} alt="" />
+                <figcaption className="photo-caption">
+                  <p className="eyebrow eyebrow-on-dark"><span>{hero.eyebrow}</span></p>
+                  <h1 className="type-h1">{hero.title}</h1>
+                  <p className="type-body">{hero.body}</p>
+                  <button type="button" className="type-cta is-light">
+                    {hero.cta}
+                  </button>
+                </figcaption>
+              </figure>
             </section>
-            <section aria-label="Seasonal campaign slots">
-              <div className="wire-box wire-slot">
-                <p className="wire-kicker">{seasonal.name}</p>
-                <p>{seasonal.line}</p>
-                <button type="button" className="type-cta">{seasonal.cta}</button>
-              </div>
-              <div className="wire-box wire-slot is-empty">Rotating slot</div>
+            <section className="seasonal" aria-label="Seasonal campaign slots">
+              {[seasonal, rotating].map((slot) => (
+                <figure key={slot.name} className="seasonal-tile editorial-frame lined" style={{ "--shell": slot.shell }}>
+                  <img className="editorial" src={slot.image} alt="" />
+                  <figcaption className="photo-caption">
+                    <p className="eyebrow eyebrow-on-dark"><span>{slot.name}</span></p>
+                    <p className="type-h3">{slot.line}</p>
+                    <button type="button" className="type-cta is-light">{slot.cta}</button>
+                  </figcaption>
+                </figure>
+              ))}
             </section>
           </div>
 
+          <FlourishRule />
           <OccasionModule occasion={occasion} onSelect={setOccasionName} />
+          <FlourishRule />
 
           <section aria-label="Brand tiles">
             <h2 className="type-h2">
@@ -231,10 +300,16 @@ export default function App() {
             </h2>
             <div className="brand-row">
               {brands.map((tile) => (
-                <button key={tile.name} type="button" className="wire-box wire-tile">
-                  <span className="wire-kicker">{tile.name}</span>
-                  <span>{tile.descriptor}</span>
-                  <span className="wire-cta">{tile.cta}</span>
+                <button
+                  key={tile.name}
+                  type="button"
+                  className="brand-tile editorial-frame"
+                  aria-label={tile.cta}
+                  style={{ "--brand-x": tile.crop.x, "--brand-y": tile.crop.y, "--brand-zoom": tile.crop.zoom }}
+                >
+                  <img className="editorial" src={tile.image} alt="" />
+                  <span className="brand-scrim" aria-hidden="true" />
+                  <span className="brand-wordmark">{tile.name}</span>
                 </button>
               ))}
             </div>
@@ -258,7 +333,9 @@ export default function App() {
         </div>
 
         <section className="reassure" aria-label="Reassurance strip">
+          <Flourish variant="sprig" />
           <p>{reassurance.visible}</p>
+          <Flourish variant="sprig" />
         </section>
       </main>
       <SiteFooter />

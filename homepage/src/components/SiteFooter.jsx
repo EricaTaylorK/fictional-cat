@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Flourish } from "../flourish.jsx";
 
 export default function SiteFooter() {
   const [joined, setJoined] = useState(false);
@@ -7,6 +8,7 @@ export default function SiteFooter() {
     <footer className="site-footer">
       <div className="footer-band">
         <div className="footer-band-inner">
+          <Flourish className="footer-flourish" />
           <h2>Perfect Fit® Rewards</h2>
           <p>Earn points on every purchase and get free shipping, exclusive offers, and more.</p>
           <button type="button" className="type-cta">Join for free</button>
