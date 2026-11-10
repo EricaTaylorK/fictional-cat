@@ -2,9 +2,12 @@ import { useEffect, useRef, useState } from "react";
 import SiteFooter from "./components/SiteFooter.jsx";
 import SiteHeader from "./components/SiteHeader.jsx";
 import { Flourish, FlourishRule } from "./flourish.jsx";
+import { CategorySpot } from "./spots.jsx";
 import {
   brandHeading,
   brands,
+  categories,
+  categoryEyebrow,
   hero,
   occasionHeading,
   occasionLooks,
@@ -213,9 +216,6 @@ function OccasionModule({ occasion, onSelect }) {
                   inert={phase === "is-out" ? true : undefined}
                   aria-hidden={phase === "is-out" ? true : undefined}
                 >
-                  <p className="eyebrow eyebrow-on-dark look-label">
-                    <span>The {look.name} look, {look.pieces.length} pieces</span>
-                  </p>
                   <div className="stories-products">
                     {look.pieces.map((piece, index) => (
                       <button
@@ -239,7 +239,7 @@ function OccasionModule({ occasion, onSelect }) {
                     ))}
                   </div>
                   <button type="button" className="type-cta is-light stories-cta">
-                    Shop the full {look.name} look
+                    {look.cta}
                   </button>
                 </div>
               )}
@@ -261,15 +261,24 @@ export default function App() {
     <div className="page" id="top">
       <SiteHeader search={search} onSearch={setSearch} />
       <main>
+        <section className="category-module" aria-label={categoryEyebrow}>
+          <p className="eyebrow is-centered"><span>{categoryEyebrow}</span></p>
+          <div className="category-row">
+            {categories.map((tile) => (
+              <button key={tile.name} type="button" className="category-tile" aria-label={tile.cta}>
+                <CategorySpot name={tile.name} />
+                <span className="category-name">{tile.name}</span>
+                <span className="category-descriptor">{tile.descriptor}</span>
+              </button>
+            ))}
+          </div>
+        </section>
         <div className="home">
           <div className="pair pair-hero">
             <section className="hero" aria-label="Primary hero">
               <figure className="hero-photo editorial-frame lined" style={{ "--shell": hero.shell }}>
                 <img className="editorial" src={hero.image} alt="" />
                 <figcaption className="photo-caption">
-                  <p className="eyebrow eyebrow-on-dark"><span>{hero.eyebrow}</span></p>
-                  <h1 className="type-h1">{hero.title}</h1>
-                  <p className="type-body">{hero.body}</p>
                   <button type="button" className="type-cta is-light">
                     {hero.cta}
                   </button>
@@ -277,16 +286,16 @@ export default function App() {
               </figure>
             </section>
             <section className="seasonal" aria-label="Seasonal campaign slots">
-              {[seasonal, rotating].map((slot) => (
-                <figure key={slot.name} className="seasonal-tile editorial-frame lined" style={{ "--shell": slot.shell }}>
-                  <img className="editorial" src={slot.image} alt="" />
-                  <figcaption className="photo-caption">
-                    <p className="eyebrow eyebrow-on-dark"><span>{slot.name}</span></p>
-                    <p className="type-h3">{slot.line}</p>
-                    <button type="button" className="type-cta is-light">{slot.cta}</button>
-                  </figcaption>
-                </figure>
-              ))}
+              <figure className="seasonal-tile editorial-frame lined" style={{ "--shell": seasonal.shell }}>
+                <img className="editorial" src={seasonal.image} alt="" />
+                <figcaption className="photo-caption">
+                  <p className="type-h3">{seasonal.line}</p>
+                  <button type="button" className="type-cta is-light">{seasonal.cta}</button>
+                </figcaption>
+              </figure>
+              <figure className="seasonal-tile editorial-frame lined is-quiet" style={{ "--shell": rotating.shell }} aria-hidden="true">
+                <img className="editorial" src={rotating.image} alt="" />
+              </figure>
             </section>
           </div>
 
@@ -309,7 +318,9 @@ export default function App() {
                 >
                   <img className="editorial" src={tile.image} alt="" />
                   <span className="brand-scrim" aria-hidden="true" />
-                  <span className="brand-wordmark">{tile.name}</span>
+                  <span className={`brand-wordmark is-${tile.mark}`}>
+                    {tile.mark === "th" ? <span>{tile.name}</span> : tile.name}
+                  </span>
                 </button>
               ))}
             </div>

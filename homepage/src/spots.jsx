@@ -148,6 +148,37 @@ export function SaleSpot() {
   );
 }
 
+export function TuxedoSpot() {
+  return (
+    <Spot>
+      <path d="M25.2 16.2 34.2 19.2 34.2 39.6 27.4 39.6 26.4 28.6 24 30.8Z" fill={gray} />
+      <path d="M20.6 17.4 24 22.2 27.4 17.4 27.2 26.8 20.8 26.8Z" fill={blue} />
+      <path d="M19.2 21.4c1.6 1.1 2.8 1.1 4.8 0 2 1.1 3.2 1.1 4.8 0" {...stroke} strokeWidth="1.45" />
+      <path d="M22.6 21.2h2.8v1.8h-2.8z" fill={ink} />
+      <path
+        d="M15.2 16.4c1.6-3 4.6-2.2 6.6.4L24 19l2.2-2.2c2-2.6 5-3.4 6.6-.4l2.8 3.2v21.2h-7.6l-1.2-12.2L24 32.2l-2.8-2.6-1.2 12.2h-7.6V19.6z"
+        {...stroke}
+      />
+    </Spot>
+  );
+}
+
+export function WeddingSpot() {
+  return (
+    <Spot>
+      <path d="M25.2 16.2 34.2 19.2 34.2 39.6 27.4 39.6 26.4 28.6 24 30.8Z" fill={gray} />
+      <path d="M20.2 17.2 24 22.4 27.8 17.2 27.4 27.6 20.6 27.6Z" fill={blue} />
+      <path d="M24 20.2 22.3 32.4 24 34.5 25.7 32.4Z" fill={ink} />
+      <circle cx="18.2" cy="22.6" r="1.7" fill={blue} stroke={ink} strokeWidth="1.1" />
+      <path d="M18.2 24.2v3.4" {...stroke} strokeWidth="1.15" />
+      <path
+        d="M15.2 16.4c1.6-3 4.6-2.2 6.6.4L24 19l2.2-2.2c2-2.6 5-3.4 6.6-.4l2.8 3.2v21.2h-7.6l-1.2-12.2L24 32.2l-2.8-2.6-1.2 12.2h-7.6V19.6z"
+        {...stroke}
+      />
+    </Spot>
+  );
+}
+
 export function RentalSpot() {
   return (
     <Spot>
@@ -162,24 +193,21 @@ export function RentalSpot() {
   );
 }
 
-const SPOTS = {
+const CATEGORY_SPOTS = {
   Suits: SuitSpot,
-  "Sport Coats": SportCoatSpot,
-  "Dress Shirts": DressShirtSpot,
-  "Casual Tops & Jackets": CasualSpot,
-  Pants: PantsSpot,
+  "Dress shirts": DressShirtSpot,
+  Tuxedos: TuxedoSpot,
   Shoes: ShoeSpot,
-  Accessories: AccessoriesSpot,
-  Trending: TrendingSpot,
+  Casualwear: CasualSpot,
+  Wedding: WeddingSpot,
   Sale: SaleSpot,
-  Rental: RentalSpot,
 };
 
-export function NavSpot({ name }) {
-  const Icon = SPOTS[name];
+export function CategorySpot({ name }) {
+  const Icon = CATEGORY_SPOTS[name];
   if (!Icon) return null;
   return (
-    <span className="nav-spot">
+    <span className="category-spot">
       <Icon />
     </span>
   );

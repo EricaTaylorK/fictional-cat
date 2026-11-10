@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { NavSpot } from "../spots.jsx";
 
 const NAV = [
   "Suits",
@@ -55,14 +54,8 @@ export default function SiteHeader({ search, onSearch }) {
 
       {menuOpen && (
         <nav className="mobile-nav" aria-label="Primary">
-          {NAV.map((item, index) => (
-            <button
-              key={item}
-              type="button"
-              className={index === 0 ? "is-current" : undefined}
-              onClick={() => setMenuOpen(false)}
-            >
-              <NavSpot name={item} />
+          {NAV.map((item) => (
+            <button key={item} type="button" onClick={() => setMenuOpen(false)}>
               {item}
             </button>
           ))}
@@ -99,7 +92,7 @@ export default function SiteHeader({ search, onSearch }) {
         <nav className="primary-nav" aria-label="Primary">
           {NAV.map((item, index) => (
             <button key={item} type="button" className={index === 0 ? "is-current" : undefined}>
-              <NavSpot name={item} />
+              <span className="nav-mark" aria-hidden="true" />
               <span>{item}</span>
             </button>
           ))}

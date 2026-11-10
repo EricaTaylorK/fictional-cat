@@ -15,11 +15,11 @@ export const returning = {
 };
 
 export const brands = [
-  { name: "Calvin Klein", descriptor: "Clean, modern essentials", cta: "Shop Calvin Klein", image: "/editorial/white-shirt-walnut.jpg", crop: { x: "50%", y: "36%", zoom: "2.6" } },
-  { name: "Kenneth Cole", descriptor: "Smart, comfortable suiting", cta: "Shop Kenneth Cole", image: "/editorial/charcoal-velvet.jpg", crop: { x: "40%", y: "42%", zoom: "2.3" } },
-  { name: "Cole Haan", descriptor: "Shoes that finish the look", cta: "Shop Cole Haan", image: "/editorial/blue-sling-cream.jpg", crop: { x: "26%", y: "92%", zoom: "3.8" } },
-  { name: "Tommy Hilfiger", descriptor: "Classic American style", cta: "Shop Tommy Hilfiger", image: "/editorial/navy-check-holiday.jpg", crop: { x: "34%", y: "42%", zoom: "2.3" } },
-  { name: "Michael Kors", descriptor: "Polished, modern looks", cta: "Shop Michael Kors", image: "/editorial/tie-detail.jpg", crop: { x: "38%", y: "46%", zoom: "1.2" } },
+  { name: "Calvin Klein", mark: "ck", descriptor: "Clean, modern essentials", cta: "Shop Calvin Klein", image: "/editorial/white-shirt-walnut.jpg", crop: { x: "50%", y: "36%", zoom: "2.6" } },
+  { name: "Kenneth Cole", mark: "kc", descriptor: "Smart, comfortable suiting", cta: "Shop Kenneth Cole", image: "/editorial/charcoal-velvet.jpg", crop: { x: "40%", y: "42%", zoom: "2.3" } },
+  { name: "Cole Haan", mark: "ch", descriptor: "Shoes that finish the look", cta: "Shop Cole Haan", image: "/editorial/blue-sling-cream.jpg", crop: { x: "26%", y: "92%", zoom: "3.8" } },
+  { name: "Tommy Hilfiger", mark: "th", descriptor: "Classic American style", cta: "Shop Tommy Hilfiger", image: "/editorial/navy-check-holiday.jpg", crop: { x: "34%", y: "42%", zoom: "2.3" } },
+  { name: "Michael Kors", mark: "mk", descriptor: "Polished, modern looks", cta: "Shop Michael Kors", image: "/editorial/tie-detail.jpg", crop: { x: "38%", y: "46%", zoom: "1.2" } },
 ];
 
 export const brandHeading = "Shop by brand";
@@ -49,6 +49,7 @@ export const occasionLooks = [
     aspect: 677 / 1024,
     focus: { x: 0.5, y: 0.2 },
     shell: "#4a3122",
+    cta: "Shop wedding",
     pieces: [
       { name: "Navy suit", price: "$348", at: { x: 0.6, y: 0.43 }, crop: { x: 0.52, y: 0.45, zoom: 2.2 } },
       { name: "White dress shirt", price: "$68", at: { x: 0.53, y: 0.27 }, crop: { x: 0.51, y: 0.33, zoom: 5.6 } },
@@ -63,6 +64,7 @@ export const occasionLooks = [
     aspect: 809 / 1024,
     focus: { x: 0.55, y: 0.4 },
     shell: "#4a3d32",
+    cta: "Shop the full Work look",
     pieces: [
       { name: "Blue suit", price: "$398", at: { x: 0.8, y: 0.46 }, crop: { x: 0.62, y: 0.66, zoom: 2.2 } },
       { name: "Print dress shirt", price: "$72", at: { x: 0.66, y: 0.51 }, crop: { x: 0.67, y: 0.56, zoom: 3.6 } },
@@ -77,6 +79,7 @@ export const occasionLooks = [
     aspect: 677 / 1024,
     focus: { x: 0.5, y: 0.25 },
     shell: "#4a3122",
+    cta: "Shop the full Prom/Black tie look",
     pieces: [
       { name: "Charcoal suit", price: "$428", at: { x: 0.28, y: 0.38 }, crop: { x: 0.38, y: 0.56, zoom: 1.85 } },
       { name: "Navy dress shirt", price: "$68", at: { x: 0.46, y: 0.27 }, crop: { x: 0.48, y: 0.34, zoom: 5.2 } },
@@ -91,6 +94,7 @@ export const occasionLooks = [
     aspect: 810 / 1024,
     focus: { x: 0.5, y: 0.2 },
     shell: "#4a3d32",
+    cta: "Shop the full Rental look",
     pieces: [
       { name: "Blue check sport coat", price: "$199", at: { x: 0.36, y: 0.4 }, crop: { x: 0.48, y: 0.55, zoom: 2.2 } },
       { name: "Light blue dress shirt", price: "$58", at: { x: 0.52, y: 0.26 }, crop: { x: 0.52, y: 0.38, zoom: 4 } },
@@ -105,6 +109,7 @@ export const occasionLooks = [
     aspect: 676 / 1024,
     focus: { x: 0.5, y: 0.1 },
     shell: "#4a3122",
+    cta: "Shop the full Sale look",
     pieces: [
       { name: "Rust corduroy blazer", price: "$198", at: { x: 0.2, y: 0.48 }, crop: { x: 0.28, y: 0.58, zoom: 2 } },
       { name: "Black knit polo", price: "$42", at: { x: 0.5, y: 0.46 }, crop: { x: 0.48, y: 0.55, zoom: 2.6 } },
@@ -114,11 +119,8 @@ export const occasionLooks = [
 ];
 
 export const hero = {
-  eyebrow: "Formalwear",
-  title: "Black tie, decoded.",
-  body: "The whole look, picked to work together, from jacket to shoes.",
   cta: "Shop the Full Look",
-  image: "/editorial/navy-coffee-walnut.jpg",
+  image: "/editorial/charcoal-velvet.jpg",
   shell: "#4a3122",
 };
 
@@ -131,9 +133,7 @@ export const seasonal = {
 };
 
 export const rotating = {
-  name: "Rotating slot",
-  line: "Campaign copy goes here.",
-  cta: "Shop now",
+  quiet: true,
   image: "/editorial/tie-detail.jpg",
   shell: "#3a4654",
 };
