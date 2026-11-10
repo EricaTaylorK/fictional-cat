@@ -8,12 +8,14 @@ import {
   brands,
   categories,
   categoryEyebrow,
+  arrivals,
   hero,
   occasionHeading,
   occasionLooks,
   reassurance,
   returning,
   rotating,
+  salePath,
   seasonal,
 } from "./homeContent.js";
 
@@ -298,6 +300,19 @@ export default function App() {
               </figure>
             </section>
           </div>
+
+          <section className="path-row" aria-label="New arrivals and sale">
+            {[arrivals, salePath].map((path) => (
+              <figure key={path.cta} className="path-tile editorial-frame lined" style={{ "--shell": path.shell }}>
+                <img className="editorial" src={path.image} alt="" style={{ objectPosition: path.focus }} />
+                <figcaption className="photo-caption">
+                  <p className="type-h3">{path.title}</p>
+                  <p className="type-body">{path.line}</p>
+                  <button type="button" className="type-cta is-light">{path.cta}</button>
+                </figcaption>
+              </figure>
+            ))}
+          </section>
 
           <FlourishRule />
           <OccasionModule occasion={occasion} onSelect={setOccasionName} />

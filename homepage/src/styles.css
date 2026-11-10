@@ -616,6 +616,12 @@ button { cursor: pointer; }
 
 .seasonal-tile .photo-caption { padding: 72px var(--space-3) var(--space-3); }
 
+.path-row { display: grid; gap: var(--space-3); }
+
+.path-tile { aspect-ratio: 4 / 3; }
+
+.path-tile .photo-caption { padding: 72px var(--space-4) var(--space-4); }
+
 .stories button:focus-visible,
 .photo-caption .type-cta:focus-visible {
   outline: 2px solid #fff;
@@ -1123,6 +1129,8 @@ button { cursor: pointer; }
     grid-template-columns: minmax(0, 2.2fr) minmax(0, 2fr);
     align-items: stretch;
   }
+
+  .path-row { grid-template-columns: 1fr 1fr; }
 
   .hero { display: grid; }
 

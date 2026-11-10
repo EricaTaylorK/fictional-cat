@@ -138,3 +138,21 @@ export const rotating = {
   shell: "#3a4654",
 };
 
+export const arrivals = {
+  title: "See what's new",
+  line: "New styles, ready when you are.",
+  cta: "Shop new arrivals",
+  image: "/editorial/blue-midcentury-cream.jpg",
+  shell: "#4a3d32",
+  focus: "72% 32%",
+};
+
+export const salePath = {
+  title: "Good style, better prices",
+  line: "Sharp looks for less, always in one place.",
+  cta: "Shop sale",
+  image: "/editorial/rust-cord-walnut.jpg",
+  shell: "#4a3122",
+  focus: "50% 22%",
+};
+
