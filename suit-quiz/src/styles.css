@@ -4979,8 +4979,31 @@ h2 {
   }
 
   .quiz-slide .actions-pair {
-    flex-direction: column;
+    flex-direction: column-reverse;
     gap: 12px;
+  }
+
+  .quiz-slide .quiz-dock .button.secondary,
+  .quiz-slide .quiz-dock .skip-button[aria-pressed="true"] {
+    background: transparent;
+    border: 0;
+    color: var(--text-link);
+    font-weight: var(--font-weight-medium);
+    min-height: 0;
+    min-width: 0;
+    padding: 4px 8px;
+    text-decoration: underline;
+    text-transform: none;
+    width: auto;
+  }
+
+  .quiz-slide .quiz-dock .button.secondary:hover:not(:disabled) {
+    background: transparent;
+    color: var(--text-link-hover);
+  }
+
+  .quiz-slide .quiz-dock .skip-button[aria-pressed="true"] {
+    font-weight: var(--font-weight-semibold);
   }
 }
 
