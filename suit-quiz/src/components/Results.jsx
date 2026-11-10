@@ -473,6 +473,13 @@ const CARD_TAILORING = [
     body: "Everything in Essentials, plus we shape the jacket and waist so you look sharper.",
     icon: "jacket",
   },
+  {
+    id: "custom",
+    name: "Custom-Level Fit",
+    price: 150,
+    body: "Our most complete tailoring—refined lines, cleaner drape, and a truly made-for-you silhouette (without the custom price).",
+    icon: "shield",
+  },
 ];
 
 const TAILOR_GLYPHS = {
@@ -1891,7 +1898,6 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
         <strong>{formatPrice(draftTotals.total)}</strong>
       </p>
       <div className="customize-actions">
-        <button className="customize-cancel" type="button" onClick={closeCustomize}>Cancel</button>
         <button className="button customize-commit" type="button" onClick={commitLook}>
           {chosen?.id === selected.id ? "Update look" : "Add to look"}
         </button>
