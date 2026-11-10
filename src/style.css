@@ -1124,7 +1124,7 @@ h1 {
 .chip-find-suit {
   position: relative;
   box-shadow: inset 0 0 0 1px #046de9;
-  gap: 6px;
+  gap: 4px;
   color: #046de9;
   font-weight: 500;
 }
@@ -1170,8 +1170,8 @@ h1 {
 
 .chip-find-icon {
   flex: none;
-  height: 16px;
-  width: 16px;
+  height: 18px;
+  width: 18px;
   color: #046de9;
 }
 
