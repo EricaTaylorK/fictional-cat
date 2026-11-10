@@ -567,7 +567,23 @@ function lookPiecesSentence(look, occasion) {
   return pairNote(look?.note, occasion);
 }
 
-function SuitOptions({ tailoringId, onTailoring, look, addedLooks, onOpenLook, onRemoveLook, occasion, showSuggestion = true }) {
+// Quiz answers as they read in the look heading ("Your work look, pulled together").
+const LOOK_HEADING_OCCASION = {
+  business: "work",
+  wedding: "wedding",
+  funeral: "funeral",
+  prom: "prom",
+  mixed: "all-purpose",
+  formal: "black-tie",
+  special: "special-event",
+};
+
+function lookHeading(occasionKey) {
+  const phrase = LOOK_HEADING_OCCASION[occasionKey];
+  return phrase ? `Your ${phrase} look, pulled together` : "Your look, pulled together";
+}
+
+function SuitOptions({ tailoringId, onTailoring, look, addedLooks, onOpenLook, onRemoveLook, occasion, occasionKey, showSuggestion = true }) {
   const items = look?.items ?? [];
   const tailoringBlock = (
     <>
@@ -622,7 +638,7 @@ function SuitOptions({ tailoringId, onTailoring, look, addedLooks, onOpenLook, o
   const lookBlock = items.length > 0 ? (
         <>
           <div className="pair-head">
-            <h3>Your look, pulled together</h3>
+            <h3>{lookHeading(occasionKey)}</h3>
             <p>{lookPiecesSentence(look, occasion)}</p>
           </div>
           <div className="pair-row">
@@ -1912,6 +1928,7 @@ export default function Results({ answers, moreMode = "toggle", onSeeAll, onEdit
       onTailoring={chooseTailoring}
       look={selectedLook}
       occasion={occasion}
+      occasionKey={answers.occasion}
       addedLooks={addedLooks}
       onOpenLook={openQuickView}
       onRemoveLook={removeLook}
