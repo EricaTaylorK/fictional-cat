@@ -15,11 +15,11 @@ export const returning = {
 };
 
 export const brands = [
-  { name: "Calvin Klein", mark: "ck", descriptor: "Clean, modern essentials", cta: "Shop Calvin Klein", image: "/editorial/white-shirt-walnut.jpg", crop: { x: "50%", y: "36%", zoom: "2.6" } },
-  { name: "Kenneth Cole", mark: "kc", descriptor: "Smart, comfortable suiting", cta: "Shop Kenneth Cole", image: "/editorial/charcoal-velvet.jpg", crop: { x: "40%", y: "42%", zoom: "2.3" } },
-  { name: "Cole Haan", mark: "ch", descriptor: "Shoes that finish the look", cta: "Shop Cole Haan", image: "/editorial/blue-sling-cream.jpg", crop: { x: "26%", y: "92%", zoom: "3.8" } },
-  { name: "Tommy Hilfiger", mark: "th", descriptor: "Classic American style", cta: "Shop Tommy Hilfiger", image: "/editorial/navy-check-holiday.jpg", crop: { x: "34%", y: "42%", zoom: "2.3" } },
-  { name: "Michael Kors", mark: "mk", descriptor: "Polished, modern looks", cta: "Shop Michael Kors", image: "/editorial/tie-detail.jpg", crop: { x: "38%", y: "46%", zoom: "1.2" } },
+  { name: "Calvin Klein", mark: "ck", descriptor: "Clean, modern essentials", cta: "Shop Calvin Klein", image: "/editorial/white-shirt-walnut.jpg", focus: "50% 28%", scrim: 0.62 },
+  { name: "Kenneth Cole", mark: "kc", descriptor: "Smart, comfortable suiting", cta: "Shop Kenneth Cole", image: "/editorial/charcoal-velvet.jpg", focus: "58% 36%", scrim: 0.32 },
+  { name: "Cole Haan", mark: "ch", descriptor: "Shoes that finish the look", cta: "Shop Cole Haan", image: "/editorial/blue-sling-cream.jpg", focus: "30% 90%", scrim: 0.55, view: "inset(74% 42% 2% 0%)" },
+  { name: "Tommy Hilfiger", mark: "th", descriptor: "Classic American style", cta: "Shop Tommy Hilfiger", image: "/editorial/navy-check-holiday.jpg", focus: "36% 32%", scrim: 0.36 },
+  { name: "Michael Kors", mark: "mk", descriptor: "Polished, modern looks", cta: "Shop Michael Kors", image: "/editorial/graphite-blazer-cream.jpg", focus: "50% 34%", scrim: 0.5 },
 ];
 
 export const brandHeading = "Shop by brand";
@@ -142,10 +142,14 @@ export const arrivals = {
   title: "See what's new",
   line: "New styles, ready when you are.",
   cta: "Shop new arrivals",
-  image: "/editorial/blue-midcentury-cream.jpg",
-  shell: "#4a3d32",
-  focus: "72% 32%",
 };
+
+export const arrivalTiles = [
+  { label: "Dress shirts", image: "/editorial/white-shirt-walnut.jpg", bar: "#4a3122", focus: "50% 32%" },
+  { label: "Sport coats", image: "/editorial/graphite-blazer-cream.jpg", bar: "#1a2438", focus: "48% 28%" },
+  { label: "Suits", image: "/editorial/navy-bench-walnut.jpg", bar: "#7a3b32", focus: "50% 18%" },
+  { label: "Shoes", image: "/editorial/blue-sling-cream.jpg", bar: "#8a8178", focus: "36% 72%" },
+];
 
 export const salePath = {
   title: "Good style, better prices",

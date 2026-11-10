@@ -2,19 +2,19 @@ import { useEffect, useRef, useState } from "react";
 import SiteFooter from "./components/SiteFooter.jsx";
 import SiteHeader from "./components/SiteHeader.jsx";
 import { Flourish, FlourishRule } from "./flourish.jsx";
-import { CategorySpot } from "./spots.jsx";
+import { CategoryIcon } from "./spots.jsx";
 import {
+  arrivalTiles,
+  arrivals,
   brandHeading,
   brands,
   categories,
   categoryEyebrow,
-  arrivals,
   hero,
   occasionHeading,
   occasionLooks,
   reassurance,
   returning,
-  rotating,
   salePath,
   seasonal,
 } from "./homeContent.js";
@@ -98,7 +98,34 @@ function FadeSlot({ current, previous, className, render, slotRef }) {
   );
 }
 
-function OccasionModule({ occasion, onSelect }) {
+function BrandMark({ tile }) {
+  if (tile.mark === "ck") {
+    return (
+      <span className="brand-mark is-ck">
+        <span className="ck-mono">CK</span>
+        <span className="ck-name">Calvin Klein</span>
+      </span>
+    );
+  }
+  if (tile.mark === "mk") {
+    return (
+      <span className="brand-mark is-mk">
+        <span className="mk-badge">MK</span>
+        <span className="mk-name">Michael Kors</span>
+      </span>
+    );
+  }
+  if (tile.mark === "th") {
+    return (
+      <span className="brand-mark is-th">
+        <span>Tommy Hilfiger</span>
+      </span>
+    );
+  }
+  return <span className={`brand-mark is-${tile.mark}`}>{tile.name}</span>;
+}
+
+function LookModule({ occasion }) {
   const reduce = usePrefersReducedMotion();
   const [shown, setShown] = useState(occasion);
   const [leaving, setLeaving] = useState(null);
@@ -120,136 +147,89 @@ function OccasionModule({ occasion, onSelect }) {
   useEffect(() => setActivePiece(null), [shown.name]);
 
   return (
-    <section className="occasion-module" aria-label="Shop by occasion">
-      <div className="stories">
-        <div className="stories-bg-stack" aria-hidden="true">
-          {leaving ? (
-            <div
-              key={`${leaving.image}-out`}
-              className="stories-bg is-out"
-              style={{ backgroundImage: `url("${leaving.image}")` }}
+    <section className="look-module" aria-label="Shoppable looks">
+      <FadeSlot
+        className="look-photo-stack"
+        slotRef={photoRef}
+        current={shown}
+        previous={leaving}
+        render={(look, phase) => (
+          <figure
+            key={phase === "is-out" ? `${look.name}-out` : look.name}
+            className={phase ? `look-photo editorial-frame lined ${phase}` : "look-photo editorial-frame lined"}
+            style={{ "--shell": look.shell }}
+            inert={phase === "is-out" ? true : undefined}
+            aria-hidden={phase === "is-out" ? true : undefined}
+          >
+            <img
+              className="editorial"
+              src={look.image}
+              alt=""
+              style={{ objectPosition: `${look.focus.x * 100}% ${look.focus.y * 100}%` }}
             />
-          ) : null}
+            <div className="look-markers" aria-hidden="true">
+              {look.pieces.map((piece, index) => {
+                const point = coverPoint(piece.at, look.aspect, frameAspect, look.focus);
+                return (
+                  <span
+                    key={piece.name}
+                    className={activePiece === index && phase !== "is-out" ? "look-marker is-active" : "look-marker"}
+                    style={{ left: `${point.x * 100}%`, top: `${point.y * 100}%` }}
+                  >
+                    {index + 1}
+                  </span>
+                );
+              })}
+            </div>
+            <figcaption>
+              <p className="eyebrow eyebrow-on-dark"><span>{look.eyebrow}</span></p>
+              <h2 className="type-h1">{look.line}</h2>
+            </figcaption>
+          </figure>
+        )}
+      />
+      <FadeSlot
+        className="stories-look-stack"
+        current={shown}
+        previous={leaving}
+        render={(look, phase) => (
           <div
-            key={shown.image}
-            className={leaving ? "stories-bg is-in" : "stories-bg"}
-            style={{ backgroundImage: `url("${shown.image}")` }}
-          />
-        </div>
-        <div className="stories-scrim" aria-hidden="true" />
-        <div className="stories-inner">
-          <div className="stories-heading">
-            <h2 className="type-h2" id="occasion-heading">
-              {occasionHeading}
-            </h2>
-            <Flourish className="occasion-flourish" />
-          </div>
-          <div className="stories-stage">
-          <FadeSlot
-            className="stories-photo-stack"
-            slotRef={photoRef}
-            current={shown}
-            previous={leaving}
-            render={(look, phase) => (
-              <figure
-                key={phase === "is-out" ? `${look.name}-out` : look.name}
-                className={phase ? `stories-photo editorial-frame lined ${phase}` : "stories-photo editorial-frame lined"}
-                style={{ "--shell": look.shell }}
-                inert={phase === "is-out" ? true : undefined}
-                aria-hidden={phase === "is-out" ? true : undefined}
-              >
-                <img
-                  className="editorial"
-                  src={look.image}
-                  alt=""
-                  style={{ objectPosition: `${look.focus.x * 100}% ${look.focus.y * 100}%` }}
-                />
-                <div className="look-markers" aria-hidden="true">
-                  {look.pieces.map((piece, index) => {
-                    const point = coverPoint(piece.at, look.aspect, frameAspect, look.focus);
-                    return (
-                      <span
-                        key={piece.name}
-                        className={activePiece === index && phase !== "is-out" ? "look-marker is-active" : "look-marker"}
-                        style={{ left: `${point.x * 100}%`, top: `${point.y * 100}%` }}
-                      >
-                        {index + 1}
-                      </span>
-                    );
-                  })}
-                </div>
-                <figcaption>
-                  <p className="eyebrow eyebrow-on-dark"><span>{look.eyebrow}</span></p>
-                  <h1 className="type-h1">{look.line}</h1>
-                </figcaption>
-              </figure>
-            )}
-          />
-          <div className="stories-panel">
-            <div className="occasion-row" role="tablist" aria-labelledby="occasion-heading">
-              {occasionLooks.map((item) => (
+            key={phase === "is-out" ? `${look.name}-look-out` : `${look.name}-look`}
+            className={phase ? `stories-look ${phase}` : "stories-look"}
+            id={phase === "is-out" ? undefined : "occasion-panel"}
+            role={phase === "is-out" ? undefined : "tabpanel"}
+            aria-labelledby={phase === "is-out" ? undefined : tabId(look.name)}
+            inert={phase === "is-out" ? true : undefined}
+            aria-hidden={phase === "is-out" ? true : undefined}
+          >
+            <div className="stories-products">
+              {look.pieces.map((piece, index) => (
                 <button
-                  key={item.name}
+                  key={piece.name}
                   type="button"
-                  role="tab"
-                  id={tabId(item.name)}
-                  aria-selected={item.name === shown.name}
-                  aria-controls="occasion-panel"
-                  className={item.name === shown.name ? "is-selected" : undefined}
-                  onClick={() => onSelect(item.name)}
-                  onMouseEnter={() => preloadLook(item)}
-                  onFocus={() => preloadLook(item)}
+                  className="product-card"
+                  aria-label={`${piece.name}, view product`}
+                  onMouseEnter={() => setActivePiece(index)}
+                  onMouseLeave={() => setActivePiece(null)}
+                  onFocus={() => setActivePiece(index)}
+                  onBlur={() => setActivePiece(null)}
                 >
-                  {item.name}
+                  <span className="product-photo editorial-frame">
+                    <img className="editorial" src={look.image} alt="" style={cropStyle(piece.crop, look.aspect)} />
+                    <span className="look-marker" aria-hidden="true">{index + 1}</span>
+                  </span>
+                  <span className="type-h3">{piece.name}</span>
+                  <span className="product-price">{piece.price}</span>
+                  <span className="type-cta product-shop">Shop</span>
                 </button>
               ))}
             </div>
-            <FadeSlot
-              className="stories-look-stack"
-              current={shown}
-              previous={leaving}
-              render={(look, phase) => (
-                <div
-                  key={phase === "is-out" ? `${look.name}-look-out` : `${look.name}-look`}
-                  className={phase ? `stories-look ${phase}` : "stories-look"}
-                  id={phase === "is-out" ? undefined : "occasion-panel"}
-                  role={phase === "is-out" ? undefined : "tabpanel"}
-                  aria-labelledby={phase === "is-out" ? undefined : tabId(look.name)}
-                  inert={phase === "is-out" ? true : undefined}
-                  aria-hidden={phase === "is-out" ? true : undefined}
-                >
-                  <div className="stories-products">
-                    {look.pieces.map((piece, index) => (
-                      <button
-                        key={piece.name}
-                        type="button"
-                        className="product-card"
-                        aria-label={`${piece.name}, view product`}
-                        onMouseEnter={() => setActivePiece(index)}
-                        onMouseLeave={() => setActivePiece(null)}
-                        onFocus={() => setActivePiece(index)}
-                        onBlur={() => setActivePiece(null)}
-                      >
-                        <span className="product-photo editorial-frame">
-                          <img className="editorial" src={look.image} alt="" style={cropStyle(piece.crop, look.aspect)} />
-                          <span className="look-marker" aria-hidden="true">{index + 1}</span>
-                        </span>
-                        <span className="type-h3">{piece.name}</span>
-                        <span className="product-price">{piece.price}</span>
-                        <span className="type-cta product-shop">Shop</span>
-                      </button>
-                    ))}
-                  </div>
-                  <button type="button" className="type-cta is-light stories-cta">
-                    {look.cta}
-                  </button>
-                </div>
-              )}
-            />
+            <button type="button" className="type-cta stories-cta">
+              {look.cta}
+            </button>
           </div>
-          </div>
-        </div>
-      </div>
+        )}
+      />
     </section>
   );
 }
@@ -263,65 +243,114 @@ export default function App() {
     <div className="page" id="top">
       <SiteHeader search={search} onSearch={setSearch} />
       <main>
-        <section className="category-module" aria-label={categoryEyebrow}>
-          <p className="eyebrow is-centered"><span>{categoryEyebrow}</span></p>
-          <div className="category-row">
-            {categories.map((tile) => (
-              <button key={tile.name} type="button" className="category-tile" aria-label={tile.cta}>
-                <CategorySpot name={tile.name} />
-                <span className="category-name">{tile.name}</span>
-                <span className="category-descriptor">{tile.descriptor}</span>
-              </button>
-            ))}
-          </div>
-        </section>
         <div className="home">
-          <div className="pair pair-hero">
-            <section className="hero" aria-label="Primary hero">
-              <figure className="hero-photo editorial-frame lined" style={{ "--shell": hero.shell }}>
-                <img className="editorial" src={hero.image} alt="" />
-                <figcaption className="photo-caption">
-                  <button type="button" className="type-cta is-light">
-                    {hero.cta}
-                  </button>
-                </figcaption>
-              </figure>
-            </section>
-            <section className="seasonal" aria-label="Seasonal campaign slots">
-              <figure className="seasonal-tile editorial-frame lined" style={{ "--shell": seasonal.shell }}>
-                <img className="editorial" src={seasonal.image} alt="" />
-                <figcaption className="photo-caption">
-                  <p className="type-h3">{seasonal.line}</p>
-                  <button type="button" className="type-cta is-light">{seasonal.cta}</button>
-                </figcaption>
-              </figure>
-              <figure className="seasonal-tile editorial-frame lined is-quiet" style={{ "--shell": rotating.shell }} aria-hidden="true">
-                <img className="editorial" src={rotating.image} alt="" />
-              </figure>
-            </section>
-          </div>
+          <section className="hero" aria-label="Primary hero">
+            <figure className="hero-photo editorial-frame lined" style={{ "--shell": hero.shell }}>
+              <img className="editorial" src={hero.image} alt="" />
+              <figcaption className="photo-caption">
+                <button type="button" className="type-cta is-light">
+                  {hero.cta}
+                </button>
+              </figcaption>
+            </figure>
+          </section>
 
-          <section className="path-row" aria-label="New arrivals and sale">
-            {[arrivals, salePath].map((path) => (
-              <figure key={path.cta} className="path-tile editorial-frame lined" style={{ "--shell": path.shell }}>
-                <img className="editorial" src={path.image} alt="" style={{ objectPosition: path.focus }} />
-                <figcaption className="photo-caption">
-                  <p className="type-h3">{path.title}</p>
-                  <p className="type-body">{path.line}</p>
-                  <button type="button" className="type-cta is-light">{path.cta}</button>
-                </figcaption>
+          <section className="seasonal" aria-label="Seasonal campaign slots">
+            <div className="holiday-band">
+              <figure className="holiday-photo editorial-frame">
+                <img className="editorial" src="/editorial/holiday-sportcoat.jpg" alt="" />
               </figure>
-            ))}
+              <div className="holiday-panel">
+                <div className="holiday-rule" aria-hidden="true">
+                  <span />
+                  <Flourish />
+                  <span />
+                </div>
+                <h2 className="holiday-line">{seasonal.line}</h2>
+                <Flourish className="holiday-scroll" />
+                <button type="button" className="type-cta is-light holiday-cta">{seasonal.cta}</button>
+              </div>
+              <figure className="holiday-photo editorial-frame">
+                <img className="editorial" src="/editorial/holiday-roulette.jpg" alt="" />
+              </figure>
+            </div>
+          </section>
+
+          <section className="arrivals" aria-label="New arrivals">
+            <div className="arrivals-title">
+              <span className="arrivals-rule" aria-hidden="true" />
+              <h2>{arrivals.title}</h2>
+              <span className="arrivals-rule" aria-hidden="true" />
+            </div>
+            <p className="arrivals-line">{arrivals.line}</p>
+            <div className="arrivals-row">
+              {arrivalTiles.map((tile) => (
+                <article key={tile.label} className="arrival-tile">
+                  <div className="arrival-photo editorial-frame">
+                    <img className="editorial" src={tile.image} alt="" style={{ objectPosition: tile.focus }} />
+                  </div>
+                  <p className="arrival-bar" style={{ background: tile.bar }}>{tile.label}</p>
+                </article>
+              ))}
+            </div>
+            <button type="button" className="type-cta arrivals-cta">{arrivals.cta}</button>
+          </section>
+
+          <section className="sale-path" aria-label="Sale path">
+            <figure className="sale-banner editorial-frame lined" style={{ "--shell": salePath.shell }}>
+              <img className="editorial" src={salePath.image} alt="" style={{ objectPosition: salePath.focus }} />
+              <figcaption className="photo-caption">
+                <p className="type-h3">{salePath.title}</p>
+                <p className="type-body">{salePath.line}</p>
+                <button type="button" className="type-cta is-light">{salePath.cta}</button>
+              </figcaption>
+            </figure>
           </section>
 
           <FlourishRule />
-          <OccasionModule occasion={occasion} onSelect={setOccasionName} />
+
+          <section className="occasion-module" aria-label="Shop by occasion">
+            <h2 className="type-h2" id="occasion-heading">{occasionHeading}</h2>
+            <Flourish className="occasion-flourish" />
+            <div className="occasion-row" role="tablist" aria-labelledby="occasion-heading">
+              {occasionLooks.map((item) => (
+                <button
+                  key={item.name}
+                  type="button"
+                  role="tab"
+                  id={tabId(item.name)}
+                  aria-selected={item.name === occasionName}
+                  aria-controls="occasion-panel"
+                  className={item.name === occasionName ? "is-selected" : undefined}
+                  onClick={() => setOccasionName(item.name)}
+                  onMouseEnter={() => preloadLook(item)}
+                  onFocus={() => preloadLook(item)}
+                >
+                  {item.name}
+                </button>
+              ))}
+            </div>
+          </section>
+
+          <LookModule occasion={occasion} />
+
           <FlourishRule />
 
+          <section className="category-module" aria-label="Category entry tiles">
+            <p className="eyebrow"><span>{categoryEyebrow}</span></p>
+            <div className="category-row">
+              {categories.map((tile) => (
+                <button key={tile.name} type="button" className="category-tile" aria-label={tile.cta}>
+                  <CategoryIcon name={tile.name} />
+                  <span className="category-name">{tile.name}</span>
+                  <span className="category-descriptor">{tile.descriptor}</span>
+                </button>
+              ))}
+            </div>
+          </section>
+
           <section aria-label="Brand tiles">
-            <h2 className="type-h2">
-              {brandHeading}
-            </h2>
+            <h2 className="type-h2">{brandHeading}</h2>
             <div className="brand-row">
               {brands.map((tile) => (
                 <button
@@ -329,13 +358,11 @@ export default function App() {
                   type="button"
                   className="brand-tile editorial-frame"
                   aria-label={tile.cta}
-                  style={{ "--brand-x": tile.crop.x, "--brand-y": tile.crop.y, "--brand-zoom": tile.crop.zoom }}
+                  style={{ "--scrim": tile.scrim, "--view": tile.view }}
                 >
-                  <img className="editorial" src={tile.image} alt="" />
+                  <img className="editorial" src={tile.image} alt="" style={{ objectPosition: tile.focus }} />
                   <span className="brand-scrim" aria-hidden="true" />
-                  <span className={`brand-wordmark is-${tile.mark}`}>
-                    {tile.mark === "th" ? <span>{tile.name}</span> : tile.name}
-                  </span>
+                  <BrandMark tile={tile} />
                 </button>
               ))}
             </div>
@@ -358,10 +385,12 @@ export default function App() {
           </section>
         </div>
 
-        <section className="reassure" aria-label="Reassurance strip">
-          <Flourish variant="sprig" />
-          <p>{reassurance.visible}</p>
-          <Flourish variant="sprig" />
+        <section className="reassure-module" aria-label="Reassurance strip">
+          <div className="reassure">
+            <Flourish variant="sprig" />
+            <p>{reassurance.visible}</p>
+            <Flourish variant="sprig" />
+          </div>
         </section>
       </main>
       <SiteFooter />

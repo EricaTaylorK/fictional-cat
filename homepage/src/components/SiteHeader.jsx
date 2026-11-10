@@ -90,11 +90,8 @@ export default function SiteHeader({ search, onSearch }) {
           </div>
         </div>
         <nav className="primary-nav" aria-label="Primary">
-          {NAV.map((item, index) => (
-            <button key={item} type="button" className={index === 0 ? "is-current" : undefined}>
-              <span className="nav-mark" aria-hidden="true" />
-              <span>{item}</span>
-            </button>
+          {NAV.map((item) => (
+            <button key={item} type="button">{item}</button>
           ))}
         </nav>
       </div>
