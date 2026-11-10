@@ -353,12 +353,94 @@ button { cursor: pointer; }
   font-size: 13px;
 }
 
-.tile-stack { display: grid; gap: 8px; }
+.occasion-module { display: grid; gap: 12px; }
 
-.wire-tile,
-.wire-look { padding: 14px; min-height: 72px; }
+.wire-caption-side { margin-left: 16px; }
 
-.wire-look { min-height: 96px; }
+.occasion-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.occasion-row button {
+  border: 1px solid #c8c8c8;
+  background: #f3f3f3;
+  padding: 10px 14px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.occasion-row button.is-selected {
+  background: #232323;
+  border-color: #232323;
+  color: #fff;
+}
+
+.look-stage { display: grid; gap: 16px; }
+
+.lifestyle {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-end;
+  gap: 8px;
+  min-height: 420px;
+  padding: 24px;
+  background: #e4e4e4;
+}
+
+.lifestyle-mark,
+.piece-mark {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+
+.look-side {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.look-copy h2 {
+  margin: 0 0 8px;
+  font-size: 36px;
+  font-weight: 500;
+  line-height: 1.1;
+}
+
+.look-copy p {
+  margin: 0 0 16px;
+  max-width: 36ch;
+}
+
+.look-copy button {
+  border: 1px solid #232323;
+  background: transparent;
+  padding: 8px 12px;
+  font-size: 13px;
+}
+
+.look-products {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.piece {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-end;
+  gap: 8px;
+  min-height: 180px;
+  padding: 16px;
+  text-align: left;
+}
 
 .tile-desc { display: none; }
 
@@ -532,6 +614,16 @@ button { cursor: pointer; }
   .pair { grid-template-columns: 1fr 1fr; align-items: start; }
 
   .pair-hero { grid-template-columns: 1.4fr 0.8fr; }
+
+  .look-stage {
+    grid-template-columns: minmax(280px, 0.9fr) minmax(0, 1.6fr);
+    align-items: stretch;
+    min-height: 560px;
+  }
+
+  .lifestyle { min-height: 560px; }
+
+  .piece { min-height: 280px; }
 
   .wire-hero { min-height: 320px; }
 

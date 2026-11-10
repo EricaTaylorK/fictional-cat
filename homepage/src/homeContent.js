@@ -32,16 +32,37 @@ export const categories = [
   { name: "Sale", descriptor: "Savings on styles you'll actually wear", cta: "Shop sale" },
 ];
 
-export const occasions = ["Wedding", "Work", "Prom/Black tie", "Rental", "Sale"];
-
-export const looks = [
+export const occasionLooks = [
   {
     name: "Wedding",
     line: "Guest, groom or groomsman, find your look.",
     cta: "Shop wedding",
+    pieces: ["Tuxedo", "Dress shirt", "Bow tie"],
   },
-  { name: "Look", line: "", cta: "" },
-  { name: "Look", line: "", cta: "" },
+  {
+    name: "Work",
+    line: "The suit for the office.",
+    cta: "Shop work",
+    pieces: ["Suit jacket", "Dress shirt", "Dress pants"],
+  },
+  {
+    name: "Prom/Black tie",
+    line: "Black tie, from the jacket to the shoes.",
+    cta: "Shop prom",
+    pieces: ["Tuxedo", "Bow tie", "Dress shoes"],
+  },
+  {
+    name: "Rental",
+    line: "Rent the tux. Keep the look.",
+    cta: "Shop rental",
+    pieces: ["Rental jacket", "Tuxedo shirt", "Dress shoes"],
+  },
+  {
+    name: "Sale",
+    line: "The same look, for less.",
+    cta: "Shop sale",
+    pieces: ["Suit", "Dress shirt", "Dress shoes"],
+  },
 ];
 
 export const hero = {

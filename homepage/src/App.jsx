@@ -5,8 +5,7 @@ import {
   brands,
   categories,
   hero,
-  looks,
-  occasions,
+  occasionLooks,
   reassurance,
   returning,
   seasonal,
@@ -14,6 +13,8 @@ import {
 
 export default function App() {
   const [search, setSearch] = useState("");
+  const [occasionName, setOccasionName] = useState(occasionLooks[0].name);
+  const occasion = occasionLooks.find((item) => item.name === occasionName) ?? occasionLooks[0];
 
   return (
     <div className="page" id="top">
@@ -44,34 +45,49 @@ export default function App() {
             </section>
           </div>
 
-          <div className="pair">
-            <section aria-labelledby="mod-occasion">
-              <p className="wire-caption" id="mod-occasion">
-                3 · Shop by occasion
-              </p>
-              <div className="tile-stack">
-                {occasions.map((name) => (
-                  <button key={name} type="button" className="wire-box wire-tile">
-                    {name}
-                  </button>
-                ))}
+          <section className="occasion-module" aria-labelledby="mod-occasion">
+            <p className="wire-caption" id="mod-occasion">
+              3 · Shop by occasion
+              <span className="wire-caption-side">4 · Shoppable looks</span>
+            </p>
+            <div className="occasion-row" role="tablist" aria-label="Shop by occasion">
+              {occasionLooks.map((item) => (
+                <button
+                  key={item.name}
+                  type="button"
+                  role="tab"
+                  aria-selected={item.name === occasion.name}
+                  className={item.name === occasion.name ? "is-selected" : undefined}
+                  onClick={() => setOccasionName(item.name)}
+                >
+                  {item.name}
+                </button>
+              ))}
+            </div>
+            <div className="look-stage">
+              <div className="wire-box lifestyle">
+                <span className="lifestyle-mark">Lifestyle</span>
+                <span className="wire-kicker">{occasion.name}</span>
+                <span>{occasion.line}</span>
+                <span className="wire-cta">{occasion.cta}</span>
               </div>
-            </section>
-            <section aria-labelledby="mod-looks">
-              <p className="wire-caption" id="mod-looks">
-                4 · Shoppable looks
-              </p>
-              <div className="tile-stack">
-                {looks.map((look, index) => (
-                  <button key={`${look.name}-${index}`} type="button" className="wire-box wire-look">
-                    <span className="wire-kicker">{look.name}</span>
-                    {look.line ? <span>{look.line}</span> : null}
-                    {look.cta ? <span className="wire-cta">{look.cta}</span> : null}
-                  </button>
-                ))}
+              <div className="look-side">
+                <div className="look-copy">
+                  <h2>{occasion.name}</h2>
+                  <p>{occasion.line}</p>
+                  <button type="button">{occasion.cta}</button>
+                </div>
+                <div className="look-products">
+                  {occasion.pieces.map((piece) => (
+                    <button key={piece} type="button" className="wire-box piece">
+                      <span className="piece-mark">On this look</span>
+                      <span className="wire-kicker">{piece}</span>
+                    </button>
+                  ))}
+                </div>
               </div>
-            </section>
-          </div>
+            </div>
+          </section>
 
           <section aria-labelledby="mod-categories">
             <p className="wire-caption" id="mod-categories">
