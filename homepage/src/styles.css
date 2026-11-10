@@ -45,7 +45,7 @@
   font-display: swap;
 }
 
-body { margin: 0; overflow-x: clip; }
+body { margin: 0; overflow-x: clip; background: var(--ed-cream); }
 
 button, input { font: inherit; color: inherit; }
 
@@ -62,7 +62,9 @@ button { cursor: pointer; }
   border: 0;
 }
 
-.page { min-height: 100vh; }
+.page { min-height: 100vh; background: var(--ed-cream); }
+
+main { background: var(--ed-cream); }
 
 .site-header {
   position: sticky;
@@ -297,9 +299,10 @@ button { cursor: pointer; }
 .home {
   max-width: 1280px;
   margin: 0 auto;
-  padding: 20px 16px 32px;
+  padding: 12px 16px 20px;
   display: grid;
-  gap: 24px;
+  gap: 16px;
+  background: var(--ed-cream);
 }
 
 .home > * { min-width: 0; }
@@ -532,14 +535,29 @@ button { cursor: pointer; }
 .hero-photo .photo-caption > * { max-width: 26rem; }
 
 .hero-photo {
-  aspect-ratio: 4 / 5;
+  aspect-ratio: 3 / 2;
 }
 
-.hero-photo .editorial { object-position: 46% 22%; }
+.hero {
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+}
+
+.hero-photo .editorial,
+.sale-banner .editorial {
+  filter: grayscale(1) contrast(1.04);
+  object-position: 46% 22%;
+}
+
+.hero-photo.editorial-frame::after,
+.sale-banner.editorial-frame::after { display: none; }
 
 .hero-photo .photo-caption { padding-top: 64px; }
 
-.category-module .eyebrow { margin-bottom: 4px; }
+.category-module {
+  background: var(--ed-cream);
+  padding: 12px 16px 0;
+}
 
 .category-row {
   display: flex;
@@ -645,7 +663,7 @@ button { cursor: pointer; }
 
 .holiday-cta { width: min(220px, 100%); }
 
-.sale-banner { aspect-ratio: 4 / 5; }
+.sale-banner { aspect-ratio: 16 / 9; }
 
 .path-row { display: grid; gap: var(--space-3); }
 
@@ -815,7 +833,7 @@ button { cursor: pointer; }
 .look-photo-stack > .look-photo,
 .stories-look-stack > .stories-look { grid-area: 1 / 1; }
 
-.look-photo { aspect-ratio: 4 / 5; }
+.look-photo { aspect-ratio: 16 / 9; max-height: 420px; }
 
 .look-photo figcaption {
   position: absolute;
@@ -825,38 +843,38 @@ button { cursor: pointer; }
   z-index: 3;
 }
 
-.look-module { display: grid; gap: var(--space-4); }
+.look-module { display: grid; gap: 12px; }
 
 .stories-look {
   display: flex;
   flex-direction: column;
   min-width: 0;
-  padding-top: var(--space-4);
+  padding-top: 4px;
 }
 
 .look-label { margin-bottom: var(--space-3); }
 
-.stories-cta { margin-top: var(--space-4); }
+.stories-cta { width: min(320px, 100%); margin-top: 12px; }
 
 .stories-products {
-  display: flex;
-  gap: var(--space-3);
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
-  scrollbar-width: none;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  max-width: 660px;
+  overflow: visible;
 }
 
 .stories-products::-webkit-scrollbar { display: none; }
 
 .product-card {
   display: flex;
-  flex: 0 0 220px;
   flex-direction: column;
   align-items: flex-start;
-  scroll-snap-align: start;
-  padding: 12px 12px var(--space-3);
+  min-width: 0;
+  width: 100%;
+  padding: 8px 8px 10px;
   border: 0;
-  background: var(--ed-cream);
+  background: #fff;
   color: var(--color-neutral-black);
   text-align: left;
 }
@@ -873,7 +891,7 @@ button { cursor: pointer; }
   transform: none;
 }
 
-.product-card .type-h3 { margin: var(--space-3) 0 2px; }
+.product-card .type-h3 { margin: 8px 0 2px; font-size: 16px; }
 
 .product-price {
   margin: 0 0 var(--space-2);
@@ -924,7 +942,6 @@ button { cursor: pointer; }
 
 .arrivals-rule {
   flex: 1;
-  max-width: 220px;
   height: 1px;
   background: #c4bdb2;
 }
@@ -1128,16 +1145,32 @@ button { cursor: pointer; }
 
 .home .wire-box > button { margin-top: 12px; }
 
+.reassure-module {
+  background: var(--ed-cream);
+  padding: 8px 16px 40px;
+}
+
 .reassure {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 14px;
-  border-top: 1px solid #d5d5d5;
-  border-bottom: 1px solid #d5d5d5;
-  background: #f7f7f7;
-  padding: 12px 16px 16px;
+  max-width: 1280px;
+  margin: 0 auto;
+  border-top: 1px solid rgba(74, 49, 34, 0.28);
+  background: transparent;
+  padding: 16px 8px 0;
   text-align: center;
+}
+
+.brand-heading {
+  margin: 0 0 12px;
+  font-family: var(--font-text);
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 1.2;
+  letter-spacing: 0;
+  text-transform: none;
 }
 
 .reassure p:last-child {
@@ -1271,9 +1304,13 @@ button { cursor: pointer; }
   .footer-referral,
   .footer-inner { padding-left: 24px; padding-right: 24px; }
 
-  .home { padding: 28px 24px 40px; }
+  .home { padding: 16px 24px 24px; }
 
-  .hero-photo { aspect-ratio: 16 / 7; }
+  .category-module { padding: 16px 24px 0; }
+
+  .brand-heading { font-size: 20px; }
+
+  .hero-photo { aspect-ratio: 2.4 / 1; max-height: 520px; }
 
   .holiday-band {
     grid-template-columns: 1.15fr minmax(280px, 0.9fr) 1.15fr;
@@ -1284,9 +1321,9 @@ button { cursor: pointer; }
 
   .holiday-line { font-size: 34px; }
 
-  .sale-banner { aspect-ratio: 16 / 7; }
+  .sale-banner { aspect-ratio: 2.4 / 1; max-height: 380px; }
 
-  .look-photo { aspect-ratio: 16 / 9; }
+  .look-photo { aspect-ratio: 2 / 1; max-height: 420px; }
 
   .arrivals-row { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 

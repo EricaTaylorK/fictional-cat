@@ -9,7 +9,6 @@ import {
   brandHeading,
   brands,
   categories,
-  categoryEyebrow,
   hero,
   occasionHeading,
   occasionLooks,
@@ -243,9 +242,20 @@ export default function App() {
     <div className="page" id="top">
       <SiteHeader search={search} onSearch={setSearch} />
       <main>
+        <section className="category-module" aria-label="Category entry tiles">
+          <div className="category-row">
+            {categories.map((tile) => (
+              <button key={tile.name} type="button" className="category-tile" aria-label={tile.cta}>
+                <CategoryIcon name={tile.name} />
+                <span className="category-name">{tile.name}</span>
+                <span className="category-descriptor">{tile.descriptor}</span>
+              </button>
+            ))}
+          </div>
+        </section>
         <div className="home">
           <section className="hero" aria-label="Primary hero">
-            <figure className="hero-photo editorial-frame lined" style={{ "--shell": hero.shell }}>
+            <figure className="hero-photo editorial-frame" style={{ "--shell": hero.shell }}>
               <img className="editorial" src={hero.image} alt="" />
               <figcaption className="photo-caption">
                 <button type="button" className="type-cta is-light">
@@ -297,7 +307,7 @@ export default function App() {
           </section>
 
           <section className="sale-path" aria-label="Sale path">
-            <figure className="sale-banner editorial-frame lined" style={{ "--shell": salePath.shell }}>
+            <figure className="sale-banner editorial-frame" style={{ "--shell": salePath.shell }}>
               <img className="editorial" src={salePath.image} alt="" style={{ objectPosition: salePath.focus }} />
               <figcaption className="photo-caption">
                 <p className="type-h3">{salePath.title}</p>
@@ -336,21 +346,8 @@ export default function App() {
 
           <FlourishRule />
 
-          <section className="category-module" aria-label="Category entry tiles">
-            <p className="eyebrow"><span>{categoryEyebrow}</span></p>
-            <div className="category-row">
-              {categories.map((tile) => (
-                <button key={tile.name} type="button" className="category-tile" aria-label={tile.cta}>
-                  <CategoryIcon name={tile.name} />
-                  <span className="category-name">{tile.name}</span>
-                  <span className="category-descriptor">{tile.descriptor}</span>
-                </button>
-              ))}
-            </div>
-          </section>
-
           <section aria-label="Brand tiles">
-            <h2 className="type-h2">{brandHeading}</h2>
+            <h3 className="brand-heading">{brandHeading}</h3>
             <div className="brand-row">
               {brands.map((tile) => (
                 <button
