@@ -4963,8 +4963,8 @@ h2 {
     display: block;
     flex-shrink: 0;
     margin-top: auto;
-    padding: 16px;
-    padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+    padding: 12px 16px;
+    padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
     position: sticky;
     width: 100%;
     z-index: 2;
@@ -4980,7 +4980,7 @@ h2 {
 
   .quiz-slide .actions-pair {
     flex-direction: column-reverse;
-    gap: 12px;
+    gap: 6px;
   }
 
   .quiz-slide .quiz-dock .button.secondary,
