@@ -25,13 +25,13 @@ export const brands = [
 export const brandHeading = "Shop by brand";
 
 export const categories = [
-  { name: "Suits", descriptor: "Slim, modern and classic fits", cta: "Shop suits" },
-  { name: "Dress shirts", descriptor: "Every cut, collar and color", cta: "Shop dress shirts" },
-  { name: "Tuxedos", descriptor: "Black tie, ready to wear", cta: "Shop tuxedos" },
-  { name: "Shoes", descriptor: "Dress shoes and more", cta: "Shop shoes" },
-  { name: "Casualwear", descriptor: "Blazers, polos, chinos and more", cta: "Shop casualwear" },
-  { name: "Wedding", descriptor: "For the groom, the party and the guests", cta: "Shop wedding" },
-  { name: "Sale", descriptor: "Savings on styles you'll actually wear", cta: "Shop sale" },
+  { name: "Suits", descriptor: "Slim, modern and classic fits", cta: "Shop suits", image: "/editorial/navy-bench-walnut.jpg", focus: "50% 50%", view: "inset(38% 16% 24% 16%)" },
+  { name: "Dress shirts", descriptor: "Every cut, collar and color", cta: "Shop dress shirts", image: "/editorial/white-shirt-walnut.jpg", focus: "50% 50%", view: "inset(36% 20% 26% 18%)" },
+  { name: "Tuxedos", descriptor: "Black tie, ready to wear", cta: "Shop tuxedos", image: "/editorial/charcoal-velvet.jpg", focus: "55% 42%", view: "inset(30% 10% 30% 20%)" },
+  { name: "Shoes", descriptor: "Dress shoes and more", cta: "Shop shoes", image: "/editorial/blue-sling-cream.jpg", focus: "30% 80%", view: "inset(74% 48% 2% 0%)" },
+  { name: "Casualwear", descriptor: "Blazers, polos, chinos and more", cta: "Shop casualwear", image: "/editorial/rust-cord-walnut.jpg", focus: "50% 50%", view: "inset(38% 2% 18% 4%)" },
+  { name: "Wedding", descriptor: "For the groom, the party and the guests", cta: "Shop wedding", image: "/editorial/navy-check-holiday.jpg", focus: "40% 50%", view: "inset(34% 24% 24% 2%)" },
+  { name: "Sale", descriptor: "Savings on styles you'll actually wear", cta: "Shop sale", image: "/editorial/gray-tonal.jpg", focus: "50% 50%", view: "inset(36% 22% 20% 22%)" },
 ];
 
 export const categoryEyebrow = "Shop by category";

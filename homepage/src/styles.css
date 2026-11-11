@@ -9,8 +9,8 @@
   --color-promo: #d71111;
   --color-focus-outline: #4b6eff;
   --font-roboto: "Roboto", "Helvetica Neue", Helvetica, Arial, sans-serif;
-  /* Draft H1. Libre Caslon Display and Fraunces are the other shortlist options; Newsreader is the working pick. */
-  --font-h1: "Newsreader", Georgia, serif;
+  /* Serif display. Gilda Display is the working face. */
+  --font-h1: "Gilda Display", Georgia, serif;
   --font-display: "Ruder Plakat", "Helvetica LT Pro", Helvetica, Arial, sans-serif;
   /* Helvetica LT Pro is not in the repo, so text roles fall through to Helvetica, Arial, sans-serif. */
   --font-text: "Helvetica LT Pro", Helvetica, Arial, sans-serif;
@@ -398,7 +398,8 @@ main { background: var(--ed-cream); }
 .type-h1 {
   margin: 0;
   font-family: var(--font-h1);
-  font-weight: 500;
+  font-weight: 400;
+  font-synthesis: none;
   font-size: var(--step-5);
   line-height: 1.1;
   letter-spacing: -0.01em;
@@ -566,19 +567,28 @@ main { background: var(--ed-cream); }
 .hero-photo .photo-caption { padding-top: 64px; }
 
 .category-module {
-  background: var(--ed-cream);
-  padding: 6px 16px 0;
+  position: relative;
+  background: var(--cta-navy);
+  padding: 22px 0 18px;
+}
+
+.category-arch-def {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
 }
 
 .category-row {
   display: flex;
-  gap: 12px;
+  justify-content: safe center;
+  gap: 28px;
   min-width: 0;
   overflow-x: auto;
   scrollbar-width: none;
   max-width: 1280px;
   margin: 0 auto;
-  padding-bottom: 4px;
+  padding: 0 16px;
 }
 
 .category-row::-webkit-scrollbar { display: none; }
@@ -588,36 +598,29 @@ main { background: var(--ed-cream); }
   flex: 0 0 auto;
   flex-direction: column;
   align-items: center;
-  justify-content: flex-start;
-  gap: 2px;
+  gap: 10px;
   border: 0;
   background: transparent;
-  padding: 2px 4px 4px;
-  color: var(--color-neutral-black);
+  padding: 0;
+  color: var(--cta-stone);
   text-align: center;
 }
 
-.category-icon {
-  display: block;
-  width: 28px;
-  height: 28px;
+.category-arch {
+  width: 96px;
+  height: 116px;
+  flex: none;
+  clip-path: url("#category-arch");
 }
 
 .category-name {
   font-family: var(--font-h1);
-  font-weight: 500;
-  font-size: 20px;
-  line-height: 1.1;
-}
-
-.category-descriptor {
-  display: none;
-  font-family: var(--font-text);
-  font-size: 13px;
   font-weight: 400;
-  line-height: 1.25;
-  color: var(--color-neutral-dark-gray);
-  text-wrap: balance;
+  font-synthesis: none;
+  font-size: 16px;
+  line-height: 1.2;
+  color: var(--cta-stone);
+  white-space: nowrap;
 }
 
 .holiday-band { display: grid; }
@@ -667,7 +670,8 @@ main { background: var(--ed-cream); }
   margin: 0;
   max-width: 12em;
   font-family: var(--font-h1);
-  font-weight: 500;
+  font-weight: 400;
+  font-synthesis: none;
   font-size: 28px;
   line-height: 1.15;
   color: var(--ed-cream);
@@ -948,7 +952,8 @@ main { background: var(--ed-cream); }
 .arrivals-title h2 {
   margin: 0;
   font-family: var(--font-h1);
-  font-weight: 500;
+  font-weight: 400;
+  font-synthesis: none;
   font-size: 32px;
   line-height: 1.1;
   letter-spacing: 0.01em;
@@ -989,7 +994,8 @@ main { background: var(--ed-cream); }
   margin: 0;
   color: #fff;
   font-family: var(--font-h1);
-  font-weight: 500;
+  font-weight: 400;
+  font-synthesis: none;
   font-size: 18px;
   line-height: 1;
   text-align: center;
@@ -1071,7 +1077,8 @@ main { background: var(--ed-cream); }
 
 .brand-mark.is-ck .ck-mono {
   font-family: var(--font-h1);
-  font-weight: 500;
+  font-weight: 400;
+  font-synthesis: none;
   font-size: 28cqi;
   line-height: 0.8;
   letter-spacing: -0.06em;
@@ -1104,6 +1111,8 @@ main { background: var(--ed-cream); }
 
 .brand-mark.is-ch {
   font-family: var(--font-h1);
+  font-weight: 400;
+  font-synthesis: none;
   font-size: 9.2cqi;
   letter-spacing: 0.03em;
 }
@@ -1128,7 +1137,8 @@ main { background: var(--ed-cream); }
   border: 1.5px solid #fff;
   border-radius: 50%;
   font-family: var(--font-h1);
-  font-weight: 500;
+  font-weight: 400;
+  font-synthesis: none;
   font-size: 14cqi;
   letter-spacing: 0.04em;
   line-height: 1;
@@ -1335,7 +1345,7 @@ main { background: var(--ed-cream); }
 
   .home { padding: 16px 24px 24px; }
 
-  .category-module { padding: 8px 24px 0; }
+  .category-module { padding: 24px 0 20px; }
 
   .brand-heading { font-size: 20px; }
 
@@ -1367,22 +1377,10 @@ main { background: var(--ed-cream); }
 
   .arrivals-row { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 
-  .category-name { font-size: 20px; }
-
   .hero-photo .photo-caption,
   .stories-photo figcaption { padding: 112px var(--space-5) var(--space-5); }
 
   .hero-photo .photo-caption { padding-top: 72px; }
-
-  .category-row {
-    display: grid;
-    grid-template-columns: repeat(7, minmax(0, 1fr));
-    overflow: visible;
-  }
-
-  .category-tile { flex: none; min-width: 0; }
-
-  .category-descriptor { display: block; }
 
   .stories-inner {
     padding: var(--space-6) var(--space-5) var(--space-7);

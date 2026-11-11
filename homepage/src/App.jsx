@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from "react";
 import SiteFooter from "./components/SiteFooter.jsx";
 import SiteHeader from "./components/SiteHeader.jsx";
 import { Flourish, FlourishRule } from "./flourish.jsx";
-import { CategoryIcon } from "./spots.jsx";
 import {
   arrivalTiles,
   arrivals,
@@ -264,12 +263,18 @@ export default function App() {
       <SiteHeader search={search} onSearch={setSearch} />
       <main>
         <section className="category-module" aria-label="Category entry tiles">
+          <svg className="category-arch-def" aria-hidden="true" focusable="false">
+            <clipPath id="category-arch" clipPathUnits="objectBoundingBox">
+              <path d="M0,1 L0,0.4138 A0.5,0.4138 0 0 1 1,0.4138 L1,1 Z" />
+            </clipPath>
+          </svg>
           <div className="category-row">
             {categories.map((tile) => (
               <button key={tile.name} type="button" className="category-tile" aria-label={tile.cta}>
-                <CategoryIcon name={tile.name} />
+                <span className="category-arch editorial-frame">
+                  <img className="editorial" src={tile.image} alt="" style={{ objectPosition: tile.focus, objectViewBox: tile.view }} />
+                </span>
                 <span className="category-name">{tile.name}</span>
-                <span className="category-descriptor">{tile.descriptor}</span>
               </button>
             ))}
           </div>
