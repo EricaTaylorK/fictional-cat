@@ -1,4 +1,6 @@
 import { useEffect, useRef, useState } from "react";
+import SiteFooter from "./components/SiteFooter.jsx";
+import SiteHeader from "./components/SiteHeader.jsx";
 import {
   arrivals,
   brands,
@@ -541,9 +543,11 @@ function Returning() {
 }
 
 export default function App() {
+  const [search, setSearch] = useState("");
+
   return (
     <div className="page" id="top">
-      <div className="bar bar-header" aria-hidden="true" />
+      <SiteHeader search={search} onSearch={setSearch} />
       <main>
         <CategoryBand />
         <OccasionModule />
@@ -570,7 +574,7 @@ export default function App() {
           <p className="t-label">{reassurance.visible}</p>
         </section>
       </main>
-      <div className="bar bar-footer" aria-hidden="true" />
+      <SiteFooter />
     </div>
   );
 }
