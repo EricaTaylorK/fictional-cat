@@ -1,399 +1,532 @@
 import { useEffect, useRef, useState } from "react";
-import SiteFooter from "./components/SiteFooter.jsx";
-import SiteHeader from "./components/SiteHeader.jsx";
-import { Flourish, FlourishRule } from "./flourish.jsx";
 import {
-  arrivalTiles,
   arrivals,
-  brandHeading,
   brands,
   categories,
+  categoryHeading,
   hero,
-  occasionHeading,
-  occasionLooks,
+  panel,
   reassurance,
   returning,
-  salePath,
-  seasonal,
+  sale,
+  secondaryTiles,
+  wedding,
 } from "./homeContent.js";
 
-function usePrefersReducedMotion() {
-  const [reduce, setReduce] = useState(() =>
-    typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches
-  );
-
-  useEffect(() => {
-    const media = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const update = () => setReduce(media.matches);
-    update();
-    media.addEventListener("change", update);
-    return () => media.removeEventListener("change", update);
-  }, []);
-
-  return reduce;
+function stopNavigation(event) {
+  event.preventDefault();
 }
 
-function tabId(name) {
-  return `occasion-tab-${name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "")}`;
+function panelRequested() {
+  return new URLSearchParams(window.location.search).get("panel") === "open";
 }
 
-function preloadLook(look) {
-  const image = new Image();
-  image.src = look.image;
+function prefersReducedMotion() {
+  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 }
 
-const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
-
-// Maps a point on an object-fit: cover image to a fraction of its frame.
-function coverPoint(point, aspect, frame, focus) {
-  if (aspect < frame) {
-    const visible = aspect / frame;
-    return { x: point.x, y: (point.y - focus.y * (1 - visible)) / visible };
-  }
-  const visible = frame / aspect;
-  return { x: (point.x - focus.x * (1 - visible)) / visible, y: point.y };
-}
-
-const CARD_ASPECT = 4 / 5;
-
-function cropStyle(crop, aspect) {
-  const visible = aspect < CARD_ASPECT ? aspect / CARD_ASPECT : CARD_ASPECT / aspect;
-  const axis = aspect < CARD_ASPECT ? "y" : "x";
-  const focus = { x: 0.5, y: 0.5, [axis]: clamp((crop[axis] - visible / 2) / (1 - visible), 0, 1) };
-  const p = coverPoint(crop, aspect, CARD_ASPECT, focus);
-  const shift = (v) => clamp(0.5 - v, 1 - (v + (1 - v) * crop.zoom), -v * (1 - crop.zoom));
-  return {
-    objectPosition: `${focus.x * 100}% ${focus.y * 100}%`,
-    transformOrigin: `${p.x * 100}% ${p.y * 100}%`,
-    transform: `translate(${shift(p.x) * 100}%, ${shift(p.y) * 100}%) scale(${crop.zoom})`,
-  };
-}
-
-function useFrameAspect() {
-  const ref = useRef(null);
-  const [aspect, setAspect] = useState(CARD_ASPECT);
-
-  useEffect(() => {
-    const node = ref.current;
-    if (!node) return undefined;
-    const observer = new ResizeObserver(([entry]) => {
-      const { width, height } = entry.contentRect;
-      if (width && height) setAspect(width / height);
-    });
-    observer.observe(node);
-    return () => observer.disconnect();
-  }, []);
-
-  return [ref, aspect];
-}
-
-function FadeSlot({ current, previous, className, render, slotRef }) {
+function Placeholder({ label, className = "", tone = "neutral", decorative = false }) {
   return (
-    <div className={className} ref={slotRef}>
-      {previous ? render(previous, "is-out") : null}
-      {render(current, previous ? "is-in" : "")}
+    <div
+      className={`ph ${className}`.trim()}
+      data-tone={tone}
+      role={decorative ? undefined : "img"}
+      aria-label={decorative ? undefined : label}
+      aria-hidden={decorative ? true : undefined}
+    >
+      <span className="ph-x" aria-hidden="true" />
+      {label ? <span className="ph-chip t-caption">{label}</span> : null}
     </div>
   );
 }
 
-function BrandMark({ tile }) {
-  if (tile.mark === "ck") {
-    return (
-      <span className="brand-mark is-ck">
-        <span className="ck-mono">CK</span>
-        <span className="ck-name">Calvin Klein</span>
-      </span>
-    );
-  }
-  if (tile.mark === "mk") {
-    return (
-      <span className="brand-mark is-mk">
-        <span className="mk-badge">MK</span>
-        <span className="mk-name">Michael Kors</span>
-      </span>
-    );
-  }
-  if (tile.mark === "th") {
-    return (
-      <span className="brand-mark is-th">
-        <span>Tommy Hilfiger</span>
-      </span>
-    );
-  }
-  return <span className={`brand-mark is-${tile.mark}`}>{tile.name}</span>;
+function CheckIcon() {
+  return (
+    <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+      <path
+        d="M5 12.5 9.5 17 19 7.5"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2.2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
 }
 
-function LookModule({ occasion, occasionName, onSelect }) {
-  const reduce = usePrefersReducedMotion();
-  const [shown, setShown] = useState(occasion);
-  const [leaving, setLeaving] = useState(null);
+function CloseIcon() {
+  return (
+    <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+      <path d="M6 6 18 18M18 6 6 18" fill="none" stroke="currentColor" strokeWidth="1.6" />
+    </svg>
+  );
+}
 
-  if (occasion.name !== shown.name) {
-    setShown(occasion);
-    setLeaving(reduce ? null : shown);
-  }
+function ArrowIcon() {
+  return (
+    <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+      <path
+        d="M5 12h14M13 6l6 6-6 6"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
 
-  const [photoRef, frameAspect] = useFrameAspect();
-  const [activePiece, setActivePiece] = useState(null);
+function CategoryBand() {
+  return (
+    <section className="category-band" aria-label="Shop by category">
+      <div className="category-layout">
+        <h2 className="t-h2 category-heading">
+          <span>{categoryHeading.line1}</span>
+          <span>{categoryHeading.line2}</span>
+        </h2>
+        <div className="category-scroller">
+          {categories.map((category) => (
+            <a
+              key={category.name}
+              className="category-item"
+              href={`#${category.name}`}
+              aria-label={category.cta}
+              onClick={stopNavigation}
+            >
+              <img src={category.image} alt="" />
+              <span className="t-h4">{category.name}</span>
+            </a>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function ShopPanel({ chipName, onClose, presetFirstSize }) {
+  const dialogRef = useRef(null);
+  const closeRef = useRef(null);
+  const listRef = useRef(null);
+  const cardRefs = useRef([]);
+  const timers = useRef([]);
+  const [activeItem, setActiveItem] = useState(0);
+  const [sizes, setSizes] = useState(() =>
+    panel.items.map((_, index) => (presetFirstSize && index === 0 ? "40" : ""))
+  );
+  const [added, setAdded] = useState(() => panel.items.map(() => false));
+
+  const onCloseRef = useRef(onClose);
+  onCloseRef.current = onClose;
 
   useEffect(() => {
-    if (!leaving) return undefined;
-    const timeout = window.setTimeout(() => setLeaving(null), 560);
-    return () => window.clearTimeout(timeout);
-  }, [leaving]);
+    const dialog = dialogRef.current;
+    closeRef.current?.focus();
 
-  useEffect(() => setActivePiece(null), [shown.name]);
+    function focusable() {
+      if (!dialog) return [];
+      return [...dialog.querySelectorAll("button, select, a[href]")].filter(
+        (el) => !el.disabled && el.getAttribute("aria-hidden") !== "true"
+      );
+    }
+
+    function onKey(event) {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        onCloseRef.current();
+        return;
+      }
+      if (event.key !== "Tab") return;
+      const items = focusable();
+      if (!items.length) return;
+      const first = items[0];
+      const last = items[items.length - 1];
+      const active = document.activeElement;
+      if (event.shiftKey && (active === first || !dialog.contains(active))) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && (active === last || !dialog.contains(active))) {
+        event.preventDefault();
+        first.focus();
+      }
+    }
+
+    document.addEventListener("keydown", onKey);
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.body.style.overflow = previousOverflow;
+      timers.current.forEach((id) => window.clearTimeout(id));
+    };
+  }, []);
+
+  function showItem(index) {
+    setActiveItem(index);
+    const list = listRef.current;
+    const card = cardRefs.current[index];
+    if (!list || !card) return;
+    const top = list.scrollTop + (card.getBoundingClientRect().top - list.getBoundingClientRect().top);
+    list.scrollTo({ top, behavior: prefersReducedMotion() ? "auto" : "smooth" });
+  }
+
+  function chooseSize(index, value) {
+    setSizes((current) => current.map((size, item) => (item === index ? value : size)));
+  }
+
+  function addToBag(index) {
+    if (!sizes[index] || added[index]) return;
+    setAdded((current) => current.map((value, item) => (item === index ? true : value)));
+    window.clearTimeout(timers.current[index]);
+    timers.current[index] = window.setTimeout(() => {
+      setAdded((current) => current.map((value, item) => (item === index ? false : value)));
+    }, 1500);
+  }
 
   return (
-    <section className="occasion-module" aria-label="Shop by occasion">
-      <h2 className="type-h2" id="occasion-heading">{occasionHeading}</h2>
-      <div className="occasion-row" role="tablist" aria-labelledby="occasion-heading">
-        {occasionLooks.map((item) => (
-          <button
-            key={item.name}
-            type="button"
-            role="tab"
-            id={tabId(item.name)}
-            aria-selected={item.name === occasionName}
-            aria-controls="occasion-panel"
-            className={item.name === occasionName ? "is-selected" : undefined}
-            onClick={() => onSelect(item.name)}
-            onMouseEnter={() => preloadLook(item)}
-            onFocus={() => preloadLook(item)}
-          >
-            {item.name}
+    <>
+      <div className="scrim" onClick={onClose} />
+      <div
+        className="panel"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="panel-title"
+        ref={dialogRef}
+      >
+        <header className="panel-head">
+          <div>
+            <h2 id="panel-title" className="t-h4">
+              {wedding.headline}
+            </h2>
+            <p className="t-label panel-kicker">{chipName}</p>
+          </div>
+          <button type="button" className="icon-btn" aria-label="Close" ref={closeRef} onClick={onClose}>
+            <CloseIcon />
           </button>
+        </header>
+        <div className="panel-strip">
+          {panel.items.map((item, index) => (
+            <button
+              key={item.id}
+              type="button"
+              className={index === activeItem ? "strip-btn is-selected" : "strip-btn"}
+              aria-label={item.shot}
+              onClick={() => showItem(index)}
+            >
+              <Placeholder label={item.shot} tone={item.tone} decorative />
+            </button>
+          ))}
+        </div>
+        <div className="panel-list" ref={listRef}>
+          {panel.items.map((item, index) => (
+            <article
+              key={item.id}
+              className="bag-card"
+              ref={(node) => {
+                cardRefs.current[index] = node;
+              }}
+            >
+              <Placeholder className="bag-photo" label={item.shot} tone={item.tone} />
+              <div className="bag-copy">
+                <p className="t-label">{item.name}</p>
+                <p className="t-price">{item.price}</p>
+                <select
+                  aria-label={panel.sizeLabel}
+                  value={sizes[index]}
+                  onChange={(event) => chooseSize(index, event.target.value)}
+                >
+                  <option value="">{panel.sizeLabel}</option>
+                  {panel.sizes.map((size) => (
+                    <option key={size} value={size}>
+                      {size}
+                    </option>
+                  ))}
+                </select>
+                <button
+                  type="button"
+                  className="add-btn"
+                  disabled={!sizes[index]}
+                  aria-label={panel.addToBag}
+                  onClick={() => addToBag(index)}
+                >
+                  {added[index] ? <CheckIcon /> : panel.addToBag}
+                </button>
+              </div>
+            </article>
+          ))}
+        </div>
+      </div>
+    </>
+  );
+}
+
+function OccasionModule() {
+  const ctaRef = useRef(null);
+  const preset = useRef(panelRequested());
+  const [selected, setSelected] = useState(0);
+  const [open, setOpen] = useState(() => panelRequested());
+  const wasOpen = useRef(false);
+  const chip = wedding.chips[selected];
+
+  useEffect(() => {
+    if (open) {
+      wasOpen.current = true;
+      return undefined;
+    }
+    if (wasOpen.current) ctaRef.current?.focus();
+    return undefined;
+  }, [open]);
+
+  function moveChip(event, index) {
+    let next = null;
+    if (event.key === "ArrowRight" || event.key === "ArrowDown") next = (index + 1) % wedding.chips.length;
+    else if (event.key === "ArrowLeft" || event.key === "ArrowUp") {
+      next = (index - 1 + wedding.chips.length) % wedding.chips.length;
+    }
+    if (next === null) return;
+    event.preventDefault();
+    setSelected(next);
+    const target = next;
+    window.requestAnimationFrame(() => {
+      document.getElementById(`occasion-chip-${target}`)?.focus();
+    });
+  }
+
+  return (
+    <section className="occasion" aria-label={wedding.headline}>
+      <div className="occasion-scene">
+        {wedding.chips.map((item, index) => (
+          <div
+            key={item.name}
+            className={index === selected ? "scene-layer is-active" : "scene-layer"}
+            aria-hidden={index === selected ? undefined : true}
+          >
+            <Placeholder label={item.shot} tone={item.tone} />
+          </div>
+        ))}
+        <div className="occasion-scrim" />
+        <div className="occasion-copy">
+          <h2 className="t-h2">{wedding.headline}</h2>
+          <p className="t-deck">{wedding.deck}</p>
+          <div className="chip-row" role="radiogroup" aria-label={wedding.headline}>
+            {wedding.chips.map((item, index) => (
+              <button
+                key={item.name}
+                id={`occasion-chip-${index}`}
+                type="button"
+                role="radio"
+                aria-checked={index === selected}
+                tabIndex={index === selected ? 0 : -1}
+                className={index === selected ? "chip is-selected" : "chip"}
+                onClick={() => setSelected(index)}
+                onKeyDown={(event) => moveChip(event, index)}
+              >
+                <Placeholder className="chip-thumb" label={item.shot} tone={item.tone} decorative />
+                <span className="chip-name" id={`occasion-chip-label-${index}`}>
+                  {item.name}
+                </span>
+              </button>
+            ))}
+          </div>
+        </div>
+        <button
+          type="button"
+          className="cta is-outline occasion-cta"
+          ref={ctaRef}
+          onClick={() => setOpen(true)}
+        >
+          {wedding.cta}
+        </button>
+      </div>
+      <div className="secondary-grid">
+        {secondaryTiles.map((tile) => (
+          <a
+            key={tile.name}
+            className="secondary-tile"
+            href={`#${tile.name}`}
+            aria-label={tile.name}
+            onClick={stopNavigation}
+          >
+            <Placeholder label={tile.shot} tone={tile.tone} />
+            <span className="t-h4">{tile.name}</span>
+          </a>
         ))}
       </div>
-      <div className="look-stage">
-      <FadeSlot
-        className="look-photo-stack"
-        slotRef={photoRef}
-        current={shown}
-        previous={leaving}
-        render={(look, phase) => (
-          <figure
-            key={phase === "is-out" ? `${look.name}-out` : look.name}
-            className={phase ? `look-photo editorial-frame matted ${phase}` : "look-photo editorial-frame matted"}
-            style={{ "--shell": look.shell }}
-            inert={phase === "is-out" ? true : undefined}
-            aria-hidden={phase === "is-out" ? true : undefined}
-          >
-            <img
-              className="editorial"
-              src={look.image}
-              alt=""
-              style={{ objectPosition: `${look.focus.x * 100}% ${look.focus.y * 100}%` }}
-            />
-            <div className="look-markers" aria-hidden="true">
-              {look.pieces.map((piece, index) => {
-                const point = coverPoint(piece.at, look.aspect, frameAspect, look.focus);
-                return (
-                  <span
-                    key={piece.name}
-                    className={activePiece === index && phase !== "is-out" ? "look-marker is-active" : "look-marker"}
-                    style={{ left: `${point.x * 100}%`, top: `${point.y * 100}%` }}
-                  >
-                    {index + 1}
-                  </span>
-                );
-              })}
-            </div>
-            <figcaption>
-              <p className="eyebrow eyebrow-on-dark"><span>{look.eyebrow}</span></p>
-              <h2 className="type-h1">{look.line}</h2>
-            </figcaption>
-          </figure>
-        )}
-      />
-      <FadeSlot
-        className="stories-look-stack"
-        current={shown}
-        previous={leaving}
-        render={(look, phase) => (
-          <div
-            key={phase === "is-out" ? `${look.name}-look-out` : `${look.name}-look`}
-            className={phase ? `stories-look ${phase}` : "stories-look"}
-            id={phase === "is-out" ? undefined : "occasion-panel"}
-            role={phase === "is-out" ? undefined : "tabpanel"}
-            aria-labelledby={phase === "is-out" ? undefined : tabId(look.name)}
-            inert={phase === "is-out" ? true : undefined}
-            aria-hidden={phase === "is-out" ? true : undefined}
-          >
-            <div className="stories-products">
-              {look.pieces.map((piece, index) => (
-                <button
-                  key={piece.name}
-                  type="button"
-                  className="product-card"
-                  aria-label={`${piece.name}, view product`}
-                  onMouseEnter={() => setActivePiece(index)}
-                  onMouseLeave={() => setActivePiece(null)}
-                  onFocus={() => setActivePiece(index)}
-                  onBlur={() => setActivePiece(null)}
-                >
-                  <span className="product-photo editorial-frame">
-                    <img className="editorial" src={look.image} alt="" style={cropStyle(piece.crop, look.aspect)} />
-                    <span className="look-marker" aria-hidden="true">{index + 1}</span>
-                  </span>
-                  <span className="type-h3">{piece.name}</span>
-                  <span className="product-price">{piece.price}</span>
-                  <span className="type-cta product-shop is-outline">Shop</span>
-                </button>
-              ))}
-            </div>
-            <button type="button" className="type-cta stories-cta">
-              {look.cta}
-            </button>
-          </div>
-        )}
-      />
+      {open ? (
+        <ShopPanel
+          chipName={chip.name}
+          presetFirstSize={preset.current}
+          onClose={() => setOpen(false)}
+        />
+      ) : null}
+    </section>
+  );
+}
+
+function HolidayBanner() {
+  return (
+    <section className="holiday" aria-label="Holiday">
+      <div className="holiday-banner">
+        <div className="holiday-photo holiday-photo-left">
+          <img className="photo" src="/editorial/navy-check-holiday.jpg" alt={hero.leftAlt} />
+          <img className="pine pine-left" src="/holiday/pine-left.svg" alt="" />
+        </div>
+        <div className="holiday-center">
+          <span className="holiday-snow" aria-hidden="true" />
+          <h1 className="holiday-title">{hero.headline}</h1>
+          <a className="holiday-cta" href="#holiday" onClick={stopNavigation}>
+            {hero.cta}
+          </a>
+        </div>
+        <div className="holiday-photo holiday-photo-right">
+          <img className="photo" src="/holiday/fireplace.jpg" alt={hero.rightAlt} />
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function Campaign({ title, deck, cta, shot, tone, label }) {
+  return (
+    <section className="campaign" aria-label={label}>
+      <Placeholder className="campaign-media" label={shot} tone={tone} />
+      <div className="campaign-copy">
+        <h2 className="t-h2">{title}</h2>
+        <p className="t-deck">{deck}</p>
+        <a className="cta" href={`#${label}`} onClick={stopNavigation}>
+          {cta}
+        </a>
+      </div>
+    </section>
+  );
+}
+
+function BrandTiles() {
+  return (
+    <section aria-label="Brands">
+      <ul className="brand-grid">
+        {brands.map((brand) => (
+          <li key={brand.name}>
+            <h3 className="t-h3 brand-word">{brand.name}</h3>
+            <p className="t-label">{brand.descriptor}</p>
+            <a className="t-link" href={`#${brand.name}`} onClick={stopNavigation}>
+              {brand.cta}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
+
+function Returning() {
+  const scrollerRef = useRef(null);
+  const [bar, setBar] = useState(120);
+
+  function measure() {
+    const el = scrollerRef.current;
+    if (!el) return;
+    const card = el.querySelector(".returning-card");
+    const cardWidth = card ? card.getBoundingClientRect().width : el.clientWidth / 3;
+    const max = el.scrollWidth - el.clientWidth;
+    const progress = max <= 1 ? 1 : el.scrollLeft / max;
+    setBar(cardWidth + progress * Math.max(0, el.clientWidth - cardWidth));
+  }
+
+  useEffect(() => {
+    measure();
+    const el = scrollerRef.current;
+    if (!el) return undefined;
+    const observer = new ResizeObserver(measure);
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  function showNext() {
+    const el = scrollerRef.current;
+    if (!el) return;
+    const card = el.querySelector(".returning-card");
+    const delta = (card?.getBoundingClientRect().width || 240) + 16;
+    const max = el.scrollWidth - el.clientWidth;
+    const behavior = prefersReducedMotion() ? "auto" : "smooth";
+    if (el.scrollLeft >= max - 8) el.scrollTo({ left: 0, behavior });
+    else el.scrollBy({ left: delta, behavior });
+  }
+
+  return (
+    <section className="returning" aria-label="Returning visitor">
+      <div className="returning-copy">
+        <h2 className="t-h2">
+          Pick up
+          <br />
+          where you
+          <br />
+          left off
+        </h2>
+        <p className="t-deck">{returning.subhead}</p>
+        <a className="t-link returning-link" href="#recently-viewed" onClick={stopNavigation}>
+          {returning.link}
+        </a>
+      </div>
+      <div className="returning-stage">
+        <div
+          className="returning-scroller"
+          ref={scrollerRef}
+          onScroll={measure}
+        >
+          {returning.items.map((item) => (
+            <article key={item.name} className="returning-card">
+              <div className="returning-frame">
+                <Placeholder label={item.shot} tone="recent" />
+              </div>
+              <p className="t-label">{item.name}</p>
+              <p className="t-price returning-price">{item.price}</p>
+            </article>
+          ))}
+        </div>
+        <button type="button" className="returning-next" aria-label="Next" onClick={showNext}>
+          <ArrowIcon />
+        </button>
+        <div className="returning-progress" aria-hidden="true">
+          <span style={{ width: `${bar}px` }} />
+        </div>
       </div>
     </section>
   );
 }
 
 export default function App() {
-  const [search, setSearch] = useState("");
-  const [occasionName, setOccasionName] = useState(occasionLooks[0].name);
-  const occasion = occasionLooks.find((item) => item.name === occasionName) ?? occasionLooks[0];
-
   return (
     <div className="page" id="top">
-      <SiteHeader search={search} onSearch={setSearch} />
+      <div className="bar bar-header" aria-hidden="true" />
       <main>
-        <section className="category-module" aria-label="Category entry tiles">
-          <svg className="category-arch-def" aria-hidden="true" focusable="false">
-            <clipPath id="category-arch" clipPathUnits="objectBoundingBox">
-              <path d="M0,1 L0,0.4138 A0.5,0.4138 0 0 1 1,0.4138 L1,1 Z" />
-            </clipPath>
-          </svg>
-          <div className="category-row">
-            {categories.map((tile) => (
-              <button key={tile.name} type="button" className="category-tile" aria-label={tile.cta}>
-                <span className="category-arch editorial-frame">
-                  <img className="editorial" src={tile.image} alt="" style={{ objectPosition: tile.focus, objectViewBox: tile.view }} />
-                </span>
-                <span className="category-name">{tile.name}</span>
-              </button>
-            ))}
-          </div>
-        </section>
-        <div className="home">
-          <section className="hero" aria-label="Primary hero">
-            <figure className="hero-photo editorial-frame bound" style={{ "--shell": hero.shell }}>
-              <img className="editorial" src={hero.image} alt="" />
-              <figcaption className="photo-caption">
-                <button type="button" className="type-cta is-light">
-                  {hero.cta}
-                </button>
-              </figcaption>
-            </figure>
-          </section>
-
-          <section className="seasonal" aria-label="Seasonal campaign slots">
-            <div className="holiday-band">
-              <figure className="holiday-photo editorial-frame bound">
-                <img className="editorial" src="/editorial/holiday-sportcoat.jpg" alt="" />
-              </figure>
-              <div className="holiday-panel">
-                <div className="holiday-rule" aria-hidden="true">
-                  <span />
-                  <Flourish />
-                  <span />
-                </div>
-                <h2 className="holiday-line">{seasonal.line}</h2>
-                <Flourish className="holiday-scroll" />
-                <button type="button" className="type-cta is-light holiday-cta">{seasonal.cta}</button>
-              </div>
-              <figure className="holiday-photo editorial-frame bound">
-                <img className="editorial" src="/editorial/holiday-roulette.jpg" alt="" />
-              </figure>
-            </div>
-          </section>
-
-          <section className="arrivals" aria-label="New arrivals">
-            <div className="arrivals-title">
-              <span className="arrivals-rule" aria-hidden="true" />
-              <h2>{arrivals.title}</h2>
-              <span className="arrivals-rule" aria-hidden="true" />
-            </div>
-            <p className="arrivals-line">{arrivals.line}</p>
-            <div className="arrivals-row">
-              {arrivalTiles.map((tile) => (
-                <article key={tile.label} className="arrival-tile">
-                  <div className="arrival-photo editorial-frame">
-                    <img className="editorial" src={tile.image} alt="" style={{ objectPosition: tile.focus }} />
-                  </div>
-                  <p className="arrival-bar" style={{ background: tile.bar }}>{tile.label}</p>
-                </article>
-              ))}
-            </div>
-            <button type="button" className="type-cta arrivals-cta is-outline">{arrivals.cta}</button>
-          </section>
-
-          <section className="sale-path" aria-label="Sale path">
-            <figure className="sale-banner editorial-frame bound" style={{ "--shell": salePath.shell }}>
-              <img className="editorial" src={salePath.image} alt="" style={{ objectPosition: salePath.focus }} />
-              <figcaption className="photo-caption cloth-panel">
-                <p className="type-h3">{salePath.title}</p>
-                <p className="type-body">{salePath.line}</p>
-                <button type="button" className="type-cta">{salePath.cta}</button>
-              </figcaption>
-            </figure>
-          </section>
-
-          <LookModule occasion={occasion} occasionName={occasionName} onSelect={setOccasionName} />
-
-          <FlourishRule />
-
-          <section aria-label="Brand tiles">
-            <h3 className="brand-heading">{brandHeading}</h3>
-            <div className="brand-row">
-              {brands.map((tile) => (
-                <button
-                  key={tile.name}
-                  type="button"
-                  className="brand-card"
-                  aria-label={tile.cta}
-                >
-                  <span className="brand-tile editorial-frame" style={{ "--scrim": tile.scrim, "--view": tile.view }}>
-                    <img className="editorial" src={tile.image} alt="" style={{ objectPosition: tile.focus }} />
-                    <span className="brand-scrim" aria-hidden="true" />
-                    <BrandMark tile={tile} />
-                  </span>
-                  <span className="brand-bar" style={{ background: tile.bar }} aria-hidden="true" />
-                </button>
-              ))}
-            </div>
-          </section>
-
-          <section aria-label="Returning visitor">
-            <div className="wire-box heritage-box">
-              <p className="wire-note">Shown only to returning visitors</p>
-              <h2>{returning.headline}</h2>
-              <p>{returning.subhead}</p>
-              <div className="recent-row">
-                {returning.items.map((item, index) => (
-                  <div key={index} className="wire-box wire-recent">
-                    {item}
-                  </div>
-                ))}
-              </div>
-              <button type="button" className="type-cta is-outline">{returning.link}</button>
-            </div>
-          </section>
-        </div>
-
-        <section className="reassure-module" aria-label="Reassurance strip">
-          <div className="reassure">
-            <Flourish variant="sprig" />
-            <p>{reassurance.visible}</p>
-            <Flourish variant="sprig" />
-          </div>
+        <CategoryBand />
+        <OccasionModule />
+        <HolidayBanner />
+        <Campaign
+          label="Sale"
+          title={sale.headline}
+          deck={sale.deck}
+          cta={sale.cta}
+          shot={sale.shot}
+          tone="sale"
+        />
+        <Campaign
+          label="New arrivals"
+          title={arrivals.headline}
+          deck={arrivals.deck}
+          cta={arrivals.cta}
+          shot={arrivals.shot}
+          tone="arrivals"
+        />
+        <BrandTiles />
+        <Returning />
+        <section className="reassure" aria-label="Reassurance">
+          <p className="t-label">{reassurance.visible}</p>
         </section>
       </main>
-      <SiteFooter />
+      <div className="bar bar-footer" aria-hidden="true" />
     </div>
   );
 }
