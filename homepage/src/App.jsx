@@ -27,7 +27,7 @@ function prefersReducedMotion() {
   return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 }
 
-function Placeholder({ label, className = "", tone = "neutral", decorative = false, photo, position = "center 22%" }) {
+function Placeholder({ label, className = "", tone = "neutral", decorative = false, photo, position = "center 22%", zoom = 1 }) {
   if (photo) {
     return (
       <div
@@ -36,7 +36,15 @@ function Placeholder({ label, className = "", tone = "neutral", decorative = fal
         aria-label={decorative ? undefined : label}
         aria-hidden={decorative ? true : undefined}
       >
-        <img src={photo} alt="" style={{ objectPosition: position }} />
+        <img
+          src={photo}
+          alt=""
+          style={{
+            objectPosition: position,
+            transform: zoom === 1 ? undefined : `scale(${zoom})`,
+            transformOrigin: position,
+          }}
+        />
       </div>
     );
   }
@@ -524,7 +532,7 @@ function Returning() {
           {returning.items.map((item) => (
             <article key={item.name} className="returning-card">
               <div className="returning-frame">
-                <Placeholder label={item.shot} tone="recent" photo={item.photo} position={item.position} />
+                <Placeholder label={item.shot} tone="recent" photo={item.photo} position={item.position} zoom={item.zoom} />
               </div>
               <p className="t-label">{item.name}</p>
               <p className="t-price returning-price">{item.price}</p>

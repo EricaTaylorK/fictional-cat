@@ -113,9 +113,9 @@ export const returning = {
   subhead: "The styles you were looking at, right where you left them.",
   link: "View all recently viewed",
   items: [
-    { name: "Placeholder product 01", price: "$000", shot: "Tailored navy suit", photo: "/looks/navy-suit-wood.jpg", position: "center 25%" },
-    { name: "Placeholder product 02", price: "$000", shot: "White dress shirt", photo: "/looks/white-dot-shirt.jpg", position: "center 25%" },
-    { name: "Placeholder product 03", price: "$000", shot: "Textured sport coat", photo: "/looks/sport-coat-detail.jpg", position: "center 35%" },
+    { name: "Placeholder product 01", price: "$000", shot: "Tailored navy suit", photo: "/looks/navy-suit-wood.jpg", position: "center 8%", zoom: 1.7 },
+    { name: "Placeholder product 02", price: "$000", shot: "White dress shirt", photo: "/looks/white-dot-shirt.jpg", position: "center 12%", zoom: 1.55 },
+    { name: "Placeholder product 03", price: "$000", shot: "Textured sport coat", photo: "/looks/sport-coat-detail.jpg", position: "center 42%", zoom: 1.15 },
   ],
 };
 

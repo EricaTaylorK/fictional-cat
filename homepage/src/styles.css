@@ -453,7 +453,6 @@ h1, h2, h3, h4,
 
 .flourish { color: #b08d57; display: block; }
 .flourish-scroll { width: 72px; height: 16px; }
-.footer-flourish { width: 56px; height: 14px; color: rgba(196, 164, 106, 0.9); margin-bottom: 4px; }
 
 @media (min-width: 1024px) {
   .header-bar-mobile,
@@ -1049,9 +1048,13 @@ h1, h2, h3, h4,
 }
 
 .returning-frame {
-  aspect-ratio: 3 / 4;
+  aspect-ratio: 1 / 1;
   margin-bottom: 12px;
+  background: #f3f3f1;
+  overflow: hidden;
 }
+
+.returning-frame .ph-photo { background: #f3f3f1; }
 
 .returning-card .t-label { color: var(--navy); }
 .returning-card .t-price { margin-top: 4px; }
