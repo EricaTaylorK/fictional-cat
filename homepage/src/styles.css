@@ -121,8 +121,7 @@ h1, h2, h3, h4,
   letter-spacing: 0;
 }
 
-.eyebrow,
-.cta {
+.eyebrow {
   font-family: var(--font-accent);
   font-weight: 400;
   font-size: 16px;
@@ -132,15 +131,27 @@ h1, h2, h3, h4,
   text-transform: uppercase;
 }
 
+.cta,
+.holiday-cta,
+.add-btn {
+  font-size: 14px;
+  letter-spacing: 0.12em;
+  border-radius: 0 8px 0 8px;
+}
+
 .eyebrow { display: inline-block; margin: 0; }
 
 .cta {
+  font-family: var(--font-accent);
+  font-weight: 400;
+  line-height: 0.95;
+  padding-block: 0.1em;
+  text-transform: uppercase;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   min-height: 44px;
   padding-inline: 1.4rem;
-  border-radius: 999px;
   border: 1.5px solid var(--navy);
   background: var(--navy);
   color: #fff;
@@ -470,13 +481,10 @@ h1, h2, h3, h4,
   justify-content: center;
   background: #e8e6de;
   border: 0;
-  border-radius: 0 8px 0 8px;
   color: #001e56;
   font-family: var(--font-accent);
   font-weight: 400;
-  font-size: calc(100cqi * 14 / 1400);
   line-height: 1;
-  letter-spacing: 0.12em;
   text-transform: uppercase;
   text-decoration: none;
   padding: 0;
@@ -795,9 +803,7 @@ h1, h2, h3, h4,
 
 .add-btn {
   font-family: var(--font-text);
-  font-size: 14px;
   font-weight: 600;
-  letter-spacing: 0;
   text-transform: none;
   background: var(--navy);
   color: #fff;
@@ -880,7 +886,6 @@ h1, h2, h3, h4,
   .holiday-cta {
     width: 189px;
     height: 40px;
-    font-size: 14px;
   }
 
   .holiday-center { padding: 28px 16px 32px; }
