@@ -369,18 +369,21 @@ function HolidayBanner() {
     <section className="holiday" aria-label="Holiday">
       <div className="holiday-banner">
         <div className="holiday-photo holiday-photo-left">
-          <img className="photo" src="/editorial/navy-check-holiday.jpg" alt={hero.leftAlt} />
-          <img className="pine pine-left" src="/holiday/pine-left.svg" alt="" />
+          <img className="photo" src="/holiday/left.jpg" alt={hero.leftAlt} />
         </div>
         <div className="holiday-center">
           <span className="holiday-snow" aria-hidden="true" />
-          <h1 className="holiday-title">{hero.headline}</h1>
+          <h1 className="holiday-title">
+            <span>Holiday</span>
+            <span>Party,</span>
+            <span>Handled.</span>
+          </h1>
           <a className="holiday-cta" href="#holiday" onClick={stopNavigation}>
             {hero.cta}
           </a>
         </div>
         <div className="holiday-photo holiday-photo-right">
-          <img className="photo" src="/holiday/fireplace.jpg" alt={hero.rightAlt} />
+          <img className="photo" src="/holiday/right.jpg" alt={hero.rightAlt} />
         </div>
       </div>
     </section>

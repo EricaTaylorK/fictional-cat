@@ -1,5 +1,5 @@
 :root {
-  --font-display: "Momo Trust Display", Georgia, "Times New Roman", serif;
+  --font-display: "Forum", Georgia, "Times New Roman", serif;
   --font-text: "DM Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
   --font-accent: "Ruder Plakat", "DM Sans", system-ui, sans-serif;
   --step-hero: clamp(3.25rem, 2.4577rem + 3.3803vw, 5.5rem);
@@ -233,7 +233,9 @@ h1, h2, h3, h4,
   padding: 56px 40px 48px 48px;
 }
 
-.category-heading span { display: block; }
+.category-heading span { display: block; line-height: 1.05; }
+.category-heading span:first-child { font-size: clamp(1.75rem, 1.5rem + 0.7vw, 2.35rem); }
+.category-heading span:last-child { font-size: clamp(3.25rem, 2.4rem + 2vw, 4.5rem); line-height: 0.95; }
 
 .category-scroller {
   display: grid;
@@ -384,15 +386,15 @@ h1, h2, h3, h4,
 }
 
 /* Holiday banner — the only module that uses this layout */
-.holiday { background: #381d00; }
+.holiday { background: #3a1700; }
 
 .holiday-banner {
   width: min(100%, 1400px);
   margin: 0 auto;
-  aspect-ratio: 1400 / 425;
+  aspect-ratio: 1024 / 310;
   display: grid;
-  grid-template-columns: 345fr 340fr 715fr;
-  background: #381d00;
+  grid-template-columns: 252fr 236fr 536fr;
+  background: #3a1700;
   position: relative;
   container-type: inline-size;
 }
@@ -413,69 +415,49 @@ h1, h2, h3, h4,
   display: block;
 }
 
-.holiday-photo-left .photo { object-position: center 20%; }
+.holiday-photo-left .photo,
 .holiday-photo-right .photo { object-position: center center; }
-
-.pine {
-  position: absolute;
-  pointer-events: none;
-  z-index: 2;
-  height: auto;
-}
-
-.pine-left {
-  left: -6%;
-  bottom: -14%;
-  width: 92%;
-  transform: rotate(-8deg);
-  transform-origin: left bottom;
-}
-
-.pine-right {
-  right: -2%;
-  top: -6%;
-  width: 48%;
-  transform: rotate(4deg);
-  transform-origin: right top;
-}
 
 .holiday-center {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 14px;
+  gap: calc(100cqi * 14 / 1024);
   text-align: center;
-  background: #381d00;
+  background: #3a1700;
   position: relative;
   z-index: 3;
-  padding: 16px 12px;
+  padding: 12px;
 }
 
 .holiday-snow {
   display: block;
-  width: calc(100cqi * 16 / 1400);
-  height: calc(100cqi * 16 / 1400);
-  background: #e0ded8;
+  width: calc(100cqi * 12 / 1024);
+  height: calc(100cqi * 12 / 1024);
+  background: #f6f1ea;
   -webkit-mask: url("/holiday/snowflake.png") center / contain no-repeat;
   mask: url("/holiday/snowflake.png") center / contain no-repeat;
 }
 
 .holiday-title {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   font-family: var(--font-display);
   font-weight: 400;
-  font-size: calc(100cqi * 38 / 1400);
-  line-height: 1.3;
+  font-size: calc(100cqi * 28 / 1024);
+  line-height: 1.12;
   letter-spacing: 0;
-  color: #e8e6de;
-  width: calc(100cqi * 226 / 1400);
+  color: #f6f1ea;
+  width: auto;
   margin: 0;
-  text-wrap: balance;
 }
 
 .holiday-cta {
-  width: calc(100cqi * 189 / 1400);
-  height: calc(100cqi * 40 / 1400);
+  width: calc(100cqi * 148 / 1024);
+  height: calc(100cqi * 30 / 1024);
+  margin-top: calc(100cqi * 6 / 1024);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -517,7 +499,7 @@ h1, h2, h3, h4,
 /* Brands */
 .brand-marquee {
   overflow: hidden;
-  background: #111;
+  background: #000;
 }
 
 .brand-track {
@@ -533,17 +515,17 @@ h1, h2, h3, h4,
   display: grid;
   place-items: center;
   flex: none;
-  width: 20vw;
+  width: 18vw;
   height: 200px;
-  border-right: 6px solid #111;
+  border-right: 2.5vw solid #000;
   text-decoration: none;
 }
 
-.tile-kenneth { background: #1e4e9b; }
-.tile-calvin { background: #6b3a22; }
-.tile-cole { background: #e8e4da; }
-.tile-tommy { background: #0c3f86; }
-.tile-michael { background: #5a3014; }
+.tile-kenneth { background: #001e56; }
+.tile-calvin { background: #3a1700; }
+.tile-cole { background: #e8e6de; }
+.tile-tommy { background: #001e56; }
+.tile-michael { background: #3a1700; }
 
 .brand-word {
   display: block;
@@ -554,7 +536,7 @@ h1, h2, h3, h4,
   line-height: 1;
 }
 
-.word-kenneth { color: #d5d8e0; font-family: var(--font-text); font-size: 18px; font-weight: 500; }
+.word-kenneth { color: #e4e7ee; font-family: var(--font-text); font-size: 18px; font-weight: 500; }
 .word-calvin {
   color: #f0e4d8;
   font-family: var(--font-text);
@@ -564,7 +546,7 @@ h1, h2, h3, h4,
   text-transform: none;
 }
 .word-cole {
-  color: #7a756e;
+  color: #5c5852;
   font-family: var(--font-display);
   font-size: 22px;
   letter-spacing: 0.14em;
@@ -594,7 +576,7 @@ h1, h2, h3, h4,
     linear-gradient(#c8102e 0 34%, #fff 34% 67%, #0c3f86 67%);
   box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.7);
 }
-.word-michael { color: #ddd6ce; font-family: var(--font-text); font-size: 18px; font-weight: 500; }
+.word-michael { color: #f0e6dc; font-family: var(--font-text); font-size: 18px; font-weight: 500; }
 
 @keyframes brand-drift {
   from { transform: translateX(0); }
@@ -872,16 +854,12 @@ h1, h2, h3, h4,
     grid-template-columns: 1fr;
   }
 
-  .holiday-photo-left { aspect-ratio: 345 / 425; }
-  .holiday-photo-right { aspect-ratio: 715 / 425; }
+  .holiday-photo-left { aspect-ratio: 252 / 310; }
+  .holiday-photo-right { aspect-ratio: 536 / 310; }
 
   .holiday-snow { width: 16px; height: 16px; }
 
-  .holiday-title {
-    font-size: 38px;
-    width: 226px;
-    max-width: 100%;
-  }
+  .holiday-title { font-size: 34px; }
 
   .holiday-cta {
     width: 189px;
@@ -893,7 +871,7 @@ h1, h2, h3, h4,
   .campaign { min-height: 520px; }
   .campaign-copy { padding: 32px 16px; }
 
-  .brand-tile { width: 240px; height: 168px; }
+  .brand-tile { width: 240px; height: 168px; border-right-width: 34px; }
 
   .returning {
     grid-template-columns: 1fr;
