@@ -174,7 +174,7 @@ function LookModule({ occasion, occasionName, onSelect }) {
         render={(look, phase) => (
           <figure
             key={phase === "is-out" ? `${look.name}-out` : look.name}
-            className={phase ? `look-photo editorial-frame lined ${phase}` : "look-photo editorial-frame lined"}
+            className={phase ? `look-photo editorial-frame matted ${phase}` : "look-photo editorial-frame matted"}
             style={{ "--shell": look.shell }}
             inert={phase === "is-out" ? true : undefined}
             aria-hidden={phase === "is-out" ? true : undefined}
@@ -281,7 +281,7 @@ export default function App() {
         </section>
         <div className="home">
           <section className="hero" aria-label="Primary hero">
-            <figure className="hero-photo editorial-frame" style={{ "--shell": hero.shell }}>
+            <figure className="hero-photo editorial-frame bound" style={{ "--shell": hero.shell }}>
               <img className="editorial" src={hero.image} alt="" />
               <figcaption className="photo-caption">
                 <button type="button" className="type-cta is-light">
@@ -293,7 +293,7 @@ export default function App() {
 
           <section className="seasonal" aria-label="Seasonal campaign slots">
             <div className="holiday-band">
-              <figure className="holiday-photo editorial-frame">
+              <figure className="holiday-photo editorial-frame bound">
                 <img className="editorial" src="/editorial/holiday-sportcoat.jpg" alt="" />
               </figure>
               <div className="holiday-panel">
@@ -306,7 +306,7 @@ export default function App() {
                 <Flourish className="holiday-scroll" />
                 <button type="button" className="type-cta is-light holiday-cta">{seasonal.cta}</button>
               </div>
-              <figure className="holiday-photo editorial-frame">
+              <figure className="holiday-photo editorial-frame bound">
                 <img className="editorial" src="/editorial/holiday-roulette.jpg" alt="" />
               </figure>
             </div>
@@ -333,17 +333,15 @@ export default function App() {
           </section>
 
           <section className="sale-path" aria-label="Sale path">
-            <figure className="sale-banner editorial-frame" style={{ "--shell": salePath.shell }}>
+            <figure className="sale-banner editorial-frame bound" style={{ "--shell": salePath.shell }}>
               <img className="editorial" src={salePath.image} alt="" style={{ objectPosition: salePath.focus }} />
-              <figcaption className="photo-caption">
+              <figcaption className="photo-caption cloth-panel">
                 <p className="type-h3">{salePath.title}</p>
                 <p className="type-body">{salePath.line}</p>
-                <button type="button" className="type-cta is-light">{salePath.cta}</button>
+                <button type="button" className="type-cta">{salePath.cta}</button>
               </figcaption>
             </figure>
           </section>
-
-          <FlourishRule />
 
           <LookModule occasion={occasion} occasionName={occasionName} onSelect={setOccasionName} />
 
@@ -371,7 +369,7 @@ export default function App() {
           </section>
 
           <section aria-label="Returning visitor">
-            <div className="wire-box">
+            <div className="wire-box heritage-box">
               <p className="wire-note">Shown only to returning visitors</p>
               <h2>{returning.headline}</h2>
               <p>{returning.subhead}</p>
