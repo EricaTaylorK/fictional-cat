@@ -239,7 +239,7 @@ function LookModule({ occasion, occasionName, onSelect }) {
                   </span>
                   <span className="type-h3">{piece.name}</span>
                   <span className="product-price">{piece.price}</span>
-                  <span className="type-cta product-shop">Shop</span>
+                  <span className="type-cta product-shop is-outline">Shop</span>
                 </button>
               ))}
             </div>
@@ -324,7 +324,7 @@ export default function App() {
                 </article>
               ))}
             </div>
-            <button type="button" className="type-cta arrivals-cta">{arrivals.cta}</button>
+            <button type="button" className="type-cta arrivals-cta is-outline">{arrivals.cta}</button>
           </section>
 
           <section className="sale-path" aria-label="Sale path">
@@ -377,7 +377,7 @@ export default function App() {
                   </div>
                 ))}
               </div>
-              <button type="button" className="type-cta">{returning.link}</button>
+              <button type="button" className="type-cta is-outline">{returning.link}</button>
             </div>
           </section>
         </div>

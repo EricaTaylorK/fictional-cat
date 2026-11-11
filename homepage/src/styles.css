@@ -24,6 +24,10 @@
   --space-1: 4px; --space-2: 8px; --space-3: 16px; --space-4: 24px;
   --space-5: 32px; --space-6: 48px; --space-7: 64px;
   --blue-dark: #010962;
+  /* CTA sheet: solid navy, stone, and the outlined navy bar. */
+  --cta-navy: #001e56;
+  --cta-stone: #e8e6de;
+  --cta-outline: #001e56;
   /* Sampled from the editorial shoot: walnut wall set, cream paper set, the navy suiting. */
   --ed-walnut: #4a3122;
   --ed-cream: #efe8dc;
@@ -445,21 +449,27 @@ main { background: var(--ed-cream); }
   min-height: 40px;
   padding: 0 16px;
   border: 0;
-  background: #111;
-  color: #fff;
+  background: var(--cta-navy);
+  color: var(--color-neutral-white);
   font-family: var(--font-display);
   font-weight: 400;
   font-synthesis: none;
-  font-size: 16px;
+  font-size: 14px;
   line-height: 1;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
   text-decoration: none;
 }
 
 .type-cta.is-light {
-  background: #d5d5d5;
-  color: #111;
+  background: var(--cta-stone);
+  color: var(--cta-navy);
+}
+
+.type-cta.is-outline {
+  background: var(--color-neutral-white);
+  color: var(--cta-navy);
+  border: 2px solid var(--cta-outline);
 }
 
 /* One grade for every editorial photo, so the walnut and cream sets read as one shoot. */

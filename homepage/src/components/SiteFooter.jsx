@@ -11,7 +11,7 @@ export default function SiteFooter() {
           <Flourish className="footer-flourish" />
           <h2>Perfect Fit® Rewards</h2>
           <p>Earn points on every purchase and get free shipping, exclusive offers, and more.</p>
-          <button type="button" className="type-cta">Join for free</button>
+          <button type="button" className="type-cta is-outline">Join for free</button>
         </div>
       </div>
       <div className="footer-referral">
