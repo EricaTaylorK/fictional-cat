@@ -53,17 +53,17 @@ export const wedding = {
   deck: "Guest, groom or groomsman, find your look.",
   cta: "Shop wedding",
   chips: [
-    { name: "Guest", shot: "Wedding guest in a styled complete outfit", tone: "guest" },
-    { name: "Groom", shot: "The groom in a styled complete outfit", tone: "groom" },
-    { name: "Groomsman", shot: "A groomsman in a styled complete outfit", tone: "groomsman" },
+    { name: "Guest", shot: "Wedding guest in a styled complete outfit", tone: "guest", photo: "/looks/navy-suit-coffee.jpg", position: "center 30%" },
+    { name: "Groom", shot: "The groom in a styled complete outfit", tone: "groom", photo: "/looks/blue-suit-leaning.jpg", position: "center 20%" },
+    { name: "Groomsman", shot: "A groomsman in a styled complete outfit", tone: "groomsman", photo: "/looks/light-blue-plaid.jpg", position: "center 20%" },
   ],
 };
 
 export const secondaryTiles = [
-  { name: "Work", shot: "Work occasion", tone: "work" },
-  { name: "Prom/Black tie", shot: "Prom/Black tie occasion", tone: "prom" },
-  { name: "Rental", shot: "Rental occasion", tone: "rental" },
-  { name: "Sale", shot: "Sale occasion", tone: "sale-tile" },
+  { name: "Work", shot: "Work occasion", tone: "work", photo: "/looks/gray-check-shirt.jpg", position: "center 25%" },
+  { name: "Prom/Black tie", shot: "Prom/Black tie occasion", tone: "prom", photo: "/looks/charcoal-chair.jpg", position: "center 20%" },
+  { name: "Rental", shot: "Rental occasion", tone: "rental", photo: "/looks/navy-chair-seated.jpg", position: "center 20%" },
+  { name: "Sale", shot: "Sale occasion", tone: "sale-tile", photo: "/looks/navy-check-gifts.jpg", position: "center 25%" },
 ];
 
 export const panel = {
@@ -113,9 +113,9 @@ export const returning = {
   subhead: "The styles you were looking at, right where you left them.",
   link: "View all recently viewed",
   items: [
-    { name: "Placeholder product 01", price: "$000", shot: "Tailored navy suit" },
-    { name: "Placeholder product 02", price: "$000", shot: "White dress shirt" },
-    { name: "Placeholder product 03", price: "$000", shot: "Textured sport coat" },
+    { name: "Placeholder product 01", price: "$000", shot: "Tailored navy suit", photo: "/looks/navy-suit-wood.jpg", position: "center 25%" },
+    { name: "Placeholder product 02", price: "$000", shot: "White dress shirt", photo: "/looks/white-dot-shirt.jpg", position: "center 25%" },
+    { name: "Placeholder product 03", price: "$000", shot: "Textured sport coat", photo: "/looks/sport-coat-detail.jpg", position: "center 35%" },
   ],
 };
 

@@ -203,6 +203,17 @@ h1, h2, h3, h4,
 .ph[data-tone="shoes"] { background: #c6c8c4; }
 .ph[data-tone="recent"] { background: #c5c6c4; }
 
+.ph-photo { background: #2a1d14; }
+
+.ph-photo img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
 .ph-x {
   position: absolute;
   inset: 0;
@@ -376,6 +387,18 @@ h1, h2, h3, h4,
 }
 
 .secondary-tile .ph { position: absolute; inset: 0; }
+
+.secondary-tile.has-photo,
+.secondary-tile.has-photo .t-h4 { color: #fff; }
+
+.secondary-tile.has-photo::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.6) 0%, rgba(0, 0, 0, 0) 45%);
+  pointer-events: none;
+}
 
 .secondary-tile .t-h4 {
   position: absolute;

@@ -25,7 +25,19 @@ function prefersReducedMotion() {
   return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 }
 
-function Placeholder({ label, className = "", tone = "neutral", decorative = false }) {
+function Placeholder({ label, className = "", tone = "neutral", decorative = false, photo, position = "center 22%" }) {
+  if (photo) {
+    return (
+      <div
+        className={`ph ph-photo ${className}`.trim()}
+        role={decorative ? undefined : "img"}
+        aria-label={decorative ? undefined : label}
+        aria-hidden={decorative ? true : undefined}
+      >
+        <img src={photo} alt="" style={{ objectPosition: position }} />
+      </div>
+    );
+  }
   return (
     <div
       className={`ph ${className}`.trim()}
@@ -302,7 +314,7 @@ function OccasionModule() {
             className={index === selected ? "scene-layer is-active" : "scene-layer"}
             aria-hidden={index === selected ? undefined : true}
           >
-            <Placeholder label={item.shot} tone={item.tone} />
+            <Placeholder label={item.shot} tone={item.tone} photo={item.photo} position={item.position} />
           </div>
         ))}
         <div className="occasion-scrim" />
@@ -322,7 +334,7 @@ function OccasionModule() {
                 onClick={() => setSelected(index)}
                 onKeyDown={(event) => moveChip(event, index)}
               >
-                <Placeholder className="chip-thumb" label={item.shot} tone={item.tone} decorative />
+                <Placeholder className="chip-thumb" label={item.shot} tone={item.tone} photo={item.photo} position={item.position} decorative />
                 <span className="chip-name" id={`occasion-chip-label-${index}`}>
                   {item.name}
                 </span>
@@ -343,12 +355,12 @@ function OccasionModule() {
         {secondaryTiles.map((tile) => (
           <a
             key={tile.name}
-            className="secondary-tile"
+            className={tile.photo ? "secondary-tile has-photo" : "secondary-tile"}
             href={`#${tile.name}`}
             aria-label={tile.name}
             onClick={stopNavigation}
           >
-            <Placeholder label={tile.shot} tone={tile.tone} />
+            <Placeholder label={tile.shot} tone={tile.tone} photo={tile.photo} position={tile.position} />
             <span className="t-h4">{tile.name}</span>
           </a>
         ))}
@@ -510,7 +522,7 @@ function Returning() {
           {returning.items.map((item) => (
             <article key={item.name} className="returning-card">
               <div className="returning-frame">
-                <Placeholder label={item.shot} tone="recent" />
+                <Placeholder label={item.shot} tone="recent" photo={item.photo} position={item.position} />
               </div>
               <p className="t-label">{item.name}</p>
               <p className="t-price returning-price">{item.price}</p>
