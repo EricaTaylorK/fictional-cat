@@ -100,6 +100,54 @@ function ArrowIcon() {
   );
 }
 
+function ReassureIcon({ name }) {
+  const common = {
+    viewBox: "0 0 48 48",
+    width: 60,
+    height: 60,
+    fill: "none",
+    stroke: "currentColor",
+    strokeWidth: 1.2,
+    strokeLinecap: "round",
+    strokeLinejoin: "round",
+    "aria-hidden": true,
+    className: "reassure-icon",
+  };
+
+  if (name === "shipping") {
+    return (
+      <svg {...common}>
+        <path d="M24 22 9 15.5 24 9l15 6.5L24 22Z" />
+        <path d="M9 15.5V32l15 6.5L39 32V15.5" />
+        <path d="M24 22v16.5" />
+        <path d="m16.5 12.3 15 6.5" />
+        <path d="M9 15.5 4.5 21 15 25.2M39 15.5 43.5 21 33 25.2" />
+      </svg>
+    );
+  }
+
+  if (name === "returns") {
+    return (
+      <svg {...common}>
+        <path d="M13 33H9V15h22l-1.6-3.2" />
+        <path d="m31 15-3.4 3" />
+        <path d="M31 15h4a4 4 0 0 1 4 4v14a4 4 0 0 1-4 4H13" />
+        <path d="m19 28-6 5 6 5" />
+        <path d="M18 21h12M18 25.5h7" />
+      </svg>
+    );
+  }
+
+  return (
+    <svg {...common}>
+      <path d="M8 19 11 9h26l3 10" />
+      <path d="M8 19c0 2.8 2.2 4.5 5.3 4.5S18.7 21.8 18.7 19c0 2.8 2.4 4.5 5.3 4.5s5.3-1.7 5.3-4.5c0 2.8 2.4 4.5 5.3 4.5S40 21.8 40 19" />
+      <path d="M11 23.5V39h26V23.5" />
+      <path d="M20 39V30h8v9" />
+    </svg>
+  );
+}
+
 function CategoryBand() {
   return (
     <section className="category-band" aria-label="Shop by category">
@@ -118,7 +166,7 @@ function CategoryBand() {
               onClick={stopNavigation}
             >
               <img src={category.image} alt="" />
-              <span className="t-h4">{category.name}</span>
+              <span className="t-label">{category.name}</span>
             </a>
           ))}
         </div>
@@ -579,7 +627,14 @@ export default function App() {
         <BrandTiles />
         <Returning />
         <section className="reassure" aria-label="Reassurance">
-          <p className="t-label">{reassurance.visible}</p>
+          <ul className="reassure-list">
+            {reassurance.items.map((item) => (
+              <li key={item.icon}>
+                <ReassureIcon name={item.icon} />
+                <p className="t-label">{item.text}</p>
+              </li>
+            ))}
+          </ul>
         </section>
       </main>
       <SiteFooter />

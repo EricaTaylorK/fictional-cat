@@ -122,6 +122,11 @@ export const returning = {
 export const reassurance = {
   visible:
     "Free shipping over $99. Free, easy returns to any store or online. Pick up or ship to your store.",
+  items: [
+    { icon: "shipping", text: "Free shipping over $99." },
+    { icon: "returns", text: "Free, easy returns to any store or online." },
+    { icon: "store", text: "Pick up or ship to your store." },
+  ],
   alternates: {
     b: "Shop with confidence: free shipping over $99, free returns anywhere, and pickup or ship to store.",
     c: "Pick up or ship to your store · Free shipping $99+ · Free, easy returns",
