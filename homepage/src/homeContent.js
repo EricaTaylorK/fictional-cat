@@ -101,11 +101,11 @@ export const arrivals = {
 };
 
 export const brands = [
-  { name: "Calvin Klein", descriptor: "Clean, modern essentials", cta: "Shop Calvin Klein" },
-  { name: "Kenneth Cole", descriptor: "Smart, comfortable suiting", cta: "Shop Kenneth Cole" },
-  { name: "Cole Haan", descriptor: "Shoes that finish the look", cta: "Shop Cole Haan" },
-  { name: "Tommy Hilfiger", descriptor: "Classic American style", cta: "Shop Tommy Hilfiger" },
-  { name: "Michael Kors", descriptor: "Polished, modern looks", cta: "Shop Michael Kors" },
+  { id: "kenneth", name: "Kenneth Cole", descriptor: "Smart, comfortable suiting", cta: "Shop Kenneth Cole" },
+  { id: "calvin", name: "Calvin Klein", descriptor: "Clean, modern essentials", cta: "Shop Calvin Klein" },
+  { id: "cole", name: "Cole Haan", descriptor: "Shoes that finish the look", cta: "Shop Cole Haan" },
+  { id: "tommy", name: "Tommy Hilfiger", descriptor: "Classic American style", cta: "Shop Tommy Hilfiger" },
+  { id: "michael", name: "Michael Kors", descriptor: "Polished, modern looks", cta: "Shop Michael Kors" },
 ];
 
 export const returning = {

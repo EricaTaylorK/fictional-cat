@@ -402,20 +402,49 @@ function Campaign({ title, deck, cta, shot, tone, label }) {
   );
 }
 
+function BrandWord({ brand }) {
+  if (brand.id === "tommy") {
+    return (
+      <span className="brand-word word-tommy">
+        <span>Tommy</span>
+        <span className="tommy-flag" aria-hidden="true" />
+        <span>Hilfiger</span>
+      </span>
+    );
+  }
+  if (brand.id === "cole") {
+    return (
+      <span className="brand-word word-cole">
+        <span>Cole Haan</span>
+        <span className="word-est">Est. 1928</span>
+      </span>
+    );
+  }
+  return <span className={`brand-word word-${brand.id}`}>{brand.name}</span>;
+}
+
 function BrandTiles() {
+  const loop = [...brands, ...brands];
   return (
-    <section aria-label="Brands">
-      <ul className="brand-grid">
-        {brands.map((brand) => (
-          <li key={brand.name}>
-            <h3 className="t-h3 brand-word">{brand.name}</h3>
-            <p className="t-label">{brand.descriptor}</p>
-            <a className="t-link" href={`#${brand.name}`} onClick={stopNavigation}>
-              {brand.cta}
+    <section className="brand-marquee" aria-label="Brands">
+      <div className="brand-track">
+        {loop.map((brand, index) => {
+          const clone = index >= brands.length;
+          return (
+            <a
+              key={`${brand.id}-${index}`}
+              className={`brand-tile tile-${brand.id}`}
+              href={`#${brand.id}`}
+              aria-label={clone ? undefined : brand.cta}
+              aria-hidden={clone ? true : undefined}
+              tabIndex={clone ? -1 : undefined}
+              onClick={stopNavigation}
+            >
+              <BrandWord brand={brand} />
             </a>
-          </li>
-        ))}
-      </ul>
+          );
+        })}
+      </div>
     </section>
   );
 }
