@@ -1,5 +1,5 @@
 :root {
-  --font-display: "Zilla Slab", Rockwell, "Rockwell Nova", Georgia, serif;
+  --font-display: "Orelega One", Georgia, serif;
   --font-text: "DM Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
   --font-accent: "Ruder Plakat", "DM Sans", system-ui, sans-serif;
   --step-hero: clamp(3.25rem, 2.4577rem + 3.3803vw, 5.5rem);
@@ -51,7 +51,7 @@ a { color: inherit; }
 h1, h2, h3, h4,
 .t-hero, .t-h2, .t-h3, .t-h4 {
   font-family: var(--font-display);
-  font-weight: 600;
+  font-weight: 400;
   text-wrap: balance;
   margin: 0;
   color: var(--navy);
@@ -957,7 +957,7 @@ h1, h2, h3, h4,
   align-items: baseline;
   gap: 0.28em;
   font-family: var(--font-display);
-  font-weight: 600;
+  font-weight: 400;
   font-size: clamp(36px, 4.5cqi, 64px);
   line-height: 1;
   letter-spacing: 0;
@@ -1128,7 +1128,7 @@ h1, h2, h3, h4,
   margin: 0;
   font-family: var(--font-display);
   font-size: clamp(1.75rem, 1.5rem + 0.6vw, 2.125rem);
-  font-weight: 600;
+  font-weight: 400;
   line-height: 1.15;
   letter-spacing: 0;
   color: var(--navy);
