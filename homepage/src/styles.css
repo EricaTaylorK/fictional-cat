@@ -899,50 +899,40 @@ h1, h2, h3, h4,
 
 .occasion-scene :focus-visible { outline-color: #fff; }
 
-/* Holiday banner — the only module that uses this layout */
+/* Holiday video hero */
 .holiday { background: #3a1700; }
 
 .holiday-banner {
-  width: min(100%, 1400px);
-  margin: 0 auto;
-  aspect-ratio: 1024 / 310;
-  display: grid;
-  grid-template-columns: 252fr 236fr 536fr;
-  background: #3a1700;
   position: relative;
+  width: 100%;
+  aspect-ratio: 1440 / 500;
+  overflow: hidden;
+  background: #3a1700;
   container-type: inline-size;
 }
 
-.holiday-photo {
-  position: relative;
-  overflow: hidden;
-  min-width: 0;
-  min-height: 0;
-}
-
-.holiday-photo .photo {
+.holiday-video {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
-  object-fit: cover;
-  display: block;
+  border: none;
+  pointer-events: none;
 }
 
-.holiday-photo-left .photo,
-.holiday-photo-right .photo { object-position: center center; }
-
 .holiday-center {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: calc(100cqi * 14 / 1024);
   text-align: center;
-  background: #3a1700;
-  position: relative;
-  z-index: 3;
+  background: transparent;
   padding: 12px;
+  pointer-events: none;
 }
 
 .holiday-snow {
@@ -969,6 +959,9 @@ h1, h2, h3, h4,
 }
 
 .holiday-cta {
+  position: relative;
+  z-index: 3;
+  pointer-events: auto;
   width: calc(100cqi * 148 / 1024);
   height: calc(100cqi * 30 / 1024);
   margin-top: calc(100cqi * 6 / 1024);
@@ -1512,11 +1505,13 @@ h1, h2, h3, h4,
   .holiday-banner {
     width: 100%;
     aspect-ratio: auto;
-    grid-template-columns: 1fr;
   }
 
-  .holiday-photo-left { aspect-ratio: 252 / 310; }
-  .holiday-photo-right { aspect-ratio: 536 / 310; }
+  .holiday-center {
+    position: relative;
+    min-height: 240px;
+    padding: 28px 16px 32px;
+  }
 
   .holiday-snow { width: 16px; height: 16px; }
 
@@ -1526,8 +1521,6 @@ h1, h2, h3, h4,
     width: 189px;
     height: 40px;
   }
-
-  .holiday-center { padding: 28px 16px 32px; }
 
   .campaign { min-height: 520px; }
   .campaign-copy { padding: 32px 16px; }
