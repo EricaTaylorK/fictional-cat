@@ -151,7 +151,7 @@ export const brands = [
 export const returning = {
   headline: "Pick up where you left off",
   subhead: "The styles you were looking at, right where you left them.",
-  link: "View all recently viewed",
+  link: "Recently Viewed",
   items: [
     { name: "Placeholder product 01", price: "$000", shot: "Tailored navy suit", photo: "/looks/navy-suit-wood.jpg", position: "center 8%", zoom: 1.7 },
     { name: "Placeholder product 02", price: "$000", shot: "White dress shirt", photo: "/looks/white-dot-shirt.jpg", position: "center 12%", zoom: 1.55 },
@@ -163,9 +163,9 @@ export const reassurance = {
   visible:
     "Free shipping over $99. Free, easy returns to any store or online. Pick up or ship to your store.",
   items: [
-    { icon: "/lottie/truck.json", text: "Free shipping over $99." },
-    { icon: "/lottie/inbox.json", text: "Free, easy returns to any store or online." },
-    { icon: "/lottie/shopping-bag.json", text: "Pick up or ship to your store." },
+    { icon: "/lottie/truck.json", title: "Free shipping", text: "On orders over $99." },
+    { icon: "/lottie/inbox.json", title: "Easy returns", text: "Free, to any store or online." },
+    { icon: "/lottie/shopping-bag.json", title: "Store pickup", text: "Pick up or ship to your store." },
   ],
   alternates: {
     b: "Shop with confidence: free shipping over $99, free returns anywhere, and pickup or ship to store.",

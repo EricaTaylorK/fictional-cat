@@ -328,7 +328,7 @@ function OccasionModule() {
               setOpen(true);
             }}
           >
-            You click me
+            Shop Gifts
           </a>
         </div>
         <div className="gifts-suitcase">
@@ -602,7 +602,8 @@ export default function App() {
             {reassurance.items.map((item) => (
               <li key={item.icon}>
                 <ReassureIcon src={item.icon} />
-                <p className="t-label">{item.text}</p>
+                <h3 className="reassure-title">{item.title}</h3>
+                <p className="t-body">{item.text}</p>
               </li>
             ))}
           </ul>

@@ -165,6 +165,7 @@ h1, h2, h3, h4,
   align-items: center;
   justify-content: center;
   min-height: 64px;
+  margin: 32px 0;
   padding: 8px 28px;
   background:
     linear-gradient(rgba(20, 16, 10, 0.25), rgba(20, 16, 10, 0.25)),
@@ -754,35 +755,36 @@ h1, h2, h3, h4,
   color: #f6f1ea;
 }
 
+.gifts-copy { width: min(22rem, 28%); }
+
 .gifts-title {
   margin: 0;
   color: #f6f1ea;
   font-family: var(--font-display);
   font-weight: 400;
-  font-size: 2.4cqi;
-  line-height: 1.1;
-  letter-spacing: 0;
-  white-space: nowrap;
+  font-size: var(--step-h2);
+  line-height: 1.05;
+  letter-spacing: -0.005em;
+  text-wrap: balance;
 }
 
 .gifts-deck {
-  margin: 2.3cqi 0 0;
-  max-width: 15.4cqi;
+  margin: 16px 0 0;
+  max-width: 22ch;
   color: #f6f1ea;
   font-family: var(--font-text);
-  font-size: 1.42cqi;
+  font-size: 20px;
   font-weight: 400;
-  line-height: 1.38;
+  line-height: 1.4;
 }
 
 .gifts-cta {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  margin-top: 3cqi;
-  width: 13cqi;
-  height: 2.75cqi;
-  min-height: 36px;
+  margin-top: 24px;
+  min-height: 48px;
+  padding: 0 28px;
   background: #ebe6dd;
   color: var(--navy);
   font-family: var(--font-accent);
@@ -897,15 +899,6 @@ h1, h2, h3, h4,
   max-width: min(680px, 62%);
 }
 
-.holiday-lockup::before {
-  content: "";
-  position: absolute;
-  z-index: -1;
-  inset: -28px -64px -24px -40px;
-  background: radial-gradient(ellipse at 18% 72%, rgba(8, 12, 16, 0.66), rgba(8, 12, 16, 0.28) 52%, transparent 74%);
-  pointer-events: none;
-}
-
 .holiday-title {
   margin: 0;
   color: #fff;
@@ -965,7 +958,7 @@ h1, h2, h3, h4,
 /* New arrivals */
 .arrivals {
   background: #fff;
-  padding: 28px 0 56px;
+  padding: 32px 0 0;
 }
 
 .arrivals-heading {
@@ -1216,8 +1209,8 @@ h1, h2, h3, h4,
   font-family: var(--font-accent);
   font-size: 14px;
   font-weight: 600;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  text-transform: none;
 }
 
 .returning-stage { position: relative; min-width: 0; }
@@ -1291,7 +1284,8 @@ h1, h2, h3, h4,
 .reassure {
   padding: clamp(36px, 4.5vw, 64px) 24px clamp(40px, 5vw, 72px);
   text-align: center;
-  background: #fff;
+  background: var(--navy);
+  color: #f6f1ea;
 }
 
 .reassure-list {
@@ -1311,14 +1305,26 @@ h1, h2, h3, h4,
   gap: 14px;
 }
 
-.reassure-icon { width: 60px; height: 60px; color: var(--navy); }
+.reassure-icon {
+  width: 60px;
+  height: 60px;
+  color: #f6f1ea;
+  filter: brightness(0) invert(0.97);
+}
 
-.reassure-icon svg path { stroke: var(--navy); }
+.reassure-title {
+  margin: 0;
+  color: #f6f1ea;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: var(--step-h4);
+  line-height: 1.15;
+}
 
 .reassure p {
   margin: 0 auto;
   max-width: 22ch;
-  color: var(--navy);
+  color: #efe8dc;
   text-wrap: balance;
 }
 
@@ -1482,9 +1488,11 @@ h1, h2, h3, h4,
   .gifts-copy {
     position: static;
     transform: none;
+    width: auto;
+    max-width: 20rem;
   }
 
-  .gifts-title { font-size: 32px; }
+  .gifts-title { font-size: var(--step-h3); }
 
   .gifts-deck {
     margin-top: 14px;
@@ -1553,7 +1561,7 @@ h1, h2, h3, h4,
   .campaign { min-height: 520px; }
   .campaign-copy { padding: 32px 16px; }
 
-  .arrivals { padding: 22px 0 36px; }
+  .arrivals { padding: 22px 0 0; }
 
   .arrivals-heading {
     margin-bottom: 14px;
@@ -1632,7 +1640,7 @@ h1, h2, h3, h4,
 .sale-panel {
   background: transparent;
   color: var(--navy);
-  padding: clamp(36px, 4vw, 56px) clamp(16px, 2vw, 28px) clamp(40px, 5vw, 64px);
+  padding: 0 clamp(16px, 2vw, 28px) clamp(40px, 5vw, 64px);
 }
 
 .sale-heading {
@@ -1714,7 +1722,7 @@ h1, h2, h3, h4,
 
   .ship-support { font-size: 10px; letter-spacing: 0.12em; }
 
-  .sale-panel { padding: 28px 16px 36px; }
+  .sale-panel { padding: 0 16px 36px; }
 
   .sale-heading { margin-bottom: 14px; }
 
