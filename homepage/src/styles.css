@@ -1,6 +1,7 @@
 :root {
   --font-display: "Faculty Glyphic", Georgia, serif;
-  --font-text: "DM Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-text: "Barlow", system-ui, -apple-system, sans-serif;
+  --font-ui: "DM Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
   --font-accent: "Ruder Plakat", "DM Sans", system-ui, sans-serif;
   --step-hero: clamp(3.25rem, 2.4577rem + 3.3803vw, 5.5rem);
   --step-h2: clamp(2.5rem, 2.3239rem + 0.7512vw, 3rem);
@@ -287,6 +288,7 @@ h1, h2, h3, h4,
   background: #fff;
   border-bottom: 1px solid #ececec;
   color: #232323;
+  font-family: var(--font-ui);
 }
 
 .promo {
@@ -298,7 +300,7 @@ h1, h2, h3, h4,
 
 .promo p {
   margin: 0;
-  font-family: var(--font-text);
+  font-family: var(--font-ui);
   font-size: 12px;
   font-weight: 600;
   line-height: 18px;
@@ -377,7 +379,7 @@ h1, h2, h3, h4,
   height: 100%;
   outline: none;
   background: transparent;
-  font-family: var(--font-text);
+  font-family: var(--font-ui);
   font-size: 14px;
   color: #232323;
 }
@@ -398,7 +400,7 @@ h1, h2, h3, h4,
   background: transparent;
   padding: 14px 16px;
   text-align: left;
-  font-family: var(--font-text);
+  font-family: var(--font-ui);
   font-size: 14px;
   font-weight: 500;
   letter-spacing: 0;
@@ -409,6 +411,7 @@ h1, h2, h3, h4,
   background: #fff;
   color: #232323;
   border-top: 1px solid #ececec;
+  font-family: var(--font-ui);
 }
 
 .footer-band { background: var(--navy); color: #fff; }
@@ -423,7 +426,7 @@ h1, h2, h3, h4,
 
 .footer-band h2,
 .footer-referral h2 {
-  font-family: var(--font-text);
+  font-family: var(--font-ui);
   font-weight: 500;
   letter-spacing: 0;
   text-wrap: wrap;
@@ -471,7 +474,7 @@ h1, h2, h3, h4,
   border-radius: 0;
   background: transparent;
   padding: 0;
-  font-family: var(--font-text);
+  font-family: var(--font-ui);
   font-size: 14px;
   font-weight: 600;
   letter-spacing: 0;
@@ -511,7 +514,7 @@ h1, h2, h3, h4,
 
 .footer-columns p {
   margin: 0 0 8px;
-  font-family: var(--font-text);
+  font-family: var(--font-ui);
   font-weight: 600;
   color: #232323;
 }
@@ -601,7 +604,7 @@ h1, h2, h3, h4,
     border-radius: 0 8px 0 8px;
     background: var(--navy);
     color: #fff;
-    font-family: var(--font-text);
+    font-family: var(--font-ui);
     font-size: 12px;
     font-weight: 600;
     letter-spacing: 0.04em;
@@ -624,7 +627,7 @@ h1, h2, h3, h4,
     border-radius: 0;
     background: transparent;
     padding: 8px 10px;
-    font-family: var(--font-text);
+    font-family: var(--font-ui);
     font-size: 13px;
     font-weight: 500;
     letter-spacing: 0;
@@ -652,7 +655,7 @@ h1, h2, h3, h4,
     background: transparent;
     padding: 6px 2px;
     color: #232323;
-    font-family: var(--font-text);
+    font-family: var(--font-ui);
     font-size: 14px;
     font-weight: 500;
     letter-spacing: 0;
