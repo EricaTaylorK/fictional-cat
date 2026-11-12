@@ -159,7 +159,8 @@ function CategoryBand() {
               href={`#${category.name}`}
               onClick={stopNavigation}
             >
-              {category.name}
+              <span className="category-icon" aria-hidden="true" />
+              <span className="category-label">{category.name}</span>
             </a>
           ))}
         </div>
