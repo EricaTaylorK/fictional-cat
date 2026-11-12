@@ -169,6 +169,7 @@ h1, h2, h3, h4,
   display: flex;
   align-items: center;
   justify-content: center;
+  text-align: center;
   min-height: 64px;
   margin: 32px 0 var(--section);
   padding: 8px var(--gutter);
@@ -183,6 +184,8 @@ h1, h2, h3, h4,
   flex-wrap: wrap;
   align-items: baseline;
   justify-content: center;
+  width: 100%;
+  text-align: center;
   gap: 4px 14px;
   margin: 0;
   min-width: 0;
@@ -190,7 +193,10 @@ h1, h2, h3, h4,
 
 .ship-kicker,
 .ship-offer,
-.ship-support { white-space: nowrap; }
+.ship-support {
+  text-align: center;
+  white-space: nowrap;
+}
 
 .ship-kicker {
   font-family: var(--font-text);
@@ -1815,6 +1821,7 @@ h1, h2, h3, h4,
 @media (max-width: 767px) {
   .ship-copy {
     justify-content: center;
+    text-align: center;
     column-gap: 8px;
     row-gap: 2px;
   }
