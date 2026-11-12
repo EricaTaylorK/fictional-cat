@@ -1067,7 +1067,7 @@ h1, h2, h3, h4,
 .brands {
   overflow: hidden;
   background: var(--cream);
-  padding: 48px 0;
+  padding: 40px 0 48px;
 }
 
 .brands-inner {
@@ -1077,7 +1077,7 @@ h1, h2, h3, h4,
   display: grid;
   grid-template-columns: minmax(0, 1.05fr) minmax(260px, 0.95fr);
   column-gap: clamp(28px, 4vw, 56px);
-  row-gap: 32px;
+  row-gap: 0;
   align-items: center;
 }
 
@@ -1088,7 +1088,7 @@ h1, h2, h3, h4,
   aspect-ratio: 1.62 / 1;
   background-color: var(--cream);
   background-image: url("/brands/holiday-belts.jpg");
-  background-position: center 6%;
+  background-position: center 42%;
   background-size: 100% auto;
   background-repeat: no-repeat;
   background-blend-mode: multiply;
@@ -1145,13 +1145,15 @@ h1, h2, h3, h4,
 
 .brands-row {
   grid-column: 1 / -1;
+  position: relative;
+  z-index: 1;
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: clamp(16px, 2vw, 28px);
+  gap: 12px;
   align-items: center;
   list-style: none;
   width: 100%;
-  margin: 0;
+  margin: -62px 0 0;
   padding: 0;
 }
 
@@ -1160,19 +1162,20 @@ h1, h2, h3, h4,
   align-items: center;
   justify-content: center;
   min-width: 0;
-  height: 100%;
 }
 
 .brand-circle {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 100%;
-  min-height: 44px;
+  width: 124px;
+  height: 124px;
+  border-radius: 50%;
+  border: 1px solid var(--navy);
   background: var(--cream);
   color: var(--navy);
   text-decoration: none;
-  padding: 4px 8px;
+  padding: 16px;
 }
 
 .brand-word {
@@ -1181,55 +1184,54 @@ h1, h2, h3, h4,
   text-align: center;
   color: var(--navy);
   font-weight: 400;
-  line-height: 1.1;
-  white-space: nowrap;
+  line-height: 1.15;
+  text-wrap: balance;
 }
 
 .word-kenneth {
   font-family: var(--font-text);
-  font-size: clamp(13px, 1.05vw, 15px);
+  font-size: 12px;
   font-weight: 600;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
 }
 
 .word-calvin {
   font-family: var(--font-text);
-  font-size: clamp(17px, 1.5vw, 22px);
+  font-size: 16px;
   font-weight: 400;
   letter-spacing: 0.01em;
 }
 
 .word-cole {
   font-family: var(--font-display);
-  font-size: clamp(14px, 1.2vw, 18px);
-  letter-spacing: 0.05em;
+  font-size: 13px;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
 }
 
 .word-est {
   display: block;
-  margin-top: 4px;
+  margin-top: 3px;
   font-family: var(--font-text);
-  font-size: 9px;
+  font-size: 8px;
   font-weight: 400;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
 }
 
 .word-tommy {
   font-family: var(--font-text);
-  font-size: clamp(13px, 1.05vw, 15px);
+  font-size: 11px;
   font-weight: 700;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
 }
 
 .word-michael {
   font-family: var(--font-display);
-  font-size: clamp(15px, 1.2vw, 18px);
+  font-size: 15px;
   letter-spacing: 0.01em;
-  white-space: nowrap;
 }
 
 /* Returning visitor */
@@ -1617,14 +1619,14 @@ h1, h2, h3, h4,
   .arrival-caption { font-size: 16px; }
 
   .brands {
-    padding: 48px 0;
+    padding: 32px 0 40px;
   }
 
   .brands-inner {
     display: flex;
     flex-direction: column;
     align-items: stretch;
-    gap: 24px;
+    gap: 20px;
     padding-top: 0;
   }
 
@@ -1643,11 +1645,12 @@ h1, h2, h3, h4,
   .brands-deck { max-width: 34ch; }
 
   .brands-row {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
     width: 100%;
-    margin: 8px 0 0;
-    gap: 8px 12px;
+    margin: -28px 0 0;
+    gap: 16px 20px;
     overflow: visible;
   }
 
@@ -1657,12 +1660,16 @@ h1, h2, h3, h4,
   }
 
   .brands-row li:last-child {
-    grid-column: 1 / -1;
-    width: min(100%, 180px);
-    margin-inline: auto;
+    grid-column: auto;
+    width: auto;
+    margin-inline: 0;
   }
 
-  .brand-circle { width: 100%; }
+  .brand-circle {
+    width: 108px;
+    height: 108px;
+    padding: 14px;
+  }
 
   .returning {
     grid-template-columns: 1fr;
