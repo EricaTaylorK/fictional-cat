@@ -1516,6 +1516,9 @@ h1, h2, h3, h4,
     transform: none;
     width: auto;
     max-width: 20rem;
+    margin-inline: auto;
+    align-items: center;
+    text-align: center;
   }
 
   .gifts-title { font-size: var(--step-h3); }
