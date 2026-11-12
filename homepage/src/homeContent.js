@@ -73,8 +73,8 @@ export const panel = {
 };
 
 export const hero = {
-  headline: "Holiday party, handled.",
-  cta: "Shop holiday looks",
+  headline: "Holiday Party, Handled.",
+  cta: "Shop Holiday Looks",
   leftAlt: "Man in a navy suit standing beside holiday gifts",
   rightAlt: "Three men dressed for a holiday party beside a fireplace",
 };
@@ -89,8 +89,8 @@ export const sale = {
     position: "center",
   },
   tiles: [
-    { id: "sale-suits", caption: "shop suits", label: "Shop suits on sale", photo: "/arrivals/joe-joseph-abboud-suit-mocha.jpg", position: "center" },
-    { id: "sale-dress-shirts", caption: "shop dress shirts", label: "Shop dress shirts on sale", photo: "/arrivals/awearness-kenneth-cole-shirt-mid-blue.jpg", position: "center" },
+    { id: "sale-suits", caption: "shop suits", label: "Shop suits on sale", photo: "/arrivals/joe-joseph-abboud-suit-mocha.jpg", position: "center 15%" },
+    { id: "sale-dress-shirts", caption: "shop dress shirts", label: "Shop dress shirts on sale", photo: "/arrivals/awearness-kenneth-cole-shirt-mid-blue.jpg", position: "center 12%" },
     { id: "sale-shoes", caption: "shop shoes", label: "Shop shoes on sale", photo: "/arrivals/calvin-klein-monk-strap-black.jpg", position: "center" },
     { id: "sale-sport-coats", caption: "shop sport coats", label: "Shop sport coats on sale", photo: "/arrivals/joseph-abboud-sport-coat-light-brown.jpg", position: "center" },
   ],
@@ -163,9 +163,9 @@ export const reassurance = {
   visible:
     "Free shipping over $99. Free, easy returns to any store or online. Pick up or ship to your store.",
   items: [
-    { icon: "shipping", text: "Free shipping over $99." },
-    { icon: "returns", text: "Free, easy returns to any store or online." },
-    { icon: "store", text: "Pick up or ship to your store." },
+    { icon: "/lottie/truck.json", text: "Free shipping over $99." },
+    { icon: "/lottie/inbox.json", text: "Free, easy returns to any store or online." },
+    { icon: "/lottie/shopping-bag.json", text: "Pick up or ship to your store." },
   ],
   alternates: {
     b: "Shop with confidence: free shipping over $99, free returns anywhere, and pickup or ship to store.",

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import lottie from "lottie-web/build/player/lottie_light";
 import SiteFooter from "./components/SiteFooter.jsx";
 import SiteHeader from "./components/SiteHeader.jsx";
 import {
@@ -99,52 +100,23 @@ function ArrowIcon() {
   );
 }
 
-function ReassureIcon({ name }) {
-  const common = {
-    viewBox: "0 0 48 48",
-    width: 60,
-    height: 60,
-    fill: "none",
-    stroke: "currentColor",
-    strokeWidth: 1.2,
-    strokeLinecap: "round",
-    strokeLinejoin: "round",
-    "aria-hidden": true,
-    className: "reassure-icon",
-  };
+function ReassureIcon({ src }) {
+  const ref = useRef(null);
 
-  if (name === "shipping") {
-    return (
-      <svg {...common}>
-        <path d="M24 22 9 15.5 24 9l15 6.5L24 22Z" />
-        <path d="M9 15.5V32l15 6.5L39 32V15.5" />
-        <path d="M24 22v16.5" />
-        <path d="m16.5 12.3 15 6.5" />
-        <path d="M9 15.5 4.5 21 15 25.2M39 15.5 43.5 21 33 25.2" />
-      </svg>
-    );
-  }
+  useEffect(() => {
+    const reduce = prefersReducedMotion();
+    const animation = lottie.loadAnimation({
+      container: ref.current,
+      renderer: "svg",
+      loop: true,
+      autoplay: !reduce,
+      path: src,
+    });
+    if (reduce) animation.addEventListener("DOMLoaded", () => animation.goToAndStop(0, true));
+    return () => animation.destroy();
+  }, [src]);
 
-  if (name === "returns") {
-    return (
-      <svg {...common}>
-        <path d="M13 33H9V15h22l-1.6-3.2" />
-        <path d="m31 15-3.4 3" />
-        <path d="M31 15h4a4 4 0 0 1 4 4v14a4 4 0 0 1-4 4H13" />
-        <path d="m19 28-6 5 6 5" />
-        <path d="M18 21h12M18 25.5h7" />
-      </svg>
-    );
-  }
-
-  return (
-    <svg {...common}>
-      <path d="M8 19 11 9h26l3 10" />
-      <path d="M8 19c0 2.8 2.2 4.5 5.3 4.5S18.7 21.8 18.7 19c0 2.8 2.4 4.5 5.3 4.5s5.3-1.7 5.3-4.5c0 2.8 2.4 4.5 5.3 4.5S40 21.8 40 19" />
-      <path d="M11 23.5V39h26V23.5" />
-      <path d="M20 39V30h8v9" />
-    </svg>
-  );
+  return <div ref={ref} className="reassure-icon" aria-hidden="true" />;
 }
 
 function CategoryBand() {
@@ -331,7 +303,6 @@ function OccasionModule() {
   const [open, setOpen] = useState(() => panelRequested());
   const wasOpen = useRef(false);
   const groom = wedding.chips.find((item) => item.name === "Groom") ?? wedding.chips[0];
-  const guest = wedding.chips.find((item) => item.name === "Guest") ?? wedding.chips[1];
 
   useEffect(() => {
     if (open) {
@@ -343,26 +314,32 @@ function OccasionModule() {
   }, [open]);
 
   return (
-    <section className="occasion" aria-label={wedding.headline}>
-      <div className="occasion-band">
-        <div className="occasion-stamp">
-          <div className="occasion-card-wrap">
-            <div className="occasion-card">
-              <h2 className="t-h2 occasion-title">{wedding.headline}</h2>
-              <p className="occasion-deck">{wedding.deck}</p>
-              <button type="button" className="occasion-cta" ref={ctaRef} onClick={() => setOpen(true)}>
-                {wedding.cta}
-              </button>
-            </div>
-            <span className="occasion-seal" aria-hidden="true">MW</span>
-          </div>
+    <section className="occasion" aria-label="Gifts He'll Love">
+      <div className="gifts-band">
+        <div className="gifts-copy">
+          <h2 className="gifts-title">Gifts He’ll Love</h2>
+          <p className="gifts-deck">Find a thoughtful gift that fits his style—and every occasion.</p>
+          <a
+            className="gifts-cta"
+            href="#gifts"
+            ref={ctaRef}
+            onClick={(event) => {
+              stopNavigation(event);
+              setOpen(true);
+            }}
+          >
+            You click me
+          </a>
         </div>
-        <figure className="occasion-photo">
-          <img src={groom.photo} alt={groom.shot} style={{ objectPosition: groom.position }} />
-        </figure>
-        <figure className="occasion-photo">
-          <img src={guest.photo} alt={guest.shot} style={{ objectPosition: guest.position }} />
-        </figure>
+        <div className="gifts-suitcase">
+          <img src="/gifts/suitcase.jpg" alt="Open suitcase packed with scarves, gloves, and a knit hat" />
+        </div>
+        <div className="gifts-still-wrap">
+          <div className="gifts-still">
+            <img src="/gifts/still.jpg" alt="Fragrance bottles and a Man Bar soap beside a sprig of cedar" />
+          </div>
+          <img className="gifts-seal" src="/gifts/seal.png" alt="" aria-hidden="true" />
+        </div>
       </div>
       {open ? (
         <ShopPanel
@@ -381,7 +358,7 @@ function HolidayBanner() {
       <div className="holiday-banner">
         <video
           className="holiday-video"
-          src="/holiday/vibe-floor-night.mp4"
+          src="/holiday/holiday-party.mp4"
           autoPlay
           muted
           loop
@@ -390,14 +367,12 @@ function HolidayBanner() {
           aria-hidden="true"
         />
         <div className="holiday-center">
-          <span className="holiday-snow" aria-hidden="true" />
-          <h1 className="holiday-title">
-            <span>Holiday Party,</span>
-            <span>Handled.</span>
-          </h1>
-          <a className="holiday-cta" href="#holiday" onClick={stopNavigation}>
-            {hero.cta}
-          </a>
+          <div className="holiday-lockup">
+            <h1 className="holiday-title">Holiday Party, Handled.</h1>
+            <a className="holiday-cta" href="#holiday" onClick={stopNavigation}>
+              {hero.cta}
+            </a>
+          </div>
         </div>
       </div>
     </section>
@@ -626,7 +601,7 @@ export default function App() {
           <ul className="reassure-list">
             {reassurance.items.map((item) => (
               <li key={item.icon}>
-                <ReassureIcon name={item.icon} />
+                <ReassureIcon src={item.icon} />
                 <p className="t-label">{item.text}</p>
               </li>
             ))}
