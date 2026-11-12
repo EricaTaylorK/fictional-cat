@@ -733,125 +733,119 @@ h1, h2, h3, h4,
 
 /* Occasion */
 .occasion {
-  position: relative;
-  z-index: 1;
-  isolation: isolate;
-  color: #efe8dc;
-  background-color: #2a100c;
-}
-
-.occasion::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  background:
-    linear-gradient(rgba(92, 32, 16, 0.28), rgba(58, 18, 10, 0.4)),
-    url("/looks/navy-suit-wood.jpg") 100% 6% / 380% auto no-repeat;
-  filter: brightness(0.62) saturate(1.55) contrast(1.25);
+  background: var(--cream);
+  color: var(--navy);
 }
 
 .occasion-band {
-  position: relative;
-  z-index: 1;
   display: grid;
-  grid-template-columns: minmax(240px, 0.85fr) minmax(280px, 1.15fr) auto;
-  align-items: center;
-  gap: 48px 56px;
-  max-width: 1440px;
-  margin: 0 auto;
-  padding: 64px 56px;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1.08fr);
+  gap: 8px;
+  align-items: stretch;
+  height: 540px;
 }
 
-.occasion-copy {
+.occasion-stamp {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  height: 100%;
+  padding: 32px 26px;
+  background: url("/banners/tweed.jpg") center / cover no-repeat;
+}
+
+.occasion-card-wrap {
+  position: relative;
+  width: 100%;
+}
+
+.occasion-card {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 16px;
-  text-align: left;
-  min-width: 0;
+  gap: 14px;
+  width: 100%;
+  padding: 42px 32px 48px;
+  background: #f4efe6;
+  color: var(--navy);
+  clip-path: polygon(
+    0% 5%, 5% 0%, 10% 5%, 15% 0%, 20% 5%, 25% 0%, 30% 5%, 35% 0%, 40% 5%, 45% 0%, 50% 5%, 55% 0%, 60% 5%, 65% 0%, 70% 5%, 75% 0%, 80% 5%, 85% 0%, 90% 5%, 95% 0%, 100% 5%,
+    100% 8%, 95% 14%, 100% 20%, 95% 26%, 100% 32%, 95% 38%, 100% 44%, 95% 50%, 100% 56%, 95% 62%, 100% 68%, 95% 74%, 100% 80%, 95% 86%, 100% 92%, 100% 95%,
+    95% 100%, 90% 95%, 85% 100%, 80% 95%, 75% 100%, 70% 95%, 65% 100%, 60% 95%, 55% 100%, 50% 95%, 45% 100%, 40% 95%, 35% 100%, 30% 95%, 25% 100%, 20% 95%, 15% 100%, 10% 95%, 5% 100%, 0% 95%,
+    0% 92%, 5% 86%, 0% 80%, 5% 74%, 0% 68%, 5% 62%, 0% 56%, 5% 50%, 0% 44%, 5% 38%, 0% 32%, 5% 26%, 0% 20%, 5% 14%, 0% 8%
+  );
 }
 
-.occasion-copy .t-h2,
-.occasion-copy .t-deck { color: #efe8dc; }
+.occasion-title {
+  color: var(--navy);
+  font-size: clamp(36px, 2.6vw, 46px);
+  line-height: 1.05;
+}
 
-.occasion-copy .t-deck {
-  max-width: 28ch;
+.occasion-deck {
+  margin: 0;
+  max-width: 22ch;
+  color: var(--navy);
+  font-family: var(--font-text);
   font-size: 16px;
+  font-weight: 400;
   line-height: 1.45;
 }
 
-.occasion-link {
+.occasion-cta {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  margin-top: 12px;
+  margin-top: 6px;
   min-height: 44px;
-  padding: 0 22px;
+  padding: 0 18px;
   border: 0;
-  background: #fff;
-  color: var(--navy);
+  background: var(--navy);
+  color: #efe8dc;
   font-family: var(--font-accent);
   font-size: 14px;
   font-weight: 600;
   letter-spacing: 0.12em;
   line-height: 1;
   text-transform: uppercase;
-  text-decoration: none;
-  border-radius: 0 8px 0 8px;
   cursor: pointer;
 }
 
-.occasion-portrait {
-  width: 100%;
-  height: 620px;
-  min-width: 0;
-  overflow: hidden;
-  background: #d5d5d5;
+.occasion-seal {
+  position: absolute;
+  z-index: 1;
+  left: -16px;
+  bottom: -14px;
+  display: grid;
+  place-items: center;
+  width: 68px;
+  height: 68px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 32%, #c12a34 0%, #8d1822 58%, #5e0e16 100%);
+  color: #f4efe6;
+  font-family: var(--font-display);
+  font-size: 18px;
+  letter-spacing: 0.04em;
+  line-height: 1;
+  box-shadow:
+    inset 0 0 0 3px rgba(244, 239, 230, 0.3),
+    inset 0 0 0 7px rgba(70, 8, 14, 0.4),
+    0 2px 5px rgba(0, 0, 0, 0.28);
 }
 
-.occasion-portrait img {
+.occasion-photo {
+  margin: 0;
+  min-width: 0;
+  height: 100%;
+  overflow: hidden;
+  background: #d8d2c8;
+}
+
+.occasion-photo img {
   width: 100%;
   height: 100%;
   object-fit: cover;
   display: block;
-}
-
-.occasion-stack {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 18px;
-}
-
-.occasion-look {
-  margin: 0;
-  width: 148px;
-  text-align: center;
-}
-
-.occasion-look img {
-  width: 100%;
-  aspect-ratio: 1;
-  object-fit: cover;
-  display: block;
-  background: #d5d5d5;
-}
-
-.occasion-look figcaption {
-  margin-top: 8px;
-  font-family: var(--font-text);
-  font-size: 13px;
-  font-weight: 400;
-  line-height: 1.3;
-  color: #efe8dc;
-}
-
-.occasion-chevron {
-  display: flex;
-  color: #efe8dc;
-  margin-top: 2px;
 }
 
 /* Holiday video hero */
@@ -1492,25 +1486,20 @@ h1, h2, h3, h4,
 
   .occasion-band {
     grid-template-columns: 1fr;
-    gap: 28px;
-    padding: 32px 20px 40px;
+    height: auto;
+    gap: 8px;
   }
 
-  .occasion-portrait {
-    max-height: none;
+  .occasion-stamp {
+    height: auto;
+    min-height: 380px;
+    padding: 28px 20px 36px;
+  }
+
+  .occasion-photo {
+    height: auto;
     aspect-ratio: 4 / 5;
   }
-
-  .occasion-stack {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 12px 10px;
-    width: 100%;
-  }
-
-  .occasion-look { width: 100%; }
-
-  .occasion-chevron { grid-column: 1 / -1; justify-self: center; }
 
   .holiday-banner {
     width: 100%;

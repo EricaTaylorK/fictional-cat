@@ -331,6 +331,7 @@ function OccasionModule() {
   const [open, setOpen] = useState(() => panelRequested());
   const wasOpen = useRef(false);
   const groom = wedding.chips.find((item) => item.name === "Groom") ?? wedding.chips[0];
+  const guest = wedding.chips.find((item) => item.name === "Guest") ?? wedding.chips[1];
 
   useEffect(() => {
     if (open) {
@@ -344,29 +345,24 @@ function OccasionModule() {
   return (
     <section className="occasion" aria-label={wedding.headline}>
       <div className="occasion-band">
-        <div className="occasion-copy">
-          <h2 className="t-h2">{wedding.headline}</h2>
-          <p className="t-deck">{wedding.deck}</p>
-          <button type="button" className="occasion-link" ref={ctaRef} onClick={() => setOpen(true)}>
-            {wedding.cta}
-          </button>
+        <div className="occasion-stamp">
+          <div className="occasion-card-wrap">
+            <div className="occasion-card">
+              <h2 className="t-h2 occasion-title">{wedding.headline}</h2>
+              <p className="occasion-deck">{wedding.deck}</p>
+              <button type="button" className="occasion-cta" ref={ctaRef} onClick={() => setOpen(true)}>
+                {wedding.cta}
+              </button>
+            </div>
+            <span className="occasion-seal" aria-hidden="true">MW</span>
+          </div>
         </div>
-        <div className="occasion-portrait">
+        <figure className="occasion-photo">
           <img src={groom.photo} alt={groom.shot} style={{ objectPosition: groom.position }} />
-        </div>
-        <div className="occasion-stack">
-          {wedding.chips.map((item) => (
-            <figure className="occasion-look" key={item.name}>
-              <img src={item.photo} alt="" style={{ objectPosition: item.position }} />
-              <figcaption>{item.name}</figcaption>
-            </figure>
-          ))}
-          <span className="occasion-chevron" aria-hidden="true">
-            <svg viewBox="0 0 24 24" width="22" height="22" focusable="false">
-              <path d="M5 9.5 12 16l7-6.5" fill="none" stroke="currentColor" strokeWidth="1.4" />
-            </svg>
-          </span>
-        </div>
+        </figure>
+        <figure className="occasion-photo">
+          <img src={guest.photo} alt={guest.shot} style={{ objectPosition: guest.position }} />
+        </figure>
       </div>
       {open ? (
         <ShopPanel
@@ -413,7 +409,7 @@ function ShippingBanner() {
     <div className="ship-bar" role="region" aria-label="Holiday shipping">
       <p className="ship-copy">
         <span className="ship-kicker">Order by Dec 15</span>
-        <span className="ship-offer">Order by Dec. 15</span>
+        <span className="ship-offer">Free shipping</span>
         <span className="ship-support">Arrives by Christmas</span>
       </p>
     </div>
@@ -623,9 +619,9 @@ export default function App() {
         <HolidayBanner />
         <CategoryBand />
         <OccasionModule />
+        <NewArrivals />
         <ShippingBanner />
         <SalePanel />
-        <NewArrivals />
         <section className="reassure" aria-label="Reassurance">
           <ul className="reassure-list">
             {reassurance.items.map((item) => (
