@@ -482,6 +482,7 @@ function NewArrivals() {
               <span className="arrival-photo">
                 <img src={tile.photo} alt="" style={{ objectPosition: tile.position }} />
               </span>
+              <span className="arrival-tweed" aria-hidden="true" />
               <span className="arrival-caption">
                 <span className="arrival-label">{tile.name}</span>
                 <svg className="arrival-arrow" viewBox="0 0 36 20" aria-hidden="true" focusable="false">

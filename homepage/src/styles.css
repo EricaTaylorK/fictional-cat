@@ -1022,6 +1022,13 @@ h1, h2, h3, h4,
   display: block;
 }
 
+.arrival-tweed {
+  display: block;
+  flex: none;
+  height: 16px;
+  background: url("/banners/tweed.jpg") center / cover no-repeat;
+}
+
 .arrival-caption {
   display: flex;
   align-items: center;
