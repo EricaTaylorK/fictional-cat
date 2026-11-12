@@ -429,7 +429,7 @@ function SalePanel() {
           aria-label={sale.feature.label}
           onClick={stopNavigation}
         >
-          <Placeholder className="sale-ph" decorative />
+          <Placeholder className="sale-ph" decorative photo={sale.feature.photo} position={sale.feature.position} />
           <span className="sale-caption">{sale.feature.caption}</span>
         </a>
         <div className="sale-grid">
@@ -441,7 +441,7 @@ function SalePanel() {
               aria-label={tile.label}
               onClick={stopNavigation}
             >
-              <Placeholder className="sale-ph" decorative />
+              <Placeholder className="sale-ph" decorative photo={tile.photo} position={tile.position} />
               <span className="sale-caption">{tile.caption}</span>
             </a>
           ))}

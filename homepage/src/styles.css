@@ -1664,6 +1664,8 @@ h1, h2, h3, h4,
   min-height: 0;
 }
 
+.sale-panel .ph-photo { background: #e4e4e4; }
+
 .sale-tile .ph { aspect-ratio: 1 / 1; }
 
 .sale-feature .ph { height: 100%; }

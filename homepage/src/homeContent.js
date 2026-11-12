@@ -85,12 +85,14 @@ export const sale = {
     id: "sale-all",
     caption: "shop all sale",
     label: "Shop all sale",
+    photo: "/arrivals/nautica-sport-coat-olive-plaid.jpg",
+    position: "center",
   },
   tiles: [
-    { id: "sale-suits", caption: "shop suits", label: "Shop suits on sale" },
-    { id: "sale-dress-shirts", caption: "shop dress shirts", label: "Shop dress shirts on sale" },
-    { id: "sale-shoes", caption: "shop shoes", label: "Shop shoes on sale" },
-    { id: "sale-sport-coats", caption: "shop sport coats", label: "Shop sport coats on sale" },
+    { id: "sale-suits", caption: "shop suits", label: "Shop suits on sale", photo: "/arrivals/joe-joseph-abboud-suit-mocha.jpg", position: "center" },
+    { id: "sale-dress-shirts", caption: "shop dress shirts", label: "Shop dress shirts on sale", photo: "/arrivals/awearness-kenneth-cole-shirt-mid-blue.jpg", position: "center" },
+    { id: "sale-shoes", caption: "shop shoes", label: "Shop shoes on sale", photo: "/arrivals/calvin-klein-monk-strap-black.jpg", position: "center" },
+    { id: "sale-sport-coats", caption: "shop sport coats", label: "Shop sport coats on sale", photo: "/arrivals/joseph-abboud-sport-coat-light-brown.jpg", position: "center" },
   ],
 };
 
