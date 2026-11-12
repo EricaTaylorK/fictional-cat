@@ -132,7 +132,6 @@ function CategoryBand() {
               onClick={stopNavigation}
             >
               <span className="category-label">{category.name}</span>
-              <span className="category-shop" aria-hidden="true">Shop</span>
             </a>
           ))}
         </div>

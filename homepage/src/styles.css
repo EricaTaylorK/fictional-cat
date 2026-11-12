@@ -684,6 +684,8 @@ h1, h2, h3, h4,
   width: 100%;
   min-width: 0;
   overflow-x: auto;
+  overflow-y: hidden;
+  overflow-anchor: none;
   scroll-snap-type: x mandatory;
   scroll-padding-inline: 0;
   scrollbar-width: none;
@@ -702,6 +704,7 @@ h1, h2, h3, h4,
   min-width: 0;
   min-height: 96px;
   padding: 22px 18px;
+  overflow: hidden;
   background: url("/banners/tweed.jpg") center / cover no-repeat;
   color: #f6f1ea;
   text-align: center;
@@ -717,13 +720,14 @@ h1, h2, h3, h4,
   position: absolute;
   inset: 0;
   z-index: 0;
-  background: linear-gradient(rgba(18, 14, 10, 0.42), rgba(18, 14, 10, 0.58));
-  transition: opacity 160ms ease;
+  background-color: transparent;
+  background-image: linear-gradient(rgba(18, 14, 10, 0.42), rgba(18, 14, 10, 0.58));
+  transition: background-color 160ms ease;
 }
 
 .category-item:hover::before,
 .category-item:focus-visible::before {
-  opacity: 0.62;
+  background-color: rgba(0, 0, 0, 0.28);
 }
 
 .category-label {
@@ -741,34 +745,11 @@ h1, h2, h3, h4,
 
 .category-item:hover .category-label,
 .category-item:focus-visible .category-label {
-  transform: translateY(-4px);
+  transform: translateY(-5px);
 }
 
 .category-item:active .category-label {
   transform: translateY(0);
-}
-
-.category-shop {
-  position: absolute;
-  z-index: 1;
-  left: 0;
-  right: 0;
-  top: calc(50% + 12px);
-  font-family: var(--font-ui);
-  font-size: 11px;
-  font-weight: 500;
-  letter-spacing: 0.04em;
-  line-height: 1;
-  text-align: center;
-  text-transform: uppercase;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 160ms ease;
-}
-
-.category-item:hover .category-shop,
-.category-item:focus-visible .category-shop {
-  opacity: 1;
 }
 
 @media (min-width: 540px) {
@@ -1670,7 +1651,6 @@ h1, h2, h3, h4,
   .scene-layer { transition: none; }
 
   .category-label,
-  .category-shop,
   .category-item::before {
     transition: none;
   }
