@@ -481,15 +481,13 @@ function BrandWord({ brand }) {
 function BrandTiles() {
   return (
     <section className="brands" aria-labelledby="brands-heading">
-      <div className="brands-photo" aria-hidden="true" />
       <div className="brands-inner">
-        <div className="brands-head">
-          <div className="brands-copy">
-            <h2 id="brands-heading" className="brands-heading">
-              {brandIntro.heading}
-            </h2>
-            <p className="brands-deck">{brandIntro.deck}</p>
-          </div>
+        <div className="brands-photo" aria-hidden="true" />
+        <div className="brands-copy">
+          <h2 id="brands-heading" className="brands-heading">
+            {brandIntro.heading}
+          </h2>
+          <p className="brands-deck">{brandIntro.deck}</p>
           <a className="brands-all" href="#brands" onClick={stopNavigation}>
             {brandIntro.link}
           </a>
