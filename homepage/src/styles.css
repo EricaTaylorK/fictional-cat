@@ -669,8 +669,8 @@ h1, h2, h3, h4,
 .category-band {
   position: relative;
   margin: 0;
-  border-top: 4px solid var(--cream);
-  border-bottom: 4px solid var(--cream);
+  border-top: 2px solid var(--cream);
+  border-bottom: 2px solid var(--cream);
   background: #120e0a url("/banners/tweed.jpg") center / 280px auto repeat;
 }
 
