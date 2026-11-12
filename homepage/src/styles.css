@@ -1068,7 +1068,7 @@ h1, h2, h3, h4,
   position: relative;
   overflow: hidden;
   background: #2c3324 url("/banners/unrolled-plaid.jpg") center / cover no-repeat;
-  padding: 24px 0 28px;
+  padding: 40px 0 44px;
 }
 
 .brands::before {
@@ -1684,7 +1684,7 @@ h1, h2, h3, h4,
   .arrival-caption { font-size: 16px; }
 
   .brands {
-    padding: 20px 0 24px;
+    padding: 30px 0 34px;
   }
 
   .brands-inner {
