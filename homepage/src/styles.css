@@ -1565,6 +1565,12 @@ h1, h2, h3, h4,
 }
 
 @media (max-width: 767px) {
+  .category-scroller {
+    justify-content: flex-start;
+    padding-inline: 16px;
+    scroll-padding-inline: 16px;
+  }
+
   .reassure-list { grid-template-columns: 1fr; gap: var(--section); }
 
   .gifts-band {
