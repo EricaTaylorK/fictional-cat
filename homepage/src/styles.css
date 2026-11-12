@@ -693,13 +693,12 @@ h1, h2, h3, h4,
 }
 
 .category-scroller {
-  --cat-gap: var(--gap);
-  --cat-visible: 1;
   display: flex;
-  gap: var(--cat-gap);
-  align-items: stretch;
+  gap: 16px;
+  align-items: center;
   width: 100%;
   min-width: 0;
+  min-height: 96px;
   overflow-x: auto;
   overflow-y: hidden;
   overflow-anchor: none;
@@ -712,27 +711,6 @@ h1, h2, h3, h4,
 .category-scroller::-webkit-scrollbar { display: none; }
 
 .category-item {
-  position: relative;
-  display: flex;
-  flex: 0 0 calc((100% - var(--cat-visible) * var(--cat-gap)) / (var(--cat-visible) + 0.2));
-  align-items: center;
-  justify-content: center;
-  min-width: 0;
-  min-height: 96px;
-  padding: 22px 18px;
-  background: transparent;
-  color: var(--cream);
-  text-align: center;
-  text-decoration: none;
-  cursor: pointer;
-  scroll-snap-align: start;
-}
-
-.category-item:last-child { scroll-snap-align: end; }
-
-.category-label {
-  position: relative;
-  z-index: 1;
   display: flex;
   flex: 0 0 auto;
   align-items: center;
@@ -743,7 +721,7 @@ h1, h2, h3, h4,
   padding: 0;
   border: 0;
   border-radius: 999px;
-  background: #ffffff;
+  background: var(--cream);
   color: #000000;
   opacity: 1;
   box-shadow: none;
@@ -755,26 +733,15 @@ h1, h2, h3, h4,
   line-height: 1;
   letter-spacing: 0;
   text-align: center;
-  text-transform: none;
+  text-decoration: none;
   text-shadow: none;
+  text-transform: none;
   white-space: nowrap;
+  cursor: pointer;
+  scroll-snap-align: start;
 }
 
-@media (min-width: 540px) {
-  .category-scroller { --cat-visible: 2; }
-}
-
-@media (min-width: 800px) {
-  .category-scroller { --cat-visible: 3; }
-}
-
-@media (min-width: 1040px) {
-  .category-scroller { --cat-visible: 4; }
-}
-
-@media (min-width: 1280px) {
-  .category-scroller { --cat-visible: 5; }
-}
+.category-item:last-child { scroll-snap-align: end; }
 
 /* Gifts band (Frame 17: 1024 x 398) */
 .occasion { background: #23271c; }
