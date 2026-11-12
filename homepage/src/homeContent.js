@@ -11,7 +11,7 @@ export const categories = [
     image: "/categories/suits.png",
   },
   {
-    name: "Dress shirts",
+    name: "Dress Shirts",
     descriptor: "Every cut, collar and color",
     cta: "Shop dress shirts",
     image: "/categories/dress-shirts.png",
