@@ -173,9 +173,9 @@ h1, h2, h3, h4,
   align-items: center;
   justify-content: center;
   gap: 12px 18px;
-  min-height: 58px;
-  padding: 6px 28px;
-  background: #1b4f3e;
+  min-height: 64px;
+  padding: 8px 28px;
+  background: #001e56;
   color: #f6f1ea;
 }
 
@@ -198,7 +198,7 @@ h1, h2, h3, h4,
   height: 48px;
   border-radius: 50%;
   background: var(--cream);
-  color: #1b4f3e;
+  color: #001e56;
   display: grid;
   place-items: center;
   text-align: center;
@@ -921,38 +921,55 @@ h1, h2, h3, h4,
   pointer-events: none;
 }
 
+.holiday-banner::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: rgba(0, 30, 86, 0.4);
+  pointer-events: none;
+}
+
 .holiday-center {
   position: absolute;
   inset: 0;
   z-index: 2;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  display: grid;
+  grid-template-columns: auto auto;
+  grid-template-areas:
+    "snow ."
+    "title cta";
+  align-content: end;
   justify-content: center;
-  gap: calc(100cqi * 14 / 1024);
-  text-align: center;
+  align-items: center;
+  column-gap: clamp(20px, 2.4cqi, 36px);
+  row-gap: 8px;
+  text-align: left;
   background: transparent;
-  padding: 12px;
+  padding: 24px 40px;
   pointer-events: none;
 }
 
 .holiday-snow {
+  grid-area: snow;
+  justify-self: center;
   display: block;
-  width: calc(100cqi * 12 / 1024);
-  height: calc(100cqi * 12 / 1024);
+  width: 20px;
+  height: 20px;
   background: #f6f1ea;
   -webkit-mask: url("/holiday/snowflake.png") center / contain no-repeat;
   mask: url("/holiday/snowflake.png") center / contain no-repeat;
 }
 
 .holiday-title {
+  grid-area: title;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
   font-family: var(--font-display);
   font-weight: 400;
-  font-size: calc(100cqi * 28 / 1024);
-  line-height: 1.12;
+  font-size: clamp(48px, calc(100cqi * 64 / 1024), 80px);
+  line-height: 0.96;
   letter-spacing: 0;
   color: #f6f1ea;
   width: auto;
@@ -960,12 +977,16 @@ h1, h2, h3, h4,
 }
 
 .holiday-cta {
+  grid-area: cta;
   position: relative;
   z-index: 3;
+  align-self: center;
   pointer-events: auto;
-  width: calc(100cqi * 148 / 1024);
-  height: calc(100cqi * 30 / 1024);
-  margin-top: calc(100cqi * 6 / 1024);
+  width: auto;
+  min-width: 196px;
+  height: 48px;
+  margin: 0;
+  padding: 0 18px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -977,7 +998,6 @@ h1, h2, h3, h4,
   line-height: 1;
   text-transform: uppercase;
   text-decoration: none;
-  padding: 0;
 }
 
 /* Sale */
@@ -1506,21 +1526,36 @@ h1, h2, h3, h4,
   .holiday-banner {
     width: 100%;
     aspect-ratio: auto;
+    min-height: 460px;
   }
 
   .holiday-center {
-    position: relative;
-    min-height: 240px;
-    padding: 28px 16px 32px;
+    position: absolute;
+    inset: 0;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      "snow"
+      "title"
+      "cta";
+    justify-items: center;
+    row-gap: 10px;
+    padding: 20px 16px 24px;
+    text-align: center;
   }
 
   .holiday-snow { width: 16px; height: 16px; }
 
-  .holiday-title { font-size: 34px; }
+  .holiday-title {
+    align-items: center;
+    font-size: 42px;
+    max-width: 100%;
+  }
 
   .holiday-cta {
     width: 189px;
+    min-width: 0;
     height: 40px;
+    padding: 0 12px;
   }
 
   .campaign { min-height: 520px; }
@@ -1665,8 +1700,8 @@ h1, h2, h3, h4,
     align-items: center;
     column-gap: 8px;
     row-gap: 0;
-    min-height: 56px;
-    padding: 6px 10px;
+    min-height: 64px;
+    padding: 8px 10px;
   }
 
   .ship-lead { gap: 5px; }
