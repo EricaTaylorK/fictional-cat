@@ -978,7 +978,7 @@ h1, h2, h3, h4,
 .arrivals-heading {
   margin: 0 0 var(--gap);
   padding-inline: var(--edge);
-  text-align: left;
+  text-align: center;
 }
 
 .arrivals-row {
