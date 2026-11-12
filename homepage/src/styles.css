@@ -170,7 +170,7 @@ h1, h2, h3, h4,
   align-items: center;
   justify-content: center;
   min-height: 64px;
-  margin: 16px 0 var(--section);
+  margin: 32px 0 var(--section);
   padding: 8px var(--gutter);
   background:
     linear-gradient(rgba(20, 16, 10, 0.25), rgba(20, 16, 10, 0.25)),
