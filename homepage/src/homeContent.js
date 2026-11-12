@@ -97,7 +97,7 @@ export const sale = {
 };
 
 export const arrivals = {
-  heading: "Sale",
+  heading: "The Sale Edit",
   tiles: [
     {
       id: "suits",
