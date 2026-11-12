@@ -94,10 +94,41 @@ export const sale = {
 };
 
 export const arrivals = {
-  headline: "See what's new",
-  deck: "New styles, ready when you are.",
-  cta: "Shop new arrivals",
-  shot: "New arrivals",
+  heading: "New Arrivals",
+  tiles: [
+    {
+      id: "suits",
+      name: "Suits",
+      cta: "Shop suits",
+      photo: "/looks/navy-suit-wood.jpg",
+      position: "center 12%",
+      bar: "navy",
+    },
+    {
+      id: "sport-coats",
+      name: "Sport coats",
+      cta: "Shop sport coats",
+      photo: "/editorial/graphite-blazer-cream.jpg",
+      position: "center 16%",
+      bar: "stone",
+    },
+    {
+      id: "dress-shirts",
+      name: "Dress shirts",
+      cta: "Shop dress shirts",
+      photo: "/looks/white-dot-shirt.jpg",
+      position: "center 18%",
+      bar: "deep",
+    },
+    {
+      id: "shoes",
+      name: "Shoes",
+      cta: "Shop shoes",
+      photo: "/products/black-dress-shoes.jpg",
+      position: "center",
+      bar: "cream",
+    },
+  ],
 };
 
 export const brands = [

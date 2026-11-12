@@ -474,6 +474,30 @@ function Campaign({ title, deck, cta, shot, tone, label }) {
   );
 }
 
+function NewArrivals() {
+  return (
+    <section className="arrivals" aria-labelledby="new-arrivals-heading">
+      <div className="arrivals-inner">
+        <h2 id="new-arrivals-heading" className="t-h2 arrivals-heading">
+          {arrivals.heading}
+        </h2>
+        <ul className="arrivals-row">
+          {arrivals.tiles.map((tile) => (
+            <li key={tile.id} className="arrival-tile" data-bar={tile.bar}>
+              <a className="arrival-link" href={`#${tile.id}`} aria-label={tile.cta} onClick={stopNavigation}>
+                <span className="arrival-photo">
+                  <img src={tile.photo} alt="" style={{ objectPosition: tile.position }} />
+                </span>
+                <span className="arrival-caption">{tile.name}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  );
+}
+
 function BrandWord({ brand }) {
   if (brand.id === "tommy") {
     return (
@@ -615,14 +639,7 @@ export default function App() {
           shot={sale.shot}
           tone="sale"
         />
-        <Campaign
-          label="New arrivals"
-          title={arrivals.headline}
-          deck={arrivals.deck}
-          cta={arrivals.cta}
-          shot={arrivals.shot}
-          tone="arrivals"
-        />
+        <NewArrivals />
         <BrandTiles />
         <Returning />
         <section className="reassure" aria-label="Reassurance">
