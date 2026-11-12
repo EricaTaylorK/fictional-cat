@@ -423,13 +423,15 @@ function HolidayBanner() {
   return (
     <section className="holiday" aria-label="Holiday">
       <div className="holiday-banner">
-        <iframe
+        <video
           className="holiday-video"
-          src="https://tmw365-my.sharepoint.com/personal/crc68_tmw_com/_layouts/15/embed.aspx?UniqueId=c5eb55f0-cb1f-473e-913b-19ffbcb56146&embed=%7B%22af%22%3Atrue%2C%22ust%22%3Atrue%7D&referrer=StreamWebApp&referrerScenario=EmbedDialog.Create"
-          title="26-5851549 JAB NP SA VIDEO 1005 1440x500 Final JS.mp4"
-          allow="autoplay; fullscreen"
-          allowFullScreen
-          scrolling="no"
+          src="/holiday/vibe-floor-night.mp4"
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="auto"
+          aria-hidden="true"
         />
         <div className="holiday-center">
           <span className="holiday-snow" aria-hidden="true" />
