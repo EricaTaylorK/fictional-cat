@@ -161,11 +161,9 @@ function CategoryBand() {
               key={category.name}
               className="category-item"
               href={`#${category.name}`}
-              aria-label={category.cta}
               onClick={stopNavigation}
             >
-              <img src={category.image} alt="" />
-              <span className="t-label">{category.name}</span>
+              {category.name}
             </a>
           ))}
         </div>

@@ -776,25 +776,28 @@ h1, h2, h3, h4,
 .category-scroller {
   display: grid;
   grid-template-columns: repeat(7, minmax(0, 1fr));
-  gap: clamp(8px, 1.6vw, 28px);
-  align-items: end;
+  gap: 8px;
+  align-items: stretch;
 }
 
 .category-item {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 10px;
+  justify-content: center;
+  min-width: 0;
+  height: 48px;
+  padding: 0 10px;
+  background: var(--navy);
+  color: var(--cream);
   text-align: center;
   text-decoration: none;
-  color: var(--navy);
-  min-width: 0;
-}
-
-.category-item img {
-  width: 100%;
-  height: clamp(64px, 7.4vw, 108px);
-  object-fit: contain;
+  font-family: var(--font-text);
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.1;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  white-space: nowrap;
 }
 
 /* Occasion */
@@ -842,7 +845,7 @@ h1, h2, h3, h4,
   border: 0;
   background: none;
   color: var(--navy);
-  font-family: var(--font-text);
+  font-family: var(--font-accent);
   font-size: 16px;
   font-weight: 400;
   letter-spacing: 0;
@@ -1095,23 +1098,25 @@ h1, h2, h3, h4,
   min-height: 48px;
   padding: 12px 10px;
   text-align: center;
-  font-family: var(--font-display);
+  font-family: var(--font-accent);
   font-size: 18px;
   font-weight: 400;
   line-height: 1.15;
   letter-spacing: 0.02em;
   text-transform: none;
   white-space: nowrap;
-  color: #f6f1ea;
-  background: #7f3a44;
+  color: var(--cream);
+  background: var(--navy);
 }
 
 .arrival-tile[data-bar="slate"] .arrival-caption {
-  background: #5f7586;
+  background: var(--cream);
+  color: var(--navy);
 }
 
 .arrival-tile[data-bar="wine"] .arrival-caption {
-  background: #7f3a44;
+  background: var(--navy);
+  color: var(--cream);
 }
 
 /* Brands */
@@ -1157,7 +1162,7 @@ h1, h2, h3, h4,
 .brands-all {
   flex: none;
   margin-top: 8px;
-  font-family: var(--font-text);
+  font-family: var(--font-accent);
   font-size: 14px;
   font-weight: 500;
   line-height: 1.2;
@@ -1269,7 +1274,10 @@ h1, h2, h3, h4,
 
 .returning-copy .t-h2 { line-height: 1.02; }
 
-.returning-link { text-transform: uppercase; }
+.returning-link {
+  font-family: var(--font-accent);
+  text-transform: uppercase;
+}
 
 .returning-stage { position: relative; min-width: 0; }
 
@@ -1508,19 +1516,19 @@ h1, h2, h3, h4,
   .category-scroller {
     display: flex;
     overflow-x: auto;
-    gap: 16px;
+    gap: 8px;
     padding-right: 16px;
     scroll-snap-type: x mandatory;
+    scrollbar-width: none;
   }
 
   .category-item {
-    flex: 0 0 96px;
+    flex: 0 0 auto;
+    width: 148px;
+    height: 48px;
     scroll-snap-align: start;
   }
 
-  .category-item img { height: 88px; }
-
-  .category-scroller { scrollbar-width: none; padding-bottom: 4px; }
   .category-scroller::-webkit-scrollbar { display: none; }
 
   .reassure-list { grid-template-columns: 1fr; gap: 28px; }
