@@ -1084,6 +1084,7 @@ h1, h2, h3, h4,
 .brands-photo {
   grid-column: 1;
   grid-row: 1;
+  position: relative;
   height: auto;
   aspect-ratio: 1.62 / 1;
   background-color: var(--cream);
@@ -1092,8 +1093,16 @@ h1, h2, h3, h4,
   background-size: 100% auto;
   background-repeat: no-repeat;
   background-blend-mode: multiply;
-  -webkit-mask-image: linear-gradient(90deg, #000 0%, #000 68%, transparent 100%);
-  mask-image: linear-gradient(90deg, #000 0%, #000 68%, transparent 100%);
+}
+
+.brands-photo::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(90deg, transparent 0%, transparent 42%, var(--cream) 88%),
+    linear-gradient(180deg, transparent 0%, transparent 46%, var(--cream) 80%);
 }
 
 .brands-copy {
@@ -1153,7 +1162,7 @@ h1, h2, h3, h4,
   align-items: center;
   list-style: none;
   width: 100%;
-  margin: -62px 0 0;
+  margin: -55px 0 0;
   padding: 0;
 }
 
@@ -1165,17 +1174,35 @@ h1, h2, h3, h4,
 }
 
 .brand-circle {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 124px;
-  height: 124px;
+  width: 110px;
+  height: 110px;
   border-radius: 50%;
-  border: 1px solid var(--navy);
+  border: 1px solid rgba(0, 30, 86, 0.4);
   background: var(--cream);
   color: var(--navy);
   text-decoration: none;
-  padding: 16px;
+  cursor: pointer;
+  padding: 18px 14px;
+  transition: transform 200ms ease-out, box-shadow 200ms ease-out;
+}
+
+.brand-circle:hover,
+.brand-circle:focus-visible {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 18px rgba(0, 30, 86, 0.14);
+}
+
+.brand-circle:focus {
+  outline: none;
+}
+
+.brand-circle:focus-visible {
+  outline: 2px solid var(--navy);
+  outline-offset: 3px;
 }
 
 .brand-word {
@@ -1186,37 +1213,64 @@ h1, h2, h3, h4,
   font-weight: 400;
   line-height: 1.15;
   text-wrap: balance;
+  transition: transform 200ms ease-out;
+}
+
+.brand-circle:hover .brand-word,
+.brand-circle:focus-visible .brand-word {
+  transform: translateY(-7px);
+}
+
+.brand-shop {
+  position: absolute;
+  left: 14px;
+  right: 14px;
+  bottom: 16px;
+  font-family: var(--font-text);
+  font-size: 9px;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: 0.02em;
+  text-align: center;
+  color: var(--navy);
+  opacity: 0;
+  transition: opacity 200ms ease-out;
+}
+
+.brand-circle:hover .brand-shop,
+.brand-circle:focus-visible .brand-shop {
+  opacity: 1;
 }
 
 .word-kenneth {
   font-family: var(--font-text);
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 600;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
 }
 
 .word-calvin {
   font-family: var(--font-text);
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 400;
   letter-spacing: 0.01em;
 }
 
 .word-cole {
   font-family: var(--font-display);
-  font-size: 13px;
+  font-size: 12px;
   letter-spacing: 0.04em;
   text-transform: uppercase;
 }
 
 .word-est {
   display: block;
-  margin-top: 3px;
+  margin-top: 2px;
   font-family: var(--font-text);
-  font-size: 8px;
+  font-size: 7px;
   font-weight: 400;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
 }
 
@@ -1224,14 +1278,28 @@ h1, h2, h3, h4,
   font-family: var(--font-text);
   font-size: 11px;
   font-weight: 700;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.03em;
   text-transform: uppercase;
 }
 
 .word-michael {
   font-family: var(--font-display);
-  font-size: 15px;
+  font-size: 13px;
   letter-spacing: 0.01em;
+}
+
+@media (hover: none), (pointer: coarse) {
+  .brand-shop { opacity: 1; }
+  .brand-word { transform: translateY(-7px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .brand-circle,
+  .brand-word,
+  .brand-shop { transition: none; }
+
+  .brand-circle:hover,
+  .brand-circle:focus-visible { transform: none; }
 }
 
 /* Returning visitor */
@@ -1634,8 +1702,6 @@ h1, h2, h3, h4,
     width: 100%;
     aspect-ratio: 1.45 / 1;
     background-position: center 12%;
-    -webkit-mask-image: linear-gradient(180deg, #000 0%, #000 70%, transparent 100%);
-    mask-image: linear-gradient(180deg, #000 0%, #000 70%, transparent 100%);
   }
 
   .brands-copy { max-width: none; }
@@ -1666,9 +1732,16 @@ h1, h2, h3, h4,
   }
 
   .brand-circle {
-    width: 108px;
-    height: 108px;
-    padding: 14px;
+    width: 100px;
+    height: 100px;
+    padding: 16px 12px;
+  }
+
+  .brand-shop {
+    left: 12px;
+    right: 12px;
+    bottom: 14px;
+    font-size: 8px;
   }
 
   .returning {

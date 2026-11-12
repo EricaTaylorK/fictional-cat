@@ -497,6 +497,7 @@ function BrandTiles() {
             <li key={brand.id}>
               <a className="brand-circle" href={`#${brand.id}`} aria-label={brand.cta} onClick={stopNavigation}>
                 <BrandWord brand={brand} />
+                <span className="brand-shop" aria-hidden="true">Shop brand →</span>
               </a>
             </li>
           ))}
