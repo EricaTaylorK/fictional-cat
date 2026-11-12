@@ -1264,8 +1264,8 @@ h1, h2, h3, h4,
   font-family: var(--font-accent);
   font-size: 14px;
   font-weight: 600;
-  letter-spacing: 0.04em;
-  text-transform: none;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
 }
 
 .returning-stage { position: relative; min-width: 0; }
