@@ -459,53 +459,69 @@ function HolidayBanner() {
   );
 }
 
-function SalePanel() {
-  const tiles = [
-    {
-      id: "sale-suits",
-      lines: ["Suits"],
-      name: "Shop suits on sale",
-      photo: "/products/suit-navy.jpg",
-      position: "center 28%",
-    },
-    {
-      id: "sale-dress-shirts",
-      lines: ["Dress", "Shirts"],
-      name: "Shop dress shirts on sale",
-      photo: "/products/white-dress-shirt.jpg",
-      position: "center 42%",
-    },
-    {
-      id: "sale-shoes",
-      lines: ["Shoes"],
-      name: "Shop shoes on sale",
-      photo: "/products/black-dress-shoes.jpg",
-      position: "center 58%",
-    },
-  ];
-
+function StarOrnament() {
   return (
-    <section className="sale-panel" aria-label="Sale">
-      <div className="sale-panel-inner">
-        <div className="sale-copy">
-          <h2 className="sale-heading">{sale.headline}</h2>
-          <p className="sale-deck">{sale.deck}</p>
-        </div>
+    <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true" focusable="false">
+      <path
+        fill="currentColor"
+        d="M12 .7 13.9 9.1 22.3 12 13.9 14.9 12 23.3 10.1 14.9 1.7 12 10.1 9.1Z"
+      />
+    </svg>
+  );
+}
+
+function ShippingBanner() {
+  return (
+    <div className="ship-bar" role="region" aria-label="Holiday shipping">
+      <div className="ship-lead">
+        <StarOrnament />
+        <span className="ship-badge">
+          limited
+          <br />
+          time!
+        </span>
+        <StarOrnament />
+      </div>
+      <p className="ship-copy">
+        <span className="ship-kicker">Order by Dec 15</span>
+        <span className="ship-offer">Free shipping</span>
+        <span className="ship-support">Arrives by Christmas</span>
+      </p>
+      <a className="ship-cta" href="#sale" onClick={stopNavigation}>
+        Shop now
+      </a>
+      <StarOrnament />
+    </div>
+  );
+}
+
+function SalePanel() {
+  return (
+    <section className="sale-panel" id="sale" aria-labelledby="sale-heading">
+      <h2 id="sale-heading" className="visually-hidden">
+        {sale.heading}
+      </h2>
+      <div className="sale-mosaic">
+        <a
+          className="sale-feature"
+          href={`#${sale.feature.id}`}
+          aria-label={sale.feature.label}
+          onClick={stopNavigation}
+        >
+          <Placeholder className="sale-ph" decorative />
+          <span className="sale-caption">{sale.feature.caption}</span>
+        </a>
         <div className="sale-grid">
-          {tiles.map((tile) => (
+          {sale.tiles.map((tile) => (
             <a
               key={tile.id}
               className="sale-tile"
               href={`#${tile.id}`}
-              aria-label={tile.name}
+              aria-label={tile.label}
               onClick={stopNavigation}
             >
-              <img src={tile.photo} alt="" style={{ objectPosition: tile.position }} />
-              <span className="sale-tile-label">
-                {tile.lines.map((line) => (
-                  <span key={line}>{line}</span>
-                ))}
-              </span>
+              <Placeholder className="sale-ph" decorative />
+              <span className="sale-caption">{tile.caption}</span>
             </a>
           ))}
         </div>
@@ -536,19 +552,19 @@ function NewArrivals() {
         <h2 id="new-arrivals-heading" className="t-h2 arrivals-heading">
           {arrivals.heading}
         </h2>
-        <ul className="arrivals-row">
-          {arrivals.tiles.map((tile) => (
-            <li key={tile.id} className="arrival-tile" data-bar={tile.bar}>
-              <a className="arrival-link" href={`#${tile.id}`} aria-label={tile.cta} onClick={stopNavigation}>
-                <span className="arrival-photo">
-                  <img src={tile.photo} alt="" style={{ objectPosition: tile.position }} />
-                </span>
-                <span className="arrival-caption">{tile.name}</span>
-              </a>
-            </li>
-          ))}
-        </ul>
       </div>
+      <ul className="arrivals-row">
+        {arrivals.tiles.map((tile) => (
+          <li key={tile.id} className="arrival-tile" data-bar={tile.bar}>
+            <a className="arrival-link" href={`#${tile.id}`} aria-label={tile.cta} onClick={stopNavigation}>
+              <span className="arrival-photo">
+                <img src={tile.photo} alt="" style={{ objectPosition: tile.position }} />
+              </span>
+              <span className="arrival-caption">{tile.name}</span>
+            </a>
+          </li>
+        ))}
+      </ul>
     </section>
   );
 }
@@ -681,11 +697,12 @@ export default function App() {
 
   return (
     <div className="page" id="top">
+      <ShippingBanner />
       <SiteHeader search={search} onSearch={setSearch} />
       <main>
         <CategoryBand />
-        <OccasionModule />
         <HolidayBanner />
+        <OccasionModule />
         <SalePanel />
         <NewArrivals />
         <BrandTiles />

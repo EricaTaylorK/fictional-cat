@@ -1,6 +1,6 @@
 export const categoryHeading = {
   line1: "Shop by",
-  line2: "Category",
+  line2: "category",
 };
 
 export const categories = [
@@ -87,10 +87,18 @@ export const hero = {
 };
 
 export const sale = {
-  headline: "Good style, better prices",
-  deck: "Sharp looks for less, always in one place.",
-  cta: "Shop sale",
-  shot: "Sale looks",
+  heading: "Sale",
+  feature: {
+    id: "sale-all",
+    caption: "shop all sale",
+    label: "Shop all sale",
+  },
+  tiles: [
+    { id: "sale-suits", caption: "shop suits", label: "Shop suits on sale" },
+    { id: "sale-dress-shirts", caption: "shop dress shirts", label: "Shop dress shirts on sale" },
+    { id: "sale-shoes", caption: "shop shoes", label: "Shop shoes on sale" },
+    { id: "sale-sport-coats", caption: "shop sport coats", label: "Shop sport coats on sale" },
+  ],
 };
 
 export const arrivals = {
@@ -102,7 +110,7 @@ export const arrivals = {
       cta: "Shop suits",
       photo: "/looks/navy-suit-wood.jpg",
       position: "center 12%",
-      bar: "navy",
+      bar: "wine",
     },
     {
       id: "sport-coats",
@@ -110,7 +118,7 @@ export const arrivals = {
       cta: "Shop sport coats",
       photo: "/editorial/graphite-blazer-cream.jpg",
       position: "center 16%",
-      bar: "stone",
+      bar: "slate",
     },
     {
       id: "dress-shirts",
@@ -118,7 +126,7 @@ export const arrivals = {
       cta: "Shop dress shirts",
       photo: "/looks/white-dot-shirt.jpg",
       position: "center 18%",
-      bar: "deep",
+      bar: "wine",
     },
     {
       id: "shoes",
@@ -126,7 +134,7 @@ export const arrivals = {
       cta: "Shop shoes",
       photo: "/products/black-dress-shoes.jpg",
       position: "center",
-      bar: "cream",
+      bar: "slate",
     },
   ],
 };
