@@ -92,7 +92,7 @@ export const sale = {
     { id: "sale-suits", caption: "shop suits", label: "Shop suits on sale", photo: "/arrivals/joe-joseph-abboud-suit-mocha.jpg", position: "center 15%" },
     { id: "sale-dress-shirts", caption: "shop dress shirts", label: "Shop dress shirts on sale", photo: "/arrivals/awearness-kenneth-cole-shirt-mid-blue.jpg", position: "center 12%" },
     { id: "sale-shoes", caption: "shop shoes", label: "Shop shoes on sale", photo: "/arrivals/calvin-klein-monk-strap-black.jpg", position: "center" },
-    { id: "sale-sport-coats", caption: "shop sport coats", label: "Shop sport coats on sale", photo: "/arrivals/joseph-abboud-sport-coat-light-brown.jpg", position: "center" },
+    { id: "sale-sport-coats", caption: "Shop All New Arrivals", label: "Shop All New Arrivals", photo: "/looks/love-patch-tweed.jpg", position: "center" },
   ],
 };
 
