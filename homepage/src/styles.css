@@ -1076,7 +1076,7 @@ h1, h2, h3, h4,
   position: absolute;
   inset: 0;
   z-index: 0;
-  background-image: linear-gradient(rgba(18, 14, 10, 0.22), rgba(18, 14, 10, 0.22));
+  background-image: linear-gradient(rgba(18, 14, 10, 0.46), rgba(18, 14, 10, 0.52));
   pointer-events: none;
 }
 
