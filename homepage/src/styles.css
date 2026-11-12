@@ -126,8 +126,7 @@ h1, h2, h3, h4,
 
 .cta,
 .holiday-cta,
-.add-btn,
-.ship-cta {
+.add-btn {
   font-size: 14px;
   letter-spacing: 0.12em;
   border-radius: 0 8px 0 8px;
@@ -163,52 +162,14 @@ h1, h2, h3, h4,
 
 .ship-bar {
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
   justify-content: center;
-  gap: 8px 14px;
   min-height: 64px;
   padding: 8px 28px;
-  background: #001e56;
+  background:
+    linear-gradient(rgba(20, 16, 10, 0.25), rgba(20, 16, 10, 0.25)),
+    url("/banners/tweed.jpg") center / 480px auto repeat #3a2f22;
   color: #f6f1ea;
-}
-
-.ship-lead,
-.ship-copy,
-.ship-cta,
-.ship-bar > svg {
-  flex: 0 0 auto;
-}
-
-.ship-lead {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.ship-bar svg {
-  width: 13px;
-  height: 13px;
-  color: #f0d78c;
-  flex: none;
-}
-
-.ship-badge {
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  background: var(--cream);
-  color: #001e56;
-  display: grid;
-  place-items: center;
-  text-align: center;
-  font-family: Georgia, "Times New Roman", serif;
-  font-style: italic;
-  font-weight: 500;
-  font-size: 11px;
-  line-height: 0.92;
-  letter-spacing: -0.01em;
-  flex: none;
 }
 
 .ship-copy {
@@ -244,27 +205,11 @@ h1, h2, h3, h4,
 
 .ship-support {
   font-family: var(--font-text);
-  font-size: 16px;
-  font-weight: 400;
-  line-height: 1;
-}
-
-.ship-cta {
-  flex: none;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 36px;
-  padding: 0 16px;
-  border: 1px solid #f6f1ea;
-  background: transparent;
-  color: #f6f1ea;
-  font-family: var(--font-accent);
+  font-size: 12px;
   font-weight: 600;
-  line-height: 1;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
-  text-decoration: none;
-  white-space: nowrap;
+  line-height: 1;
 }
 
 .ship-bar :focus-visible { outline-color: #f6f1ea; }
@@ -1723,32 +1668,13 @@ h1, h2, h3, h4,
 
 @media (max-width: 767px) {
   .ship-bar {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: center;
-    gap: 4px 8px;
-    min-height: 64px;
     padding: 8px 10px;
   }
-
-  .ship-lead,
-  .ship-copy { display: contents; }
-
-  .ship-lead { gap: 5px; }
-
-  .ship-badge {
-    width: 40px;
-    height: 40px;
-    font-size: 9px;
-  }
-
-  .ship-bar svg { width: 10px; height: 10px; }
 
   .ship-copy {
     justify-content: center;
     column-gap: 8px;
-    row-gap: 1px;
+    row-gap: 2px;
   }
 
   .ship-kicker {
@@ -1758,12 +1684,7 @@ h1, h2, h3, h4,
 
   .ship-offer { font-size: 20px; }
 
-  .ship-support { font-size: 12px; }
-
-  .ship-cta {
-    min-height: 32px;
-    padding: 0 10px;
-  }
+  .ship-support { font-size: 10px; letter-spacing: 0.12em; }
 
   .sale-panel { padding: 28px 16px 36px; }
 

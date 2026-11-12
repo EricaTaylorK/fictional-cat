@@ -407,38 +407,14 @@ function HolidayBanner() {
   );
 }
 
-function StarOrnament() {
-  return (
-    <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true" focusable="false">
-      <path
-        fill="currentColor"
-        d="M12 .7 13.9 9.1 22.3 12 13.9 14.9 12 23.3 10.1 14.9 1.7 12 10.1 9.1Z"
-      />
-    </svg>
-  );
-}
-
 function ShippingBanner() {
   return (
     <div className="ship-bar" role="region" aria-label="Holiday shipping">
-      <div className="ship-lead">
-        <StarOrnament />
-        <span className="ship-badge">
-          limited
-          <br />
-          time!
-        </span>
-        <StarOrnament />
-      </div>
       <p className="ship-copy">
         <span className="ship-kicker">Order by Dec 15</span>
-        <span className="ship-offer">Free shipping</span>
+        <span className="ship-offer">Order by Dec. 15</span>
         <span className="ship-support">Arrives by Christmas</span>
       </p>
-      <a className="ship-cta" href="#sale" onClick={stopNavigation}>
-        Shop now
-      </a>
-      <StarOrnament />
     </div>
   );
 }
