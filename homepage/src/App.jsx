@@ -422,7 +422,7 @@ function ShippingBanner() {
 function SalePanel() {
   return (
     <section className="sale-panel" id="sale" aria-labelledby="sale-heading">
-      <h2 id="sale-heading" className="visually-hidden">
+      <h2 id="sale-heading" className="t-h2 sale-heading">
         {sale.heading}
       </h2>
       <div className="sale-mosaic">

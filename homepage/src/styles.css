@@ -197,7 +197,7 @@ h1, h2, h3, h4,
 
 .ship-offer {
   font-family: var(--font-display);
-  font-size: 34px;
+  font-size: 28px;
   font-weight: 400;
   line-height: 0.9;
   letter-spacing: 0.01em;
@@ -1615,6 +1615,12 @@ h1, h2, h3, h4,
   padding: clamp(36px, 4vw, 56px) clamp(16px, 2vw, 28px) clamp(40px, 5vw, 64px);
 }
 
+.sale-heading {
+  width: min(100%, 1360px);
+  margin: 0 auto 16px;
+  text-align: left;
+}
+
 .sale-mosaic {
   width: min(100%, 1360px);
   margin: 0 auto;
@@ -1682,11 +1688,13 @@ h1, h2, h3, h4,
     letter-spacing: 0.12em;
   }
 
-  .ship-offer { font-size: 20px; }
+  .ship-offer { font-size: 18px; }
 
   .ship-support { font-size: 10px; letter-spacing: 0.12em; }
 
   .sale-panel { padding: 28px 16px 36px; }
+
+  .sale-heading { margin-bottom: 14px; }
 
   .sale-mosaic {
     grid-template-columns: minmax(0, 1fr);

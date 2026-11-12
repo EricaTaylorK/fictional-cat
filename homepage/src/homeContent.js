@@ -80,7 +80,7 @@ export const hero = {
 };
 
 export const sale = {
-  heading: "Sale",
+  heading: "New Arrivals",
   feature: {
     id: "sale-all",
     caption: "shop all sale",
@@ -95,7 +95,7 @@ export const sale = {
 };
 
 export const arrivals = {
-  heading: "New Arrivals",
+  heading: "Sale",
   tiles: [
     {
       id: "suits",
