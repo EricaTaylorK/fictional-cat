@@ -333,10 +333,9 @@ function ShopPanel({ chipName, onClose, presetFirstSize }) {
 function OccasionModule() {
   const ctaRef = useRef(null);
   const preset = useRef(panelRequested());
-  const [selected, setSelected] = useState(0);
   const [open, setOpen] = useState(() => panelRequested());
   const wasOpen = useRef(false);
-  const chip = wedding.chips[selected];
+  const groom = wedding.chips.find((item) => item.name === "Groom") ?? wedding.chips[0];
 
   useEffect(() => {
     if (open) {
@@ -347,70 +346,38 @@ function OccasionModule() {
     return undefined;
   }, [open]);
 
-  function moveChip(event, index) {
-    let next = null;
-    if (event.key === "ArrowRight" || event.key === "ArrowDown") next = (index + 1) % wedding.chips.length;
-    else if (event.key === "ArrowLeft" || event.key === "ArrowUp") {
-      next = (index - 1 + wedding.chips.length) % wedding.chips.length;
-    }
-    if (next === null) return;
-    event.preventDefault();
-    setSelected(next);
-    const target = next;
-    window.requestAnimationFrame(() => {
-      document.getElementById(`occasion-chip-${target}`)?.focus();
-    });
-  }
-
   return (
     <section className="occasion" aria-label={wedding.headline}>
-      <div className="occasion-scene">
-        {wedding.chips.map((item, index) => (
-          <div
-            key={item.name}
-            className={index === selected ? "scene-layer is-active" : "scene-layer"}
-            aria-hidden={index === selected ? undefined : true}
-          >
-            <Placeholder label={item.shot} tone={item.tone} photo={item.photo} position={item.position} />
-          </div>
-        ))}
-        <div className="occasion-scrim" />
+      <div className="occasion-band">
         <div className="occasion-copy">
           <h2 className="t-h2">{wedding.headline}</h2>
           <p className="t-deck">{wedding.deck}</p>
-          <div className="chip-row" role="radiogroup" aria-label={wedding.headline}>
-            {wedding.chips.map((item, index) => (
-              <button
-                key={item.name}
-                id={`occasion-chip-${index}`}
-                type="button"
-                role="radio"
-                aria-checked={index === selected}
-                tabIndex={index === selected ? 0 : -1}
-                className={index === selected ? "chip is-selected" : "chip"}
-                onClick={() => setSelected(index)}
-                onKeyDown={(event) => moveChip(event, index)}
-              >
-                <Placeholder className="chip-thumb" label={item.shot} tone={item.tone} photo={item.photo} position={item.position} decorative />
-                <span className="chip-name" id={`occasion-chip-label-${index}`}>
-                  {item.name}
-                </span>
-              </button>
-            ))}
-          </div>
+          <button type="button" className="occasion-link" ref={ctaRef} onClick={() => setOpen(true)}>
+            <span className="occasion-rule" aria-hidden="true" />
+            {wedding.cta}
+            <span className="occasion-rule" aria-hidden="true" />
+          </button>
         </div>
-        <button
-          type="button"
-          className="cta is-outline occasion-cta"
-          ref={ctaRef}
-          onClick={() => setOpen(true)}
-        >
-          {wedding.cta}
-        </button>
+        <div className="occasion-portrait">
+          <img src={groom.photo} alt={groom.shot} style={{ objectPosition: groom.position }} />
+        </div>
+        <div className="occasion-stack">
+          {wedding.chips.map((item) => (
+            <figure className="occasion-look" key={item.name}>
+              <img src={item.photo} alt="" style={{ objectPosition: item.position }} />
+              <figcaption>{item.name}</figcaption>
+            </figure>
+          ))}
+          <span className="occasion-chevron" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="22" height="22" focusable="false">
+              <path d="M5 9.5 12 16l7-6.5" fill="none" stroke="currentColor" strokeWidth="1.4" />
+            </svg>
+          </span>
+        </div>
       </div>
       {open ? (
         <ShopPanel
-          chipName={chip.name}
+          chipName={groom.name}
           presetFirstSize={preset.current}
           onClose={() => setOpen(false)}
         />
@@ -436,8 +403,7 @@ function HolidayBanner() {
         <div className="holiday-center">
           <span className="holiday-snow" aria-hidden="true" />
           <h1 className="holiday-title">
-            <span>Holiday</span>
-            <span>Party,</span>
+            <span>Holiday Party,</span>
             <span>Handled.</span>
           </h1>
           <a className="holiday-cta" href="#holiday" onClick={stopNavigation}>
@@ -538,11 +504,9 @@ function Campaign({ title, deck, cta, shot, tone, label }) {
 function NewArrivals() {
   return (
     <section className="arrivals" aria-labelledby="new-arrivals-heading">
-      <div className="arrivals-inner">
-        <h2 id="new-arrivals-heading" className="t-h2 arrivals-heading">
-          {arrivals.heading}
-        </h2>
-      </div>
+      <h2 id="new-arrivals-heading" className="t-h2 arrivals-heading">
+        {arrivals.heading}
+      </h2>
       <ul className="arrivals-row">
         {arrivals.tiles.map((tile) => (
           <li key={tile.id} className="arrival-tile" data-bar={tile.bar}>

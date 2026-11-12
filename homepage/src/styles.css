@@ -798,106 +798,116 @@ h1, h2, h3, h4,
 }
 
 /* Occasion */
-.occasion { position: relative; z-index: 1; }
-
-.occasion-scene {
+.occasion {
   position: relative;
-  height: 720px;
-  overflow: hidden;
-  background: #8d8d8d;
+  z-index: 1;
+  background: #e6e6e6;
+  color: var(--navy);
 }
 
-.scene-layer {
-  position: absolute;
-  inset: 0;
-  opacity: 0;
-  transition: opacity 300ms linear;
-  z-index: 0;
-}
-
-.scene-layer.is-active { opacity: 1; z-index: 1; }
-
-.occasion-scrim {
-  position: absolute;
-  inset: 0;
-  z-index: 2;
-  pointer-events: none;
-  background: linear-gradient(to bottom, transparent 50%, rgba(0, 0, 0, 0.72) 100%);
+.occasion-band {
+  display: grid;
+  grid-template-columns: minmax(240px, 0.85fr) minmax(280px, 1.15fr) auto;
+  align-items: center;
+  gap: 48px 56px;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 64px 56px;
 }
 
 .occasion-copy {
-  position: absolute;
-  z-index: 3;
-  left: 0;
-  right: 0;
-  top: 50%;
-  bottom: 0;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  gap: 14px;
-  padding: 24px 24px 96px;
-  color: #fff;
+  align-items: flex-start;
+  gap: 16px;
+  text-align: left;
+  min-width: 0;
 }
 
 .occasion-copy .t-h2,
-.occasion-copy .t-deck { color: #fff; }
+.occasion-copy .t-deck { color: var(--navy); }
 
-.occasion-copy .t-deck { max-width: 40ch; }
-
-.chip-row {
-  display: flex;
-  justify-content: center;
-  gap: 18px;
+.occasion-copy .t-deck {
+  max-width: 28ch;
+  font-size: 16px;
+  line-height: 1.45;
 }
 
-.chip {
+.occasion-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 8px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--navy);
+  font-family: var(--font-text);
+  font-size: 16px;
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 1;
+  text-transform: none;
+  cursor: pointer;
+}
+
+.occasion-rule {
+  width: 1px;
+  height: 16px;
+  background: currentColor;
+  flex: none;
+}
+
+.occasion-portrait {
+  width: 100%;
+  height: 620px;
+  min-width: 0;
+  overflow: hidden;
+  background: #d5d5d5;
+}
+
+.occasion-portrait img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.occasion-stack {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
-  color: #fff;
-  width: 104px;
+  gap: 18px;
 }
 
-.chip-thumb {
-  width: 104px;
-  height: 68px;
-  border-radius: 6px;
-  outline: 1px solid rgba(255, 255, 255, 0.55);
-  outline-offset: 0;
+.occasion-look {
+  margin: 0;
+  width: 148px;
+  text-align: center;
 }
 
-.chip.is-selected .chip-thumb { outline: 2px solid #fff; }
+.occasion-look img {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  display: block;
+  background: #d5d5d5;
+}
 
-.chip-name {
+.occasion-look figcaption {
+  margin-top: 8px;
   font-family: var(--font-text);
-  font-size: 14px;
-  font-weight: 500;
-  letter-spacing: 0;
+  font-size: 13px;
+  font-weight: 400;
   line-height: 1.3;
-  opacity: 0.7;
+  color: var(--navy);
 }
 
-.chip.is-selected .chip-name { opacity: 1; }
-
-.chip-thumb .ph-chip {
-  font-size: 9px;
-  line-height: 1.2;
-  padding: 2px 4px;
-  max-width: calc(100% - 8px);
+.occasion-chevron {
+  display: flex;
+  color: var(--navy);
+  margin-top: 2px;
 }
-
-.occasion-cta {
-  position: absolute;
-  z-index: 4;
-  right: 32px;
-  bottom: 32px;
-}
-
-.occasion-scene :focus-visible { outline-color: #fff; }
 
 /* Holiday video hero */
 .holiday { background: #3a1700; }
@@ -940,22 +950,23 @@ h1, h2, h3, h4,
     "snow ."
     "title cta";
   align-content: end;
-  justify-content: center;
+  justify-content: start;
+  justify-items: start;
   align-items: center;
-  column-gap: clamp(20px, 2.4cqi, 36px);
+  column-gap: 28px;
   row-gap: 8px;
   text-align: left;
   background: transparent;
-  padding: 24px 40px;
+  padding: 24px 32px 22px 24px;
   pointer-events: none;
 }
 
 .holiday-snow {
   grid-area: snow;
-  justify-self: center;
+  justify-self: start;
   display: block;
-  width: 20px;
-  height: 20px;
+  width: 16px;
+  height: 16px;
   background: #f6f1ea;
   -webkit-mask: url("/holiday/snowflake.png") center / contain no-repeat;
   mask: url("/holiday/snowflake.png") center / contain no-repeat;
@@ -964,17 +975,22 @@ h1, h2, h3, h4,
 .holiday-title {
   grid-area: title;
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
+  flex-flow: row nowrap;
+  align-items: baseline;
+  gap: 0.28em;
   font-family: var(--font-display);
   font-weight: 400;
-  font-size: clamp(48px, calc(100cqi * 64 / 1024), 80px);
-  line-height: 0.96;
+  font-size: clamp(36px, 4.5cqi, 64px);
+  line-height: 1;
   letter-spacing: 0;
+  text-wrap: nowrap;
   color: #f6f1ea;
   width: auto;
+  max-width: 100%;
   margin: 0;
 }
+
+.holiday-title span { white-space: nowrap; }
 
 .holiday-cta {
   grid-area: cta;
@@ -1027,16 +1043,14 @@ h1, h2, h3, h4,
 /* New arrivals */
 .arrivals {
   background: #fff;
-  padding: clamp(40px, 4.5vw, 64px) 0 clamp(48px, 5vw, 72px);
+  padding: 28px 0 56px;
 }
 
-.arrivals-inner {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding-inline: clamp(20px, 3.4vw, 48px);
+.arrivals-heading {
+  margin: 0 0 16px;
+  padding-inline: 32px;
+  text-align: left;
 }
-
-.arrivals-heading { margin-bottom: clamp(20px, 2.4vw, 28px); }
 
 .arrivals-row {
   display: grid;
@@ -1511,61 +1525,75 @@ h1, h2, h3, h4,
 
   .reassure-list { grid-template-columns: 1fr; gap: 28px; }
 
-  .occasion-scene { height: 560px; }
-
-  .chip { width: 88px; }
-  .chip-thumb { width: 88px; height: 58px; }
-
-  .occasion-cta {
-    left: 16px;
-    right: 16px;
-    bottom: 16px;
-    width: auto;
+  .occasion-band {
+    grid-template-columns: 1fr;
+    gap: 28px;
+    padding: 32px 20px 40px;
   }
+
+  .occasion-portrait {
+    max-height: none;
+    aspect-ratio: 4 / 5;
+  }
+
+  .occasion-stack {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px 10px;
+    width: 100%;
+  }
+
+  .occasion-look { width: 100%; }
+
+  .occasion-chevron { grid-column: 1 / -1; justify-self: center; }
 
   .holiday-banner {
     width: 100%;
     aspect-ratio: auto;
-    min-height: 460px;
+    min-height: 420px;
   }
 
   .holiday-center {
     position: absolute;
     inset: 0;
-    grid-template-columns: minmax(0, 1fr);
+    grid-template-columns: minmax(0, max-content);
     grid-template-areas:
       "snow"
       "title"
       "cta";
-    justify-items: center;
-    row-gap: 10px;
-    padding: 20px 16px 24px;
-    text-align: center;
+    justify-content: start;
+    justify-items: start;
+    row-gap: 8px;
+    padding: 16px 24px 22px;
+    text-align: left;
   }
 
-  .holiday-snow { width: 16px; height: 16px; }
+  .holiday-snow { width: 14px; height: 14px; }
 
   .holiday-title {
-    align-items: center;
-    font-size: 42px;
+    flex-flow: column nowrap;
+    align-items: flex-start;
+    gap: 0;
+    font-size: 32px;
     max-width: 100%;
   }
 
   .holiday-cta {
-    width: 189px;
+    width: auto;
     min-width: 0;
     height: 40px;
-    padding: 0 12px;
+    padding: 0 16px;
   }
 
   .campaign { min-height: 520px; }
   .campaign-copy { padding: 32px 16px; }
 
-  .arrivals { padding: 36px 0 40px; }
+  .arrivals { padding: 22px 0 36px; }
 
-  .arrivals-inner { padding-inline: 0; }
-
-  .arrivals-heading { padding-inline: 16px; }
+  .arrivals-heading {
+    margin-bottom: 14px;
+    padding-inline: 24px;
+  }
 
   .arrivals-row {
     display: flex;
