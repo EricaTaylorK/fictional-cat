@@ -728,34 +728,36 @@ h1, h2, h3, h4,
   z-index: 0;
   background-color: transparent;
   background-image: linear-gradient(rgba(18, 14, 10, 0.42), rgba(18, 14, 10, 0.58));
-  transition: background-color 160ms ease;
-}
-
-.category-item:hover::before,
-.category-item:focus-visible::before {
-  background-color: rgba(0, 0, 0, 0.28);
 }
 
 .category-label {
   position: relative;
   z-index: 1;
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 128px;
+  height: 40px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: #ffffff;
+  color: #000000;
+  opacity: 1;
+  box-shadow: none;
+  filter: none;
+  backdrop-filter: none;
   font-family: var(--font-ui);
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 500;
-  line-height: 1.15;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
+  line-height: 1;
+  letter-spacing: 0;
+  text-align: center;
+  text-transform: none;
+  text-shadow: none;
   white-space: nowrap;
-  transition: transform 160ms ease;
-}
-
-.category-item:hover .category-label,
-.category-item:focus-visible .category-label {
-  transform: translateY(-5px);
-}
-
-.category-item:active .category-label {
-  transform: translateY(0);
 }
 
 @media (min-width: 540px) {
@@ -1656,17 +1658,6 @@ h1, h2, h3, h4,
 
 @media (prefers-reduced-motion: reduce) {
   .scene-layer { transition: none; }
-
-  .category-label,
-  .category-item::before {
-    transition: none;
-  }
-
-  .category-item:hover .category-label,
-  .category-item:focus-visible .category-label,
-  .category-item:active .category-label {
-    transform: none;
-  }
 }
 
 /* Sale mosaic */
