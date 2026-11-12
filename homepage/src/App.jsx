@@ -415,7 +415,7 @@ function SalePanel() {
               aria-label={tile.label}
               onClick={stopNavigation}
             >
-              <Placeholder className="sale-ph" decorative photo={tile.photo} position={tile.position} />
+              <Placeholder className="sale-ph" decorative photo={tile.photo} position={tile.position} zoom={tile.zoom} />
               <span className="sale-caption">{tile.caption}</span>
             </a>
           ))}
