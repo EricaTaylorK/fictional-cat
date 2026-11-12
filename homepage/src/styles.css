@@ -1067,7 +1067,7 @@ h1, h2, h3, h4,
 .brands {
   position: relative;
   overflow: hidden;
-  background: #2c3324 url("/banners/olive-plaid.jpg") center / cover no-repeat;
+  background: #2c3324 url("/banners/unrolled-plaid.jpg") center / cover no-repeat;
   padding: 24px 0 28px;
 }
 
@@ -1076,7 +1076,7 @@ h1, h2, h3, h4,
   position: absolute;
   inset: 0;
   z-index: 0;
-  background-image: none;
+  background-image: linear-gradient(rgba(18, 14, 10, 0.22), rgba(18, 14, 10, 0.22));
   pointer-events: none;
 }
 
