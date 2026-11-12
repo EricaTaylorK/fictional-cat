@@ -3,6 +3,7 @@ import SiteFooter from "./components/SiteFooter.jsx";
 import SiteHeader from "./components/SiteHeader.jsx";
 import {
   arrivals,
+  brandIntro,
   brands,
   categories,
   categoryHeading,
@@ -11,7 +12,6 @@ import {
   reassurance,
   returning,
   sale,
-  secondaryTiles,
   wedding,
 } from "./homeContent.js";
 
@@ -408,20 +408,6 @@ function OccasionModule() {
           {wedding.cta}
         </button>
       </div>
-      <div className="secondary-grid">
-        {secondaryTiles.map((tile) => (
-          <a
-            key={tile.name}
-            className={tile.photo ? "secondary-tile has-photo" : "secondary-tile"}
-            href={`#${tile.name}`}
-            aria-label={tile.name}
-            onClick={stopNavigation}
-          >
-            <Placeholder label={tile.shot} tone={tile.tone} photo={tile.photo} position={tile.position} />
-            <span className="t-h4">{tile.name}</span>
-          </a>
-        ))}
-      </div>
       {open ? (
         <ShopPanel
           chipName={chip.name}
@@ -570,15 +556,6 @@ function NewArrivals() {
 }
 
 function BrandWord({ brand }) {
-  if (brand.id === "tommy") {
-    return (
-      <span className="brand-word word-tommy">
-        <span>Tommy</span>
-        <span className="tommy-flag" aria-hidden="true" />
-        <span>Hilfiger</span>
-      </span>
-    );
-  }
   if (brand.id === "cole") {
     return (
       <span className="brand-word word-cole">
@@ -591,26 +568,29 @@ function BrandWord({ brand }) {
 }
 
 function BrandTiles() {
-  const loop = [...brands, ...brands];
   return (
-    <section className="brand-marquee" aria-label="Brands">
-      <div className="brand-track">
-        {loop.map((brand, index) => {
-          const clone = index >= brands.length;
-          return (
-            <a
-              key={`${brand.id}-${index}`}
-              className={`brand-tile tile-${brand.id}`}
-              href={`#${brand.id}`}
-              aria-label={clone ? undefined : brand.cta}
-              aria-hidden={clone ? true : undefined}
-              tabIndex={clone ? -1 : undefined}
-              onClick={stopNavigation}
-            >
-              <BrandWord brand={brand} />
-            </a>
-          );
-        })}
+    <section className="brands" aria-labelledby="brands-heading">
+      <div className="brands-inner">
+        <div className="brands-head">
+          <div className="brands-copy">
+            <h2 id="brands-heading" className="brands-heading">
+              {brandIntro.heading}
+            </h2>
+            <p className="brands-deck">{brandIntro.deck}</p>
+          </div>
+          <a className="brands-all" href="#brands" onClick={stopNavigation}>
+            {brandIntro.link}
+          </a>
+        </div>
+        <ul className="brands-row">
+          {brands.map((brand) => (
+            <li key={brand.id}>
+              <a className="brand-circle" href={`#${brand.id}`} aria-label={brand.cta} onClick={stopNavigation}>
+                <BrandWord brand={brand} />
+              </a>
+            </li>
+          ))}
+        </ul>
       </div>
     </section>
   );
@@ -697,16 +677,14 @@ export default function App() {
 
   return (
     <div className="page" id="top">
-      <ShippingBanner />
       <SiteHeader search={search} onSearch={setSearch} />
       <main>
         <CategoryBand />
         <HolidayBanner />
         <OccasionModule />
+        <ShippingBanner />
         <SalePanel />
         <NewArrivals />
-        <BrandTiles />
-        <Returning />
         <section className="reassure" aria-label="Reassurance">
           <ul className="reassure-list">
             {reassurance.items.map((item) => (
@@ -717,6 +695,8 @@ export default function App() {
             ))}
           </ul>
         </section>
+        <Returning />
+        <BrandTiles />
       </main>
       <SiteFooter />
     </div>

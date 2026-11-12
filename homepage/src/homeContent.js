@@ -1,6 +1,6 @@
 export const categoryHeading = {
   line1: "Shop by",
-  line2: "category",
+  line2: "Category",
 };
 
 export const categories = [
@@ -58,13 +58,6 @@ export const wedding = {
     { name: "Groomsman", shot: "A groomsman in a styled complete outfit", tone: "groomsman", photo: "/looks/light-blue-plaid.jpg", position: "center 20%" },
   ],
 };
-
-export const secondaryTiles = [
-  { name: "Work", shot: "Work occasion", tone: "work", photo: "/looks/gray-check-shirt.jpg", position: "center 25%" },
-  { name: "Prom/Black tie", shot: "Prom/Black tie occasion", tone: "prom", photo: "/looks/charcoal-chair.jpg", position: "center 20%" },
-  { name: "Rental", shot: "Rental occasion", tone: "rental", photo: "/looks/navy-chair-seated.jpg", position: "center 20%" },
-  { name: "Sale", shot: "Sale occasion", tone: "sale-tile", photo: "/looks/navy-check-gifts.jpg", position: "center 25%" },
-];
 
 export const panel = {
   addToBag: "Add to bag",
@@ -137,6 +130,12 @@ export const arrivals = {
       bar: "slate",
     },
   ],
+};
+
+export const brandIntro = {
+  heading: "Holiday-ready brands",
+  deck: "Standout styles from the brands you wear, all in one place.",
+  link: "Shop all",
 };
 
 export const brands = [
