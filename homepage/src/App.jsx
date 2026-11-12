@@ -6,7 +6,6 @@ import {
   brandIntro,
   brands,
   categories,
-  categoryHeading,
   hero,
   panel,
   reassurance,
@@ -152,9 +151,6 @@ function CategoryBand() {
   return (
     <section className="category-band" aria-label="Shop by category">
       <div className="category-layout">
-        <h2 className="category-heading">
-          <span>{categoryHeading.line1} {categoryHeading.line2}</span>
-        </h2>
         <div className="category-scroller">
           {categories.map((category) => (
             <a
@@ -645,8 +641,8 @@ export default function App() {
     <div className="page" id="top">
       <SiteHeader search={search} onSearch={setSearch} />
       <main>
-        <CategoryBand />
         <HolidayBanner />
+        <CategoryBand />
         <OccasionModule />
         <ShippingBanner />
         <SalePanel />
