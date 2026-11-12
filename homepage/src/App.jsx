@@ -152,9 +152,8 @@ function CategoryBand() {
   return (
     <section className="category-band" aria-label="Shop by category">
       <div className="category-layout">
-        <h2 className="t-h2 category-heading">
-          <span>{categoryHeading.line1}</span>
-          <span>{categoryHeading.line2}</span>
+        <h2 className="category-heading">
+          <span>{categoryHeading.line1} {categoryHeading.line2}</span>
         </h2>
         <div className="category-scroller">
           {categories.map((category) => (
