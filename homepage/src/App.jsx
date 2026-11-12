@@ -459,6 +459,61 @@ function HolidayBanner() {
   );
 }
 
+function SalePanel() {
+  const tiles = [
+    {
+      id: "sale-suits",
+      lines: ["Suits"],
+      name: "Shop suits on sale",
+      photo: "/products/suit-navy.jpg",
+      position: "center 28%",
+    },
+    {
+      id: "sale-dress-shirts",
+      lines: ["Dress", "Shirts"],
+      name: "Shop dress shirts on sale",
+      photo: "/products/white-dress-shirt.jpg",
+      position: "center 42%",
+    },
+    {
+      id: "sale-shoes",
+      lines: ["Shoes"],
+      name: "Shop shoes on sale",
+      photo: "/products/black-dress-shoes.jpg",
+      position: "center 58%",
+    },
+  ];
+
+  return (
+    <section className="sale-panel" aria-label="Sale">
+      <div className="sale-panel-inner">
+        <div className="sale-copy">
+          <h2 className="sale-heading">{sale.headline}</h2>
+          <p className="sale-deck">{sale.deck}</p>
+        </div>
+        <div className="sale-grid">
+          {tiles.map((tile) => (
+            <a
+              key={tile.id}
+              className="sale-tile"
+              href={`#${tile.id}`}
+              aria-label={tile.name}
+              onClick={stopNavigation}
+            >
+              <img src={tile.photo} alt="" style={{ objectPosition: tile.position }} />
+              <span className="sale-tile-label">
+                {tile.lines.map((line) => (
+                  <span key={line}>{line}</span>
+                ))}
+              </span>
+            </a>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function Campaign({ title, deck, cta, shot, tone, label }) {
   return (
     <section className="campaign" aria-label={label}>
@@ -631,14 +686,7 @@ export default function App() {
         <CategoryBand />
         <OccasionModule />
         <HolidayBanner />
-        <Campaign
-          label="Sale"
-          title={sale.headline}
-          deck={sale.deck}
-          cta={sale.cta}
-          shot={sale.shot}
-          tone="sale"
-        />
+        <SalePanel />
         <NewArrivals />
         <BrandTiles />
         <Returning />
