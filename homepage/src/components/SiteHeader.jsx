@@ -19,10 +19,6 @@ export default function SiteHeader({ search, onSearch }) {
 
   return (
     <header className="site-header">
-      <div className="promo">
-        <p>New markdowns — clearance up to 70% off original prices | Shop now &gt;</p>
-      </div>
-
       <div className="header-bar header-bar-mobile">
         <button
           type="button"

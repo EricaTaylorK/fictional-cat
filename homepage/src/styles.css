@@ -236,23 +236,6 @@ h1, h2, h3, h4,
   font-family: var(--font-ui);
 }
 
-.promo {
-  background: #d71111;
-  color: #fff;
-  text-align: center;
-  padding: 9px 16px;
-}
-
-.promo p {
-  margin: 0;
-  font-family: var(--font-ui);
-  font-size: 12px;
-  font-weight: 600;
-  line-height: 18px;
-  letter-spacing: 0.09em;
-  text-transform: uppercase;
-}
-
 .header-bar-mobile {
   display: flex;
   align-items: center;
