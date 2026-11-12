@@ -731,7 +731,7 @@ h1, h2, h3, h4,
 /* Category band */
 .category-band {
   position: relative;
-  background: transparent;
+  background: var(--cream);
 }
 
 .category-layout {
@@ -740,7 +740,7 @@ h1, h2, h3, h4,
   width: 100%;
   min-width: 0;
   margin: 0;
-  padding: 0;
+  padding: 24px 20px;
   background: transparent;
 }
 
@@ -777,8 +777,14 @@ h1, h2, h3, h4,
 .occasion {
   position: relative;
   z-index: 1;
-  background: #e6e6e6;
   color: var(--navy);
+  background-color: #c4a882;
+  background-image:
+    linear-gradient(rgba(239, 232, 220, 0.34), rgba(239, 232, 220, 0.34)),
+    url("/looks/navy-suit-wood.jpg");
+  background-repeat: no-repeat;
+  background-size: auto, 380% auto;
+  background-position: center, 100% 6%;
 }
 
 .occasion-band {
@@ -812,11 +818,12 @@ h1, h2, h3, h4,
 .occasion-link {
   display: inline-flex;
   align-items: center;
-  gap: 14px;
-  margin-top: 8px;
-  padding: 0;
+  justify-content: center;
+  margin-top: 12px;
+  min-height: 44px;
+  padding: 0 22px;
   border: 0;
-  background: none;
+  background: #fff;
   color: var(--navy);
   font-family: var(--font-accent);
   font-size: 14px;
@@ -824,14 +831,9 @@ h1, h2, h3, h4,
   letter-spacing: 0.12em;
   line-height: 1;
   text-transform: uppercase;
+  text-decoration: none;
+  border-radius: 0 8px 0 8px;
   cursor: pointer;
-}
-
-.occasion-rule {
-  width: 1px;
-  height: 16px;
-  background: currentColor;
-  flex: none;
 }
 
 .occasion-portrait {
@@ -1075,11 +1077,21 @@ h1, h2, h3, h4,
   font-size: 18px;
   font-weight: 400;
   line-height: 1.15;
-  letter-spacing: 0.02em;
+  letter-spacing: 0;
   text-transform: uppercase;
   white-space: nowrap;
   color: var(--cream);
   background: var(--navy);
+  gap: 8px;
+}
+
+.arrival-label { letter-spacing: 0.12em; }
+
+.arrival-arrow {
+  width: 22px;
+  height: 12px;
+  flex: none;
+  display: block;
 }
 
 .arrival-tile[data-bar="slate"] .arrival-caption {
@@ -1590,7 +1602,7 @@ h1, h2, h3, h4,
     scroll-margin-inline: 0;
   }
 
-  .arrival-caption { font-size: 17px; letter-spacing: 0.01em; }
+  .arrival-caption { font-size: 16px; }
 
   .brands-head { gap: 16px; }
 

@@ -347,9 +347,7 @@ function OccasionModule() {
           <h2 className="t-h2">{wedding.headline}</h2>
           <p className="t-deck">{wedding.deck}</p>
           <button type="button" className="occasion-link" ref={ctaRef} onClick={() => setOpen(true)}>
-            <span className="occasion-rule" aria-hidden="true" />
             {wedding.cta}
-            <span className="occasion-rule" aria-hidden="true" />
           </button>
         </div>
         <div className="occasion-portrait">
@@ -508,7 +506,12 @@ function NewArrivals() {
               <span className="arrival-photo">
                 <img src={tile.photo} alt="" style={{ objectPosition: tile.position }} />
               </span>
-              <span className="arrival-caption">{tile.name}</span>
+              <span className="arrival-caption">
+                <span className="arrival-label">{tile.name}</span>
+                <svg className="arrival-arrow" viewBox="0 0 36 20" aria-hidden="true" focusable="false">
+                  <path fill="currentColor" d="M0 6.5h17.5V1.5L36 10 17.5 18.5V13.5H0z" />
+                </svg>
+              </span>
             </a>
           </li>
         ))}
