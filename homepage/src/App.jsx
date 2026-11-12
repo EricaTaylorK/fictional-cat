@@ -481,6 +481,7 @@ function BrandWord({ brand }) {
 function BrandTiles() {
   return (
     <section className="brands" aria-labelledby="brands-heading">
+      <div className="brands-photo" aria-hidden="true" />
       <div className="brands-inner">
         <div className="brands-head">
           <div className="brands-copy">

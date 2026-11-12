@@ -1095,22 +1095,58 @@ h1, h2, h3, h4,
 
 /* Brands */
 .brands {
-  background: #fff url("/brands/holiday-still-life.jpg") center / cover no-repeat;
-  padding: calc(var(--section) / 2) 0;
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background: var(--cream);
+  padding: calc(var(--section) * 0.7) 0 calc(var(--section) * 0.55);
+}
+
+.brands-photo {
+  position: absolute;
+  z-index: 0;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: min(48%, 600px);
+  overflow: hidden;
+  pointer-events: none;
+  -webkit-mask-image: linear-gradient(105deg, #000 0%, #000 26%, transparent 64%);
+  mask-image: linear-gradient(105deg, #000 0%, #000 26%, transparent 64%);
+}
+
+.brands-photo::before {
+  content: "";
+  position: absolute;
+  left: 40%;
+  top: 62%;
+  width: 230%;
+  height: 230%;
+  background: url("/brands/holiday-belts.jpg") 78% 0% / 112% auto no-repeat;
+  transform: translate(-50%, -50%) rotate(-66deg);
 }
 
 .brands-inner {
+  position: relative;
+  z-index: 1;
   max-width: var(--page);
   margin: 0 auto;
   padding-inline: var(--gutter);
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(260px, 1.1fr);
+  column-gap: clamp(20px, 3vw, 48px);
+  row-gap: clamp(18px, 2.2vw, 28px);
+  align-items: center;
 }
 
 .brands-head {
+  grid-column: 2;
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
   gap: var(--gap);
-  margin-bottom: calc(var(--section) / 2);
+  width: min(100%, 540px);
+  margin: 0 auto;
 }
 
 .brands-heading {
@@ -1148,11 +1184,13 @@ h1, h2, h3, h4,
 }
 
 .brands-row {
+  grid-column: 1 / -1;
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: var(--gap);
   list-style: none;
-  margin: 0;
+  width: 74%;
+  margin: 0 0 0 auto;
   padding: 0;
 }
 
@@ -1164,10 +1202,7 @@ h1, h2, h3, h4,
   width: 100%;
   aspect-ratio: 1;
   border-radius: 50%;
-  overflow: hidden;
-  background: rgba(243, 240, 234, 0.46);
-  -webkit-backdrop-filter: blur(16px);
-  backdrop-filter: blur(16px);
+  background: #f6f3ec;
   color: var(--navy);
   text-decoration: none;
   padding: 12%;
@@ -1613,12 +1648,39 @@ h1, h2, h3, h4,
 
   .arrival-caption { font-size: 16px; }
 
-  .brands-head { gap: var(--gap); }
+  .brands {
+    padding: 0 0 calc(var(--section) * 0.7);
+  }
+
+  .brands-photo {
+    width: 100%;
+    height: 240px;
+    bottom: auto;
+    overflow: hidden;
+    -webkit-mask-image: linear-gradient(120deg, #000 0px, #000 96px, transparent 230px);
+    mask-image: linear-gradient(120deg, #000 0px, #000 96px, transparent 230px);
+  }
+
+  .brands-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--gap);
+    padding-top: 200px;
+  }
+
+  .brands-head {
+    gap: var(--gap);
+    width: 100%;
+    margin: 0;
+  }
 
   .brands-heading { font-size: 1.75rem; }
 
   .brands-row {
     display: flex;
+    width: auto;
+    margin: 0;
     gap: var(--gap);
     overflow-x: auto;
     scroll-snap-type: x mandatory;
