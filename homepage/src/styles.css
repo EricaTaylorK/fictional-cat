@@ -732,9 +732,9 @@ h1, h2, h3, h4,
   backdrop-filter: none;
   font-family: var(--font-accent);
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 500;
   line-height: 1;
-  letter-spacing: 0;
+  letter-spacing: 0.04em;
   text-align: center;
   text-decoration: none;
   text-shadow: none;
