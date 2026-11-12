@@ -1073,7 +1073,8 @@ h1, h2, h3, h4,
 .brands-inner {
   max-width: var(--page);
   margin: 0 auto;
-  padding-inline: var(--gutter);
+  padding-left: 0;
+  padding-right: var(--gutter);
   display: grid;
   grid-template-columns: minmax(0, 1.05fr) minmax(260px, 0.95fr);
   column-gap: clamp(28px, 4vw, 56px);
@@ -1163,7 +1164,7 @@ h1, h2, h3, h4,
   list-style: none;
   width: 100%;
   margin: -55px 0 0;
-  padding: 0;
+  padding: 0 0 0 var(--gutter);
 }
 
 .brands-row li {
@@ -1695,7 +1696,12 @@ h1, h2, h3, h4,
     flex-direction: column;
     align-items: stretch;
     gap: 20px;
-    padding-top: 0;
+    padding: 0;
+  }
+
+  .brands-copy,
+  .brands-row {
+    padding-inline: var(--gutter);
   }
 
   .brands-photo {
