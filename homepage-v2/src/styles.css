@@ -1172,6 +1172,25 @@ input {
   display: none;
 }
 
+/* Shop the Look sits on dark plaid: hidden under the full-bleed photos on
+   desktop, it frames the swipeable lookbook and its pager on phones */
+.lookbook {
+  background: linear-gradient(rgba(18, 14, 10, 0.62), rgba(18, 14, 10, 0.62)),
+    url("/v2/brands/plaid.png") center / cover, #2c3324;
+}
+
+@media (max-width: 767.98px) {
+  .lookbook {
+    padding: var(--space-2xl) 0;
+  }
+
+  .lookbook .real-pager {
+    background: var(--ivory);
+    color: var(--umber);
+  }
+}
+
+
 .visually-hidden {
   position: absolute;
   width: 1px;
@@ -1190,7 +1209,7 @@ input {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: var(--section-y) var(--gutter) var(--space-4xl);
+  padding: var(--section-y) var(--gutter); /* a full section: dark Gifts follows */
   gap: var(--space-2xl);
 }
 
@@ -2105,6 +2124,7 @@ input {
   gap: 16px 24px;
   padding: 30px var(--chrome-gutter);
   background: var(--burgundy);
+  border-top: 1px solid rgba(239, 232, 220, 0.18); /* hairline from the burgundy trust strip above */
   color: #fff;
 }
 
@@ -3231,7 +3251,6 @@ input {
     display: grid;
     grid-template-columns: repeat(var(--grid-cols), minmax(0, 1fr));
     column-gap: var(--grid-gap);
-    padding-bottom: var(--section-gap);
   }
 
   .real-titles {

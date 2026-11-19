@@ -706,16 +706,8 @@ function Gifts() {
 
 /* ---------- Holiday, in the real world ---------- */
 
-function RealWorld() {
-  const [open, setOpen] = useState(null);
-  const trigger = useRef(null);
-  const lookRail = useCardRail(); // on phones the two looks become a swipeable lookbook
-  const lookIndex = Math.round(lookRail.progress) + 1;
-  const openLook = (id, element) => {
-    trigger.current = element;
-    setOpen(id);
-  };
-
+// Brand story: the editorial pause after the tag rack (cream, the Love patch)
+function Moments() {
   return (
     <section className="real">
       <div className="real-accent" aria-hidden="true" />
@@ -737,6 +729,23 @@ function RealWorld() {
           <img src={A("realworld/love-patch-hd.png")} alt="Love, Men’s Wearhouse" width="504" height="349" />
         </div>
       </div>
+    </section>
+  );
+}
+
+// Shop the Look: the two full-bleed looks, each opening the look drawer
+function LookBook() {
+  const [open, setOpen] = useState(null);
+  const trigger = useRef(null);
+  const lookRail = useCardRail(); // on phones the two looks become a swipeable lookbook
+  const lookIndex = Math.round(lookRail.progress) + 1;
+  const openLook = (id, element) => {
+    trigger.current = element;
+    setOpen(id);
+  };
+
+  return (
+    <section className="lookbook" aria-label="Shop the look">
       <div className="real-row" ref={lookRail.railRef} onScroll={lookRail.onScroll}>
         <article className="real-tile real-tile--office">
           <img className="real-office-photo" src={A("realworld/office-party.png")} alt="" />
@@ -1305,16 +1314,19 @@ export default function App() {
     <div className="page">
       <GlobalNav />
       <main>
+        {/* Strict 1:1 rhythm: every dark plaid band is separated by a cream one,
+            then the burgundy trust strip leads into the referral bar and footer */}
         <Hero />
         <CategoryTags />
-        <Gifts />
-        <RealWorld />
         <SaleEdit />
         <ShippingBanner />
+        <Moments />
+        <Gifts />
         <NewArrivals />
-        <Reassurance />
+        <LookBook />
         <RecentlyViewed />
         <Brands />
+        <Reassurance />
       </main>
       <Footer />
     </div>
