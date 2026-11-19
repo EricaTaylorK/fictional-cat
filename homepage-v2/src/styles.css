@@ -117,6 +117,7 @@
   --studio-vignette: radial-gradient(ellipse 90% 80% at 50% 45%, transparent 60%, rgba(58, 47, 34, 0.07) 100%);
   --studio-shadow: drop-shadow(0 10px 12px rgba(58, 47, 34, 0.16)) drop-shadow(0 2px 3px rgba(58, 47, 34, 0.12));
 
+  --ink-stamp: #1e1610;  /* kraft tape labels: deep espresso, reads crisply on kraft */
   --cta-ink: #7f5e34;    /* button copy on ivory: 4.9:1 */
   --motion: 0.25s ease;  /* one subtle timing for every CTA and link */
   --radius-s: 4px;
@@ -672,10 +673,12 @@ input {
   z-index: -1;
 }
 
+/* Section header lockups: the title and its actions share one baseline
+   (same rule on Tags, Just In and Sale); the arrows center on the link */
 .tags-head {
   width: 100%;
   display: flex;
-  align-items: flex-start;
+  align-items: baseline;
   justify-content: space-between;
 }
 
@@ -1052,7 +1055,7 @@ input {
   border-image-width: 0 14px;
   border-image-repeat: stretch;
   filter: drop-shadow(0 1px 0.5px rgba(20, 12, 4, 0.3)) drop-shadow(0 2px 3px rgba(20, 12, 4, 0.18));
-  color: var(--espresso);
+  color: var(--ink-stamp);
   text-align: center;
 }
 
@@ -1162,10 +1165,72 @@ input {
   }
 }
 
-/* ---------- Holiday, in the real world ---------- */
-
-.real {
+/* ---------- Moments That Matter: the Threadworthy story ----------
+   A full-width 50/50 split: the lining photo bleeds to the left edge and runs
+   the full height; the copy sits on cream in the right half, its left edge one
+   column gutter past the midline and its right edge on the page gutter. */
+.story {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  min-height: clamp(560px, 46vw, 760px);
   background: var(--ivory);
+}
+
+.story-media {
+  position: relative;
+  overflow: hidden;
+  background: #1f2a22; /* the lining's green, while the photo loads */
+}
+
+.story-media img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 42%; /* the label sits just above center */
+}
+
+.story-copy {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  gap: var(--stack);
+  padding: var(--section-y) var(--gutter) var(--section-y) clamp(var(--space-3xl), 6vw, var(--space-9xl));
+  color: var(--umber);
+}
+
+.story-title {
+  max-width: 14ch;
+  line-height: 1.2; /* a touch more air than --lh-h1 so the three lines balance the photo */
+  color: var(--burgundy);
+  text-wrap: balance;
+}
+
+.story-deck {
+  max-width: 34ch;
+  text-wrap: pretty;
+}
+
+.story-copy .link-caps {
+  margin-top: var(--space-s);
+}
+
+/* phones: the photo leads as a portrait, the story follows */
+@media (max-width: 767.98px) {
+  .story {
+    grid-template-columns: minmax(0, 1fr);
+    min-height: 0;
+  }
+
+  .story-media {
+    aspect-ratio: 4 / 5;
+  }
+
+  .story-copy {
+    padding: var(--section-y) var(--gutter);
+  }
 }
 
 .real-pager {
@@ -1190,7 +1255,6 @@ input {
   }
 }
 
-
 .visually-hidden {
   position: absolute;
   width: 1px;
@@ -1198,59 +1262,6 @@ input {
   overflow: hidden;
   clip: rect(0 0 0 0);
   white-space: nowrap;
-}
-
-.real-accent {
-  height: 8px;
-  background: url("/v2/realworld/plaid-accent.png") top left / 25px 25px;
-}
-
-.real-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: var(--section-y) var(--gutter); /* a full section: dark Gifts follows */
-  gap: var(--space-2xl);
-}
-
-.real-titles {
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: var(--stack);
-  white-space: nowrap;
-}
-
-.real-titles .h-section {
-  max-width: min(692px, 100%); /* Figma's title block width; keeps the headline clear of the Love patch */
-  white-space: normal;
-}
-
-.real-deck {
-  width: min(692px, 100%);
-  white-space: normal;
-  color: var(--umber);
-}
-
-.real-cta {
-  align-self: flex-start;
-  margin-top: var(--space-s);
-}
-
-.real-patch {
-  width: clamp(180px, 20.9583vw, 301.799px);
-  aspect-ratio: 301.799 / 213.836;
-  flex-shrink: 0;
-  display: grid;
-  place-items: center;
-}
-
-.real-patch img {
-  width: 93.08%; /* 280.9 of 301.8 */
-  height: auto;
-  transform: rotate(4deg);
-  /* Figma: (1, 2) blur 8 at 15% and (0, 6) blur 14 at 10%, warm brown */
-  filter: drop-shadow(1px 2px 4px rgba(31, 20, 8, 0.18)) drop-shadow(0 6px 7px rgba(31, 20, 8, 0.12));
 }
 
 .real-row {
@@ -1436,10 +1447,15 @@ input {
 
 /* ---------- Shipping banner ---------- */
 
+.ship-caps {
+  margin-right: calc(-1 * var(--track-caps)); /* cancel the tracking after the last letter */
+}
+
+/* the caps and the serif line share one baseline (their line boxes differ) */
 .ship {
   display: flex;
   flex-wrap: wrap;
-  align-items: center;
+  align-items: baseline;
   justify-content: center;
   gap: var(--space-s) var(--space-2xl);
   padding: var(--band-y) var(--gutter);
@@ -1447,6 +1463,20 @@ input {
     url("/v2/banner/woven.png") top left / 627px 627px, var(--umber);
   color: var(--ivory);
   white-space: nowrap;
+}
+
+/* below desktop the three lines don't fit one row: stack them, centered */
+@media (max-width: 1023.98px) {
+  .ship {
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-xs);
+    padding: var(--space-2xl) var(--gutter);
+  }
+
+  .ship-caps {
+    margin-right: 0;
+  }
 }
 
 /* ---------- New Arrivals ---------- */
@@ -1527,7 +1557,7 @@ input {
 .arrivals-head {
   display: flex;
   flex-wrap: wrap;
-  align-items: center;
+  align-items: baseline;
   justify-content: space-between;
   gap: var(--space-l) var(--space-2xl);
 }
@@ -2804,21 +2834,6 @@ input {
     padding: 0 var(--space-l);
   }
 
-  /* Tablet: patch on the left, copy beside it */
-  .real-head {
-    gap: var(--space-2xl);
-  }
-
-  .real-titles {
-    flex: 1 1 0;
-    white-space: normal;
-  }
-
-  .real-patch {
-    order: -1;
-    width: clamp(200px, 36vw, 300px);
-  }
-
   /* Holiday tiles stack */
   .real-row {
     flex-direction: column;
@@ -3011,40 +3026,6 @@ input {
     transform-origin: top left;
   }
 
-  /* Phone: eyebrow, then the patch, then headline, copy and CTA.
-     The title block opens up (display: contents) so the patch can slot in. */
-  .real-head {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: var(--stack);
-  }
-
-  .real-titles {
-    display: contents;
-  }
-
-  .real-head .eyebrow {
-    order: 1;
-  }
-
-  .real-patch {
-    order: 2;
-    width: min(320px, 88%);
-    margin: var(--space-xs) 0 var(--space-s);
-  }
-
-  .real-head .h-section {
-    order: 3;
-  }
-
-  .real-deck {
-    order: 4;
-  }
-
-  .real-cta {
-    order: 5;
-  }
-
   .real-office-title,
   .real-family-title {
     max-width: calc(100% - 2 * var(--gutter));
@@ -3065,6 +3046,7 @@ input {
 
   .ship {
     flex-direction: column;
+    align-items: center;
     gap: var(--space-xs);
     padding: var(--space-2xl) var(--gutter);
   }
@@ -3246,23 +3228,6 @@ input {
     scroll-padding-inline: 0;
   }
 
-  /* Holiday heritage: copy on columns 1–7, the patch centered on 9–12 */
-  .real-head {
-    display: grid;
-    grid-template-columns: repeat(var(--grid-cols), minmax(0, 1fr));
-    column-gap: var(--grid-gap);
-  }
-
-  .real-titles {
-    grid-column: 1 / span 7;
-  }
-
-  .real-patch {
-    grid-column: 9 / -1;
-    justify-self: center;
-    width: min(100%, clamp(260px, 26vw, 400px));
-  }
-
   /* Shop the look stays full-bleed (edge to edge, no gap), like the hero:
      an editorial break from the grid in the spirit of Ralph Lauren's split tiles */
 
@@ -3284,19 +3249,29 @@ input {
   }
 
   /* Sale: uniform gutters, link aligned to the grid's right edge */
-  .sale {
-    padding-bottom: var(--space-6xl);
-  }
-
   .sale-grid,
   .sale-pair {
     gap: var(--grid-gap);
   }
 
   /* Shipping ribbon: a crisp band, not a block */
+  /* "Free Shipping" anchors the exact page center; the caps lines hug it from
+     each side, so unequal phrase lengths never pull it off-center */
   .ship {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    align-items: baseline;
+    column-gap: var(--space-2xl);
     padding-top: var(--space-l);
     padding-bottom: var(--space-l);
+  }
+
+  .ship-caps:first-child {
+    justify-self: end;
+  }
+
+  .ship-caps:last-child {
+    justify-self: start;
   }
 
   /* Just In: three whole tiles inside the gutters */

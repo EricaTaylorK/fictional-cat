@@ -706,28 +706,31 @@ function Gifts() {
 
 /* ---------- Holiday, in the real world ---------- */
 
-// Brand story: the editorial pause after the tag rack (cream, the Love patch)
+// Brand story / Threadworthy blog: a full-width 50/50 split. The photo (the
+// "Love, Men's Wearhouse" label stitched into a green paisley jacket lining) runs
+// edge to edge on the left half; the story sits on cream on the right half.
 function Moments() {
   return (
-    <section className="real">
-      <div className="real-accent" aria-hidden="true" />
-      <div className="real-head">
-        <div className="real-titles">
-          <p className="eyebrow t-eyebrow">A little know-how goes a long way</p>
-          <h2 className="h-section t-h1">Ready for the Moments That Matter</h2>
-          <p className="real-deck t-lead">
-            For generations, we’ve helped men get dressed for life’s big moments—and all the ones in between.
-          </p>
-          {/* Blog CTA: the MW blog from the footer; href pending the real post URL */}
-          <a className="real-cta link-caps link-caps--dark t-cta" href="#" onClick={stop}>
-            Read on Threadworthy
-          </a>
-        </div>
-        {/* Figma "Love patch" (48:635): 281 x 195 patch tilted 4deg in a 302 x 214 frame.
-            Image is the original embroidered artwork, cut out at 2.4x Figma's fill resolution. */}
-        <div className="real-patch">
-          <img src={A("realworld/love-patch-hd.png")} alt="Love, Men’s Wearhouse" width="504" height="349" />
-        </div>
+    <section className="story" aria-labelledby="story-title">
+      <div className="story-media">
+        <img
+          src={A("realworld/lining-label.jpg")}
+          alt="A “Love, Men’s Wearhouse” label stitched into the green paisley lining of a navy jacket"
+          width="1024"
+          height="1536"
+          loading="lazy"
+        />
+      </div>
+      <div className="story-copy">
+        <p className="story-eyebrow t-eyebrow">A little know-how goes a long way</p>
+        <h2 id="story-title" className="story-title t-h1">Ready for the Moments That Matter</h2>
+        <p className="story-deck t-lead">
+          For generations, we’ve helped men get dressed for life’s big moments—and all the ones in between.
+        </p>
+        {/* Blog CTA: the MW blog from the footer; href pending the real post URL */}
+        <a className="link-caps link-caps--dark t-cta" href="#" onClick={stop}>
+          Read on Threadworthy
+        </a>
       </div>
     </section>
   );
@@ -1318,11 +1321,11 @@ export default function App() {
             then the burgundy trust strip leads into the referral bar and footer */}
         <Hero />
         <CategoryTags />
-        <SaleEdit />
+        <NewArrivals />
         <ShippingBanner />
         <Moments />
         <Gifts />
-        <NewArrivals />
+        <SaleEdit />
         <LookBook />
         <RecentlyViewed />
         <Brands />
