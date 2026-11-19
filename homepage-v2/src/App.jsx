@@ -187,6 +187,48 @@ const looks = {
   },
 };
 
+// Per-piece details. Sizes, price and Add to Bag render only when real product
+// data is supplied ({ name, category, price?, sizes?: [], href? }); until then the
+// piece links to its category. Nothing here is placeholder data.
+function LookItemDetails({ item }) {
+  const [size, setSize] = useState(null);
+  const [added, setAdded] = useState(false);
+  const hasProduct = Array.isArray(item.sizes) && item.sizes.length > 0;
+  const group = `size-${item.name.toLowerCase().replace(/[^a-z]+/g, "-")}`;
+
+  return (
+    <span className="look-item-copy">
+      <span className="t-body look-item-name">{item.name}</span>
+      {item.price ? <span className="t-small look-item-price">{item.price}</span> : null}
+      {hasProduct ? (
+        <>
+          <span className="look-sizes" role="radiogroup" aria-label={`Size for ${item.name}`}>
+            {item.sizes.map((value) => (
+              <label key={value} className={`look-size${size === value ? " is-selected" : ""}`}>
+                <input type="radio" name={group} value={value} checked={size === value} onChange={() => setSize(value)} />
+                {value}
+              </label>
+            ))}
+          </span>
+          <button
+            type="button"
+            className="btn btn--solid btn--small t-cta"
+            disabled={!size}
+            onClick={() => setAdded(true)}
+          >
+            {added ? "Added" : "Add to Bag"}
+          </button>
+          <span className="visually-hidden" aria-live="polite">{added ? `${item.name}, size ${size}, added to bag` : ""}</span>
+        </>
+      ) : (
+        <a className="link-caps link-caps--burgundy t-cta" href={item.href || "#"} onClick={item.href ? undefined : stop}>
+          Shop {item.category}
+        </a>
+      )}
+    </span>
+  );
+}
+
 function LookDrawer({ look, onClose, returnFocusTo }) {
   const panelRef = useRef(null);
   const closeRef = useRef(null);
@@ -274,12 +316,7 @@ function LookDrawer({ look, onClose, returnFocusTo }) {
                   backgroundPosition: item.pos,
                 }}
               />
-              <span className="look-item-copy">
-                <span className="t-body look-item-name">{item.name}</span>
-                <a className="link-caps link-caps--burgundy t-cta" href="#" onClick={stop}>
-                  Shop {item.category}
-                </a>
-              </span>
+              <LookItemDetails item={item} />
             </li>
           ))}
         </ul>
@@ -622,6 +659,8 @@ function Gifts() {
 function RealWorld() {
   const [open, setOpen] = useState(null);
   const trigger = useRef(null);
+  const lookRail = useCardRail(); // on phones the two looks become a swipeable lookbook
+  const lookIndex = Math.round(lookRail.progress) + 1;
   const openLook = (id, element) => {
     trigger.current = element;
     setOpen(id);
@@ -637,6 +676,10 @@ function RealWorld() {
           <p className="real-deck t-lead">
             For generations, we’ve helped men get dressed for life’s big moments—and all the ones in between.
           </p>
+          {/* Blog CTA: the MW blog from the footer; href pending the real post URL */}
+          <a className="real-cta link-caps link-caps--dark t-cta" href="#" onClick={stop}>
+            Read on Threadworthy
+          </a>
         </div>
         {/* Figma "Love patch" (48:635): 281 x 195 patch tilted 4deg in a 302 x 214 frame.
             Image is the original embroidered artwork, cut out at 2.4x Figma's fill resolution. */}
@@ -644,7 +687,7 @@ function RealWorld() {
           <img src={A("realworld/love-patch-hd.png")} alt="Love, Men’s Wearhouse" width="504" height="349" />
         </div>
       </div>
-      <div className="real-row">
+      <div className="real-row" ref={lookRail.railRef} onScroll={lookRail.onScroll}>
         <article className="real-tile real-tile--office">
           <img className="real-office-photo" src={A("realworld/office-party.png")} alt="" />
           <h3 className="real-office-title t-eyebrow-lg t-wide">The Office Party</h3>
@@ -661,6 +704,9 @@ function RealWorld() {
           </div>
         </article>
       </div>
+      <p className="real-pager t-eyebrow" aria-hidden="true">
+        {String(lookIndex).padStart(2, "0")} / 02
+      </p>
       {open ? <LookDrawer look={looks[open]} onClose={() => setOpen(null)} returnFocusTo={trigger.current} /> : null}
     </section>
   );
@@ -688,8 +734,20 @@ function SaleEdit() {
           </span>
         </a>
         <div className="sale-pair">
-          <div className="sale-blank" aria-label="Sport coats" />
-          <div className="sale-blank" aria-label="Dress shirts" />
+          {/* Figma "Image assets" sale fills (5:14 / 5:15) */}
+          {[
+            { label: "Sport Coats", photo: "sale/coat.png" },
+            { label: "Dress Shirts", photo: "sale/shirt.png" },
+          ].map((tile) => (
+            <a key={tile.label} className="sale-tile" href="#" onClick={stop}>
+              <img className="sale-tile-photo" src={A(tile.photo)} alt="" />
+              <span className="sale-shade" aria-hidden="true" />
+              <span className="sale-label t-eyebrow-lg">
+                {tile.label}
+                <img src={A("sale/arrow.svg")} alt="" width="40" height="9" />
+              </span>
+            </a>
+          ))}
         </div>
       </div>
     </section>
@@ -885,15 +943,43 @@ function Reassurance() {
 /* ---------- Recently viewed ---------- */
 
 const recent = [
-  { name: "Egara Golden Santa Socks, 1-Pair, Gray", price: "$16", photo: "recent/sock-1.png" },
-  { name: "Egara Snowmen Socks, 1-Pair, Gray", price: "$16", photo: "recent/sock-2.png" },
-  { name: "Egara Surfing Santa Socks, 1-Pair, Black", price: "$16", photo: "recent/sock-3.png" },
-  { name: "Joseph Abboud Golf Pattern Performance Socks, 1-Pair, Blue", price: "$18", photo: "recent/sock-4.png" },
-  { name: "Egara Party Socks, 1-Pair, Gray", price: "$15", photo: "recent/sock-5.png" },
+  // swatch: APPROXIMATE main color sampled from each product photo (no SKU color data)
+  { name: "Egara Golden Santa Socks, 1-Pair, Gray", price: "$16", photo: "recent/sock-1.png", swatch: "#817c78" },
+  { name: "Egara Snowmen Socks, 1-Pair, Gray", price: "$16", photo: "recent/sock-2.png", swatch: "#adc4db" },
+  { name: "Egara Surfing Santa Socks, 1-Pair, Black", price: "$16", photo: "recent/sock-3.png", swatch: "#181616" },
+  { name: "Joseph Abboud Golf Pattern Performance Socks, 1-Pair, Blue", price: "$18", photo: "recent/sock-4.png", swatch: "#a7caf7" },
+  { name: "Egara Party Socks, 1-Pair, Gray", price: "$15", photo: "recent/sock-5.png", swatch: "#7f7e7c" },
 ];
 
 // The card row scrolls natively (swipe on touch, the Next button on desktop);
 // the progress bar follows the scroll position.
+function RecentCard({ card }) {
+  const [saved, setSaved] = useState(false);
+  return (
+    <div className="recent-card t-small">
+      <a className="recent-link" href="#" onClick={stop}>
+        <span className="recent-photo-wrap">
+          <img className="recent-photo" src={A(card.photo)} alt="" />
+        </span>
+        <span className="recent-name">{card.name}</span>
+        <span className="recent-price">{card.price}</span>
+      </a>
+      <span className="recent-swatch" style={{ "--swatch": card.swatch }} title="Color (approximate)" aria-hidden="true" />
+      <button
+        type="button"
+        className={`recent-heart${saved ? " is-saved" : ""}`}
+        aria-pressed={saved}
+        aria-label={`Save ${card.name} to wishlist`}
+        onClick={() => setSaved((value) => !value)}
+      >
+        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+          <path d="M12 20.5s-7.5-4.6-7.5-10.2A4.3 4.3 0 0 1 12 7.6a4.3 4.3 0 0 1 7.5 2.7c0 5.6-7.5 10.2-7.5 10.2z" />
+        </svg>
+      </button>
+    </div>
+  );
+}
+
 function RecentlyViewed() {
   const rail = useCardRail();
 
@@ -917,13 +1003,7 @@ function RecentlyViewed() {
           aria-label="Recently viewed products"
         >
           {recent.map((card) => (
-            <a key={card.name} className="recent-card t-small" href="#" onClick={stop}>
-              <span className="recent-photo-wrap">
-                <img className="recent-photo" src={A(card.photo)} alt="" />
-              </span>
-              <span className="recent-name">{card.name}</span>
-              <span className="recent-price">{card.price}</span>
-            </a>
+            <RecentCard key={card.name} card={card} />
           ))}
         </div>
         <RailProgress rail={rail} />

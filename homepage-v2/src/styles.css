@@ -273,11 +273,11 @@ input {
 /* ---------- Text links ----------
    One style for every text link: Thabit caps (.t-cta) over a hand-drawn brush
    stroke that echoes the brush arrows, drawn in the link's own color.
-   Hover: the stroke softly fades back. */
+   At rest the stroke is a quiet half-strength accent; hover brings it to full. */
 .link-caps {
   position: relative;
   display: inline-block;
-  padding-bottom: var(--space-s);
+  padding-bottom: 6px;
   color: var(--ivory);
   text-decoration: none;
   white-space: nowrap;
@@ -289,8 +289,9 @@ input {
   left: -2px;
   right: -4px;
   bottom: 0;
-  height: 6px;
+  height: 4px;
   background: currentColor;
+  opacity: 0.5;
   -webkit-mask: url("/v2/links/brush-underline.svg") 0 0 / 100% 100% no-repeat;
   mask: url("/v2/links/brush-underline.svg") 0 0 / 100% 100% no-repeat;
   transition: opacity var(--motion);
@@ -310,7 +311,7 @@ input {
 
 @media (hover: hover) {
   .link-caps:hover::after {
-    opacity: 0.35;
+    opacity: 1;
   }
 }
 
@@ -330,7 +331,7 @@ input {
 }
 
 /* ---------- Buttons ----------
-   Square, 1px, 40px tall; copy uses .t-cta, the same type token as text links.
+   Square, 1px, 48px tall; copy uses .t-cta, the same type token as text links.
    Hover: the fill shifts gently (the "+" on Shop the look turns a quarter).
    - Solid:   ivory fill, #7F5E34 copy
    - Outline: ivory line + copy on photos */
@@ -339,7 +340,7 @@ input {
   align-items: center;
   justify-content: center;
   gap: var(--space-m);
-  height: 40px;
+  height: 48px;
   padding: 0 var(--space-xl);
   border: 1px solid var(--ivory);
   border-radius: 0;
@@ -728,17 +729,15 @@ input {
 
 @keyframes tag-settle-a {
   0% { rotate: 0deg; }
-  20% { rotate: 2.4deg; }
-  45% { rotate: -1.6deg; }
-  70% { rotate: 0.8deg; }
+  30% { rotate: -3deg; }
+  65% { rotate: 2deg; }
   100% { rotate: 0deg; }
 }
 
 @keyframes tag-settle-b {
   0% { rotate: 0deg; }
-  20% { rotate: 2.4deg; }
-  45% { rotate: -1.6deg; }
-  70% { rotate: 0.8deg; }
+  30% { rotate: -3deg; }
+  65% { rotate: 2deg; }
   100% { rotate: 0deg; }
 }
 
@@ -1011,6 +1010,19 @@ input {
   background: var(--ivory);
 }
 
+.real-pager {
+  display: none;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
 .real-accent {
   height: 8px;
   background: url("/v2/realworld/plaid-accent.png") top left / 25px 25px;
@@ -1041,6 +1053,11 @@ input {
   width: min(692px, 100%);
   white-space: normal;
   color: var(--umber);
+}
+
+.real-cta {
+  align-self: flex-start;
+  margin-top: var(--space-s);
 }
 
 .real-patch {
@@ -1203,9 +1220,26 @@ input {
   gap: var(--space-l);
 }
 
-.sale-blank {
+.sale-tile {
+  position: relative;
   flex: 1 0 0;
+  min-height: 0;
+  overflow: hidden;
   background: var(--espresso);
+}
+
+.sale-tile-photo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 18%;
+}
+
+.sale-tile:focus-visible {
+  outline: 2px solid var(--umber);
+  outline-offset: 3px;
 }
 
 /* ---------- Shipping banner ---------- */
@@ -1250,7 +1284,7 @@ input {
 
 .arrivals-row {
   display: flex;
-  gap: var(--space-2xl);
+  gap: var(--space-l);
   padding-right: var(--gutter);
   overflow-x: auto;
   overscroll-behavior-x: contain;
@@ -1265,7 +1299,7 @@ input {
 .arrival {
   position: relative;
   flex: none;
-  width: calc((100% - var(--gaps) * var(--space-2xl)) / var(--visible));
+  width: calc((100% - var(--gaps) * var(--space-l)) / var(--visible));
   aspect-ratio: 3 / 4;
   overflow: hidden;
   scroll-snap-align: start;
@@ -1329,7 +1363,8 @@ input {
 /* Image tiles: the caption's arrow steps forward, matching the buttons */
 @media (hover: hover) {
   .arrival:hover .arrival-arrow,
-  .sale-suits:hover .sale-label img {
+  .sale-suits:hover .sale-label img,
+  .sale-tile:hover .sale-label img {
     transform: translateX(4px);
   }
 }
@@ -1484,7 +1519,16 @@ input {
   }
 }
 
-.recent-card:focus-visible {
+.recent-card {
+  position: relative;
+}
+
+.recent-link {
+  display: flex;
+  flex-direction: column;
+}
+
+.recent-link:focus-visible {
   outline: 2px solid var(--umber);
   outline-offset: 4px;
 }
@@ -1526,6 +1570,61 @@ input {
   width: 35.3081%; /* Figma: 298 of 844 */
   height: 3px;
   background: var(--burgundy);
+}
+
+/* Swatch: one dot for the product's color (approximate, sampled from the photo) */
+.recent-swatch {
+  display: block;
+  width: 12px;
+  height: 12px;
+  margin: var(--space-s) 0 0 4px;
+  border-radius: 50%;
+  background: var(--swatch);
+  box-shadow: 0 0 0 1px rgba(58, 47, 34, 0.25), 0 0 0 3px var(--ivory), 0 0 0 4px rgba(58, 47, 34, 0.35);
+}
+
+/* Wishlist heart on the product image */
+.recent-heart {
+  position: absolute;
+  top: var(--space-s);
+  right: var(--space-s);
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(246, 242, 235, 0.9);
+  color: var(--umber);
+  cursor: pointer;
+  transition: transform var(--motion), background-color var(--motion);
+}
+
+.recent-heart path {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+}
+
+.recent-heart.is-saved {
+  color: var(--burgundy);
+}
+
+.recent-heart.is-saved path {
+  fill: currentColor;
+}
+
+@media (hover: hover) {
+  .recent-heart:hover {
+    background: var(--ivory);
+    transform: scale(1.06);
+  }
+}
+
+.recent-heart:focus-visible {
+  outline: 2px solid var(--umber);
+  outline-offset: 2px;
 }
 
 /* ---------- Brands ---------- */
@@ -2065,6 +2164,56 @@ input {
   background-repeat: no-repeat;
 }
 
+.look-item-price {
+  color: rgba(58, 47, 34, 0.8);
+}
+
+.look-sizes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-s);
+}
+
+.look-size {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-width: 40px;
+  height: 40px;
+  padding: 0 var(--space-s);
+  border: 1px solid rgba(58, 47, 34, 0.3);
+  font-family: var(--sans);
+  font-size: var(--fs-14);
+  cursor: pointer;
+}
+
+.look-size input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.look-size.is-selected {
+  border-color: var(--umber);
+  background: var(--umber);
+  color: var(--ivory);
+}
+
+.look-size:focus-within {
+  outline: 2px solid var(--umber);
+  outline-offset: 2px;
+}
+
+.btn--small {
+  border-color: var(--cta-ink);
+  align-self: flex-start;
+}
+
+.btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
 .look-item-copy {
   display: flex;
   flex-direction: column;
@@ -2110,7 +2259,7 @@ input {
     top: auto;
     left: 0;
     width: 100%;
-    max-height: 88vh;
+    max-height: 60vh;
     border-radius: var(--radius-m) var(--radius-m) 0 0;
     padding-bottom: calc(var(--space-2xl) + env(safe-area-inset-bottom));
     animation-name: look-in-up;
@@ -2385,16 +2534,19 @@ input {
     padding: 0 var(--space-l);
   }
 
+  /* Tablet: patch on the left, copy beside it */
   .real-head {
-    flex-wrap: wrap;
+    gap: var(--space-2xl);
   }
 
   .real-titles {
+    flex: 1 1 0;
     white-space: normal;
   }
 
   .real-patch {
-    margin-left: auto;
+    order: -1;
+    width: clamp(200px, 36vw, 300px);
   }
 
   /* Holiday tiles stack */
@@ -2457,8 +2609,9 @@ input {
     height: auto;
   }
 
-  .sale-blank {
-    aspect-ratio: 1;
+  .sale-tile {
+    flex: 1 0 0;
+    aspect-ratio: 3 / 4;
   }
 
   .refer {
@@ -2469,24 +2622,120 @@ input {
 
 /* ---------- Mobile (0–767) ---------- */
 @media (max-width: 767.98px) {
-  /* Reassurance stacks with hairlines between, on phones only */
+  /* A. Hero: brief's bottom-up scrim over the lower half; CTA full width at 48px;
+     pause control moves to the top-right of the video */
+  .hero-scrim {
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.65) 0%, rgba(0, 0, 0, 0.2) 30%, transparent 50%);
+  }
+
+  .hero-pause {
+    top: var(--space-l);
+    right: var(--space-l);
+    bottom: auto;
+  }
+
+  .hero .btn,
+  .gifts .btn {
+    align-self: stretch;
+    height: 48px;
+  }
+
+  .gifts-cta {
+    align-self: stretch;
+  }
+
+  .gifts-cta .btn {
+    display: flex;
+    width: 100%;
+  }
+
+  /* B / E / G. Touch-native rails: no arrows on phones, swipe + snap with a peek */
+  .tags .brush-arrows,
+  .rail-actions .brush-arrows {
+    display: none;
+  }
+
+  .recent .rail-actions {
+    display: none;
+  }
+
+  .tags-row {
+    scroll-snap-type: x mandatory;
+  }
+
+  /* about 2.2 tags at rest */
+  .tag-slot {
+    width: 128px;
+    height: 199px;
+  }
+
+  /* D. Shop the Look: a swipeable lookbook, 85% card + 15% peek, with a pager */
+  .real-row {
+    flex-direction: row;
+    gap: var(--space-s);
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    background: var(--ivory);
+  }
+
+  .real-row::-webkit-scrollbar {
+    display: none;
+  }
+
+  .real-tile {
+    flex: 0 0 85%;
+    height: min(125vw, 560px);
+    scroll-snap-align: start;
+  }
+
+  .real-pager {
+    display: block;
+    width: fit-content;
+    margin: var(--space-m) auto 0;
+    padding: var(--space-xs) var(--space-m);
+    border-radius: 999px;
+    background: var(--umber);
+    color: var(--ivory);
+    font-size: var(--fs-14);
+    line-height: 20px;
+  }
+
+  /* E. Sale labels on the smaller 2-up tiles */
+  .sale-tile .sale-label {
+    left: var(--space-l);
+    bottom: var(--space-l);
+  }
+
+  .sale-tile .sale-label img {
+    display: none;
+  }
+
+  /* F. Value props: one compact 3-across badge bar instead of a tall stack */
   .reassure {
-    flex-direction: column;
-    align-items: center;
-    padding: var(--space-xl) var(--gutter);
+    padding: var(--space-xl) var(--space-s);
   }
 
   .reassure-item {
-    flex: none;
-    width: 100%;
-    max-width: 360px;
+    flex: 1 1 0;
     min-height: 0;
-    padding: var(--space-xl) 0;
+    padding: 0 var(--space-xs);
+    gap: var(--space-xs);
   }
 
-  .reassure-item + .reassure-item {
-    border-left: 0;
-    border-top: 1px solid rgba(239, 232, 220, 0.22);
+  .reassure-icon {
+    width: 32px;
+    height: 32px;
+  }
+
+  .reassure-title {
+    white-space: normal;
+    font-size: var(--fs-14);
+    line-height: 1.25;
+  }
+
+  .reassure-body {
+    display: none;
   }
 
   .hero-photo {
@@ -2511,23 +2760,44 @@ input {
     display: none;
   }
 
-  .tag-slot {
-    width: 136px;
-    height: 212px;
-  }
-
   .tag {
-    scale: 0.9;
+    scale: 0.842; /* 128 / 152: about 2.2 tags at rest */
     transform-origin: top left;
   }
 
 
+  /* Phone: eyebrow, then the patch, then headline, copy and CTA.
+     The title block opens up (display: contents) so the patch can slot in. */
   .real-head {
-    gap: var(--space-xl);
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--stack);
+  }
+
+  .real-titles {
+    display: contents;
+  }
+
+  .real-head .eyebrow {
+    order: 1;
   }
 
   .real-patch {
-    width: 180px;
+    order: 2;
+    width: min(320px, 88%);
+    margin: var(--space-xs) 0 var(--space-s);
+  }
+
+  .real-head .h-section {
+    order: 3;
+  }
+
+  .real-deck {
+    order: 4;
+  }
+
+  .real-cta {
+    order: 5;
   }
 
 
@@ -2586,12 +2856,26 @@ input {
   }
 
   .brands-row {
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    width: 100%;
     gap: var(--space-l);
+    padding: var(--space-xs) var(--gutter);
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: var(--gutter);
+    scrollbar-width: none;
+  }
+
+  .brands-row::-webkit-scrollbar {
+    display: none;
   }
 
   .badge {
-    width: 96px;
-    height: 96px;
+    flex: none;
+    width: 88px;
+    height: 88px;
+    scroll-snap-align: start;
   }
 
   /* Replatform "Footer / Mobile": link groups become accordion rows */
@@ -2688,6 +2972,7 @@ input {
 
   .btn,
   .btn-plus,
+  .recent-heart,
   .link-caps::after {
     transition: none;
   }

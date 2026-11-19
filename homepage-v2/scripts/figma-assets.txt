@@ -72,3 +72,6 @@ arrivals/coat.png https://www.figma.com/api/mcp/asset/c56b36ea-24a6-45d1-bb7d-93
 arrivals/suit.png https://www.figma.com/api/mcp/asset/16390699-6a78-4f15-8cb4-fed2f7a61cd9.png
 arrivals/shirt.png https://www.figma.com/api/mcp/asset/e64050ab-fb5b-4fa4-9d5d-73ae3ce504ec.png
 arrivals/shoes.png https://www.figma.com/api/mcp/asset/19b2ce8a-5d91-4c8b-9b1a-19db99c6da57.png
+# Sale tiles (Figma "Image assets (source fills)" 5:14 / 5:15)
+sale/coat.png https://www.figma.com/api/mcp/asset/53f57749-17c3-40b4-82dd-92ffcaaac753.png
+sale/shirt.png https://www.figma.com/api/mcp/asset/610f0239-301a-4b85-938f-ca8a7f87e7e5.png
