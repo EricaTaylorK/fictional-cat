@@ -100,7 +100,9 @@
   --space-10xl: 128px;
 
   /* Layout rhythm */
-  --gutter: clamp(var(--space-xl), 7.7778vw, var(--space-9xl));          /* 24 → 112 */
+  --content-max: 1440px;                                                /* the design frame */
+  --gutter-base: clamp(var(--space-xl), 7.7778vw, var(--space-9xl));     /* 24 → 112 */
+  --chrome-gutter-base: clamp(var(--space-l), 3.6111vw, 52px);           /* Replatform nav/footer: 16 → 52 */
   --section-y: clamp(var(--space-6xl), 6.6667vw, var(--space-8xl));      /* 64 → 96 */
   --band-y: var(--space-3xl);                                           /* 40: bands */
   --section-gap: clamp(var(--space-xl), 2.7778vw, var(--space-3xl));     /* 24 → 40: title → content */
@@ -253,8 +255,12 @@ input {
 }
 
 .page {
+  /* Full-bleed: sections span the viewport; content keeps a centered 1440 column.
+     cqw = page width without the scrollbar, so gutters stay true on wide screens. */
+  container-type: inline-size;
+  --gutter: max(var(--gutter-base), calc((100cqw - var(--content-max)) / 2 + var(--gutter-base)));
+  --chrome-gutter: max(var(--chrome-gutter-base), calc((100cqw - var(--content-max)) / 2 + 52px));
   width: 100%;
-  max-width: 1440px;
   margin: 0 auto;
   background: var(--ivory);
   overflow: hidden;
@@ -350,7 +356,7 @@ input {
   display: flex;
   flex-direction: column;
   gap: 16px;
-  padding: 16px clamp(16px, 3.6111vw, 52px);
+  padding: var(--space-l) var(--chrome-gutter);
   background: #fff;
   box-shadow: inset 0 -1px 0 #f2f2f2; /* Figma stroke sits inside the 120px frame */
   font-family: var(--ui);
@@ -497,6 +503,40 @@ input {
   object-fit: cover;
 }
 
+.hero-video {
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
+
+.hero-video.is-playing {
+  opacity: 1; /* fade in over the poster once frames are moving */
+}
+
+/* Small, quiet pause control (WCAG 2.2.2 for motion longer than 5s) */
+.hero-pause {
+  position: absolute;
+  right: var(--gutter);
+  bottom: clamp(var(--space-2xl), 4.4444vw, var(--space-6xl));
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 1px solid rgba(246, 242, 235, 0.5);
+  border-radius: 50%;
+  background: rgba(18, 14, 10, 0.35);
+  color: var(--ivory);
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.hero-pause:hover {
+  background: rgba(18, 14, 10, 0.6);
+  border-color: var(--ivory);
+}
+
 .hero-scrim {
   background: linear-gradient(
     180deg,
@@ -536,7 +576,6 @@ input {
 
 .tags {
   position: relative;
-  height: 366px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -576,16 +615,137 @@ input {
   gap: var(--space-3xl);
 }
 
-.tags-actions img {
-  width: 128px;
-  height: 19px;
+.tags-actions {
+  align-items: center;
 }
 
+/* Category rail: swipe / drag / arrows. Bleeds to the viewport edge, snaps to the gutter. */
 .tags-row {
-  width: 100%;
+  width: calc(100% + 2 * var(--gutter));
+  margin: calc(-1 * var(--space-s)) calc(-1 * var(--gutter));
+  padding: var(--space-s) var(--gutter);
+  scroll-padding-inline: var(--gutter);
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  gap: clamp(var(--space-l), 4.4444vw, var(--space-6xl)); /* 64 at 1440: the 6th tag peeks past the edge */
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x proximity;
+  scrollbar-width: none;
+  cursor: grab;
+}
+
+.tags-row::-webkit-scrollbar {
+  display: none;
+}
+
+.tags-row.is-dragging {
+  cursor: grabbing;
+  scroll-snap-type: none;
+  user-select: none;
+}
+
+.tag-slot {
+  scroll-snap-align: start;
+  transform-origin: 76px 40px; /* the punch hole: tags pivot on their twine */
+  border-radius: var(--radius-m);
+}
+
+.tag-slot:focus-visible {
+  outline: 2px solid var(--ivory);
+  outline-offset: -4px;
+}
+
+/* A brief settle after scrolling stops. Two identical keyframes let it restart. */
+.tag-slot.is-wiggle-a {
+  animation: tag-settle-a 0.9s cubic-bezier(0.3, 0.7, 0.4, 1) calc(var(--i) * 40ms) both;
+}
+
+.tag-slot.is-wiggle-b {
+  animation: tag-settle-b 0.9s cubic-bezier(0.3, 0.7, 0.4, 1) calc(var(--i) * 40ms) both;
+}
+
+@keyframes tag-settle-a {
+  0% { rotate: 0deg; }
+  20% { rotate: 2.4deg; }
+  45% { rotate: -1.6deg; }
+  70% { rotate: 0.8deg; }
+  100% { rotate: 0deg; }
+}
+
+@keyframes tag-settle-b {
+  0% { rotate: 0deg; }
+  20% { rotate: 2.4deg; }
+  45% { rotate: -1.6deg; }
+  70% { rotate: 0.8deg; }
+  100% { rotate: 0deg; }
+}
+
+/* Label-only tags (categories without a Figma icon) */
+.tag--plain .tag-label {
+  top: 108px;
+  font-size: var(--fs-16);
+  line-height: 20px;
+}
+
+/* Prev / next drawn from Figma's brush-arrow artwork */
+.brush-arrows {
+  display: flex;
+  align-items: center;
+  gap: var(--space-s);
+  color: var(--ivory);
+}
+
+.brush-arrow {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-s);
+  background: none;
+  cursor: pointer;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.brush-arrow span {
+  display: block;
+  width: 44px;
+  height: 19px;
+  /* Figma's arrow artwork as a mask, so the arrows take the surrounding text color */
+  background: currentColor;
+  -webkit-mask: url("/v2/tags/arrows.svg") 0 0 / 128px 19px no-repeat;
+  mask: url("/v2/tags/arrows.svg") 0 0 / 128px 19px no-repeat;
+}
+
+.brush-arrow--next span {
+  -webkit-mask-position: -76px 0; /* right-hand arrow sits at x 78–118 in the artwork */
+  mask-position: -76px 0;
+}
+
+.brush-arrow:not(:disabled):hover.brush-arrow--prev {
+  transform: translateX(-3px);
+}
+
+.brush-arrow:not(:disabled):hover.brush-arrow--next {
+  transform: translateX(3px);
+}
+
+.brush-arrow:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.brush-arrow:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+
+.brush-arrows-rule {
+  width: 1px;
+  height: 19px;
+  background: currentColor;
 }
 
 .tag-slot {
@@ -727,6 +887,24 @@ input {
   height: 113.8756%;
 }
 
+/* Kraft tape, 370 x 123 each. Figma: top piece at (488, 11), bottom piece at (618, 426) */
+.gifts-tape {
+  position: absolute;
+  width: 36.6700%;
+  height: auto;
+  pointer-events: none;
+}
+
+.gifts-tape--top {
+  left: 5.6492%;
+  top: 1.9643%;
+}
+
+.gifts-tape--bottom {
+  left: 18.5332%;
+  top: 76.0714%;
+}
+
 /* Figma: 178 x 178 at x 431, y 346 */
 .gifts-seal {
   position: absolute;
@@ -802,9 +980,18 @@ input {
 
 .real-patch {
   width: clamp(180px, 20.9583vw, 301.799px);
-  height: auto;
   aspect-ratio: 301.799 / 213.836;
   flex-shrink: 0;
+  display: grid;
+  place-items: center;
+}
+
+.real-patch img {
+  width: 93.08%; /* 280.9 of 301.8 */
+  height: auto;
+  transform: rotate(4deg);
+  /* Figma: (1, 2) blur 8 at 15% and (0, 6) blur 14 at 10%, warm brown */
+  filter: drop-shadow(1px 2px 4px rgba(31, 20, 8, 0.18)) drop-shadow(0 6px 7px rgba(31, 20, 8, 0.12));
 }
 
 .real-row {
@@ -824,11 +1011,11 @@ input {
 
 .real-office-photo {
   position: absolute;
-  left: 0;
-  top: -13.55%;
+  inset: 0;
   width: 100%;
-  height: 168.32%;
-  max-width: none;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 25%; /* same framing as Figma's crop, without its horizontal squeeze */
 }
 
 .real-office-title {
@@ -992,94 +1179,92 @@ input {
   white-space: nowrap;
 }
 
+/* Editorial rail: tall 3:4 photography, bleeding off the right edge so the next
+   look peeks in. --visible = how many tiles fit across. */
+.arrivals-carousel {
+  --visible: 2.5;
+  --gaps: 2; /* gaps inside the visible span */
+  margin-right: calc(-1 * var(--gutter));
+}
+
 .arrivals-row {
-  width: calc(100% + 24px); /* Figma's mosaic is 1240 wide, 24px past the right gutter */
   display: flex;
   gap: var(--space-2xl);
+  padding-right: var(--gutter);
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+}
+
+.arrivals-row::-webkit-scrollbar {
+  display: none;
 }
 
 .arrival {
-  flex: 1 0 0;
-  min-width: 1px;
-  display: flex;
-  flex-direction: column;
-}
-
-.arrival-photo {
-  display: block;
-  height: 352px;
-  margin-bottom: calc(-1 * var(--space-xl)); /* caption tape overlaps the photo */
+  position: relative;
+  flex: none;
+  width: calc((100% - var(--gaps) * var(--space-2xl)) / var(--visible));
+  aspect-ratio: 3 / 4;
+  overflow: hidden;
+  scroll-snap-align: start;
+  color: var(--cream);
   background: var(--espresso);
 }
 
-.arrival-caption {
-  position: relative;
-  display: block;
-  height: 52px;
-}
-
-.arrival-tape {
+.arrival-photo {
   position: absolute;
-  left: -22px;
-  right: -22px;
-  top: 50%;
-  height: 66px;
-  transform: translateY(-50%);
-  filter: drop-shadow(0 1px 2px rgba(38, 26, 13, 0.18));
-  overflow: hidden;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.6s ease;
 }
 
-.arrival-tape-img {
+@media (hover: hover) {
+  .arrival:hover .arrival-photo {
+    transform: scale(1.03);
+  }
+}
+
+.arrivals .rail-controls {
+  padding-right: var(--gutter); /* the rail bleeds right; keep the controls in the column */
+}
+
+.arrival-shade {
   position: absolute;
-  max-width: none;
-}
-
-/* Figma flips the same tape image per tile */
-.arrival-tape-img--1 {
-  left: 1.57%;
-  top: 11.67%;
-  width: 95.86%;
-  height: 73.89%;
-}
-
-.arrival-tape-img--2 {
-  left: 2.99%;
-  top: 2.98%;
-  width: 94.89%;
-  height: 73.87%;
-  transform: scaleX(-1);
-}
-
-.arrival-tape-img--3 {
-  left: 1.23%;
-  top: 7.7%;
-  width: 96.8%;
-  height: 73.87%;
-  transform: scaleY(-1);
-}
-
-.arrival-tape-img--4 {
-  left: 2.59%;
-  top: 0.29%;
-  width: 95.87%;
-  height: 73.89%;
-  transform: scale(-1, -1);
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 40%;
+  background: linear-gradient(0deg, var(--umber) 0%, rgba(58, 47, 34, 0) 100%);
+  mix-blend-mode: multiply;
 }
 
 .arrival-label {
   position: absolute;
-  left: calc(50% - 42px); /* Figma: x 101 in a 286 tile */
-  top: 10.5px;
-  color: var(--umber);
-  white-space: nowrap;
+  left: var(--space-2xl);
+  bottom: var(--space-2xl);
+  display: flex;
+  align-items: center;
+  gap: var(--space-m);
 }
 
 .arrival-arrow {
-  position: absolute;
-  left: calc(50% + 21px); /* Figma: x 164 in a 286 tile */
-  top: 16px;
-  width: 44px;
-  height: 10px;
+  width: 40px;
+  height: 9px;
+  transition: transform 0.2s ease;
+}
+
+@media (hover: hover) {
+  .arrival:hover .arrival-arrow {
+    transform: translateX(4px);
+  }
+}
+
+.arrival:focus-visible {
+  outline: 2px solid var(--umber);
+  outline-offset: 3px;
 }
 
 /* ---------- Reassurance ---------- */
@@ -1088,12 +1273,14 @@ input {
   display: flex;
   align-items: flex-start;
   justify-content: center;
-  padding: var(--band-y) 0;
+  padding: var(--band-y) var(--gutter);
   background: var(--burgundy);
 }
 
+/* Three columns hold until mobile; they share the row below 320px each */
 .reassure-item {
-  width: 320px;
+  flex: 0 1 320px;
+  min-width: 0;
   min-height: 120px;
   display: flex;
   flex-direction: column;
@@ -1108,46 +1295,15 @@ input {
 }
 
 .reassure-icon {
-  position: relative;
+  display: block;
   width: 44px;
   height: 44px;
   flex-shrink: 0;
 }
 
-/* Figma nests each icon: group box inside the 44px frame, then the SVG bleeds past it */
-.reassure-icon > span,
-.reassure-icon > span > span {
-  position: absolute;
-}
-
-.reassure-icon img {
-  width: 100%;
-  height: 100%;
-  max-width: none;
-}
-
-.reassure-icon--truck > span {
-  inset: 21.56% 11.87% 22.19% 19.37%;
-}
-
-.reassure-icon--truck > span > span {
-  inset: -5.56% -4.55%;
-}
-
-.reassure-icon--returns > span {
-  inset: 27.5% 17.56% 25% 17.44%;
-}
-
-.reassure-icon--returns > span > span {
-  inset: -6.54% -4.78%;
-}
-
-.reassure-icon--pickup > span {
-  inset: 18.75% 21.88%;
-}
-
-.reassure-icon--pickup > span > span {
-  inset: -5% -5.56%;
+/* Lottie files draw in black; recolor the strokes for the burgundy band */
+.reassure-icon svg path {
+  stroke: var(--ivory);
 }
 
 .reassure-title {
@@ -1186,11 +1342,10 @@ input {
 }
 
 .recent-carousel {
-  --card: 295px;
+  --card: 295px; /* Figma product card */
   position: relative;
   flex: 0 1 844px;
   min-width: 0;
-  padding-bottom: var(--space-xl); /* progress track sits under the cards */
 }
 
 .recent-cards {
@@ -1214,65 +1369,75 @@ input {
   color: var(--umber);
 }
 
-.recent-photo {
-  width: var(--card);
-  height: var(--card);
-  object-fit: cover;
+.recent-photo-wrap {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
   margin-bottom: var(--space-m);
+  overflow: hidden;
+  background: #e9e5df;
 }
 
+.recent-photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+/* Figma card spec: names clamp to two lines so prices share a baseline */
 .recent-name {
-  font-weight: 500;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  min-height: calc(2 * 1.4286em);
   overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  font-weight: 500;
   margin-bottom: var(--space-xs);
+}
+
+@media (hover: hover) {
+  .recent-card:hover .recent-photo {
+    transform: scale(1.04);
+  }
+
+  .recent-card:hover .recent-name {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+}
+
+.recent-card:focus-visible {
+  outline: 2px solid var(--umber);
+  outline-offset: 4px;
 }
 
 .recent-price {
   font-weight: 600;
 }
 
-.recent-track {
-  position: absolute;
-  left: 0;
-  bottom: 0;
-  width: 100%;
+.rail-controls {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xl);
+  margin-top: var(--space-xl);
+  color: var(--umber);
+}
+
+.rail-track {
+  position: relative;
+  flex: 1;
   height: 2px;
   background: rgba(0, 30, 86, 0.15);
 }
 
-.recent-progress {
+.rail-progress {
   position: absolute;
   left: calc(var(--progress, 0) * 64.6919%);
-  bottom: 0;
+  top: -1px;
   width: 35.3081%; /* Figma: 298 of 844 */
   height: 3px;
   background: var(--burgundy);
-}
-
-.recent-next {
-  position: absolute;
-  right: 8px; /* Figma: x 788 in an 844 carousel */
-  top: calc(var(--card) / 2 - var(--space-xl)); /* centered on the photo */
-  width: 48px;
-  height: 48px;
-  padding: 0;
-  border: 0;
-  border-radius: 24px;
-  overflow: hidden;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.16);
-  background: linear-gradient(rgba(239, 232, 220, 0.55), rgba(239, 232, 220, 0.55)),
-    url("/v2/recent/next-texture.png") top left / 220px 220px, var(--ivory);
-  cursor: pointer;
-}
-
-.recent-next img {
-  position: absolute;
-  left: 15px;
-  top: 15px;
-  width: 18px;
-  height: 18px;
 }
 
 /* ---------- Brands ---------- */
@@ -1420,7 +1585,7 @@ input {
   align-items: center;
   justify-content: space-between; /* Figma: 293px gaps at 1440 */
   gap: 16px 24px;
-  padding: 30px clamp(20px, 3.6111vw, 52px);
+  padding: 30px var(--chrome-gutter);
   background: var(--burgundy);
   color: #fff;
 }
@@ -1463,7 +1628,7 @@ input {
   display: flex;
   flex-direction: column;
   gap: var(--space-3xl);
-  padding: clamp(var(--space-6xl), 5.5556vw, var(--space-7xl)) clamp(var(--space-xl), 3.6111vw, 52px) var(--space-xl); /* 52px: Replatform footer gutter */
+  padding: clamp(var(--space-6xl), 5.5556vw, var(--space-7xl)) var(--chrome-gutter) var(--space-xl);
   background: #fff;
 }
 
@@ -1694,6 +1859,263 @@ input {
 }
 
 
+/* ---------- Shop the look drawer (rendered on <body>) ---------- */
+
+.look-btn {
+  background: none;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.look-btn:hover,
+.look-btn:focus-visible {
+  background: var(--ivory);
+  color: var(--umber);
+}
+
+.look-btn:focus-visible {
+  outline: 2px solid var(--ivory);
+  outline-offset: 3px;
+}
+
+.look-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+}
+
+.look-scrim {
+  position: absolute;
+  inset: 0;
+  background: rgba(18, 14, 10, 0.5);
+  animation: look-fade 0.25s ease both;
+}
+
+.look-panel {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: min(440px, 100%);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+  padding: var(--space-xl) var(--space-xl) var(--space-2xl);
+  overflow-y: auto;
+  background: var(--ivory);
+  color: var(--umber);
+  box-shadow: -8px 0 32px rgba(18, 14, 10, 0.2);
+  animation: look-in-side 0.32s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+.look-layer.is-closing .look-scrim {
+  animation: look-fade 0.2s ease reverse both;
+}
+
+.look-layer.is-closing .look-panel {
+  animation: look-out-side 0.22s ease-in both;
+}
+
+.look-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-l);
+}
+
+.look-kicker {
+  margin-bottom: var(--space-xs);
+}
+
+.look-close {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  margin: calc(-1 * var(--space-s)) calc(-1 * var(--space-s)) 0 0;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  color: var(--umber);
+  cursor: pointer;
+}
+
+.look-close:hover {
+  background: rgba(58, 47, 34, 0.08);
+}
+
+.look-close:focus-visible,
+.look-item-link:focus-visible {
+  outline: 2px solid var(--umber);
+  outline-offset: 2px;
+}
+
+.look-hero {
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  border-radius: var(--radius-s);
+}
+
+.look-hero img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 25%;
+}
+
+.look-count {
+  margin-bottom: calc(-1 * var(--space-s));
+  color: rgba(58, 47, 34, 0.75);
+}
+
+.look-items {
+  display: flex;
+  flex-direction: column;
+}
+
+.look-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-l);
+  padding: var(--space-l) 0;
+  border-top: 1px solid rgba(58, 47, 34, 0.15);
+}
+
+.look-item:last-child {
+  border-bottom: 1px solid rgba(58, 47, 34, 0.15);
+}
+
+.look-thumb {
+  flex: none;
+  width: 88px;
+  height: 104px;
+  border-radius: var(--radius-s);
+  background-color: var(--espresso);
+  background-repeat: no-repeat;
+}
+
+.look-item-copy {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-s);
+}
+
+.look-item-name {
+  font-weight: 500;
+}
+
+.look-item-link {
+  align-self: flex-start;
+  color: var(--burgundy);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
+}
+
+@keyframes look-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes look-in-side {
+  from { transform: translateX(100%); }
+  to { transform: none; }
+}
+
+@keyframes look-out-side {
+  from { transform: none; }
+  to { transform: translateX(100%); }
+}
+
+@keyframes look-in-up {
+  from { transform: translateY(100%); }
+  to { transform: none; }
+}
+
+@keyframes look-out-up {
+  from { transform: none; }
+  to { transform: translateY(100%); }
+}
+
+/* Mobile: bottom sheet */
+@media (max-width: 767.98px) {
+  .look-panel {
+    top: auto;
+    left: 0;
+    width: 100%;
+    max-height: 88vh;
+    border-radius: var(--radius-m) var(--radius-m) 0 0;
+    padding-bottom: calc(var(--space-2xl) + env(safe-area-inset-bottom));
+    animation-name: look-in-up;
+  }
+
+  .look-layer.is-closing .look-panel {
+    animation-name: look-out-up;
+  }
+
+  .look-hero {
+    aspect-ratio: 16 / 9;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .look-scrim,
+  .look-panel {
+    animation: none !important;
+  }
+}
+
+/* ---------- Wide screens (1440+): collage stays on the content column,
+   the suitcase photo still runs to the viewport edge as in the 1440 frame ---------- */
+@media (min-width: 1440px) {
+  .gifts-collage {
+    left: calc(50% - 289px); /* = 431px at 1440 */
+    right: 0;
+    width: auto;
+  }
+
+  .gifts-suitcase {
+    left: 433px;
+    right: 0;
+    width: auto;
+  }
+
+  .gifts-suitcase img {
+    left: -219px;
+    right: -245px;
+    top: -104px;
+    width: auto;
+    height: 694px;
+  }
+
+  .gifts-still {
+    left: 119px;
+    top: 81px;
+    width: 340px;
+    height: 418px;
+  }
+
+  .gifts-seal {
+    top: 346px;
+    width: 178px;
+  }
+
+  .gifts-tape {
+    width: 370px;
+  }
+
+  .gifts-tape--top {
+    left: 57px;
+    top: 11px;
+  }
+
+  .gifts-tape--bottom {
+    left: 187px;
+    top: 426px;
+  }
+}
+
 /* =====================================================================
    Responsive
    The Figma frame is 1440 wide; everything above matches it exactly there.
@@ -1708,8 +2130,8 @@ input {
     gap: var(--space-xl);
     overflow-x: auto;
     scrollbar-width: none;
-    margin: 0 calc(-1 * clamp(16px, 3.6111vw, 52px));
-    padding: 0 clamp(16px, 3.6111vw, 52px);
+    margin: 0 calc(-1 * var(--chrome-gutter));
+    padding: 0 var(--chrome-gutter);
   }
 
   .nav-links::-webkit-scrollbar {
@@ -1723,53 +2145,15 @@ input {
     padding-right: var(--gutter);
   }
 
-  .tags-row {
-    justify-content: flex-start;
-    gap: var(--space-l);
-    overflow-x: auto;
-    scroll-snap-type: x proximity;
-    scrollbar-width: none;
-    width: calc(100% + 2 * var(--gutter));
-    margin: 0 calc(-1 * var(--gutter));
-    padding: 0 var(--gutter);
-    scroll-padding-inline: var(--gutter);
-  }
 
-  .tags-row::-webkit-scrollbar {
-    display: none;
-  }
-
-  .tag-slot {
-    scroll-snap-align: start;
-  }
-
-  /* New Arrivals mosaic becomes a rail; tape still overhangs each tile */
-  .arrivals-row {
-    width: calc(100% + 2 * var(--gutter));
-    margin: 0 calc(-1 * var(--gutter));
-    padding: var(--space-m) calc(var(--gutter) + 22px) var(--space-s); /* 22px: tape overhang */
-    scroll-padding-inline: calc(var(--gutter) + 22px);
-    overflow-x: auto;
-    scroll-snap-type: x proximity;
-    scrollbar-width: none;
-  }
-
-  .arrivals-row::-webkit-scrollbar {
-    display: none;
-  }
-
-  .arrival {
-    flex: 0 0 260px;
-    scroll-snap-align: start;
-  }
-
-  .arrival-photo {
-    height: 320px;
-  }
 }
 
 /* ---------- Desktop: gifts stacks before the collage would reach the copy ---------- */
 @media (max-width: 1279.98px) {
+  .arrivals-carousel {
+    --visible: 2.1;
+  }
+
   /* Gifts: copy above, collage below at its Figma proportions */
   .gifts {
     height: auto;
@@ -1798,6 +2182,38 @@ input {
     width: 100%;
     height: auto;
     aspect-ratio: 1009 / 560;
+  }
+}
+
+/* ---------- Tablet: recently viewed stacks ---------- */
+@media (max-width: 1023.98px) {
+  /* Recently viewed: copy above, full-width rail below */
+  .recent {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--section-gap);
+  }
+
+  .recent-copy {
+    width: auto;
+  }
+
+  .recent-carousel {
+    flex: none;
+    margin-right: calc(-1 * var(--gutter));
+  }
+
+  .recent-cards {
+    padding-right: var(--gutter);
+  }
+
+  .recent .rail-controls {
+    padding-right: var(--gutter); /* the rail bleeds right; keep the controls in the column */
+  }
+
+  .arrivals-carousel {
+    --visible: 1.6;
+    --gaps: 1;
   }
 }
 
@@ -1884,39 +2300,6 @@ input {
     text-wrap: balance;
   }
 
-  /* Recently viewed: copy above, full-width rail below */
-  .recent {
-    flex-direction: column;
-    align-items: stretch;
-    gap: var(--section-gap);
-  }
-
-  .recent-copy {
-    width: auto;
-  }
-
-  .recent-carousel {
-    flex: none;
-    margin-right: calc(-1 * var(--gutter));
-  }
-
-  .recent-cards {
-    padding-right: var(--gutter);
-  }
-
-  .recent-track {
-    width: calc(100% - var(--gutter));
-  }
-
-  .recent-progress {
-    left: calc(var(--progress, 0) * (100% - var(--gutter)) * 0.646919);
-    width: calc((100% - var(--gutter)) * 0.353081);
-  }
-
-  .recent-next {
-    right: calc(var(--gutter) + 8px);
-  }
-
   .footer-optin {
     flex-basis: 100%;
     min-width: 0;
@@ -1931,6 +2314,10 @@ input {
 
 /* ---------- Tablet: stacked tiles and bands ---------- */
 @media (max-width: 1023.98px) {
+  .reassure-item {
+    padding: 0 var(--space-l);
+  }
+
   .real-head {
     flex-wrap: wrap;
   }
@@ -1954,12 +2341,6 @@ input {
     height: clamp(460px, 110vw, 647px);
   }
 
-  .real-office-photo {
-    top: 0;
-    height: 100%;
-    object-fit: cover;
-    object-position: center 20%;
-  }
 
   /* Same bottom shade as the family tile, so the caps stay legible over the sweater */
   .real-tile--office::after {
@@ -2013,7 +2394,15 @@ input {
     aspect-ratio: 1;
   }
 
-  /* Reassurance stacks with hairlines between */
+  .refer {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+/* ---------- Mobile (0–767) ---------- */
+@media (max-width: 767.98px) {
+  /* Reassurance stacks with hairlines between, on phones only */
   .reassure {
     flex-direction: column;
     align-items: center;
@@ -2021,6 +2410,7 @@ input {
   }
 
   .reassure-item {
+    flex: none;
     width: 100%;
     max-width: 360px;
     min-height: 0;
@@ -2032,14 +2422,6 @@ input {
     border-top: 1px solid rgba(239, 232, 220, 0.22);
   }
 
-  .refer {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-}
-
-/* ---------- Mobile (0–767) ---------- */
-@media (max-width: 767.98px) {
   .hero-photo {
     object-position: 28% center;
   }
@@ -2108,21 +2490,20 @@ input {
   }
 
 
-  .arrival {
-    flex-basis: 220px;
+  .arrivals-carousel {
+    --visible: 1.1;
+    --gaps: 1;
   }
 
-  .arrival-photo {
-    height: 260px;
+  .arrival-label {
+    left: var(--space-xl);
+    bottom: var(--space-xl);
   }
 
   .recent-carousel {
     --card: 220px;
   }
 
-  .recent-next {
-    display: none;
-  }
 
   .brands {
     padding: var(--space-4xl) 0;
@@ -2214,5 +2595,26 @@ input {
 
   .footer-bottom p {
     white-space: normal;
+  }
+}
+
+
+/* ---------- Reduced motion ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .tag-slot.is-wiggle-a,
+  .tag-slot.is-wiggle-b {
+    animation: none;
+  }
+
+  .hero-video,
+  .brush-arrow,
+  .recent-photo,
+  .arrival-arrow,
+  .arrival-photo {
+    transition: none;
+  }
+
+  .recent-card:hover .recent-photo {
+    transform: none;
   }
 }
