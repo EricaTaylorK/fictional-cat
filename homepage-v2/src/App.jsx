@@ -135,7 +135,7 @@ function GlobalNav() {
 
 /* ---------- Shared bits ---------- */
 
-// Buttons: square, 1px, black and white. Copy uses the same .t-cta token as text links.
+// Buttons: 16px corners (--radius-btn), 1px, black and white. Copy uses the same .t-cta token as text links.
 // tone: "solid" (white fill, black text: on dark surfaces) | "outline" (white hairline: on photos)
 function TextureButton({ children, tone = "solid", href = "#" }) {
   return (
@@ -502,8 +502,10 @@ function Hero() {
 /* ---------- Category tags ---------- */
 
 // swing: "right" = rotate 3deg, "still" = none, "left" = rotate -3deg (Figma variants).
-// The first six carry Figma's category icons; the rest are existing nav categories
-// shown as label-only kraft tags, revealed by the arrows / swipe.
+// Icons: the first six are from the homepage Figma; Vests, Hats, Scarves & Gloves and
+// Wedding come from the Clothes Icon Pack (Figma Community), recolored to the tag umber.
+// Tags avoid categories already pictured in Just In (Dress Shirts, Pants, Ties...),
+// and the pack has no footwear, so there is no Shoes tag.
 const tags = [
   { label: "Gifts", icon: "gifts", swing: "right" },
   { label: "Accessories", icon: "accessories", swing: "still" },
@@ -511,10 +513,10 @@ const tags = [
   { label: "Suits", icon: "suits", swing: "right" },
   { label: "Jeans & Chinos", icon: "jeans-chinos", swing: "still" },
   { label: "Outerwear", icon: "outerwear", swing: "left" },
-  { label: "Dress Shirts", swing: "right" },
-  { label: "Pants", swing: "still" },
-  { label: "Shoes", swing: "left" },
-  { label: "Wedding", swing: "right" },
+  { label: "Vests", icon: "vests", swing: "right" },
+  { label: "Hats", icon: "hats", swing: "still" },
+  { label: "Scarves & Gloves", icon: "scarves-gloves", swing: "left" },
+  { label: "Wedding", icon: "wedding", swing: "right" },
 ];
 
 // Shared rail behaviour: arrow buttons, edge state, mouse drag, and a callback
@@ -746,9 +748,7 @@ function Gifts() {
         <p className="gifts-deck t-lead">
           From everyday favorites to party-ready finishing touches, find a gift he’ll reach for long after the holidays.
         </p>
-        <a className="link-caps t-cta" href="#" onClick={stop}>
-          Shop Gifts for Him
-        </a>
+        <TextureButton>Shop Gifts for Him</TextureButton>
       </div>
       <div className="gifts-spread">
         <GiftTile gift={giftLead} lead />
@@ -847,7 +847,7 @@ function SaleEdit() {
       </div>
       <div className="sale-grid">
         <a className="sale-suits" href="#" onClick={stop}>
-          <img className="sale-suits-photo" src={A("sale/suits.png")} alt="" width="600" height="717" />
+          <img className="sale-suits-photo" src={A("sale/suits-holiday.webp")} alt="" width="1122" height="1402" />
           <span className="sale-shade" aria-hidden="true" />
           <span className="sale-shade" aria-hidden="true" />
           <span className="sale-label t-eyebrow-lg">
@@ -856,10 +856,10 @@ function SaleEdit() {
           </span>
         </a>
         <div className="sale-pair">
-          {/* Figma "Image assets" sale fills (5:14 / 5:15) */}
+          {/* Holiday party photography: green sport coat, blue dress shirt */}
           {[
-            { label: "Sport Coats", photo: "sale/coat.png" },
-            { label: "Dress Shirts", photo: "sale/shirt.png" },
+            { label: "Sport Coats", photo: "sale/sport-coat-holiday.webp" },
+            { label: "Dress Shirts", photo: "sale/dress-shirt-holiday.webp" },
           ].map((tile) => (
             <a key={tile.label} className="sale-tile" href="#" onClick={stop}>
               <img className="sale-tile-photo" src={A(tile.photo)} alt="" />
@@ -1382,9 +1382,9 @@ export default function App() {
         <Hero />
         <CategoryTags />
         <NewArrivals />
-        <ShippingBanner />
         <Moments />
         <Gifts />
+        <ShippingBanner />
         <SaleEdit />
         <LookBook />
         <RecentlyViewed />

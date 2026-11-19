@@ -29,6 +29,7 @@
   /* Color */
   --ivory: #f6f2eb;
   --cream: #efe8dc;
+  --linen: #e8dfd0; /* the "Love," label fabric: sets the story band apart from ivory sections */
   --burgundy: #480013;
   --burgundy-cta: #570515;
   --kraft-text: #dec7ab;
@@ -122,6 +123,7 @@
   --motion: 0.25s ease;  /* one subtle timing for every CTA and link */
   --radius-s: 4px;
   --radius-m: 8px;
+  --radius-btn: 16px; /* every button: CTAs, Shop the look, footer refer */
 }
 
 /* ---------- Type roles ---------- */
@@ -353,7 +355,7 @@ input {
   height: 48px;
   padding: 0 var(--space-xl);
   border: 1px solid var(--ivory);
-  border-radius: 0;
+  border-radius: var(--radius-btn);
   white-space: nowrap;
   cursor: pointer;
   transition: background-color var(--motion);
@@ -977,7 +979,7 @@ input {
   text-wrap: pretty;
 }
 
-.gifts-head .link-caps {
+.gifts-head .btn {
   margin-top: var(--space-s);
 }
 
@@ -1173,7 +1175,7 @@ input {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   min-height: clamp(560px, 46vw, 760px);
-  background: var(--ivory);
+  background: var(--linen);
 }
 
 .story-media {
@@ -1225,7 +1227,11 @@ input {
   }
 
   .story-media {
-    aspect-ratio: 4 / 5;
+    aspect-ratio: 4 / 3; /* a shorter crop on phones: just the label and pocket */
+  }
+
+  .story-media img {
+    object-position: center 34%; /* centers the label in the 4:3 crop */
   }
 
   .story-copy {
@@ -1388,6 +1394,8 @@ input {
   inset: 0;
   width: 100%;
   height: 100%;
+  object-fit: cover; /* 4:5 photo in a 600:717 tile */
+  object-position: center 20%;
 }
 
 .sale-shade {
@@ -1460,6 +1468,9 @@ input {
   justify-content: center;
   gap: var(--space-s) var(--space-2xl);
   padding: var(--band-y) var(--gutter);
+  /* sits between the dark Gifts herringbone and The Holiday Sale: cream above it
+     (the page background) matches the sale's top padding below it */
+  margin-top: var(--section-y);
   background: linear-gradient(rgba(37, 41, 37, 0.5), rgba(37, 41, 37, 0.5)),
     url("/v2/banner/woven.png") top left / 627px 627px, var(--umber);
   color: var(--ivory);
@@ -2184,6 +2195,7 @@ input {
   padding: 15px 23px; /* 16px 24px in Figma, minus the 1px inside stroke */
   background: #fff;
   border: 1px solid #000c2c;
+  border-radius: var(--radius-btn);
   color: #000c2c;
   font-weight: 500;
   font-size: 14px;
@@ -3267,10 +3279,21 @@ input {
     bottom: calc(6.0278% + var(--space-2xl));
   }
 
-  /* Sale: uniform gutters, link aligned to the grid's right edge */
-  .sale-grid,
-  .sale-pair {
+  /* Sale: three portrait tiles in a row, each the photos' own 4:5, so every
+     photo shows whole (heads and outfits); uniform gutters */
+  .sale-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: var(--grid-gap);
+  }
+
+  .sale-pair {
+    display: contents;
+  }
+
+  .sale-suits,
+  .sale-tile {
+    aspect-ratio: 4 / 5;
   }
 
   /* Shipping ribbon: a crisp band, not a block */
