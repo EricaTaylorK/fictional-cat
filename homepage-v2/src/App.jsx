@@ -658,12 +658,43 @@ function BrushArrows({ edges, step, controls, label }) {
 function CategoryTags() {
   const reduced = usePrefersReducedMotion();
   const [settling, setSettling] = useState(0);
+  // "moving": the row is scrolling or its settle wiggle is still playing. Hover
+  // swings pause meanwhile, so tags sliding under a resting cursor don't swing and
+  // the two rotations never stack.
+  const [moving, setMoving] = useState(false);
+  const movingRef = useRef(false);
+  const restTimer = useRef(null);
+  const setMove = (value) => {
+    if (movingRef.current === value) return;
+    movingRef.current = value;
+    setMoving(value);
+  };
+  const restAfter = (ms) => {
+    clearTimeout(restTimer.current);
+    restTimer.current = setTimeout(() => setMove(false), ms);
+  };
   const onSettle = useRef(() => {});
   onSettle.current = () => {
     if (!reduced) setSettling((n) => n + 1);
+    restAfter(reduced ? 0 : 1100); // 0.9s wiggle + up to 120ms stagger
   };
   const stableSettle = useRef(() => onSettle.current()).current;
   const { railRef, edges, step, dragHandlers } = useRail({ onSettle: stableSettle });
+
+  useEffect(() => {
+    const el = railRef.current;
+    if (!el) return undefined;
+    const onScroll = () => {
+      setMove(true);
+      restAfter(1500); // fallback if no settle event arrives
+    };
+    el.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      el.removeEventListener("scroll", onScroll);
+      clearTimeout(restTimer.current);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <section className="tags" aria-label="Shop by category">
@@ -681,7 +712,7 @@ function CategoryTags() {
       <div
         id="tag-rail"
         ref={railRef}
-        className="tags-row"
+        className={`tags-row${moving ? " is-moving" : ""}`}
         // re-keying the class restarts the wiggle each time scrolling settles
         data-settle={settling % 2}
         {...dragHandlers}

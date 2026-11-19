@@ -755,6 +755,16 @@ input {
   .tag-slot:hover {
     transform: rotate(-3.5deg) translateY(-2px);
   }
+
+  /* while the row scrolls and settles, hover rests: the tag under the cursor eases
+     back to straight (no springy overshoot), and the settle wiggle plays on its own */
+  .tags-row.is-moving .tag-slot {
+    transition: transform 0.25s ease-out;
+  }
+
+  .tags-row.is-moving .tag-slot:hover {
+    transform: none;
+  }
 }
 
 .tag-slot:focus-visible {
@@ -2137,15 +2147,20 @@ input {
   transform: none;
 }
 
-/* touch screens have no hover: show the descriptor */
+/* touch screens have no hover: the descriptor sits in the flow under the wordmark
+   (no overlay, so wrapped lines can't collide), and the whole card is the tap target,
+   so the "Shop {brand}" line is dropped */
 @media (hover: none) {
   .brand-reveal {
+    position: static;
+    padding: 0;
+    margin-top: var(--space-s);
     opacity: 1;
     transform: none;
   }
 
-  .brand-mark {
-    transform: translateY(-48px);
+  .brand-shop {
+    display: none;
   }
 }
 
@@ -2670,7 +2685,10 @@ input {
     top: auto;
     left: 0;
     width: 100%;
-    max-height: 60vh;
+    /* near full screen, so the photo and product cards are easy to browse;
+       a sliver of the page stays visible above it (tap it to close) */
+    height: 92vh;
+    height: 92dvh;
     border-radius: var(--radius-m) var(--radius-m) 0 0;
     padding-bottom: calc(var(--space-2xl) + env(safe-area-inset-bottom));
     animation-name: look-in-up;
@@ -2681,7 +2699,7 @@ input {
   }
 
   .look-hero {
-    aspect-ratio: 16 / 9;
+    aspect-ratio: 4 / 5; /* the whole outfit, like desktop's 3:4 */
   }
 }
 
