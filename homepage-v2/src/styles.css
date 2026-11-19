@@ -501,6 +501,30 @@ input {
 
 .hero-photo {
   object-fit: cover;
+  /* The source footage is 854x480: a light tone lift reads as crisper when enlarged */
+  filter: contrast(1.06) saturate(1.08);
+}
+
+/* Fine film grain over the footage: masks upscaling softness and compression,
+   and suits the tactile, editorial look. Shifts slowly unless motion is reduced. */
+.hero-grain {
+  position: absolute;
+  inset: -50%;
+  background: url("/v2/hero/grain.png") 0 0 / 256px 256px;
+  opacity: 0.14;
+  mix-blend-mode: overlay;
+  pointer-events: none;
+  animation: hero-grain 0.9s steps(6) infinite;
+}
+
+@keyframes hero-grain {
+  0% { transform: translate(0, 0); }
+  17% { transform: translate(-7%, 4%); }
+  33% { transform: translate(5%, -6%); }
+  50% { transform: translate(-3%, 8%); }
+  67% { transform: translate(8%, 2%); }
+  83% { transform: translate(-6%, -4%); }
+  100% { transform: translate(0, 0); }
 }
 
 .hero-video {
@@ -566,6 +590,7 @@ input {
 
 .hero-title {
   width: 100%;
+  text-shadow: 2px 4px 8px rgba(0, 0, 0, 0.5);
 }
 
 .hero .tex-btn {
@@ -2637,6 +2662,10 @@ input {
 @media (prefers-reduced-motion: reduce) {
   .tag-slot.is-wiggle-a,
   .tag-slot.is-wiggle-b {
+    animation: none;
+  }
+
+  .hero-grain {
     animation: none;
   }
 

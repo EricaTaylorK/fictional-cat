@@ -390,6 +390,7 @@ function Hero() {
   return (
     <section className="hero">
       <HeroVideo />
+      <div className="hero-grain" aria-hidden="true" />
       <div className="hero-scrim" aria-hidden="true" />
       <div className="hero-lockup">
         <p className="hero-eyebrow t-eyebrow-lg">Holiday Party, Handled.</p>
