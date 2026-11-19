@@ -747,9 +747,11 @@ function useCardRail() {
 function RailActions({ rail, controls, label, linkText }) {
   return (
     <div className="rail-actions">
-      <a className="link-caps link-caps--dark t-cta" href="#" onClick={stop}>
-        {linkText}
-      </a>
+      {linkText ? (
+        <a className="link-caps link-caps--dark t-cta" href="#" onClick={stop}>
+          {linkText}
+        </a>
+      ) : null}
       <BrushArrows edges={rail.edges} step={rail.step} controls={controls} label={label} />
     </div>
   );
@@ -900,9 +902,12 @@ function RecentlyViewed() {
       <div className="recent-copy">
         <h2 className="recent-title t-h2">Still Thinking It Over?</h2>
         <p className="recent-deck t-body">Your recently viewed styles are right here.</p>
+        <a className="link-caps link-caps--dark t-cta" href="#" onClick={stop}>
+          Recently Viewed
+        </a>
       </div>
       <div className="recent-carousel">
-        <RailActions rail={rail} controls="recent-rail" label="recently viewed items" linkText="View All Recently Viewed" />
+        <RailActions rail={rail} controls="recent-rail" label="recently viewed items" />
         <div
           id="recent-rail"
           className="recent-cards"
