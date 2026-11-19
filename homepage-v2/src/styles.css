@@ -1,9 +1,32 @@
 /*
-  Homepage V2 — built from Figma "MW Homepage — Refined (Holiday)", frame 5:51 (1440 wide).
-  Values are taken straight from the Figma layers.
+  Homepage V2 — Men's Wearhouse holiday homepage.
+  Layout from Figma "MW Homepage — Refined (Holiday)" (frame 5:51, 1440 wide);
+  global nav, search and footer from "Replatform – S/N Epic Build" (8P7Mou78hdsT3cIqaXlFxT).
+
+  DESIGN TOKENS
+  -------------
+  Type    Minor-third scale (x1.2) from a 16px base, rounded to the 4px grid:
+          12 · 14 · 16 · 20 · 24 · 28 · 32 · 40 · 48 · 56 · 80
+          Headlines   Newsreader Bold
+          Eyebrows    Thabit Bold, uppercase, 0.12em tracking
+          CTAs        Thabit Bold, uppercase, 0.12em tracking
+          Body        Schibsted Grotesk
+          Global nav + footer keep Roboto from the Replatform system.
+          Line heights land on the 4px grid at each role's desktop size.
+          Headline sizes are fluid between their mobile and desktop steps.
+
+  Space   8pt grid, named like the Replatform system (space/xs = 4, s = 8, …).
+          4 and 12 are half-steps for tight UI only.
+
+  Breakpoints (Replatform frames: 375 / 768 / 1440; desktop nav from 1024)
+          mobile   0–767     @media (max-width: 767.98px)
+          tablet   768–1023  @media (max-width: 1023.98px)   mobile nav
+          desktop  1024–1279 @media (max-width: 1279.98px)
+          wide     1280+     design frame is 1440
 */
 
 :root {
+  /* Color */
   --ivory: #f6f2eb;
   --cream: #efe8dc;
   --burgundy: #480013;
@@ -12,12 +35,173 @@
   --umber: #3a2f22;
   --espresso: #2a1d14;
   --ink: #232323;
+  --ui-text: #3a3a3a;
+  --ui-muted: #747474;
+  --ui-border: rgba(0, 0, 0, 0.1);
+  --ui-fill: rgba(0, 0, 0, 0.05);
 
+  /* Font families */
   --serif: "Newsreader", Georgia, serif;
   --sans: "Schibsted Grotesk", system-ui, sans-serif;
-  /* Figma uses Thabit; Courier Prime is the closest web font until Thabit files are added. */
+  /* Thabit is the brand face; Courier Prime stands in until Thabit font files are added. */
   --mono: "Thabit", "Courier Prime", "Courier New", monospace;
   --ui: "Roboto", system-ui, sans-serif;
+
+  /* Type scale (rem, 1rem = 16px) */
+  --fs-12: 0.75rem;
+  --fs-14: 0.875rem;
+  --fs-16: 1rem;
+  --fs-20: 1.25rem;
+  --fs-24: 1.5rem;
+  --fs-28: 1.75rem;
+  --fs-32: 2rem;
+  --fs-40: 2.5rem;
+  --fs-48: 3rem;
+  --fs-56: 3.5rem;
+  --fs-80: 5rem;
+
+  /* Type roles: fluid between the mobile step and the desktop step */
+  --type-display: clamp(var(--fs-40), 1.6rem + 4vw, var(--fs-80));   /* 40 → 80 */
+  --type-h1: clamp(var(--fs-32), 1.35rem + 2.5vw, var(--fs-56));     /* 32 → 56 */
+  --type-h2: clamp(var(--fs-28), 1.3rem + 1.9vw, var(--fs-48));      /* 28 → 48 */
+  --type-h3: clamp(var(--fs-24), 1.3rem + 0.8vw, var(--fs-32));      /* 24 → 32 */
+  --type-h4: clamp(var(--fs-20), 1.1rem + 0.75vw, var(--fs-28));      /* 20 → 28 */
+  --type-lead: clamp(var(--fs-16), 0.85rem + 0.5vw, var(--fs-20));   /* 16 → 20 */
+  --type-eyebrow-lg: clamp(var(--fs-16), 0.85rem + 0.5vw, var(--fs-20)); /* 16 → 20 */
+
+  --lh-display: 1.1;    /* 80 → 88 */
+  --lh-h1: 1.1429;      /* 56 → 64 */
+  --lh-h2: 1.1667;      /* 48 → 56 */
+  --lh-h3: 1.25;        /* 32 → 40 */
+  --lh-h4: 1.1429;      /* 28 → 32 */
+  --lh-lead: 1.4;       /* 20 → 28 */
+  --lh-body: 1.5;       /* 16 → 24 */
+  --lh-small: 1.4286;   /* 14 → 20 */
+  --lh-caps: 1.2;       /* 20 → 24 */
+  --lh-label: 1.5;      /* 16 → 24 */
+
+  --track-caps: 0.12em;
+  --track-caps-wide: 0.36em; /* editorial tile captions */
+
+  /* Space: 8pt grid */
+  --space-xs: 4px;
+  --space-s: 8px;
+  --space-m: 12px;
+  --space-l: 16px;
+  --space-xl: 24px;
+  --space-2xl: 32px;
+  --space-3xl: 40px;
+  --space-4xl: 48px;
+  --space-5xl: 56px;
+  --space-6xl: 64px;
+  --space-7xl: 80px;
+  --space-8xl: 96px;
+  --space-9xl: 112px;
+  --space-10xl: 128px;
+
+  /* Layout rhythm */
+  --gutter: clamp(var(--space-xl), 7.7778vw, var(--space-9xl));          /* 24 → 112 */
+  --section-y: clamp(var(--space-6xl), 6.6667vw, var(--space-8xl));      /* 64 → 96 */
+  --band-y: var(--space-3xl);                                           /* 40: bands */
+  --section-gap: clamp(var(--space-xl), 2.7778vw, var(--space-3xl));     /* 24 → 40: title → content */
+  --stack: var(--space-l);                                              /* 16: within a copy block */
+
+  --radius-s: 4px;
+  --radius-m: 8px;
+}
+
+/* ---------- Type roles ---------- */
+
+.t-display,
+.t-h1,
+.t-h2,
+.t-h3,
+.t-h4 {
+  font-family: var(--serif);
+  font-weight: 700;
+  letter-spacing: 0;
+}
+
+.t-display {
+  font-size: var(--type-display);
+  line-height: var(--lh-display);
+  letter-spacing: -0.01em;
+}
+
+.t-h1 {
+  font-size: var(--type-h1);
+  line-height: var(--lh-h1);
+}
+
+.t-h2 {
+  font-size: var(--type-h2);
+  line-height: var(--lh-h2);
+}
+
+.t-h3 {
+  font-size: var(--type-h3);
+  line-height: var(--lh-h3);
+}
+
+.t-h4 {
+  font-size: var(--type-h4);
+  line-height: var(--lh-h4);
+}
+
+.t-lead,
+.t-body,
+.t-small {
+  font-family: var(--sans);
+  font-weight: 400;
+}
+
+.t-lead {
+  font-size: var(--type-lead);
+  line-height: var(--lh-lead);
+}
+
+.t-body {
+  font-size: var(--fs-16);
+  line-height: var(--lh-body);
+}
+
+.t-small {
+  font-size: var(--fs-14);
+  line-height: var(--lh-small);
+}
+
+.t-eyebrow,
+.t-eyebrow-lg,
+.t-cta,
+.t-label {
+  font-family: var(--mono);
+  font-weight: 700;
+}
+
+.t-eyebrow,
+.t-cta {
+  font-size: var(--fs-16);
+  line-height: var(--lh-label);
+  letter-spacing: var(--track-caps);
+  text-transform: uppercase;
+}
+
+.t-eyebrow-lg {
+  font-size: var(--type-eyebrow-lg);
+  line-height: var(--lh-caps);
+  letter-spacing: var(--track-caps);
+  text-transform: uppercase;
+}
+
+.t-wide {
+  letter-spacing: var(--track-caps-wide);
+}
+
+/* Mixed-case Thabit for short labels on artwork (kraft tags) */
+.t-label {
+  font-size: var(--fs-14);
+  line-height: var(--lh-small);
+  letter-spacing: 0.04em;
 }
 
 *,
@@ -69,7 +253,8 @@ input {
 }
 
 .page {
-  width: 1440px;
+  width: 100%;
+  max-width: 1440px;
   margin: 0 auto;
   background: var(--ivory);
   overflow: hidden;
@@ -78,12 +263,6 @@ input {
 /* ---------- Shared type ---------- */
 
 .link-caps {
-  font-family: var(--mono);
-  font-weight: 700;
-  font-size: 16px;
-  line-height: 1.3125; /* Thabit "normal" line height in Figma */
-  letter-spacing: 1.92px;
-  text-transform: uppercase;
   text-decoration: underline;
   text-decoration-thickness: 5%;
   text-decoration-skip-ink: none;
@@ -100,21 +279,10 @@ input {
 }
 
 .eyebrow {
-  font-family: var(--mono);
-  font-weight: 700;
-  font-size: 16px;
-  line-height: 1.3125; /* Thabit "normal" line height in Figma */
-  letter-spacing: 0.8px;
-  text-transform: uppercase;
   color: var(--umber);
 }
 
 .h-section {
-  font-family: var(--serif);
-  font-weight: 600;
-  font-size: 56px;
-  line-height: 1;
-  letter-spacing: 0.14px;
   color: var(--burgundy);
   white-space: nowrap;
 }
@@ -126,14 +294,10 @@ input {
   align-items: center;
   justify-content: center;
   height: 48px;
-  padding: 0 28px;
+  padding: 0 var(--space-xl);
   border-radius: 8px;
   overflow: hidden;
   isolation: isolate;
-  font-family: var(--mono);
-  font-weight: 700;
-  font-size: 16px;
-  line-height: 1.3125; /* Thabit "normal" line height in Figma */
   color: var(--kraft-text);
   white-space: nowrap;
 }
@@ -170,27 +334,15 @@ input {
 .look-btn {
   display: inline-flex;
   align-items: center;
-  gap: 12px;
-  padding: 11px 27px; /* 12px 28px in Figma, minus the 1px inside stroke */
+  gap: var(--space-m);
+  padding: calc(var(--space-m) - 1px) calc(var(--space-xl) - 1px); /* 48px tall incl. 1px stroke */
   border: 1px solid #fff;
   border-radius: 999px;
   color: #fff;
-  font-family: var(--mono);
-  line-height: 1.3125; /* Thabit "normal" line height in Figma */
   white-space: nowrap;
 }
 
-.look-btn-label {
-  font-weight: 700;
-  font-size: 16px;
-  letter-spacing: 2.24px;
-  text-transform: uppercase;
-}
 
-.look-btn-plus {
-  font-weight: 400;
-  font-size: 18px;
-}
 
 /* ---------- Global navigation ---------- */
 
@@ -198,7 +350,7 @@ input {
   display: flex;
   flex-direction: column;
   gap: 16px;
-  padding: 16px 52px;
+  padding: 16px clamp(16px, 3.6111vw, 52px);
   background: #fff;
   box-shadow: inset 0 -1px 0 #f2f2f2; /* Figma stroke sits inside the 120px frame */
   font-family: var(--ui);
@@ -211,7 +363,7 @@ input {
 .nav-utility {
   display: flex;
   align-items: center;
-  gap: 64px;
+  gap: clamp(16px, 4.4444vw, 64px);
 }
 
 .nav-logo img {
@@ -224,7 +376,7 @@ input {
   min-width: 1px;
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: var(--space-l);
   padding: 0 8px 0 16px;
   background: #f2f2f2;
   border-radius: 4px;
@@ -258,7 +410,7 @@ input {
 .nav-utility-items {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: var(--space-l);
 }
 
 .nav-store {
@@ -307,11 +459,28 @@ input {
   color: #da3535;
 }
 
+/* Mobile/tablet bar (Replatform "Global Navigation / Mobile"): hidden on desktop */
+.nav-mobile,
+.nav-mobile-search,
+.nav-drawer {
+  display: none;
+}
+
+.nav-icon-btn {
+  display: flex;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+
 /* ---------- Hero ---------- */
 
 .hero {
   position: relative;
-  height: 774px;
+  height: clamp(560px, 53.75vw, 774px);
   background: #1c140c;
   overflow: hidden;
 }
@@ -340,32 +509,23 @@ input {
 
 .hero-lockup {
   position: absolute;
-  left: 112px;
-  top: 408px;
-  width: 798px;
+  left: var(--gutter);
+  bottom: clamp(var(--space-2xl), 4.4444vw, var(--space-6xl));
+  width: min(798px, calc(100% - 2 * var(--gutter)));
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 24px;
+  gap: var(--space-xl);
   color: var(--ivory);
   text-shadow: 0 1px 24px rgba(0, 0, 0, 0.25);
 }
 
 .hero-eyebrow {
-  width: 680px;
-  font-family: var(--mono);
-  font-weight: 700;
-  font-size: 20px;
-  line-height: 1.3125; /* Thabit "normal" line height in Figma */
-  text-transform: uppercase;
+  max-width: 680px;
 }
 
 .hero-title {
   width: 100%;
-  font-family: var(--serif);
-  font-weight: 700;
-  font-size: 78px;
-  line-height: 1.2;
 }
 
 .hero .tex-btn {
@@ -381,8 +541,8 @@ input {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 16px;
-  padding: 40px 120px;
+  gap: var(--stack);
+  padding: var(--band-y) var(--gutter);
   background: url("/v2/tags/plaid.png") top left / 627px 627px;
   isolation: isolate;
 }
@@ -405,22 +565,15 @@ input {
 
 .tags-title {
   flex: 1 0 0;
-  font-family: var(--serif);
-  font-weight: 500;
-  font-size: 28px;
-  line-height: 1.2;
   color: var(--ivory);
   text-shadow: 0 1px 24px rgba(0, 0, 0, 0.25);
 }
 
-.tags-title em {
-  font-weight: 400;
-}
 
 .tags-actions {
   display: flex;
   align-items: flex-start;
-  gap: 40px;
+  gap: var(--space-3xl);
 }
 
 .tags-actions img {
@@ -499,11 +652,6 @@ input {
   align-items: center;
   justify-content: center;
   text-align: center;
-  font-family: var(--mono);
-  font-weight: 700;
-  font-size: 16px;
-  line-height: 1.05;
-  letter-spacing: 1.12px;
   color: rgba(17, 17, 17, 0.92);
 }
 
@@ -525,6 +673,14 @@ input {
   background: url("/v2/gifts/herringbone.png") top left / 864.256px 864.256px, #23271c;
 }
 
+.gifts-collage {
+  position: absolute;
+  left: 29.9306%; /* Figma: x 431 of 1440 */
+  top: 0;
+  width: 70.0694%; /* 1009 of 1440 */
+  height: 100%;
+}
+
 .gifts-suitcase,
 .gifts-still {
   position: absolute;
@@ -532,78 +688,78 @@ input {
   background: var(--ivory);
 }
 
-.gifts-suitcase {
-  left: 864px;
-  top: 0;
-  width: 576px;
-  height: 560px;
-}
-
-.gifts-suitcase img {
-  position: absolute;
-  left: -219px;
-  top: -104px;
-  width: 1040px;
-  height: 694px;
-  object-fit: cover;
-}
-
-.gifts-still {
-  left: 550px;
-  top: 81px;
-  width: 340px;
-  height: 418px;
-}
-
+.gifts-suitcase img,
 .gifts-still img {
   position: absolute;
-  left: -132px;
-  top: -33px;
-  width: 713px;
-  height: 476px;
+  max-width: none;
   object-fit: cover;
 }
 
+/* Figma: 576 x 560 at x 864 */
+.gifts-suitcase {
+  left: 42.9138%;
+  top: 0;
+  width: 57.0862%;
+  height: 100%;
+}
+
+/* Figma: 1040 x 694 at -219, -104 inside the suitcase frame */
+.gifts-suitcase img {
+  left: -38.0208%;
+  top: -18.5714%;
+  width: 180.5556%;
+  height: 123.9286%;
+}
+
+/* Figma: 340 x 418 at x 550, y 81 */
+.gifts-still {
+  left: 11.7939%;
+  top: 14.4643%;
+  width: 33.6967%;
+  height: 74.6429%;
+}
+
+/* Figma: 713 x 476 at -132, -33 inside the still frame */
+.gifts-still img {
+  left: -38.8235%;
+  top: -7.8947%;
+  width: 209.7059%;
+  height: 113.8756%;
+}
+
+/* Figma: 178 x 178 at x 431, y 346 */
 .gifts-seal {
   position: absolute;
-  left: 431px;
-  top: 346px;
-  width: 178px;
-  height: 178px;
+  left: 0;
+  top: 61.7857%;
+  width: 17.6412%;
+  aspect-ratio: 1;
   object-fit: cover;
 }
 
 .gifts-copy {
   position: absolute;
-  left: 112px;
-  top: 171px;
+  left: var(--gutter);
+  top: 50%; /* Figma's copy block sat centered (171px of 560) */
+  transform: translateY(-50%);
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 16px;
+  gap: var(--stack);
 }
 
 .gifts-title {
-  font-family: var(--serif);
-  font-weight: 600;
-  font-size: 48px;
-  line-height: 1.05;
-  letter-spacing: 0.12px;
+  max-width: 360px; /* breaks as "Gifts that feel / like him", clear of the photo at x=550 */
   color: var(--ivory);
-  white-space: nowrap;
 }
 
 .gifts-body {
   width: 250px;
-  font-family: var(--sans);
-  font-weight: 500;
-  font-size: 18px;
-  line-height: 1.4;
   color: rgba(255, 255, 255, 0.85);
 }
 
 .gifts-cta {
-  padding-top: 8px;
+  padding-top: var(--space-s);
 }
 
 /* ---------- Holiday, in the real world ---------- */
@@ -621,47 +777,39 @@ input {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 88px 112px 56px;
+  padding: var(--section-y) var(--gutter) var(--space-4xl);
+  gap: var(--space-2xl);
 }
 
 .real-titles {
+  min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: var(--stack);
   white-space: nowrap;
 }
 
+.real-titles .h-section {
+  max-width: min(692px, 100%); /* Figma's title block width; keeps the headline clear of the Love patch */
+  white-space: normal;
+}
+
 .real-deck {
-  font-family: var(--sans);
-  font-size: 20px;
-  line-height: 1.3;
+  width: min(692px, 100%);
+  white-space: normal;
   color: var(--umber);
 }
 
 .real-patch {
-  display: flex;
-  padding-right: 8px;
-}
-
-.real-patch-box {
-  width: 293.799px;
-  height: 213.836px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.real-patch-box img {
-  width: 280.901px;
-  height: 194.715px;
-  object-fit: contain;
-  transform: rotate(4deg);
-  box-shadow: 0 6px 14px rgba(31, 20, 8, 0.1), 1px 2px 8px rgba(31, 20, 8, 0.15);
+  width: clamp(180px, 20.9583vw, 301.799px);
+  height: auto;
+  aspect-ratio: 301.799 / 213.836;
+  flex-shrink: 0;
 }
 
 .real-row {
   display: flex;
-  height: 647px;
+  height: clamp(480px, 44.9306vw, 647px); /* keeps Figma's 720 x 647 tile shape */
   background: var(--umber);
   overflow: hidden;
 }
@@ -669,7 +817,7 @@ input {
 .real-tile {
   position: relative;
   flex: 1 0 0;
-  height: 647px;
+  height: 100%;
   overflow: hidden;
   color: #fff;
 }
@@ -685,21 +833,15 @@ input {
 
 .real-office-title {
   position: absolute;
-  left: 112px;
-  top: 474.02px;
-  font-family: var(--mono);
-  font-weight: 700;
-  font-size: 20px;
-  line-height: 1.3125; /* Thabit "normal" line height in Figma */
-  letter-spacing: 7.6px;
-  text-transform: uppercase;
+  left: var(--gutter);
+  bottom: 146.73px; /* Figma: top 474 in a 647 tile */
   white-space: nowrap;
 }
 
 .real-office-cta {
   position: absolute;
-  left: 112px;
-  top: 517.02px;
+  left: var(--gutter);
+  bottom: 82.35px; /* Figma: top 517 in a 647 tile */
 }
 
 .real-tile--family {
@@ -709,10 +851,10 @@ input {
 .real-family-photo,
 .real-family-scrim {
   position: absolute;
-  left: 43px;
-  top: 39px;
-  width: 634px;
-  height: 569px;
+  left: 5.9722%; /* Figma: 634 x 569 at 43, 39 in a 720 x 647 tile */
+  top: 6.0278%;
+  width: 88.0556%;
+  height: 87.9444%;
 }
 
 .real-family-photo {
@@ -725,21 +867,15 @@ input {
 
 .real-family-copy {
   position: absolute;
-  left: 83px;
-  top: 477.02px;
+  left: 11.5278%; /* Figma: x 83 of 720 */
+  bottom: 82.73px; /* Figma: top 477 in a 647 tile */
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 16px;
+  gap: var(--stack);
 }
 
 .real-family-title {
-  font-family: var(--mono);
-  font-weight: 700;
-  font-size: 18px;
-  line-height: 1.3125; /* Thabit "normal" line height in Figma */
-  letter-spacing: 6.12px;
-  text-transform: uppercase;
   white-space: nowrap;
 }
 
@@ -748,48 +884,49 @@ input {
 .sale {
   display: flex;
   flex-direction: column;
-  gap: 40px;
-  padding: 96px 112px 104px;
+  gap: var(--section-gap);
+  padding: var(--section-y) var(--gutter);
   background: var(--ivory);
 }
 
 .sale-head {
   display: flex;
-  align-items: center;
+  flex-wrap: wrap;
+  align-items: baseline;
   justify-content: space-between;
+  gap: var(--space-l) var(--space-2xl);
 }
 
 .sale-all {
-  padding-bottom: 6px;
   text-underline-position: from-font;
   text-decoration-thickness: from-font;
 }
 
 .sale-grid {
   display: flex;
-  gap: 16px;
+  gap: var(--space-l);
 }
 
 .sale-suits {
   position: relative;
-  width: 600px;
-  height: 717px;
-  flex-shrink: 0;
+  flex: 1 1 0;
+  min-width: 0;
+  aspect-ratio: 600 / 717;
   overflow: hidden;
 }
 
 .sale-suits-photo {
   position: absolute;
   inset: 0;
-  width: 600px;
-  height: 717px;
+  width: 100%;
+  height: 100%;
 }
 
 .sale-shade {
   position: absolute;
   left: 0;
-  top: 556px;
-  width: 600px;
+  bottom: 0;
+  width: 100%;
   height: 161px;
   background: linear-gradient(0deg, var(--umber) 0%, rgba(58, 47, 34, 0) 100%);
   mix-blend-mode: multiply;
@@ -797,17 +934,11 @@ input {
 
 .sale-label {
   position: absolute;
-  left: 32px;
-  top: 664px;
+  left: var(--space-2xl);
+  bottom: var(--space-2xl);
   display: flex;
   align-items: center;
-  gap: 12px;
-  font-family: var(--mono);
-  font-weight: 700;
-  font-size: 20px;
-  line-height: 1.3125; /* Thabit "normal" line height in Figma */
-  letter-spacing: 2.4px;
-  text-transform: uppercase;
+  gap: var(--space-m);
   color: var(--cream);
 }
 
@@ -817,11 +948,11 @@ input {
 }
 
 .sale-pair {
-  flex: 1 0 0;
-  height: 717px;
+  flex: 1 1 0;
+  min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: var(--space-l);
 }
 
 .sale-blank {
@@ -832,60 +963,39 @@ input {
 /* ---------- Shipping banner ---------- */
 
 .ship {
-  height: 108px;
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: center;
-  gap: 32px;
-  padding: 40px 0;
+  gap: var(--space-s) var(--space-2xl);
+  padding: var(--band-y) var(--gutter);
   background: linear-gradient(rgba(37, 41, 37, 0.5), rgba(37, 41, 37, 0.5)),
     url("/v2/banner/woven.png") top left / 627px 627px, var(--umber);
   color: var(--ivory);
   white-space: nowrap;
 }
 
-.ship-caps {
-  font-family: var(--mono);
-  font-weight: 700;
-  font-size: 20px;
-  line-height: 1.3125; /* Thabit "normal" line height in Figma */
-  letter-spacing: 0.4px;
-  text-transform: uppercase;
-}
 
-.ship-title {
-  font-family: var(--serif);
-  font-weight: 600;
-  font-size: 28px;
-  line-height: 1;
-  letter-spacing: 0.07px;
-}
 
 /* ---------- New Arrivals ---------- */
 
 .arrivals {
   display: flex;
   flex-direction: column;
-  gap: 32px;
-  padding: 80px 112px;
+  gap: var(--section-gap);
+  padding: var(--section-y) var(--gutter);
   background: var(--ivory);
 }
 
 .arrivals-title {
-  font-family: var(--serif);
-  font-weight: 600;
-  font-size: 48px;
-  line-height: 1.15;
-  height: 55px;
-  letter-spacing: 0.12px;
   color: var(--burgundy);
   white-space: nowrap;
 }
 
 .arrivals-row {
-  width: 1240px;
+  width: calc(100% + 24px); /* Figma's mosaic is 1240 wide, 24px past the right gutter */
   display: flex;
-  gap: 32px;
+  gap: var(--space-2xl);
 }
 
 .arrival {
@@ -898,7 +1008,7 @@ input {
 .arrival-photo {
   display: block;
   height: 352px;
-  margin-bottom: -24px;
+  margin-bottom: calc(-1 * var(--space-xl)); /* caption tape overlaps the photo */
   background: var(--espresso);
 }
 
@@ -958,21 +1068,15 @@ input {
 
 .arrival-label {
   position: absolute;
-  left: 101px;
+  left: calc(50% - 42px); /* Figma: x 101 in a 286 tile */
   top: 10.5px;
-  font-family: var(--mono);
-  font-weight: 700;
-  font-size: 16px;
-  line-height: 1.3125; /* Thabit "normal" line height in Figma */
-  letter-spacing: 1.92px;
-  text-transform: uppercase;
   color: var(--umber);
   white-space: nowrap;
 }
 
 .arrival-arrow {
   position: absolute;
-  left: 164px;
+  left: calc(50% + 21px); /* Figma: x 164 in a 286 tile */
   top: 16px;
   width: 44px;
   height: 10px;
@@ -984,20 +1088,19 @@ input {
   display: flex;
   align-items: flex-start;
   justify-content: center;
-  padding: 40px 0;
+  padding: var(--band-y) 0;
   background: var(--burgundy);
 }
 
 .reassure-item {
   width: 320px;
-  height: 120px;
+  min-height: 120px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
-  padding: 0 24px;
+  gap: var(--space-s);
+  padding: 0 var(--space-xl);
   text-align: center;
-  white-space: nowrap;
 }
 
 .reassure-item + .reassure-item {
@@ -1048,19 +1151,11 @@ input {
 }
 
 .reassure-title {
-  font-family: var(--serif);
-  font-weight: 600;
-  font-size: 28px;
-  line-height: 1.15;
-  letter-spacing: 0.07px;
+  white-space: nowrap;
   color: var(--ivory);
 }
 
 .reassure-body {
-  font-family: var(--sans);
-  font-weight: 500;
-  font-size: 18px;
-  line-height: 1.5;
   color: rgba(255, 255, 255, 0.85);
 }
 
@@ -1069,8 +1164,8 @@ input {
 .recent {
   display: flex;
   align-items: center;
-  gap: 72px;
-  padding: 90px 112px;
+  gap: var(--space-6xl);
+  padding: var(--section-y) var(--gutter);
   background: var(--ivory);
 }
 
@@ -1080,61 +1175,50 @@ input {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 16px;
+  gap: var(--stack);
   color: var(--umber);
 }
 
-.recent-title {
-  font-family: var(--serif);
-  font-weight: 600;
-  font-size: 48px;
-  line-height: 1.2;
-  letter-spacing: 0.12px;
-  white-space: nowrap;
-}
 
 .recent-deck {
   width: 300px;
-  font-family: var(--sans);
-  font-weight: 500;
-  font-size: 18px;
-  line-height: 1.4;
+  max-width: 100%;
 }
 
 .recent-carousel {
+  --card: 295px;
   position: relative;
-  width: 844px;
-  height: 394px;
-  flex-shrink: 0;
-  overflow: hidden;
+  flex: 0 1 844px;
+  min-width: 0;
+  padding-bottom: var(--space-xl); /* progress track sits under the cards */
 }
 
 .recent-cards {
-  position: absolute;
-  left: 0;
-  top: 0;
   display: flex;
-  gap: 16px;
-  transition: transform 0.45s ease;
+  gap: var(--space-l);
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+}
+
+.recent-cards::-webkit-scrollbar {
+  display: none;
 }
 
 .recent-card {
-  width: 295px;
-  height: 372px;
+  width: var(--card);
+  scroll-snap-align: start;
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
   color: var(--umber);
-  font-family: var(--sans);
-  font-size: 14px;
-  line-height: 1.4;
 }
 
 .recent-photo {
-  width: 295px;
-  height: 295px;
+  width: var(--card);
+  height: var(--card);
   object-fit: cover;
-  margin-bottom: 12px;
+  margin-bottom: var(--space-m);
 }
 
 .recent-name {
@@ -1142,7 +1226,7 @@ input {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  margin-bottom: 6px;
+  margin-bottom: var(--space-xs);
 }
 
 .recent-price {
@@ -1152,26 +1236,25 @@ input {
 .recent-track {
   position: absolute;
   left: 0;
-  top: 392px;
-  width: 844px;
+  bottom: 0;
+  width: 100%;
   height: 2px;
   background: rgba(0, 30, 86, 0.15);
 }
 
 .recent-progress {
   position: absolute;
-  left: 0;
-  top: 391px;
-  width: 298px;
+  left: calc(var(--progress, 0) * 64.6919%);
+  bottom: 0;
+  width: 35.3081%; /* Figma: 298 of 844 */
   height: 3px;
   background: var(--burgundy);
-  transition: transform 0.45s ease;
 }
 
 .recent-next {
   position: absolute;
-  left: 788px;
-  top: 124px;
+  right: 8px; /* Figma: x 788 in an 844 carousel */
+  top: calc(var(--card) / 2 - var(--space-xl)); /* centered on the photo */
   width: 48px;
   height: 48px;
   padding: 0;
@@ -1199,8 +1282,8 @@ input {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 40px;
-  padding: 56px 0 60px;
+  gap: var(--section-gap);
+  padding: var(--space-6xl) 0;
   background: linear-gradient(180deg, rgba(18, 14, 10, 0.46) 0%, rgba(18, 14, 10, 0.52) 100%),
     url("/v2/brands/plaid.png") center / cover, #2c3324;
 }
@@ -1209,31 +1292,26 @@ input {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
+  gap: var(--space-s);
   text-align: center;
 }
 
 .brands-title {
-  font-family: var(--serif);
-  font-weight: 600;
-  font-size: 32px;
-  line-height: 1.12;
-  letter-spacing: 0.08px;
   color: var(--ivory);
   white-space: nowrap;
 }
 
 .brands-deck {
-  width: 608px;
-  font-family: var(--sans);
-  font-size: 20px;
-  line-height: 1.45;
+  width: min(608px, calc(100vw - 2 * var(--gutter)));
   color: rgba(239, 232, 220, 0.9);
 }
 
 .brands-row {
   display: flex;
-  gap: 32px;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-2xl);
+  padding: 0 var(--gutter);
 }
 
 .badge {
@@ -1336,11 +1414,13 @@ input {
 }
 
 .refer {
-  height: 116px;
+  min-height: 116px;
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 293px;
-  padding: 30px 52px;
+  justify-content: space-between; /* Figma: 293px gaps at 1440 */
+  gap: 16px 24px;
+  padding: 30px clamp(20px, 3.6111vw, 52px);
   background: var(--burgundy);
   color: #fff;
 }
@@ -1354,6 +1434,7 @@ input {
 
 .refer-copy {
   width: 331px;
+  max-width: 100%;
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -1381,27 +1462,38 @@ input {
 .footer-main {
   display: flex;
   flex-direction: column;
-  gap: 40px;
-  padding: 80px 52px 24px;
+  gap: var(--space-3xl);
+  padding: clamp(var(--space-6xl), 5.5556vw, var(--space-7xl)) clamp(var(--space-xl), 3.6111vw, 52px) var(--space-xl); /* 52px: Replatform footer gutter */
   background: #fff;
 }
 
 .footer-links {
   display: flex;
+  flex-wrap: wrap;
   align-items: flex-start;
-  gap: 64px;
+  gap: var(--space-3xl) clamp(var(--space-2xl), 4.4444vw, var(--space-6xl));
 }
 
 .footer-col {
   width: 160px;
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: var(--space-xl);
 }
 
 .footer-col-title {
+  display: block;
   height: 17px;
-  color: #3a3a3a;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--ui-text);
+  text-align: left;
+  cursor: default;
+}
+
+.footer-col-chevron {
+  display: none;
 }
 
 .footer-col ul {
@@ -1442,17 +1534,19 @@ input {
 }
 
 .footer-optin-top {
+  max-width: 100%;
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
 
 .footer-optin-title {
-  width: 384px;
+  width: min(384px, 100%);
   color: #3a3a3a;
 }
 
 .footer-fields {
+  max-width: 100%;
   height: 136px;
   display: flex;
   flex-direction: column;
@@ -1460,7 +1554,7 @@ input {
 }
 
 .footer-field {
-  width: 440px;
+  width: min(440px, 100%);
   height: 64px;
   display: flex;
   align-items: center;
@@ -1512,17 +1606,19 @@ input {
 }
 
 .footer-secondary {
-  width: 1337px;
+  width: 100%;
+  max-width: 1337px;
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: var(--space-xl);
 }
 
 .footer-terms {
-  height: 48px;
+  min-height: 48px;
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 8px;
+  gap: 4px 8px;
   color: #747474;
   white-space: pre;
 }
@@ -1572,7 +1668,8 @@ input {
 }
 
 .footer-divider {
-  width: 1336px;
+  width: 100%;
+  max-width: 1336px;
   height: 1px;
   margin-top: -1px; /* Figma draws the 0px-tall divider's stroke above its line */
 }
@@ -1594,4 +1691,528 @@ input {
   width: 84px;
   height: 44px;
   object-fit: cover;
+}
+
+
+/* =====================================================================
+   Responsive
+   The Figma frame is 1440 wide; everything above matches it exactly there.
+   Below that, sections reflow using the same materials (kraft, plaid,
+   herringbone, the patch) so smaller screens keep the cozy, editorial feel.
+   ===================================================================== */
+
+/* ---------- Desktop (1024–1279): rails instead of fixed rows ---------- */
+@media (max-width: 1279.98px) {
+  .nav-links {
+    justify-content: flex-start;
+    gap: var(--space-xl);
+    overflow-x: auto;
+    scrollbar-width: none;
+    margin: 0 calc(-1 * clamp(16px, 3.6111vw, 52px));
+    padding: 0 clamp(16px, 3.6111vw, 52px);
+  }
+
+  .nav-links::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Kraft tags become a swipeable rail */
+  .tags {
+    height: auto;
+    padding-left: var(--gutter);
+    padding-right: var(--gutter);
+  }
+
+  .tags-row {
+    justify-content: flex-start;
+    gap: var(--space-l);
+    overflow-x: auto;
+    scroll-snap-type: x proximity;
+    scrollbar-width: none;
+    width: calc(100% + 2 * var(--gutter));
+    margin: 0 calc(-1 * var(--gutter));
+    padding: 0 var(--gutter);
+    scroll-padding-inline: var(--gutter);
+  }
+
+  .tags-row::-webkit-scrollbar {
+    display: none;
+  }
+
+  .tag-slot {
+    scroll-snap-align: start;
+  }
+
+  /* New Arrivals mosaic becomes a rail; tape still overhangs each tile */
+  .arrivals-row {
+    width: calc(100% + 2 * var(--gutter));
+    margin: 0 calc(-1 * var(--gutter));
+    padding: var(--space-m) calc(var(--gutter) + 22px) var(--space-s); /* 22px: tape overhang */
+    scroll-padding-inline: calc(var(--gutter) + 22px);
+    overflow-x: auto;
+    scroll-snap-type: x proximity;
+    scrollbar-width: none;
+  }
+
+  .arrivals-row::-webkit-scrollbar {
+    display: none;
+  }
+
+  .arrival {
+    flex: 0 0 260px;
+    scroll-snap-align: start;
+  }
+
+  .arrival-photo {
+    height: 320px;
+  }
+}
+
+/* ---------- Desktop: gifts stacks before the collage would reach the copy ---------- */
+@media (max-width: 1279.98px) {
+  /* Gifts: copy above, collage below at its Figma proportions */
+  .gifts {
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    gap: var(--section-gap);
+    padding: var(--section-y) 0 0;
+    background-size: 640px 640px, auto;
+  }
+
+  .gifts-copy {
+    order: -1;
+    position: static;
+    transform: none;
+    padding: 0 var(--gutter);
+  }
+
+  .gifts-body {
+    width: auto;
+    max-width: 420px;
+  }
+
+  .gifts-collage {
+    position: relative;
+    left: auto;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1009 / 560;
+  }
+}
+
+/* ---------- Tablet (768–1023) ---------- */
+@media (max-width: 1023.98px) {
+  /* Replatform: tablet and mobile share the mobile nav */
+  .nav {
+    padding: 0;
+    gap: 0;
+    box-shadow: none;
+  }
+
+  .nav-utility,
+  .nav-links {
+    display: none;
+  }
+
+  .nav-mobile {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-m) var(--space-l);
+    box-shadow: inset 0 -1px 0 var(--ui-border); /* Figma stroke sits inside the 64px bar */
+    background: #fff;
+  }
+
+  .nav-mobile-start {
+    display: flex;
+    align-items: center;
+    gap: var(--space-s);
+  }
+
+  .nav-mobile-logo img {
+    width: 168px;
+    height: 9px;
+  }
+
+  .nav-mobile-end {
+    display: flex;
+    gap: var(--space-xs);
+    padding: var(--space-xs) 0;
+  }
+
+  .nav-mobile-search {
+    display: block;
+    padding: var(--space-m) var(--space-l);
+    border-bottom: 1px solid var(--ui-border);
+    background: #fff;
+  }
+
+  .nav-mobile-search input {
+    width: 100%;
+    height: 44px;
+    padding: 0 var(--space-l);
+    border: 0;
+    border-radius: var(--radius-s);
+    background: #f2f2f2;
+    font-family: var(--ui);
+    font-size: var(--fs-14);
+    line-height: 20px;
+  }
+
+  .nav-drawer {
+    display: flex;
+    flex-direction: column;
+    border-bottom: 1px solid var(--ui-border);
+    background: #fff;
+    font-family: var(--ui);
+    font-size: var(--fs-16);
+    line-height: 24px;
+  }
+
+  .nav-drawer a {
+    padding: var(--space-m) var(--space-l);
+    border-top: 1px solid var(--ui-border);
+  }
+
+  /* Even line breaks once headlines wrap more than in Figma */
+  .hero-title,
+  .gifts-title,
+  .h-section,
+  .recent-title,
+  .arrivals-title {
+    text-wrap: balance;
+  }
+
+  /* Recently viewed: copy above, full-width rail below */
+  .recent {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--section-gap);
+  }
+
+  .recent-copy {
+    width: auto;
+  }
+
+  .recent-carousel {
+    flex: none;
+    margin-right: calc(-1 * var(--gutter));
+  }
+
+  .recent-cards {
+    padding-right: var(--gutter);
+  }
+
+  .recent-track {
+    width: calc(100% - var(--gutter));
+  }
+
+  .recent-progress {
+    left: calc(var(--progress, 0) * (100% - var(--gutter)) * 0.646919);
+    width: calc((100% - var(--gutter)) * 0.353081);
+  }
+
+  .recent-next {
+    right: calc(var(--gutter) + 8px);
+  }
+
+  .footer-optin {
+    flex-basis: 100%;
+    min-width: 0;
+    align-items: flex-start;
+  }
+
+  .footer-optin-top,
+  .footer-fields {
+    width: 100%;
+  }
+}
+
+/* ---------- Tablet: stacked tiles and bands ---------- */
+@media (max-width: 1023.98px) {
+  .real-head {
+    flex-wrap: wrap;
+  }
+
+  .real-titles {
+    white-space: normal;
+  }
+
+  .real-patch {
+    margin-left: auto;
+  }
+
+  /* Holiday tiles stack */
+  .real-row {
+    flex-direction: column;
+    height: auto;
+  }
+
+  .real-tile {
+    flex: none;
+    height: clamp(460px, 110vw, 647px);
+  }
+
+  .real-office-photo {
+    top: 0;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 20%;
+  }
+
+  /* Same bottom shade as the family tile, so the caps stay legible over the sweater */
+  .real-tile--office::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background: linear-gradient(180deg, rgba(13, 8, 5, 0) 45%, rgba(13, 8, 5, 0.72) 100%);
+  }
+
+  .real-office-title,
+  .real-office-cta {
+    z-index: 2;
+  }
+
+  .real-family-photo,
+  .real-family-scrim {
+    left: 20px;
+    top: 20px;
+    width: calc(100% - 40px);
+    height: calc(100% - 40px);
+  }
+
+  .real-family-copy {
+    left: calc(20px + var(--gutter));
+    bottom: 52px;
+  }
+
+  /* Sale: lead tile on top, pair side by side below */
+  .sale-grid {
+    flex-direction: column;
+  }
+
+  .sale-suits {
+    flex: none;
+    width: 100%;
+    aspect-ratio: 4 / 5;
+  }
+
+  .sale-suits-photo {
+    object-fit: cover;
+    object-position: center 30%;
+  }
+
+  .sale-pair {
+    flex-direction: row;
+    height: auto;
+  }
+
+  .sale-blank {
+    aspect-ratio: 1;
+  }
+
+  /* Reassurance stacks with hairlines between */
+  .reassure {
+    flex-direction: column;
+    align-items: center;
+    padding: var(--space-xl) var(--gutter);
+  }
+
+  .reassure-item {
+    width: 100%;
+    max-width: 360px;
+    min-height: 0;
+    padding: var(--space-xl) 0;
+  }
+
+  .reassure-item + .reassure-item {
+    border-left: 0;
+    border-top: 1px solid rgba(239, 232, 220, 0.22);
+  }
+
+  .refer {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+/* ---------- Mobile (0–767) ---------- */
+@media (max-width: 767.98px) {
+  .hero-photo {
+    object-position: 28% center;
+  }
+
+  .hero-scrim {
+    background: linear-gradient(
+      180deg,
+      rgba(18, 14, 10, 0) 0%,
+      rgba(18, 14, 10, 0.2) 45%,
+      rgba(18, 14, 10, 0.72) 100%
+    );
+  }
+
+  .tags-head {
+    flex-direction: column;
+    gap: var(--space-m);
+  }
+
+  .tags-actions img {
+    display: none;
+  }
+
+  .tag-slot {
+    width: 136px;
+    height: 212px;
+  }
+
+  .tag {
+    scale: 0.9;
+    transform-origin: top left;
+  }
+
+
+  .real-head {
+    gap: var(--space-xl);
+  }
+
+  .real-patch {
+    width: 180px;
+  }
+
+
+
+  .real-office-title,
+  .real-family-title {
+    max-width: calc(100% - 2 * var(--gutter));
+    white-space: normal;
+  }
+
+  .real-family-copy {
+    right: calc(20px + var(--gutter));
+  }
+
+  .real-family-title {
+    max-width: none;
+  }
+
+  .sale-label {
+    left: 20px;
+  }
+
+  .ship {
+    flex-direction: column;
+    gap: var(--space-xs);
+    padding: var(--space-2xl) var(--gutter);
+  }
+
+
+  .arrival {
+    flex-basis: 220px;
+  }
+
+  .arrival-photo {
+    height: 260px;
+  }
+
+  .recent-carousel {
+    --card: 220px;
+  }
+
+  .recent-next {
+    display: none;
+  }
+
+  .brands {
+    padding: var(--space-4xl) 0;
+  }
+
+  .brands-row {
+    gap: var(--space-l);
+  }
+
+  .badge {
+    width: 96px;
+    height: 96px;
+  }
+
+  /* Replatform "Footer / Mobile": link groups become accordion rows */
+  .footer-main {
+    padding: var(--space-2xl) var(--space-xl) var(--space-xl);
+  }
+
+  .footer-links {
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .footer-col {
+    width: 100%;
+    gap: 0;
+  }
+
+  .footer-col-title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    height: auto;
+    padding: var(--space-l) var(--space-s);
+    border-bottom: 1px solid var(--ui-border);
+    cursor: pointer;
+  }
+
+  .footer-col-chevron {
+    display: block;
+    transition: transform 0.2s ease;
+  }
+
+  .footer-col.is-open .footer-col-chevron {
+    transform: rotate(180deg);
+  }
+
+  .footer-col ul {
+    display: none;
+    padding: var(--space-l) var(--space-s);
+  }
+
+  .footer-col.is-open ul {
+    display: flex;
+  }
+
+  .footer-optin {
+    margin-top: var(--space-2xl);
+  }
+
+  .footer-field {
+    height: 56px;
+  }
+
+  .footer-terms {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .footer-texts {
+    width: 100%;
+    height: auto;
+    white-space: normal;
+  }
+
+  .footer-terms .dot {
+    display: none;
+  }
+
+  .footer-terms {
+    gap: var(--space-s) var(--space-l);
+  }
+
+  .footer-bottom {
+    gap: var(--space-l);
+  }
+
+  .footer-bottom p {
+    white-space: normal;
+  }
 }

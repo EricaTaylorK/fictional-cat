@@ -2,7 +2,7 @@
 # Downloads Figma assets listed in figma-assets.txt into public/v2/.
 cd "$(dirname "$0")/.." || exit 1
 while read -r path url; do
-  [ -z "$path" ] && continue
+  case "$path" in ""|\#*) continue;; esac
   out="public/v2/$path"
   [ -s "$out" ] && continue
   mkdir -p "$(dirname "$out")"

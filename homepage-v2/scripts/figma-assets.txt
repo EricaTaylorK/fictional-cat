@@ -23,7 +23,7 @@ gifts/still.png https://www.figma.com/api/mcp/asset/149a391c-4d81-458a-852e-5678
 gifts/wax-seal.png https://www.figma.com/api/mcp/asset/371c76d9-5c2e-4f06-8118-eb2992f0e338.png
 gifts/cta-texture.png https://www.figma.com/api/mcp/asset/9f9660e7-e4a1-47e9-8d7b-8c30a2ba476c.png
 realworld/plaid-accent.png https://www.figma.com/api/mcp/asset/68929356-4212-4cb8-b10d-9cb4a6087d42.png
-realworld/love-patch.png https://www.figma.com/api/mcp/asset/947a713c-e542-4210-bc73-39002d7b56f3.png
+# realworld/love-patch.svg is a Figma export of frame 48:635 (added by hand)
 realworld/office-party.png https://www.figma.com/api/mcp/asset/6788f3ba-142a-4c8d-9a59-5460e52ee05e.png
 realworld/herringbone.png https://www.figma.com/api/mcp/asset/d1f17889-83d8-47dd-bd45-5cf824009e58.png
 realworld/family-gathering.png https://www.figma.com/api/mcp/asset/10d7a8ec-6a0c-4524-bceb-082b7c7ab906.png
@@ -58,3 +58,10 @@ footer/mail.svg https://www.figma.com/api/mcp/asset/55092f5d-0c43-4423-9988-b03f
 footer/phone.svg https://www.figma.com/api/mcp/asset/4444df96-9116-4a00-994d-d20d3e39becb.svg
 footer/curved-arrow.svg https://www.figma.com/api/mcp/asset/710fbe23-3c32-4a5c-8fd7-08cbad307360.svg
 footer/divider.svg https://www.figma.com/api/mcp/asset/583a6b3e-5b07-4630-90ed-2ad2a1a376f3.svg
+# Replatform file (8P7Mou78hdsT3cIqaXlFxT): Global Navigation / Mobile 8743:33716
+nav/menu.svg https://www.figma.com/api/mcp/asset/c2e9147d-41ff-4210-844f-d9195229ac45.svg
+nav/logo-mobile.svg https://www.figma.com/api/mcp/asset/477bcb31-4dd0-40ec-9a14-d87f0f921820.svg
+nav/search-mobile.svg https://www.figma.com/api/mcp/asset/9ea663d4-6305-464d-8b27-9db561fd7135.svg
+nav/bag-mobile.svg https://www.figma.com/api/mcp/asset/d3685452-7904-426a-afdb-fbad3dba75e2.svg
+# Replatform file: Footer / Mobile 4036:12243
+footer/chevron-down.svg https://www.figma.com/api/mcp/asset/f32d42da-b69a-4611-ba31-bf7f6e31ddbc.svg
