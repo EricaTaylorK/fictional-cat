@@ -163,70 +163,140 @@ function ShopTheLook({ look, onOpen, expanded = false }) {
 
 /* ---------- Shop the look ---------- */
 
-// Pieces visible on the model in each photo. No catalog data exists for these
-// looks yet, so each piece links to its existing nav category instead of a SKU.
-// Thumbnails are crops of the look photo itself (size = zoom, pos = focal point).
+// Pieces visible on the model in each photo.
+// Both looks use real menswearhouse.com products (prices as of Nov 2026).
+// image: a path under /v2/ for local files, or a full URL.
+const MW_IMG = (id) => `https://image.menswearhouse.com/is/image/TMW/${id}?wid=544&fmt=jpg&qlt=85`;
 const looks = {
-  office: {
-    id: "office",
-    title: "The Office Party",
-    photo: "realworld/office-party.png",
+  clubcar: {
+    id: "clubcar",
+    title: "The Club Car",
+    photo: "realworld/club-car.jpg",
     items: [
-      { name: "Cable-knit turtleneck sweater", category: "Casual", size: "230%", pos: "55% 46%" },
-      { name: "Charcoal trousers", category: "Pants", size: "240%", pos: "58% 94%" },
+      {
+        sku: "TMW_72N0",
+        brand: "Tommy Hilfiger",
+        name: "Freeman Car Coat",
+        price: "$395.00",
+        // Recolored locally from the Burgundy photo to match the navy coat in the look
+        // (the Freeman only comes in burgundy). Swap back to MW_IMG(...) for the real color.
+        image: "realworld/car-coat-navy.jpg",
+        photo: true,
+        href: "https://www.menswearhouse.com/p/freeman-car-coat-tmw-72n0?color=burgundy",
+      },
+      {
+        sku: "TMW_6UXH",
+        brand: "Weatherproof Vintage",
+        name: "Cotton & Cashmere Roll Neck Crew Sweater",
+        price: "$90.00",
+        image: MW_IMG("TMW_6UXH_19_WEATHERPROOF_VINTAGE_SWEATERS_CAMEL_MAIN"),
+        href: "https://www.menswearhouse.com/p/cotton-cashmere-roll-neck-crew-sweater-tmw-6uxh?color=camel",
+      },
+      {
+        sku: "TMW_202B",
+        brand: "Joseph Abboud",
+        name: "Modern Fit Comfort Stretch Chinos",
+        price: "$69.99",
+        rating: 4.6,
+        reviews: 1135,
+        image: MW_IMG("TMW_202B_23_JOSEPH_ABBOUD_CASUAL_PANTS_TAN_MAIN"),
+        href: "https://www.menswearhouse.com/p/joseph-abboud-modern-fit-comfort-stretch-chinos-tmw-202b?color=tan",
+      },
     ],
   },
-  family: {
-    id: "family",
-    title: "The Family Gathering",
-    photo: "realworld/family-gathering.png",
+  cabin: {
+    id: "cabin",
+    title: "The Cabin Getaway",
+    photo: "realworld/cabin-getaway.jpg",
     items: [
-      { name: "Shearling-collar jacket", category: "Outerwear", size: "190%", pos: "40% 46%" },
-      { name: "Plaid flannel shirt", category: "Casual Shirts", size: "320%", pos: "54% 52%" },
-      { name: "Jeans", category: "Jeans & Chinos", size: "300%", pos: "78% 100%" },
+      {
+        sku: "TMW_6MEX",
+        brand: "Weatherproof Vintage",
+        name: "Berber-Lined Corduroy Trucker",
+        price: "$125.00",
+        // Recolored locally from the Spanish Brown photo to match the navy jacket in the look
+        // (the trucker only comes in brown). Swap back to MW_IMG(...) for the real color.
+        image: "realworld/trucker-navy.jpg",
+        photo: true,
+        href: "https://www.menswearhouse.com/p/berber-lined-corduroy-trucker-tmw-6mex?color=spanish-brown",
+      },
+      {
+        sku: "TMW_6GKM",
+        brand: "Weatherproof Vintage",
+        name: "Regular Fit Brushed Flannel Button Up Shirt",
+        price: "$65.00",
+        image: MW_IMG("TMW_6GKM_03_WEATHERPROOF_VINTAGE_LONG_SLEEVE_BUTTON_UP_SHIRTS_BROWN_WILLOW_MAIN"),
+        href: "https://www.menswearhouse.com/p/regular-fit-brushed-flannel-button-up-shirt-tmw-6gkm?color=brown-willow",
+      },
+      {
+        sku: "TMW_234W",
+        brand: "Joseph Abboud",
+        name: "Slim Fit Comfort Stretch Jeans",
+        price: "$14.99",
+        was: "$69.99",
+        rating: 4.7,
+        reviews: 1425,
+        image: MW_IMG("TMW_234W_51_JOSEPH_ABBOUD_JEANS_MEDIUM_WASH_MAIN"),
+        href: "https://www.menswearhouse.com/p/joseph-abboud-slim-fit-cleankore-comfort-stretch-jeans-tmw-234w?color=medium-wash",
+      },
     ],
   },
 };
 
-// Per-piece details. Sizes, price and Add to Bag render only when real product
-// data is supplied ({ name, category, price?, sizes?: [], href? }); until then the
-// piece links to its category. Nothing here is placeholder data.
-function LookItemDetails({ item }) {
-  const [size, setSize] = useState(null);
-  const [added, setAdded] = useState(false);
-  const hasProduct = Array.isArray(item.sizes) && item.sizes.length > 0;
-  const group = `size-${item.name.toLowerCase().replace(/[^a-z]+/g, "-")}`;
+const STAR_PATH = "M8 1.5 9.85 5.95l4.81.39-3.66 3.13 1.12 4.69L8 11.65l-4.12 2.51 1.12-4.69-3.66-3.13 4.81-.39L8 1.5Z";
 
+function Stars({ rating, reviews }) {
   return (
-    <span className="look-item-copy">
-      <span className="t-body look-item-name">{item.name}</span>
-      {item.price ? <span className="t-small look-item-price">{item.price}</span> : null}
-      {hasProduct ? (
-        <>
-          <span className="look-sizes" role="radiogroup" aria-label={`Size for ${item.name}`}>
-            {item.sizes.map((value) => (
-              <label key={value} className={`look-size${size === value ? " is-selected" : ""}`}>
-                <input type="radio" name={group} value={value} checked={size === value} onChange={() => setSize(value)} />
-                {value}
-              </label>
-            ))}
-          </span>
-          <button
-            type="button"
-            className="btn btn--solid btn--small t-cta"
-            disabled={!size}
-            onClick={() => setAdded(true)}
-          >
-            {added ? "Added" : "Add to Bag"}
-          </button>
-          <span className="visually-hidden" aria-live="polite">{added ? `${item.name}, size ${size}, added to bag` : ""}</span>
-        </>
-      ) : (
-        <a className="link-caps link-caps--burgundy t-cta" href={item.href || "#"} onClick={item.href ? undefined : stop}>
-          Shop {item.category}
-        </a>
-      )}
+    <span className="pcard-rating">
+      <span className="pcard-stars" role="img" aria-label={`Rated ${rating} out of 5`}>
+        {[0, 1, 2, 3, 4].map((i) => {
+          const fill = Math.max(0, Math.min(1, rating - i));
+          const id = `star-${String(rating).replace(".", "-")}-${i}`;
+          return (
+            <svg key={i} viewBox="0 0 16 16" width="16" height="16" aria-hidden="true">
+              {fill > 0 && fill < 1 ? (
+                <defs>
+                  <linearGradient id={id}>
+                    <stop offset={fill} stopColor="var(--ui-muted)" />
+                    <stop offset={fill} stopColor="var(--ui-border)" />
+                  </linearGradient>
+                </defs>
+              ) : null}
+              <path d={STAR_PATH} fill={fill >= 1 ? "var(--ui-muted)" : fill > 0 ? `url(#${id})` : "var(--ui-border)"} />
+            </svg>
+          );
+        })}
+      </span>
+      <span className="pcard-reviews">({reviews})<span className="visually-hidden"> reviews</span></span>
     </span>
+  );
+}
+
+// Product card: image on a warm tile, brand, name, price, optional rating.
+function ProductCard({ item }) {
+  const isRemote = /^https?:/.test(item.image);
+  const isPhoto = item.photo || isRemote; // on-model photo: fill the tile; local cutouts sit inside it
+  return (
+    <a className="pcard" href={item.href || "#"} onClick={item.href ? undefined : stop}>
+      <span className={`pcard-media${isPhoto ? " pcard-media--photo" : ""}`}>
+        <img src={isRemote ? item.image : A(item.image)} alt="" loading="lazy" />
+      </span>
+      <span className="pcard-copy">
+        {item.brand ? <span className="pcard-brand">{item.brand}</span> : null}
+        <span className="pcard-name">{item.name}</span>
+        <span className="pcard-price">
+          {item.was ? <span className="visually-hidden">Sale price </span> : null}
+          {item.price}
+          {item.was ? (
+            <>
+              <span className="visually-hidden">, was </span>
+              <s className="pcard-was">{item.was}</s>
+            </>
+          ) : null}
+        </span>
+        {item.rating ? <Stars rating={item.rating} reviews={item.reviews} /> : null}
+      </span>
+    </a>
   );
 }
 
@@ -306,18 +376,8 @@ function LookDrawer({ look, onClose, returnFocusTo }) {
         </p>
         <ul className="look-items">
           {look.items.map((item) => (
-            <li key={item.name} className="look-item">
-              <span
-                className="look-thumb"
-                role="img"
-                aria-label={`${item.name}, as worn in ${look.title}`}
-                style={{
-                  backgroundImage: `url(${A(look.photo)})`,
-                  backgroundSize: item.size,
-                  backgroundPosition: item.pos,
-                }}
-              />
-              <LookItemDetails item={item} />
+            <li key={item.sku}>
+              <ProductCard item={item} />
             </li>
           ))}
         </ul>
@@ -751,18 +811,18 @@ function LookBook() {
     <section className="lookbook" aria-label="Shop the look">
       <div className="real-row" ref={lookRail.railRef} onScroll={lookRail.onScroll}>
         <article className="real-tile real-tile--office">
-          <img className="real-office-photo" src={A("realworld/office-party.png")} alt="" />
-          <h3 className="real-office-title t-eyebrow-lg t-wide">The Office Party</h3>
+          <img className="real-office-photo" src={A("realworld/club-car.jpg")} alt="" />
+          <h3 className="real-office-title t-eyebrow-lg t-wide">The Club Car</h3>
           <div className="real-office-cta">
-            <ShopTheLook look={looks.office} onOpen={openLook} expanded={open === "office"} />
+            <ShopTheLook look={looks.clubcar} onOpen={openLook} expanded={open === "clubcar"} />
           </div>
         </article>
         <article className="real-tile real-tile--family">
-          <img className="real-family-photo" src={A("realworld/family-gathering.png")} alt="" />
+          <img className="real-family-photo" src={A("realworld/cabin-getaway.jpg")} alt="" />
           <div className="real-family-scrim" aria-hidden="true" />
           <div className="real-family-copy">
-            <h3 className="real-family-title t-eyebrow-lg t-wide">The Family Gathering</h3>
-            <ShopTheLook look={looks.family} onOpen={openLook} expanded={open === "family"} />
+            <h3 className="real-family-title t-eyebrow-lg t-wide">The Cabin Getaway</h3>
+            <ShopTheLook look={looks.cabin} onOpen={openLook} expanded={open === "cabin"} />
           </div>
         </article>
       </div>
