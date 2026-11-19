@@ -685,6 +685,11 @@ input {
   text-shadow: 0 1px 24px rgba(0, 0, 0, 0.25);
 }
 
+/* the aside reads as a softer, regular-weight italic beside the bold line */
+.tags-title em {
+  font-style: italic;
+  font-weight: 400;
+}
 
 .tags-actions {
   display: flex;
@@ -934,126 +939,227 @@ input {
   top: 149.21px;
 }
 
-/* ---------- Gifts ---------- */
-
+/* ---------- Gifts: gift guide with kraft tape chips ----------
+   A centered editorial header over the herringbone, then four square shots on
+   the 12-column grid. Each tile is labeled by a strip of kraft tape that
+   overhangs the photo's bottom edge, like a label pinned to a print. The tape
+   stays put on hover; only the photo eases in and the arrow steps forward. */
 .gifts {
-  position: relative;
-  height: 560px;
-  background: url("/v2/gifts/herringbone.png") top left / 864.256px 864.256px, #23271c;
-}
-
-.gifts-collage {
-  position: absolute;
-  left: 29.9306%; /* Figma: x 431 of 1440 */
-  top: 0;
-  width: 70.0694%; /* 1009 of 1440 */
-  height: 100%;
-}
-
-.gifts-suitcase,
-.gifts-still {
-  position: absolute;
-  overflow: hidden;
-  background: var(--ivory);
-}
-
-/* the taped still is a print laid on the board: a soft cast shadow lifts it */
-.gifts-still {
-  box-shadow: 0 2px 4px rgba(10, 6, 2, 0.22), 0 12px 24px rgba(10, 6, 2, 0.28);
-}
-
-.gifts-suitcase img,
-.gifts-still img {
-  position: absolute;
-  max-width: none;
-  object-fit: cover;
-}
-
-/* Figma: 576 x 560 at x 864 */
-.gifts-suitcase {
-  left: 42.9138%;
-  top: 0;
-  width: 57.0862%;
-  height: 100%;
-}
-
-/* Figma: 1040 x 694 at -219, -104 inside the suitcase frame */
-.gifts-suitcase img {
-  left: -38.0208%;
-  top: -18.5714%;
-  width: 180.5556%;
-  height: 123.9286%;
-}
-
-/* Figma: 340 x 418 at x 550, y 81 */
-.gifts-still {
-  left: 11.7939%;
-  top: 14.4643%;
-  width: 33.6967%;
-  height: 74.6429%;
-}
-
-/* Figma: 713 x 476 at -132, -33 inside the still frame */
-.gifts-still img {
-  left: -38.8235%;
-  top: -7.8947%;
-  width: 209.7059%;
-  height: 113.8756%;
-}
-
-/* Kraft tape, 370 x 123 each. Figma: top piece at (488, 11), bottom piece at (618, 426) */
-.gifts-tape {
-  position: absolute;
-  filter: drop-shadow(0 1px 0.5px rgba(20, 12, 4, 0.3)) drop-shadow(0 1.5px 2px rgba(20, 12, 4, 0.12));
-  width: 36.6700%;
-  height: auto;
-  pointer-events: none;
-}
-
-.gifts-tape--top {
-  left: 5.6492%;
-  top: 1.9643%;
-}
-
-.gifts-tape--bottom {
-  left: 18.5332%;
-  top: 76.0714%;
-}
-
-/* Figma: 178 x 178 at x 431, y 346 */
-.gifts-seal {
-  position: absolute;
-  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.25));
-  left: 0;
-  top: 61.7857%;
-  width: 17.6412%;
-  aspect-ratio: 1;
-  object-fit: cover;
-}
-
-.gifts-copy {
-  position: absolute;
-  left: var(--gutter);
-  top: 50%; /* Figma's copy block sat centered (171px of 560) */
-  transform: translateY(-50%);
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  gap: var(--stack);
-}
-
-.gifts-title {
-  max-width: 360px; /* breaks as "Gifts that feel / like him", clear of the photo at x=550 */
+  align-items: center;
+  gap: var(--section-gap);
+  padding: var(--section-y) var(--gutter) calc(var(--section-y) + var(--space-l));
+  background: url("/v2/gifts/herringbone.png") top left / 864.256px 864.256px, #23271c;
   color: var(--ivory);
 }
 
-.gifts-body {
-  width: 250px;
-  color: rgba(255, 255, 255, 0.85);
+.gifts-head {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--stack);
+  max-width: 720px;
+  text-align: center;
 }
 
-.gifts-cta {
-  padding-top: var(--space-s);
+.gifts-title {
+  color: var(--ivory);
+  text-wrap: balance;
+}
+
+.gifts-deck {
+  max-width: 56ch;
+  color: rgba(246, 242, 235, 0.85);
+  text-wrap: pretty;
+}
+
+.gifts-head .link-caps {
+  margin-top: var(--space-s);
+}
+
+/* lead image on columns 1–5, the 2 x 2 of gift edits on 6–12; rows leave room
+   for the tape that hangs below each photo */
+.gifts-spread {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(var(--grid-cols), minmax(0, 1fr));
+  column-gap: var(--grid-gap);
+  align-items: stretch;
+}
+
+.gift--lead {
+  grid-column: 1 / span 5;
+  margin-bottom: var(--space-xl); /* bottom edge lines up with the lower row's photos */
+}
+
+/* the lead photo fills the whole row height, down to its tape */
+.gift--lead .gift-media {
+  position: absolute;
+  inset: 0;
+  aspect-ratio: auto;
+}
+
+.gifts-grid {
+  grid-column: 6 / -1;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-6xl) var(--grid-gap);
+  margin: 0;
+  padding: 0 0 var(--space-xl);
+  list-style: none;
+}
+
+.gift {
+  position: relative;
+  display: block;
+  color: var(--umber);
+}
+
+.gift-media {
+  position: relative;
+  display: block;
+  aspect-ratio: 1;
+  overflow: hidden;
+  background: var(--cream);
+  box-shadow: 0 2px 4px rgba(10, 6, 2, 0.25), 0 14px 28px rgba(10, 6, 2, 0.3);
+}
+
+.gift-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.6s ease;
+}
+
+/* kraft tape label: overhangs the photo's sides and straddles its bottom edge */
+.gift-chip {
+  position: absolute;
+  left: calc(-1 * var(--space-xs));
+  right: calc(-1 * var(--space-xs));
+  bottom: calc(-1 * var(--space-xl));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-m);
+  min-height: 52px;
+  padding: var(--space-m) var(--space-l);
+  /* three-slice tape: the torn ends keep their shape, only the middle stretches */
+  border: 0 solid transparent;
+  border-width: 0 14px;
+  border-image-source: url("/v2/gifts/tape-chip.png");
+  border-image-slice: 0 22 fill;
+  border-image-width: 0 14px;
+  border-image-repeat: stretch;
+  filter: drop-shadow(0 1px 0.5px rgba(20, 12, 4, 0.3)) drop-shadow(0 2px 3px rgba(20, 12, 4, 0.18));
+  color: var(--espresso);
+  text-align: center;
+}
+
+.gift-arrow {
+  flex: none;
+  width: 40px;
+  height: 9px;
+  background: currentColor;
+  -webkit-mask: url("/v2/sale/arrow.svg") center / contain no-repeat;
+  mask: url("/v2/sale/arrow.svg") center / contain no-repeat;
+  transition: transform 0.2s ease;
+}
+
+@media (hover: hover) {
+  .gift:hover .gift-media img {
+    transform: scale(1.03);
+  }
+
+  .gift:hover .gift-arrow {
+    transform: translateX(4px);
+  }
+}
+
+.gift:focus-visible {
+  outline: 2px solid var(--ivory);
+  outline-offset: 6px;
+}
+
+.gift-chip {
+  white-space: nowrap;
+}
+
+/* small desktop: four narrow tiles, so the chip type steps down to 14px */
+@media (max-width: 1279.98px) {
+  .gift-chip {
+    left: 0;
+    right: 0;
+  }
+}
+
+@media (min-width: 1024px) and (max-width: 1279.98px) {
+  .gift-chip {
+    padding: var(--space-m) var(--space-l);
+    gap: var(--space-s);
+    font-size: var(--fs-14);
+  }
+
+  .gift-arrow {
+    width: 28px;
+  }
+}
+
+/* tablet and phones: the lead runs full width as a 4:5 portrait, the four
+   edits sit two by two beneath it */
+@media (max-width: 1023.98px) {
+  .gifts-spread {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: var(--space-5xl);
+  }
+
+  .gift--lead,
+  .gifts-grid {
+    grid-column: 1 / -1;
+  }
+
+  .gift--lead {
+    margin-bottom: 0;
+  }
+
+  .gift--lead .gift-media {
+    position: relative;
+    inset: auto;
+    aspect-ratio: 4 / 5;
+  }
+
+  .gifts-grid {
+    gap: var(--space-5xl) var(--space-l);
+  }
+}
+
+@media (max-width: 767.98px) {
+  .gift-chip {
+    left: 0;
+    right: 0;
+    bottom: calc(-1 * var(--space-l));
+    min-height: 40px;
+    padding: var(--space-s) var(--space-s);
+    gap: var(--space-s);
+    font-size: var(--fs-12);
+    letter-spacing: 0.08em;
+  }
+
+  .gift-chip {
+    white-space: nowrap;
+  }
+
+  /* phones: one-line labels; the whole tile is the link, so the arrow can go */
+  .gift-arrow {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gift-media img,
+  .gift-arrow {
+    transition: none;
+  }
 }
 
 /* ---------- Holiday, in the real world ---------- */
@@ -1324,8 +1430,6 @@ input {
   white-space: nowrap;
 }
 
-
-
 /* ---------- New Arrivals ---------- */
 
 .arrivals {
@@ -1532,7 +1636,6 @@ input {
   gap: var(--stack);
   color: var(--umber);
 }
-
 
 .recent-deck {
   max-width: 36ch;
@@ -2273,7 +2376,6 @@ input {
   object-fit: cover;
 }
 
-
 /* ---------- Shop the look drawer (rendered on <body>) ---------- */
 
 .look-layer {
@@ -2538,43 +2640,12 @@ input {
     padding-right: var(--gutter);
   }
 
-
 }
 
-/* ---------- Desktop: gifts stacks before the collage would reach the copy ---------- */
+/* ---------- Small desktop: Just In shows a peek of the next tile ---------- */
 @media (max-width: 1279.98px) {
   .arrivals-carousel {
     --visible: 2.1;
-  }
-
-  /* Gifts: copy above, collage below at its Figma proportions */
-  .gifts {
-    height: auto;
-    display: flex;
-    flex-direction: column;
-    gap: var(--section-gap);
-    padding: var(--section-y) 0 0;
-    background-size: 640px 640px, auto;
-  }
-
-  .gifts-copy {
-    order: -1;
-    position: static;
-    transform: none;
-    padding: 0 var(--gutter);
-  }
-
-  .gifts-body {
-    width: auto;
-    max-width: 420px;
-  }
-
-  .gifts-collage {
-    position: relative;
-    left: auto;
-    width: 100%;
-    height: auto;
-    aspect-ratio: 1009 / 560;
   }
 }
 
@@ -2689,7 +2760,6 @@ input {
 
   /* Even line breaks once headlines wrap more than in Figma */
   .hero-title,
-  .gifts-title,
   .h-section,
   .recent-title,
   .arrivals-title {
@@ -2739,8 +2809,6 @@ input {
     flex: none;
     height: clamp(460px, 110vw, 647px);
   }
-
-
 
   .real-family-photo,
   .real-family-scrim {
@@ -2801,19 +2869,9 @@ input {
     bottom: auto;
   }
 
-  .hero .btn,
-  .gifts .btn {
+  .hero .btn {
     align-self: stretch;
     height: 48px;
-  }
-
-  .gifts-cta {
-    align-self: stretch;
-  }
-
-  .gifts-cta .btn {
-    display: flex;
-    width: 100%;
   }
 
   /* B / E / G. Touch-native rails: no arrows on phones, swipe + snap with a peek */
@@ -2933,7 +2991,6 @@ input {
     transform-origin: top left;
   }
 
-
   /* Phone: eyebrow, then the patch, then headline, copy and CTA.
      The title block opens up (display: contents) so the patch can slot in. */
   .real-head {
@@ -2968,8 +3025,6 @@ input {
     order: 5;
   }
 
-
-
   .real-office-title,
   .real-family-title {
     max-width: calc(100% - 2 * var(--gutter));
@@ -2994,7 +3049,6 @@ input {
     padding: var(--space-2xl) var(--gutter);
   }
 
-
   .arrivals-carousel {
     --visible: 1.1;
     --gaps: 1;
@@ -3017,7 +3071,6 @@ input {
   .recent-carousel {
     --card: 220px;
   }
-
 
   /* Brands: copy above, a swipeable rail of larger cards */
   .brands-carousel {
@@ -3108,7 +3161,6 @@ input {
   }
 }
 
-
 /* ---------- Reduced motion ---------- */
 @media (prefers-reduced-motion: reduce) {
   .tag-slot.is-wiggle-a,
@@ -3192,12 +3244,8 @@ input {
     width: min(100%, clamp(260px, 26vw, 400px));
   }
 
-  /* Shop the look: two tiles on the grid, gap = column gutter */
-  .real-row {
-    gap: var(--grid-gap);
-    padding: 0 var(--gutter);
-    background: none;
-  }
+  /* Shop the look stays full-bleed (edge to edge, no gap), like the hero:
+     an editorial break from the grid in the spirit of Ralph Lauren's split tiles */
 
   /* Both tiles share one caption inset: the family photo's frame (6%) + 32px,
      so titles and buttons line up across the pair */
@@ -3338,126 +3386,3 @@ input {
   }
 }
 
-/* =====================================================================
-   Gifts on phones: one portrait scrapbook composition
-   The desktop strip shrunk to a sliver here and the trunk ran off the edge.
-   On phones the collage is recomposed as a single 4:5 block inside the page
-   gutters: the trunk photo is the base print, the fragrance still overlaps its
-   top-left corner, kraft tape straddles the still's top and bottom edges, and
-   the wax seal sits on its lower-left. Each piece is a % of the block, so the
-   whole scene scales as one. Prints are crisp with a soft cast shadow, laid on
-   the herringbone like a flatlay (no feathered seams).
-   ===================================================================== */
-@media (max-width: 767.98px) {
-  .gifts {
-    padding-bottom: var(--section-y);
-  }
-
-  .gifts-collage {
-    width: min(100% - 2 * var(--gutter), 480px); /* centered; capped so large phones don't get a tower */
-    margin: 0 auto;
-    aspect-ratio: 4 / 5;
-  }
-
-  .gifts-suitcase,
-  .gifts-still {
-    box-shadow: 0 2px 4px rgba(10, 6, 2, 0.25), 0 14px 28px rgba(10, 6, 2, 0.35);
-  }
-
-  .gifts-suitcase {
-    left: 22%;
-    top: 30%; /* the still overlaps only the wall above the trunk */
-    width: 78%;
-    height: 70%;
-  }
-
-  .gifts-still {
-    left: 10%; /* room on the left for the seal to hang off the card's edge */
-    top: 4%;
-    width: 48%;
-    height: 50%;
-  }
-
-  .gifts-suitcase img,
-  .gifts-still img {
-    inset: 0;
-    width: 100%;
-    height: 100%;
-  }
-
-  .gifts-suitcase img {
-    object-position: 49% center; /* the trunk sits at the photo's center */
-  }
-
-  .gifts-still img {
-    object-position: 42% center; /* bottles, Man Bar box and the pine sprig */
-  }
-
-  /* tape is ~1.09x the still's width (as in Figma); its strip spans 29–71% of
-     the image height, so each piece is centered on the still's edge */
-  .gifts-tape {
-    width: 52%;
-  }
-
-  .gifts-tape--top {
-    left: 6%;
-    top: calc(4% - 6.9%);
-  }
-
-  .gifts-tape--bottom {
-    left: 20%;
-    top: calc(54% - 6.9%);
-  }
-
-  /* seal centered on the card's left edge, ~85% of the way down (as in Figma):
-     half on the card, half on the herringbone */
-  .gifts-seal {
-    left: calc(10% - 13%);
-    top: calc(4% + 50% * 0.85 - 10.4%);
-    width: 26%;
-  }
-}
-
-/* =====================================================================
-   Gifts on desktop (1024+): keep the Figma side-by-side scene
-   (copy on the herringbone, the taped still and seal mid-frame, the trunk
-   photo full height to the right edge) instead of stacking. The section
-   scales with the viewport like the 1440 frame (560 / 1440 = 38.89vw, up to
-   640), every piece is a % of the collage so the trunk photo always fills its
-   frame to the right edge, and the collage starts after the copy column.
-   ===================================================================== */
-@media (min-width: 1024px) {
-  .gifts {
-    display: block;
-    height: clamp(440px, 38.8889vw, 640px);
-    padding: 0;
-    background-size: 864.256px 864.256px, auto;
-  }
-
-  .gifts-copy {
-    position: absolute;
-    left: var(--gutter);
-    top: 50%;
-    transform: translateY(-50%);
-    padding: 0;
-  }
-
-  .gifts-title {
-    max-width: 320px;
-  }
-
-  .gifts-body {
-    width: 250px;
-    max-width: none;
-  }
-
-  .gifts-collage {
-    position: absolute;
-    top: 0;
-    left: max(29.9306%, calc(var(--gutter) + 360px));
-    right: 0;
-    width: auto;
-    height: 100%;
-    aspect-ratio: auto;
-  }
-}

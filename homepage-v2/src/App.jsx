@@ -650,30 +650,55 @@ function CategoryTags() {
 
 /* ---------- Gifts ---------- */
 
+// Gift guide (Figma "Gifts He'll Love — Concept 1 — Kraft tape chips", 77:5335),
+// set as an editorial spread: a tall lead image on the left five columns and four
+// square gift edits in a 2 x 2 on the right seven. Every tile is labeled by a strip
+// of kraft tape. The lead model was lifted off his gray seamless onto the same
+// warm cream as the slippers and fragrance stills, so the set reads as one shoot.
+// pos = object-position for each photo's crop.
+const giftLead = { label: "Sweaters", photo: "gifts/sweater-lead.jpg", pos: "center 30%" };
+const giftEdits = [
+  { label: "Under $50", photo: "gifts/pants-belt.jpg", pos: "center 52%" },
+  { label: "Under $100", photo: "gifts/slippers-hd.jpg", pos: "center" },
+  { label: "Stocking Stuffers", photo: "gifts/still.png", pos: "42% center" },
+  { label: "Luxury Gifts", photo: "gifts/suitcase.png", pos: "49% center" },
+];
+
+function GiftTile({ gift, lead = false }) {
+  return (
+    <a className={`gift${lead ? " gift--lead" : ""}`} href="#" onClick={stop}>
+      <span className="gift-media">
+        <img src={A(gift.photo)} alt="" loading="lazy" style={{ objectPosition: gift.pos }} />
+      </span>
+      <span className="gift-chip t-cta">
+        {gift.label}
+        <span className="gift-arrow" aria-hidden="true" />
+      </span>
+    </a>
+  );
+}
+
 function Gifts() {
   return (
-    <section className="gifts">
-      {/* Collage box = Figma's x 431–1440 strip; children are % of it so it scales as one piece */}
-      <div className="gifts-collage">
-        <div className="gifts-suitcase">
-          <img src={A("gifts/suitcase.png")} alt="" />
-        </div>
-        <div className="gifts-still">
-          <img src={A("gifts/still.png")} alt="" />
-        </div>
-        {/* Kraft washi tape holding the still to the board (Figma canvas nodes 35:4772 / 35:4773) */}
-        <img className="gifts-tape gifts-tape--top" src={A("gifts/tape-top.png")} alt="" />
-        <img className="gifts-tape gifts-tape--bottom" src={A("gifts/tape-bottom.png")} alt="" />
-        <img className="gifts-seal" src={A("gifts/wax-seal.png")} alt="" />
-      </div>
-      <div className="gifts-copy">
-        <h2 className="gifts-title t-h2">Gifts That Feel Like Him</h2>
-        <p className="gifts-body t-body">
+    <section className="gifts" aria-labelledby="gifts-title">
+      <div className="gifts-head">
+        <h2 id="gifts-title" className="gifts-title t-h1">Gifts That Feel Like Him</h2>
+        <p className="gifts-deck t-lead">
           From everyday favorites to party-ready finishing touches, find a gift he’ll reach for long after the holidays.
         </p>
-        <div className="gifts-cta">
-          <TextureButton>Shop Gifts for Him</TextureButton>
-        </div>
+        <a className="link-caps t-cta" href="#" onClick={stop}>
+          Shop Gifts for Him
+        </a>
+      </div>
+      <div className="gifts-spread">
+        <GiftTile gift={giftLead} lead />
+        <ul className="gifts-grid">
+          {giftEdits.map((gift) => (
+            <li key={gift.label}>
+              <GiftTile gift={gift} />
+            </li>
+          ))}
+        </ul>
       </div>
     </section>
   );
