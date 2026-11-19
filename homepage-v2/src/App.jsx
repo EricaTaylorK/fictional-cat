@@ -742,15 +742,24 @@ function useCardRail() {
   return { railRef, progress, edges, step, onScroll: measure };
 }
 
-// Progress bar + brush arrows, always directly under the cards they move
-function RailControls({ rail, controls, label }) {
+// Section actions, same as the category band: a "shop all" link + brush arrows
+function RailActions({ rail, controls, label, linkText }) {
   return (
-    <div className="rail-controls">
-      <span className="rail-track" aria-hidden="true">
-        <span className="rail-progress" style={{ "--progress": rail.progress }} />
-      </span>
+    <div className="rail-actions">
+      <a className="link-caps link-caps--dark t-cta" href="#" onClick={stop}>
+        {linkText}
+      </a>
       <BrushArrows edges={rail.edges} step={rail.step} controls={controls} label={label} />
     </div>
+  );
+}
+
+// Thin progress track under the cards
+function RailProgress({ rail }) {
+  return (
+    <span className="rail-track" aria-hidden="true">
+      <span className="rail-progress" style={{ "--progress": rail.progress }} />
+    </span>
   );
 }
 
@@ -766,7 +775,10 @@ function NewArrivals() {
   const rail = useCardRail();
   return (
     <section className="arrivals">
-      <h2 className="arrivals-title t-h2">Just In: New-Season Styles</h2>
+      <div className="arrivals-head">
+        <h2 className="arrivals-title t-h2">Just In: New-Season Styles</h2>
+        <RailActions rail={rail} controls="arrivals-rail" label="new-season styles" linkText="Shop All" />
+      </div>
       <div className="arrivals-carousel">
         <div
           id="arrivals-rail"
@@ -787,7 +799,7 @@ function NewArrivals() {
             </a>
           ))}
         </div>
-        <RailControls rail={rail} controls="arrivals-rail" label="new-season styles" />
+        <RailProgress rail={rail} />
       </div>
     </section>
   );
@@ -887,11 +899,9 @@ function RecentlyViewed() {
       <div className="recent-copy">
         <h2 className="recent-title t-h2">Still Thinking It Over?</h2>
         <p className="recent-deck t-body">Your recently viewed styles are right here.</p>
-        <a className="link-caps link-caps--dark t-cta" href="#" onClick={stop}>
-          View all recently viewed
-        </a>
       </div>
       <div className="recent-carousel">
+        <RailActions rail={rail} controls="recent-rail" label="recently viewed items" linkText="View All Recently Viewed" />
         <div
           id="recent-rail"
           className="recent-cards"
@@ -910,7 +920,7 @@ function RecentlyViewed() {
             </a>
           ))}
         </div>
-        <RailControls rail={rail} controls="recent-rail" label="recently viewed items" />
+        <RailProgress rail={rail} />
       </div>
     </section>
   );

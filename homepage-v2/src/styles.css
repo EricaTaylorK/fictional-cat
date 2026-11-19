@@ -693,6 +693,10 @@ input {
   display: flex;
   align-items: center;
   gap: var(--space-s);
+  color: inherit; /* ivory on the plaid band, umber on light sections */
+}
+
+.tags-actions {
   color: var(--ivory);
 }
 
@@ -1227,8 +1231,17 @@ input {
   }
 }
 
-.arrivals .rail-controls {
-  padding-right: var(--gutter); /* the rail bleeds right; keep the controls in the column */
+.arrivals-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-l) var(--space-2xl);
+}
+
+/* the rail bleeds right; keep the progress track in the column */
+.arrivals .rail-track {
+  margin-right: var(--gutter);
 }
 
 .arrival-shade {
@@ -1416,17 +1429,28 @@ input {
   font-weight: 600;
 }
 
-.rail-controls {
+/* "Shop all" + brush arrows: the category band's header pattern, in umber */
+.rail-actions {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: var(--space-xl);
-  margin-top: var(--space-xl);
+  gap: var(--space-l) var(--space-3xl);
   color: var(--umber);
+}
+
+.recent .rail-actions {
+  justify-content: flex-end;
+  margin-bottom: var(--space-xl);
+}
+
+.rail-actions .brush-arrows {
+  margin-left: auto; /* arrows stay at the right edge, even when the row wraps */
 }
 
 .rail-track {
   position: relative;
-  flex: 1;
+  display: block;
+  margin-top: var(--space-xl);
   height: 2px;
   background: rgba(0, 30, 86, 0.15);
 }
@@ -2207,8 +2231,9 @@ input {
     padding-right: var(--gutter);
   }
 
-  .recent .rail-controls {
-    padding-right: var(--gutter); /* the rail bleeds right; keep the controls in the column */
+  .recent .rail-actions,
+  .recent .rail-track {
+    margin-right: var(--gutter); /* the rail bleeds right; keep actions and track in the column */
   }
 
   .arrivals-carousel {
@@ -2498,6 +2523,15 @@ input {
   .arrival-label {
     left: var(--space-xl);
     bottom: var(--space-xl);
+  }
+
+  .arrivals-head .rail-actions {
+    flex-basis: 100%;
+    justify-content: space-between;
+  }
+
+  .recent .rail-actions {
+    justify-content: space-between;
   }
 
   .recent-carousel {
