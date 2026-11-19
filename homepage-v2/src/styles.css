@@ -100,13 +100,15 @@
   --space-10xl: 128px;
 
   /* Layout rhythm */
-  --content-max: 1440px;                                                /* the design frame */
-  --gutter-base: clamp(var(--space-xl), 7.7778vw, var(--space-9xl));     /* 24 → 112 */
+  --content-max: 1680px;                                                /* centered content column on wide screens */
+  --gutter-base: clamp(var(--space-xl), 5vw, var(--space-7xl));          /* 24 → 80 */
   --chrome-gutter-base: clamp(var(--space-l), 3.6111vw, 52px);           /* Replatform nav/footer: 16 → 52 */
   --section-y: clamp(var(--space-6xl), 6.6667vw, var(--space-8xl));      /* 64 → 96 */
   --band-y: var(--space-3xl);                                           /* 40: bands */
   --section-gap: clamp(var(--space-xl), 2.7778vw, var(--space-3xl));     /* 24 → 40: title → content */
   --stack: var(--space-l);                                              /* 16: within a copy block */
+  --grid-cols: 12;                                                      /* desktop content column: 12 columns */
+  --grid-gap: clamp(var(--space-l), 1.6667vw, var(--space-xl));          /* 16 → 24: column gutter, also card gaps */
 
   --cta-ink: #7f5e34;    /* button copy on ivory: 4.9:1 */
   --motion: 0.25s ease;  /* one subtle timing for every CTA and link */
@@ -257,7 +259,7 @@ input {
 }
 
 .page {
-  /* Full-bleed: sections span the viewport; content keeps a centered 1440 column.
+  /* Full-bleed: sections span the viewport; content keeps a centered 1680 column.
      cqw = page width without the scrollbar, so gutters stay true on wide screens. */
   container-type: inline-size;
   --gutter: max(var(--gutter-base), calc((100cqw - var(--content-max)) / 2 + var(--gutter-base)));
@@ -380,6 +382,10 @@ input {
   .btn:hover .btn-plus {
     transform: rotate(90deg);
   }
+}
+
+.btn[aria-expanded="true"] .btn-plus {
+  transform: rotate(45deg);
 }
 
 .btn:focus-visible {
@@ -576,7 +582,7 @@ input {
 /* Small, quiet pause control (WCAG 2.2.2 for motion longer than 5s) */
 .hero-pause {
   position: absolute;
-  right: var(--gutter);
+  right: calc(var(--gutter) + var(--space-s));
   bottom: clamp(var(--space-2xl), 4.4444vw, var(--space-6xl));
   z-index: 1;
   display: flex;
@@ -585,17 +591,19 @@ input {
   width: 40px;
   height: 40px;
   padding: 0;
-  border: 1px solid rgba(246, 242, 235, 0.5);
-  border-radius: 50%;
-  background: rgba(18, 14, 10, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.35);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
   color: var(--ivory);
   cursor: pointer;
   transition: background 0.2s ease, border-color 0.2s ease;
 }
 
 .hero-pause:hover {
-  background: rgba(18, 14, 10, 0.6);
-  border-color: var(--ivory);
+  background: rgba(0, 0, 0, 0.5);
+  border-color: rgba(255, 255, 255, 0.45);
 }
 
 .hero-scrim {
@@ -701,6 +709,17 @@ input {
   display: none;
 }
 
+/* Touch sizes only: rails bleed off the right edge with a soft fade so the next
+   card reads as swipeable. Desktop rails stay inside the grid and use arrows. */
+@media (max-width: 1023.98px) {
+  .tags-row,
+  .arrivals-row,
+  .brands-rail {
+    -webkit-mask-image: linear-gradient(to right, #000 90%, transparent 100%);
+    mask-image: linear-gradient(to right, #000 90%, transparent 100%);
+  }
+}
+
 .tags-row.is-dragging {
   cursor: grabbing;
   scroll-snap-type: none;
@@ -711,6 +730,14 @@ input {
   scroll-snap-align: start;
   transform-origin: 76px 40px; /* the punch hole: tags pivot on their twine */
   border-radius: var(--radius-m);
+  transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* pendulum: a hovered tag swings gently from its eyelet */
+@media (hover: hover) {
+  .tag-slot:hover {
+    transform: rotate(-3.5deg) translateY(-2px);
+  }
 }
 
 .tag-slot:focus-visible {
@@ -767,10 +794,21 @@ input {
   height: 44px;
   padding: 0;
   border: 0;
-  border-radius: var(--radius-s);
-  background: none;
+  border-radius: 50%;
+  background: transparent;
   cursor: pointer;
-  transition: opacity 0.2s ease, transform 0.2s ease;
+  transition: opacity 0.2s ease, transform 0.2s ease, background-color var(--motion);
+}
+
+/* hit state: a soft round chip in the arrows' own color */
+@media (hover: hover) {
+  .brush-arrow:not(:disabled):hover {
+    background: color-mix(in srgb, currentColor 10%, transparent);
+  }
+}
+
+.brush-arrow:not(:disabled):active {
+  background: color-mix(in srgb, currentColor 16%, transparent);
 }
 
 .brush-arrow span {
@@ -912,6 +950,12 @@ input {
   background: var(--ivory);
 }
 
+/* feathered left edge: the photo melts into the herringbone instead of a hard seam */
+.gifts-suitcase {
+  -webkit-mask-image: linear-gradient(to right, transparent 0, #000 64px);
+  mask-image: linear-gradient(to right, transparent 0, #000 64px);
+}
+
 .gifts-suitcase img,
 .gifts-still img {
   position: absolute;
@@ -954,6 +998,7 @@ input {
 /* Kraft tape, 370 x 123 each. Figma: top piece at (488, 11), bottom piece at (618, 426) */
 .gifts-tape {
   position: absolute;
+  filter: drop-shadow(0 1px 0.5px rgba(20, 12, 4, 0.3)) drop-shadow(0 1.5px 2px rgba(20, 12, 4, 0.12));
   width: 36.6700%;
   height: auto;
   pointer-events: none;
@@ -972,6 +1017,7 @@ input {
 /* Figma: 178 x 178 at x 431, y 346 */
 .gifts-seal {
   position: absolute;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.25));
   left: 0;
   top: 61.7857%;
   width: 17.6412%;
@@ -1098,6 +1144,21 @@ input {
   height: 100%;
   object-fit: cover;
   object-position: center 25%; /* same framing as Figma's crop, without its horizontal squeeze */
+}
+
+/* bottom shade behind the caps, so they stay legible over the ivory sweater */
+.real-tile--office::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0.3) 40%, transparent 80%);
+  pointer-events: none;
+}
+
+.real-office-title,
+.real-office-cta {
+  z-index: 2;
 }
 
 .real-office-title {
@@ -1429,17 +1490,25 @@ input {
 
 /* ---------- Recently viewed ---------- */
 
+/* Header row on top (copy left, arrows right, one top edge), the full-width
+   rail of product cards below it */
 .recent {
   display: flex;
-  align-items: center;
-  gap: var(--space-6xl);
+  flex-direction: column;
+  gap: var(--section-gap);
   padding: var(--section-y) var(--gutter);
   background: var(--ivory);
 }
 
+.recent-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-2xl);
+}
+
 .recent-copy {
-  width: 300px;
-  flex-shrink: 0;
+  min-width: 0;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -1449,14 +1518,12 @@ input {
 
 
 .recent-deck {
-  width: 300px;
-  max-width: 100%;
+  max-width: 36ch;
 }
 
 .recent-carousel {
   --card: 295px; /* Figma product card */
   position: relative;
-  flex: 0 1 844px;
   min-width: 0;
 }
 
@@ -1481,19 +1548,39 @@ input {
   color: var(--umber);
 }
 
+/* Studio set: a 4:5 portrait frame on a warm seamless sweep. The light falls
+   on the product (ivory at center) and drops to a deeper cream at the edges and
+   floor, like seamless paper. The socks are transparent cutouts,
+   so every product sits on the same backdrop. */
 .recent-photo-wrap {
+  position: relative;
   display: block;
   width: 100%;
-  aspect-ratio: 1;
+  aspect-ratio: 4 / 5;
   margin-bottom: var(--space-m);
   overflow: hidden;
-  background: #e9e5df;
+  background:
+    radial-gradient(ellipse 75% 60% at 50% 42%, #faf7f2 0%, rgba(250, 247, 242, 0) 100%),
+    linear-gradient(180deg, #efe8dc 0%, #ebe3d5 68%, #e3d9c8 100%);
+}
+
+/* a soft vignette, kept just above the threshold of notice */
+.recent-photo-wrap::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 90% 80% at 50% 45%, transparent 60%, rgba(58, 47, 34, 0.07) 100%);
+  pointer-events: none;
 }
 
 .recent-photo {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+  position: absolute;
+  inset: 8%;
+  width: 84%;
+  height: 84%;
+  object-fit: contain;
+  /* contact shadow: the sock rests on the sweep */
+  filter: drop-shadow(0 10px 12px rgba(58, 47, 34, 0.16)) drop-shadow(0 2px 3px rgba(58, 47, 34, 0.12));
   transition: transform 0.4s ease;
 }
 
@@ -1546,9 +1633,10 @@ input {
   color: var(--umber);
 }
 
+/* arrows centered on the headline's first line (56px line box, 44px buttons) */
 .recent .rail-actions {
-  justify-content: flex-end;
-  margin-bottom: var(--space-xl);
+  flex-shrink: 0;
+  margin-top: calc((var(--type-h2) * var(--lh-h2) - 44px) / 2);
 }
 
 .rail-actions .brush-arrows {
@@ -1627,134 +1715,259 @@ input {
   outline-offset: 2px;
 }
 
-/* ---------- Brands ---------- */
-
+/* ---------- Brands ----------
+   Editorial rail in the spirit of luxury brand carousels: a copy column on the
+   left, tall cards bleeding off the right edge. Cards are made of our materials
+   (herringbone, ivory canvas, plaid, woven), stitched inside, and pinned with a
+   strip of kraft washi tape (it stays put). Hover / focus slides up the descriptor. */
 .brands {
-  position: relative;
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: minmax(260px, 340px) minmax(0, 1fr);
   align-items: center;
-  gap: var(--section-gap);
-  padding: var(--space-6xl) 0;
-  background: linear-gradient(180deg, rgba(18, 14, 10, 0.46) 0%, rgba(18, 14, 10, 0.52) 100%),
+  gap: var(--space-6xl);
+  padding: var(--section-y) 0 var(--section-y) var(--gutter);
+  background: linear-gradient(rgba(18, 14, 10, 0.62), rgba(18, 14, 10, 0.62)),
     url("/v2/brands/plaid.png") center / cover, #2c3324;
+  color: var(--ivory);
 }
 
-.brands-head {
+.brands-copy {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: var(--space-s);
-  text-align: center;
+  align-items: flex-start;
+  gap: var(--stack);
+}
+
+.brands-kicker {
+  color: rgba(246, 242, 235, 0.8);
 }
 
 .brands-title {
   color: var(--ivory);
-  white-space: nowrap;
 }
 
 .brands-deck {
-  width: min(608px, calc(100vw - 2 * var(--gutter)));
-  color: rgba(239, 232, 220, 0.9);
+  color: rgba(239, 232, 220, 0.85);
+  margin-bottom: var(--space-s);
 }
 
-.brands-row {
+.brands-carousel {
+  min-width: 0;
+  --visible: 2.4;
+}
+
+.brands .rail-actions {
+  justify-content: flex-end;
+  margin: 0 var(--gutter) var(--space-s) 0;
+  color: var(--ivory);
+}
+
+.brands-rail {
   display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: var(--space-2xl);
-  padding: 0 var(--gutter);
+  gap: var(--space-l);
+  /* room above for the tape, which overhangs each card's top edge */
+  padding: var(--space-xl) var(--gutter) var(--space-xs) 0;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
 }
 
-.badge {
-  position: relative;
-  width: 112px;
-  height: 112px;
-  flex-shrink: 0;
-  display: flex;
-  padding: 5px;
-  border-radius: 56px;
-  isolation: isolate;
+.brands-rail::-webkit-scrollbar {
+  display: none;
 }
 
-.badge::before,
-.badge::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: 56px;
-  z-index: -1;
+.brands .rail-track {
+  margin-right: var(--gutter);
+  background: rgba(246, 242, 235, 0.25);
 }
 
-.badge::before {
+.brands .rail-progress {
   background: var(--ivory);
 }
 
-.badge::after {
-  background: url("/v2/brands/badge-texture.png") top left / 220px 220px;
-  opacity: 0.2;
-}
-
-.badge-stitch {
-  flex: 1 0 0;
+.brand-card {
+  position: relative;
+  flex: none;
+  width: calc((100% - 2 * var(--space-l)) / var(--visible));
+  aspect-ratio: 3 / 4;
   display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
   align-items: center;
-  justify-content: center;
-  padding: 0 11px;
-  border: 1px dashed #aa7f00;
-  border-radius: 51px;
-  overflow: hidden;
-}
-
-.badge-name {
-  width: 100%;
+  padding: 0 var(--space-xl) var(--space-4xl);
   text-align: center;
-  line-height: 1.15;
-  color: var(--burgundy);
+  color: var(--ivory);
+  isolation: isolate;
+  scroll-snap-align: start;
+  box-shadow: 0 10px 24px rgba(10, 6, 2, 0.35);
 }
 
-.badge-name--kenneth {
+/* photo in its own clipped frame, so the tape can overhang the card */
+.brand-media {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  background: var(--espresso);
+}
+
+.brand-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.6s ease;
+}
+
+/* bottom scrim so the ivory wordmark reads on any photo */
+.brand-media::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(10, 6, 2, 0.72) 0%, rgba(10, 6, 2, 0.25) 38%, rgba(10, 6, 2, 0) 60%);
+}
+
+/* washi tape pinning the card's top edge. The strip sits at 29–71% of its image
+   height, so shifting up by half the image straddles the edge: half on the photo,
+   half above it. Thin paper tape casts only a tight contact shadow. */
+.brand-tape {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  z-index: 2;
+  width: 52%;
+  height: auto;
+  transform: translate(-50%, -50%) rotate(var(--tilt, -2deg));
+  opacity: 0.95;
+  filter: drop-shadow(0 1px 0.5px rgba(20, 12, 4, 0.3)) drop-shadow(0 1.5px 2px rgba(20, 12, 4, 0.12));
+  pointer-events: none;
+}
+
+/* wordmarks, set large in each brand's style */
+.brand-mark {
+  line-height: 1.1;
+  transition: transform var(--motion);
+}
+
+.brand-mark--kenneth {
   font-family: "Barlow", sans-serif;
   font-weight: 600;
-  font-size: 13px;
-  letter-spacing: 0.65px;
+  font-size: clamp(22px, 2vw, 28px);
+  letter-spacing: 0.06em;
   text-transform: uppercase;
 }
 
-.badge-name--calvin {
+.brand-mark--calvin {
   font-family: "Barlow", sans-serif;
   font-weight: 400;
-  font-size: 16px;
-  letter-spacing: 0.16px;
+  font-size: clamp(26px, 2.4vw, 34px);
+  letter-spacing: 0.01em;
 }
 
-.badge-name--cole {
+.brand-mark--cole {
   font-family: "Castoro", serif;
-  font-size: 14px;
-  letter-spacing: 0.56px;
+  font-size: clamp(24px, 2.2vw, 32px);
+  letter-spacing: 0.06em;
   text-transform: uppercase;
 }
 
-.badge-sub {
+.brand-mark-sub {
   display: block;
+  margin-top: var(--space-xs);
   font-family: "Barlow", sans-serif;
-  font-size: 8px;
-  letter-spacing: 0.8px;
+  font-size: 11px;
+  letter-spacing: 0.2em;
 }
 
-.badge-name--tommy {
+.brand-mark--tommy {
   font-family: "Barlow", sans-serif;
   font-weight: 700;
-  font-size: 13px;
-  letter-spacing: 0.39px;
+  font-size: clamp(22px, 2vw, 28px);
+  letter-spacing: 0.04em;
   text-transform: uppercase;
 }
 
-.badge-name--kors {
+.brand-mark--kors {
   font-family: var(--serif);
   font-weight: 600;
-  font-size: 15px;
-  letter-spacing: 0.0375px;
+  font-size: clamp(26px, 2.4vw, 34px);
+}
+
+/* descriptor + shop line, revealed from the bottom */
+.brand-reveal {
+  position: absolute;
+  left: var(--space-m);
+  right: var(--space-m);
+  bottom: var(--space-m);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-s);
+  padding: 0 var(--space-l) var(--space-l);
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity var(--motion), transform var(--motion);
+}
+
+.brand-descriptor {
+  color: inherit;
+  opacity: 0.9;
+}
+
+.brand-shop {
+  position: relative;
+  padding-bottom: 6px;
+}
+
+.brand-shop::after {
+  content: "";
+  position: absolute;
+  left: -2px;
+  right: -4px;
+  bottom: 0;
+  height: 4px;
+  background: currentColor;
+  opacity: 0.6;
+  -webkit-mask: url("/v2/links/brush-underline.svg") 0 0 / 100% 100% no-repeat;
+  mask: url("/v2/links/brush-underline.svg") 0 0 / 100% 100% no-repeat;
+}
+
+@media (hover: hover) {
+  .brand-card:hover .brand-reveal {
+    opacity: 1;
+    transform: none;
+  }
+
+  .brand-card:hover .brand-mark {
+    transform: translateY(-48px);
+  }
+
+  .brand-card:hover .brand-media img {
+    transform: scale(1.03);
+  }
+
+}
+
+.brand-card:focus-visible {
+  outline: 2px solid var(--ivory);
+  outline-offset: 4px;
+}
+
+.brand-card:focus-visible .brand-reveal {
+  opacity: 1;
+  transform: none;
+}
+
+/* touch screens have no hover: show the descriptor */
+@media (hover: none) {
+  .brand-reveal {
+    opacity: 1;
+    transform: none;
+  }
+
+  .brand-mark {
+    transform: translateY(-48px);
+  }
 }
 
 /* ---------- Footer ---------- */
@@ -2066,7 +2279,7 @@ input {
   top: 0;
   right: 0;
   bottom: 0;
-  width: min(440px, 100%);
+  width: min(420px, 100%);
   display: flex;
   flex-direction: column;
   gap: var(--space-xl);
@@ -2285,7 +2498,7 @@ input {
    the suitcase photo still runs to the viewport edge as in the 1440 frame ---------- */
 @media (min-width: 1440px) {
   .gifts-collage {
-    left: calc(50% - 289px); /* = 431px at 1440 */
+    left: calc(var(--gutter) + 319px); /* collage starts 319px after the copy's left edge */
     right: 0;
     width: auto;
   }
@@ -2402,17 +2615,20 @@ input {
 
 /* ---------- Tablet: recently viewed stacks ---------- */
 @media (max-width: 1023.98px) {
-  /* Recently viewed: copy above, full-width rail below */
-  .recent {
-    flex-direction: column;
-    align-items: stretch;
+  .brands {
+    grid-template-columns: minmax(0, 1fr);
     gap: var(--section-gap);
   }
 
-  .recent-copy {
-    width: auto;
+  .brands-copy {
+    padding-right: var(--gutter);
   }
 
+  .brands-carousel {
+    --visible: 2.2;
+  }
+
+  /* Recently viewed: the rail bleeds right on touch sizes */
   .recent-carousel {
     flex: none;
     margin-right: calc(-1 * var(--gutter));
@@ -2422,9 +2638,8 @@ input {
     padding-right: var(--gutter);
   }
 
-  .recent .rail-actions,
   .recent .rail-track {
-    margin-right: var(--gutter); /* the rail bleeds right; keep actions and track in the column */
+    margin-right: var(--gutter); /* the rail bleeds right; keep the track in the column */
   }
 
   .arrivals-carousel {
@@ -2561,19 +2776,6 @@ input {
   }
 
 
-  /* Same bottom shade as the family tile, so the caps stay legible over the sweater */
-  .real-tile--office::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    z-index: 1;
-    background: linear-gradient(180deg, rgba(13, 8, 5, 0) 45%, rgba(13, 8, 5, 0.72) 100%);
-  }
-
-  .real-office-title,
-  .real-office-cta {
-    z-index: 2;
-  }
 
   .real-family-photo,
   .real-family-scrim {
@@ -2655,7 +2857,8 @@ input {
     display: none;
   }
 
-  .recent .rail-actions {
+  .recent .rail-actions,
+  .brands .rail-actions {
     display: none;
   }
 
@@ -2851,31 +3054,13 @@ input {
   }
 
 
-  .brands {
-    padding: var(--space-4xl) 0;
+  /* Brands: copy above, a swipeable rail of larger cards */
+  .brands-carousel {
+    --visible: 1.2;
   }
 
-  .brands-row {
-    flex-wrap: nowrap;
-    justify-content: flex-start;
-    width: 100%;
-    gap: var(--space-l);
-    padding: var(--space-xs) var(--gutter);
-    overflow-x: auto;
-    scroll-snap-type: x mandatory;
-    scroll-padding-inline: var(--gutter);
-    scrollbar-width: none;
-  }
-
-  .brands-row::-webkit-scrollbar {
-    display: none;
-  }
-
-  .badge {
-    flex: none;
-    width: 88px;
-    height: 88px;
-    scroll-snap-align: start;
+  .brands-rail .brand-card {
+    padding: 0 var(--space-l) var(--space-3xl);
   }
 
   /* Replatform "Footer / Mobile": link groups become accordion rows */
@@ -2973,11 +3158,19 @@ input {
   .btn,
   .btn-plus,
   .recent-heart,
+  .tag-slot,
+  .brand-mark,
+  .brand-reveal,
+  .brand-media img,
   .link-caps::after {
     transition: none;
   }
 
   .btn:hover .btn-plus {
+    transform: none;
+  }
+
+  .tag-slot:hover {
     transform: none;
   }
 
@@ -2991,5 +3184,186 @@ input {
 
   .recent-card:hover .recent-photo {
     transform: none;
+  }
+}
+
+/* =====================================================================
+   Desktop grid (1024+)
+   Every section sits on the 12-column content column: left and right
+   gutters match, card gaps equal the column gutter (--grid-gap), and
+   nothing runs off the page. Rails that hold more than fits page with
+   their arrows and show whole cards only.
+   ===================================================================== */
+@media (min-width: 1024px) {
+  /* Category tags: header → rack spacing, rack held inside the gutters */
+  .tags {
+    gap: var(--space-2xl);
+    padding-top: var(--space-4xl);
+    padding-bottom: var(--space-l); /* each tag slot carries ~30px of air under the tag */
+  }
+
+  .tags-row {
+    width: 100%;
+    margin: calc(-1 * var(--space-s)) 0;
+    padding: var(--space-s) 0;
+    scroll-padding-inline: 0;
+  }
+
+  /* Holiday heritage: copy on columns 1–7, the patch centered on 9–12 */
+  .real-head {
+    display: grid;
+    grid-template-columns: repeat(var(--grid-cols), minmax(0, 1fr));
+    column-gap: var(--grid-gap);
+    padding-bottom: var(--section-gap);
+  }
+
+  .real-titles {
+    grid-column: 1 / span 7;
+  }
+
+  .real-patch {
+    grid-column: 9 / -1;
+    justify-self: center;
+    width: min(100%, clamp(260px, 26vw, 400px));
+  }
+
+  /* Shop the look: two tiles on the grid, gap = column gutter */
+  .real-row {
+    gap: var(--grid-gap);
+    padding: 0 var(--gutter);
+    background: none;
+  }
+
+  /* Both tiles share one caption inset: the family photo's frame (6%) + 32px,
+     so titles and buttons line up across the pair */
+  .real-office-title {
+    left: calc(5.9722% + var(--space-2xl));
+    bottom: calc(6.0278% + var(--space-2xl) + 48px + var(--space-l)); /* one stack above the 48px button */
+  }
+
+  .real-office-cta {
+    left: calc(5.9722% + var(--space-2xl));
+    bottom: calc(6.0278% + var(--space-2xl));
+  }
+
+  .real-family-copy {
+    left: calc(5.9722% + var(--space-2xl)); /* inside the photo's frame, same inset as the office caption */
+    bottom: calc(6.0278% + var(--space-2xl));
+  }
+
+  /* Sale: uniform gutters, link aligned to the grid's right edge */
+  .sale {
+    padding-bottom: var(--space-6xl);
+  }
+
+  .sale-grid,
+  .sale-pair {
+    gap: var(--grid-gap);
+  }
+
+  /* Shipping ribbon: a crisp band, not a block */
+  .ship {
+    padding-top: var(--space-l);
+    padding-bottom: var(--space-l);
+  }
+
+  /* Just In: three whole tiles inside the gutters */
+  .arrivals-carousel {
+    --visible: 3;
+    --gaps: 2;
+    margin-right: 0;
+  }
+
+  .arrivals-row {
+    gap: var(--grid-gap);
+    padding-right: 0;
+  }
+
+  .arrival {
+    width: calc((100% - var(--gaps) * var(--grid-gap)) / var(--visible));
+  }
+
+  .arrivals .rail-track {
+    margin-right: 0;
+  }
+
+  .rail-track {
+    margin-top: var(--space-2xl);
+  }
+
+  /* Value props: three equal columns across the full grid */
+  .reassure {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .reassure-item {
+    padding: 0 var(--space-2xl);
+  }
+
+  .reassure-body {
+    max-width: 36ch;
+  }
+
+  /* Recently viewed: header row above, four whole cards across all 12 columns */
+  .recent-cards {
+    gap: var(--grid-gap);
+  }
+
+  .recent-carousel {
+    --per-view: 4;
+  }
+
+  .recent-card {
+    width: calc((100% - (var(--per-view) - 1) * var(--grid-gap)) / var(--per-view)); /* whole cards only */
+  }
+
+  /* Brands: copy on columns 1–4, rail on 5–12, both gutters respected */
+  .brands {
+    grid-template-columns: repeat(var(--grid-cols), minmax(0, 1fr));
+    column-gap: var(--grid-gap);
+    padding-right: var(--gutter);
+  }
+
+  .brands-copy {
+    grid-column: 1 / span 4;
+    padding-right: var(--space-2xl);
+  }
+
+  .brands-deck {
+    margin-bottom: var(--space-l); /* deck → CTA matches the other editorial modules */
+  }
+
+  .brands-carousel {
+    grid-column: 5 / -1;
+    --visible: 3;
+  }
+
+  .brands .rail-actions {
+    margin-right: 0;
+  }
+
+  .brands-rail {
+    gap: var(--grid-gap);
+    padding-right: 0;
+  }
+
+  .brands-rail .brand-card {
+    width: calc((100% - (var(--visible) - 1) * var(--grid-gap)) / var(--visible));
+  }
+
+  .brands .rail-track {
+    margin-right: 0;
+  }
+}
+
+/* Small desktop (1024–1279): two whole cards keep product and brand cards near their 295px design size */
+@media (min-width: 1024px) and (max-width: 1279.98px) {
+  .recent-carousel {
+    --per-view: 3;
+  }
+
+  .brands-carousel {
+    --visible: 2;
   }
 }

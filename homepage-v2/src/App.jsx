@@ -145,12 +145,13 @@ function TextureButton({ children, tone = "solid", href = "#" }) {
   );
 }
 
-function ShopTheLook({ look, onOpen }) {
+function ShopTheLook({ look, onOpen, expanded = false }) {
   return (
     <button
       type="button"
       className="btn btn--outline t-cta"
       aria-haspopup="dialog"
+      aria-expanded={expanded}
       aria-label={`Shop the look: ${look.title}`}
       onClick={(event) => onOpen(look.id, event.currentTarget)}
     >
@@ -472,10 +473,31 @@ function useRail({ onSettle } = {}) {
     setEdges({ start: el.scrollLeft <= 2, end: el.scrollLeft >= max - 2 });
   };
 
+  // Desktop: the rack stays inside the grid. Space the tags so a whole number fits
+  // the content column (no tag sliced at the gutter); the arrows reveal the rest.
+  const fitGap = () => {
+    const el = railRef.current;
+    const slot = el?.firstElementChild;
+    if (!slot) return;
+    if (!window.matchMedia("(min-width: 1024px)").matches) {
+      el.style.columnGap = "";
+      return;
+    }
+    const minGap = 32;
+    const w = slot.getBoundingClientRect().width;
+    const n = Math.max(2, Math.floor((el.clientWidth + minGap) / (w + minGap)));
+    el.style.columnGap = n >= el.children.length ? `${minGap}px` : `${(el.clientWidth - n * w) / (n - 1)}px`;
+  };
+
   useEffect(() => {
     const el = railRef.current;
     if (!el) return undefined;
+    fitGap();
     measure();
+    const onResize = () => {
+      fitGap();
+      measure();
+    };
     let timer;
     const settle = () => onSettle && onSettle();
     const onScroll = () => {
@@ -488,19 +510,22 @@ function useRail({ onSettle } = {}) {
     };
     el.addEventListener("scroll", onScroll, { passive: true });
     el.addEventListener("scrollend", settle);
-    window.addEventListener("resize", measure);
+    window.addEventListener("resize", onResize);
     return () => {
       clearTimeout(timer);
       el.removeEventListener("scroll", onScroll);
       el.removeEventListener("scrollend", settle);
-      window.removeEventListener("resize", measure);
+      window.removeEventListener("resize", onResize);
     };
   }, [onSettle]);
 
   function step(direction) {
     const el = railRef.current;
     if (!el) return;
-    el.scrollBy({ left: direction * el.clientWidth * 0.8, behavior: reduced ? "auto" : "smooth" });
+    // desktop pages by exactly one view of whole tags; touch sizes keep a partial step
+    const gap = parseFloat(getComputedStyle(el).columnGap) || 0;
+    const amount = window.matchMedia("(min-width: 1024px)").matches ? el.clientWidth + gap : el.clientWidth * 0.8;
+    el.scrollBy({ left: direction * amount, behavior: reduced ? "auto" : "smooth" });
   }
 
   // Mouse drag to scroll (touch and trackpads scroll natively)
@@ -692,7 +717,7 @@ function RealWorld() {
           <img className="real-office-photo" src={A("realworld/office-party.png")} alt="" />
           <h3 className="real-office-title t-eyebrow-lg t-wide">The Office Party</h3>
           <div className="real-office-cta">
-            <ShopTheLook look={looks.office} onOpen={openLook} />
+            <ShopTheLook look={looks.office} onOpen={openLook} expanded={open === "office"} />
           </div>
         </article>
         <article className="real-tile real-tile--family">
@@ -700,7 +725,7 @@ function RealWorld() {
           <div className="real-family-scrim" aria-hidden="true" />
           <div className="real-family-copy">
             <h3 className="real-family-title t-eyebrow-lg t-wide">The Family Gathering</h3>
-            <ShopTheLook look={looks.family} onOpen={openLook} />
+            <ShopTheLook look={looks.family} onOpen={openLook} expanded={open === "family"} />
           </div>
         </article>
       </div>
@@ -784,10 +809,29 @@ function useCardRail() {
     setEdges({ start: el.scrollLeft <= 2, end: el.scrollLeft >= max - 2 });
   };
 
+  // Pad the end of the rail so the last scroll stop lands on a card start.
+  // Without it the final snap leaves the first visible card cut off at the left edge.
+  const fitTail = () => {
+    const el = railRef.current;
+    const first = el?.firstElementChild;
+    const last = el?.lastElementChild;
+    if (!first || !last) return;
+    last.style.marginRight = "0px";
+    const gap = parseFloat(getComputedStyle(el).columnGap) || 0;
+    const pitch = first.getBoundingClientRect().width + gap;
+    const max = el.scrollWidth - el.clientWidth;
+    const rem = max > 0 ? max % pitch : 0;
+    last.style.marginRight = rem > 1 && pitch - rem > 1 ? `${pitch - rem}px` : "0px";
+  };
+
   useEffect(() => {
-    measure();
-    window.addEventListener("resize", measure);
-    return () => window.removeEventListener("resize", measure);
+    const update = () => {
+      fitTail();
+      measure();
+    };
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
   }, []);
 
   const step = (direction) => {
@@ -985,15 +1029,18 @@ function RecentlyViewed() {
 
   return (
     <section className="recent">
-      <div className="recent-copy">
-        <h2 className="recent-title t-h2">Still Thinking It Over?</h2>
-        <p className="recent-deck t-body">Your recently viewed styles are right here.</p>
-        <a className="link-caps link-caps--dark t-cta" href="#" onClick={stop}>
-          Recently Viewed
-        </a>
+      {/* Header row: copy on the left, arrows on the right, one shared top edge */}
+      <div className="recent-head">
+        <div className="recent-copy">
+          <h2 className="recent-title t-h2">Still Thinking It Over?</h2>
+          <p className="recent-deck t-body">Your recently viewed styles are right here.</p>
+          <a className="link-caps link-caps--dark t-cta" href="#" onClick={stop}>
+            Recently Viewed
+          </a>
+        </div>
+        <RailActions rail={rail} controls="recent-rail" label="recently viewed items" />
       </div>
       <div className="recent-carousel">
-        <RailActions rail={rail} controls="recent-rail" label="recently viewed items" />
         <div
           id="recent-rail"
           className="recent-cards"
@@ -1014,36 +1061,63 @@ function RecentlyViewed() {
 
 /* ---------- Brands ---------- */
 
+// Descriptors from the V1 homepage data; photography supplied by the design team,
+// cropped to 3:4. Each card is pinned with a strip of washi tape.
 const brands = [
-  { name: "Kenneth Cole", style: "kenneth" },
-  { name: "Calvin Klein", style: "calvin" },
-  { name: "Cole Haan", style: "cole", sub: "Est. 1928" },
-  { name: "Tommy Hilfiger", style: "tommy" },
-  { name: "Michael Kors", style: "kors" },
+  { name: "Kenneth Cole", style: "kenneth", photo: "brands/kenneth.jpg", tilt: -3, descriptor: "Smart, comfortable suiting" },
+  { name: "Calvin Klein", style: "calvin", photo: "brands/calvin.jpg", tilt: 2.5, descriptor: "Clean, modern essentials" },
+  { name: "Cole Haan", style: "cole", sub: "Est. 1928", photo: "brands/cole.jpg", tilt: -2, descriptor: "Shoes that finish the look" },
+  { name: "Tommy Hilfiger", style: "tommy", photo: "brands/tommy.jpg", tilt: 3, descriptor: "Classic American style" },
+  { name: "Michael Kors", style: "kors", photo: "brands/kors.jpg", tilt: -2.5, descriptor: "Polished, modern looks" },
 ];
 
 function Brands() {
+  const rail = useCardRail();
   return (
     <section className="brands">
-      <div className="brands-head">
-        <h2 className="brands-title t-h3">Holiday-Ready Brands</h2>
-        <p className="brands-deck t-lead">Standout styles from the brands you wear, all in one place.</p>
+      <div className="brands-copy">
+        <p className="t-eyebrow brands-kicker">Discover</p>
+        <h2 className="brands-title t-h2">Holiday‑Ready Brands</h2>
+        <p className="brands-deck t-body">Standout styles from the brands you wear, all in one place.</p>
+        <a className="link-caps link-caps--white t-cta" href="#" onClick={stop}>
+          Shop All Brands
+        </a>
       </div>
-      <div className="brands-row">
-        {brands.map((brand) => (
-          <a key={brand.name} className="badge" href="#" onClick={stop}>
-            <span className="badge-stitch">
-              <span className={`badge-name badge-name--${brand.style}`}>
-                {brand.name}
-                {brand.sub ? <span className="badge-sub">{brand.sub}</span> : null}
+      <div className="brands-carousel">
+        <RailActions rail={rail} controls="brands-rail" label="brands" />
+        <div
+          id="brands-rail"
+          ref={rail.railRef}
+          onScroll={rail.onScroll}
+          className="brands-rail"
+          role="region"
+          aria-label="Brands"
+        >
+          {brands.map((brand) => (
+            <a
+              key={brand.name}
+              className="brand-card"
+              style={{ "--tilt": `${brand.tilt}deg` }}
+              href="#"
+              onClick={stop}
+            >
+              <span className="brand-media" aria-hidden="true">
+                <img src={A(brand.photo)} alt="" />
               </span>
-            </span>
-          </a>
-        ))}
+              <img className="brand-tape" src={A("gifts/tape-top.png")} alt="" />
+              <span className={`brand-mark brand-mark--${brand.style}`}>
+                {brand.name}
+                {brand.sub ? <span className="brand-mark-sub">{brand.sub}</span> : null}
+              </span>
+              <span className="brand-reveal">
+                <span className="t-body brand-descriptor">{brand.descriptor}</span>
+                <span className="brand-shop t-cta">Shop {brand.name}</span>
+              </span>
+            </a>
+          ))}
+        </div>
+        <RailProgress rail={rail} />
       </div>
-      <a className="link-caps link-caps--white t-cta" href="#" onClick={stop}>
-        Shop All
-      </a>
     </section>
   );
 }
