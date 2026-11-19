@@ -108,6 +108,8 @@
   --section-gap: clamp(var(--space-xl), 2.7778vw, var(--space-3xl));     /* 24 → 40: title → content */
   --stack: var(--space-l);                                              /* 16: within a copy block */
 
+  --cta-ink: #7f5e34;    /* button copy on ivory: 4.9:1 */
+  --motion: 0.25s ease;  /* one subtle timing for every CTA and link */
   --radius-s: 4px;
   --radius-m: 8px;
 }
@@ -268,12 +270,30 @@ input {
 
 /* ---------- Shared type ---------- */
 
+/* ---------- Text links ----------
+   One style for every text link: Thabit caps (.t-cta) over a hand-drawn brush
+   stroke that echoes the brush arrows, drawn in the link's own color.
+   Hover: the stroke softly fades back. */
 .link-caps {
-  text-decoration: underline;
-  text-decoration-thickness: 5%;
-  text-decoration-skip-ink: none;
+  position: relative;
+  display: inline-block;
+  padding-bottom: var(--space-s);
   color: var(--ivory);
+  text-decoration: none;
   white-space: nowrap;
+}
+
+.link-caps::after {
+  content: "";
+  position: absolute;
+  left: -2px;
+  right: -4px;
+  bottom: 0;
+  height: 6px;
+  background: currentColor;
+  -webkit-mask: url("/v2/links/brush-underline.svg") 0 0 / 100% 100% no-repeat;
+  mask: url("/v2/links/brush-underline.svg") 0 0 / 100% 100% no-repeat;
+  transition: opacity var(--motion);
 }
 
 .link-caps--dark {
@@ -282,6 +302,22 @@ input {
 
 .link-caps--white {
   color: #fff;
+}
+
+.link-caps--burgundy {
+  color: var(--burgundy);
+}
+
+@media (hover: hover) {
+  .link-caps:hover::after {
+    opacity: 0.35;
+  }
+}
+
+.link-caps:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 4px;
+  border-radius: 2px;
 }
 
 .eyebrow {
@@ -293,62 +329,62 @@ input {
   white-space: nowrap;
 }
 
-/* Textured CTA (Figma "Button / Ivory CTA") */
-.tex-btn {
-  position: relative;
+/* ---------- Buttons ----------
+   Square, 1px, 40px tall; copy uses .t-cta, the same type token as text links.
+   Hover: the fill shifts gently (the "+" on Shop the look turns a quarter).
+   - Solid:   ivory fill, #7F5E34 copy
+   - Outline: ivory line + copy on photos */
+.btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  height: 48px;
-  padding: 0 var(--space-xl);
-  border-radius: 8px;
-  overflow: hidden;
-  isolation: isolate;
-  color: var(--kraft-text);
-  white-space: nowrap;
-}
-
-.tex-btn::before,
-.tex-btn::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: 8px;
-  z-index: -1;
-}
-
-.tex-btn--burgundy::before {
-  background: var(--burgundy-cta);
-}
-
-.tex-btn--burgundy::after {
-  background: url("/v2/hero/cta-texture.png") center / cover;
-  mix-blend-mode: soft-light;
-  opacity: 0.5;
-}
-
-.tex-btn--ivory::before {
-  background: var(--ivory);
-}
-
-.tex-btn--ivory::after {
-  background: url("/v2/gifts/cta-texture.png") top left / 220px 220px;
-  opacity: 0.5;
-}
-
-/* Outlined pill (Figma "Button / Shop the look") */
-.look-btn {
-  display: inline-flex;
-  align-items: center;
   gap: var(--space-m);
-  padding: calc(var(--space-m) - 1px) calc(var(--space-xl) - 1px); /* 48px tall incl. 1px stroke */
-  border: 1px solid #fff;
-  border-radius: 999px;
-  color: #fff;
+  height: 40px;
+  padding: 0 var(--space-xl);
+  border: 1px solid var(--ivory);
+  border-radius: 0;
   white-space: nowrap;
+  cursor: pointer;
+  transition: background-color var(--motion);
 }
 
+.btn--solid {
+  background: var(--ivory);
+  color: var(--cta-ink);
+}
 
+.btn--outline {
+  background: transparent;
+  color: var(--ivory);
+}
+
+.btn-plus {
+  display: inline-block;
+  width: 14px;
+  text-align: center;
+  font-weight: 400;
+  letter-spacing: 0;
+  transition: transform var(--motion);
+}
+
+@media (hover: hover) {
+  .btn--solid:hover {
+    background: #ebe3d6;
+  }
+
+  .btn--outline:hover {
+    background: rgba(246, 242, 235, 0.14);
+  }
+
+  .btn:hover .btn-plus {
+    transform: rotate(90deg);
+  }
+}
+
+.btn:focus-visible {
+  outline: 2px solid var(--ivory);
+  outline-offset: 3px;
+}
 
 /* ---------- Global navigation ---------- */
 
@@ -593,7 +629,7 @@ input {
   text-shadow: 2px 4px 8px rgba(0, 0, 0, 0.5);
 }
 
-.hero .tex-btn {
+.hero .btn {
   text-shadow: none;
 }
 
@@ -1113,11 +1149,6 @@ input {
   gap: var(--space-l) var(--space-2xl);
 }
 
-.sale-all {
-  text-underline-position: from-font;
-  text-decoration-thickness: from-font;
-}
-
 .sale-grid {
   display: flex;
   gap: var(--space-l);
@@ -1159,6 +1190,7 @@ input {
 }
 
 .sale-label img {
+  transition: transform 0.2s ease;
   width: 40px;
   height: 9px;
 }
@@ -1294,10 +1326,17 @@ input {
   transition: transform 0.2s ease;
 }
 
+/* Image tiles: the caption's arrow steps forward, matching the buttons */
 @media (hover: hover) {
-  .arrival:hover .arrival-arrow {
+  .arrival:hover .arrival-arrow,
+  .sale-suits:hover .sale-label img {
     transform: translateX(4px);
   }
+}
+
+.sale-suits:focus-visible {
+  outline: 2px solid var(--umber);
+  outline-offset: 3px;
 }
 
 .arrival:focus-visible {
@@ -1910,23 +1949,6 @@ input {
 
 /* ---------- Shop the look drawer (rendered on <body>) ---------- */
 
-.look-btn {
-  background: none;
-  cursor: pointer;
-  transition: background 0.2s ease, color 0.2s ease;
-}
-
-.look-btn:hover,
-.look-btn:focus-visible {
-  background: var(--ivory);
-  color: var(--umber);
-}
-
-.look-btn:focus-visible {
-  outline: 2px solid var(--ivory);
-  outline-offset: 3px;
-}
-
 .look-layer {
   position: fixed;
   inset: 0;
@@ -1994,8 +2016,7 @@ input {
   background: rgba(58, 47, 34, 0.08);
 }
 
-.look-close:focus-visible,
-.look-item-link:focus-visible {
+.look-close:focus-visible {
   outline: 2px solid var(--umber);
   outline-offset: 2px;
 }
@@ -2054,12 +2075,8 @@ input {
   font-weight: 500;
 }
 
-.look-item-link {
+.look-item-copy .link-caps {
   align-self: flex-start;
-  color: var(--burgundy);
-  text-decoration: underline;
-  text-decoration-thickness: 1px;
-  text-underline-offset: 4px;
 }
 
 @keyframes look-fade {
@@ -2667,6 +2684,16 @@ input {
 
   .hero-grain {
     animation: none;
+  }
+
+  .btn,
+  .btn-plus,
+  .link-caps::after {
+    transition: none;
+  }
+
+  .btn:hover .btn-plus {
+    transform: none;
   }
 
   .hero-video,

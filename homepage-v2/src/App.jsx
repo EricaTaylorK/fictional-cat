@@ -135,10 +135,12 @@ function GlobalNav() {
 
 /* ---------- Shared bits ---------- */
 
-function TextureButton({ children, tone = "burgundy", href = "#" }) {
+// Buttons: square, 1px, black and white. Copy uses the same .t-cta token as text links.
+// tone: "solid" (white fill, black text: on dark surfaces) | "outline" (white hairline: on photos)
+function TextureButton({ children, tone = "solid", href = "#" }) {
   return (
-    <a className={`tex-btn tex-btn--${tone} t-cta`} href={href} onClick={stop}>
-      <span>{children}</span>
+    <a className={`btn btn--${tone} t-cta`} href={href} onClick={stop}>
+      {children}
     </a>
   );
 }
@@ -147,15 +149,13 @@ function ShopTheLook({ look, onOpen }) {
   return (
     <button
       type="button"
-      className="look-btn"
+      className="btn btn--outline t-cta"
       aria-haspopup="dialog"
       aria-label={`Shop the look: ${look.title}`}
       onClick={(event) => onOpen(look.id, event.currentTarget)}
     >
-      <span className="look-btn-label t-cta">Shop the look</span>
-      <span className="look-btn-plus" aria-hidden="true">
-        +
-      </span>
+      Shop the look
+      <span className="btn-plus" aria-hidden="true">+</span>
     </button>
   );
 }
@@ -276,7 +276,7 @@ function LookDrawer({ look, onClose, returnFocusTo }) {
               />
               <span className="look-item-copy">
                 <span className="t-body look-item-name">{item.name}</span>
-                <a className="t-cta look-item-link" href="#" onClick={stop}>
+                <a className="link-caps link-caps--burgundy t-cta" href="#" onClick={stop}>
                   Shop {item.category}
                 </a>
               </span>
@@ -610,7 +610,7 @@ function Gifts() {
           From everyday favorites to party-ready finishing touches, find a gift he’ll reach for long after the holidays.
         </p>
         <div className="gifts-cta">
-          <TextureButton tone="ivory">Shop gifts for him</TextureButton>
+          <TextureButton>Shop gifts for him</TextureButton>
         </div>
       </div>
     </section>
@@ -673,7 +673,7 @@ function SaleEdit() {
     <section className="sale">
       <div className="sale-head">
         <h2 className="h-section t-h1">The Holiday Sale</h2>
-        <a className="link-caps link-caps--dark sale-all t-cta" href="#" onClick={stop}>
+        <a className="link-caps link-caps--dark t-cta" href="#" onClick={stop}>
           Shop all sale styles
         </a>
       </div>
