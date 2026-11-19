@@ -110,6 +110,13 @@
   --grid-cols: 12;                                                      /* desktop content column: 12 columns */
   --grid-gap: clamp(var(--space-l), 1.6667vw, var(--space-xl));          /* 16 → 24: column gutter, also card gaps */
 
+  /* Studio set for product cutouts (Recently Viewed, Just In) */
+  --studio-sweep:
+    radial-gradient(ellipse 75% 60% at 50% 42%, #faf7f2 0%, rgba(250, 247, 242, 0) 100%),
+    linear-gradient(180deg, #efe8dc 0%, #ebe3d5 68%, #e3d9c8 100%);
+  --studio-vignette: radial-gradient(ellipse 90% 80% at 50% 45%, transparent 60%, rgba(58, 47, 34, 0.07) 100%);
+  --studio-shadow: drop-shadow(0 10px 12px rgba(58, 47, 34, 0.16)) drop-shadow(0 2px 3px rgba(58, 47, 34, 0.12));
+
   --cta-ink: #7f5e34;    /* button copy on ivory: 4.9:1 */
   --motion: 0.25s ease;  /* one subtle timing for every CTA and link */
   --radius-s: 4px;
@@ -950,10 +957,9 @@ input {
   background: var(--ivory);
 }
 
-/* feathered left edge: the photo melts into the herringbone instead of a hard seam */
-.gifts-suitcase {
-  -webkit-mask-image: linear-gradient(to right, transparent 0, #000 64px);
-  mask-image: linear-gradient(to right, transparent 0, #000 64px);
+/* the taped still is a print laid on the board: a soft cast shadow lifts it */
+.gifts-still {
+  box-shadow: 0 2px 4px rgba(10, 6, 2, 0.22), 0 12px 24px rgba(10, 6, 2, 0.28);
 }
 
 .gifts-suitcase img,
@@ -1357,6 +1363,8 @@ input {
   display: none;
 }
 
+/* Same studio set as the Recently Viewed cards: product cutouts on a warm
+   seamless sweep, lit at center, with an umber caption below the product */
 .arrival {
   position: relative;
   flex: none;
@@ -1364,16 +1372,26 @@ input {
   aspect-ratio: 3 / 4;
   overflow: hidden;
   scroll-snap-align: start;
-  color: var(--cream);
-  background: var(--espresso);
+  color: var(--umber);
+  background: var(--studio-sweep);
+}
+
+.arrival::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--studio-vignette);
+  pointer-events: none;
 }
 
 .arrival-photo {
   position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+  top: 9%;
+  left: 12%;
+  width: 76%;
+  height: 70%; /* the bottom of the frame stays clear for the caption */
+  object-fit: contain;
+  filter: var(--studio-shadow);
   transition: transform 0.6s ease;
 }
 
@@ -1396,16 +1414,6 @@ input {
   margin-right: var(--gutter);
 }
 
-.arrival-shade {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 40%;
-  background: linear-gradient(0deg, var(--umber) 0%, rgba(58, 47, 34, 0) 100%);
-  mix-blend-mode: multiply;
-}
-
 .arrival-label {
   position: absolute;
   left: var(--space-2xl);
@@ -1415,9 +1423,18 @@ input {
   gap: var(--space-m);
 }
 
+.arrival-label {
+  z-index: 1;
+}
+
+/* the caption arrow is drawn in the caption's color */
 .arrival-arrow {
+  display: block;
   width: 40px;
   height: 9px;
+  background: currentColor;
+  -webkit-mask: url("/v2/sale/arrow.svg") center / contain no-repeat;
+  mask: url("/v2/sale/arrow.svg") center / contain no-repeat;
   transition: transform 0.2s ease;
 }
 
@@ -1559,9 +1576,7 @@ input {
   aspect-ratio: 4 / 5;
   margin-bottom: var(--space-m);
   overflow: hidden;
-  background:
-    radial-gradient(ellipse 75% 60% at 50% 42%, #faf7f2 0%, rgba(250, 247, 242, 0) 100%),
-    linear-gradient(180deg, #efe8dc 0%, #ebe3d5 68%, #e3d9c8 100%);
+  background: var(--studio-sweep);
 }
 
 /* a soft vignette, kept just above the threshold of notice */
@@ -1569,7 +1584,7 @@ input {
   content: "";
   position: absolute;
   inset: 0;
-  background: radial-gradient(ellipse 90% 80% at 50% 45%, transparent 60%, rgba(58, 47, 34, 0.07) 100%);
+  background: var(--studio-vignette);
   pointer-events: none;
 }
 
@@ -1580,7 +1595,7 @@ input {
   height: 84%;
   object-fit: contain;
   /* contact shadow: the sock rests on the sweep */
-  filter: drop-shadow(0 10px 12px rgba(58, 47, 34, 0.16)) drop-shadow(0 2px 3px rgba(58, 47, 34, 0.12));
+  filter: var(--studio-shadow);
   transition: transform 0.4s ease;
 }
 
@@ -2494,56 +2509,6 @@ input {
   }
 }
 
-/* ---------- Wide screens (1440+): collage stays on the content column,
-   the suitcase photo still runs to the viewport edge as in the 1440 frame ---------- */
-@media (min-width: 1440px) {
-  .gifts-collage {
-    left: calc(var(--gutter) + 319px); /* collage starts 319px after the copy's left edge */
-    right: 0;
-    width: auto;
-  }
-
-  .gifts-suitcase {
-    left: 433px;
-    right: 0;
-    width: auto;
-  }
-
-  .gifts-suitcase img {
-    left: -219px;
-    right: -245px;
-    top: -104px;
-    width: auto;
-    height: 694px;
-  }
-
-  .gifts-still {
-    left: 119px;
-    top: 81px;
-    width: 340px;
-    height: 418px;
-  }
-
-  .gifts-seal {
-    top: 346px;
-    width: 178px;
-  }
-
-  .gifts-tape {
-    width: 370px;
-  }
-
-  .gifts-tape--top {
-    left: 57px;
-    top: 11px;
-  }
-
-  .gifts-tape--bottom {
-    left: 187px;
-    top: 426px;
-  }
-}
-
 /* =====================================================================
    Responsive
    The Figma frame is 1440 wide; everything above matches it exactly there.
@@ -3269,8 +3234,8 @@ input {
 
   /* Just In: three whole tiles inside the gutters */
   .arrivals-carousel {
-    --visible: 3;
-    --gaps: 2;
+    --visible: 4; /* four whole tiles at 1280+; three at 1024–1279 */
+    --gaps: 3;
     margin-right: 0;
   }
 
@@ -3363,7 +3328,136 @@ input {
     --per-view: 3;
   }
 
+  .arrivals-carousel {
+    --visible: 3;
+    --gaps: 2;
+  }
+
   .brands-carousel {
     --visible: 2;
+  }
+}
+
+/* =====================================================================
+   Gifts on phones: one portrait scrapbook composition
+   The desktop strip shrunk to a sliver here and the trunk ran off the edge.
+   On phones the collage is recomposed as a single 4:5 block inside the page
+   gutters: the trunk photo is the base print, the fragrance still overlaps its
+   top-left corner, kraft tape straddles the still's top and bottom edges, and
+   the wax seal sits on its lower-left. Each piece is a % of the block, so the
+   whole scene scales as one. Prints are crisp with a soft cast shadow, laid on
+   the herringbone like a flatlay (no feathered seams).
+   ===================================================================== */
+@media (max-width: 767.98px) {
+  .gifts {
+    padding-bottom: var(--section-y);
+  }
+
+  .gifts-collage {
+    width: min(100% - 2 * var(--gutter), 480px); /* centered; capped so large phones don't get a tower */
+    margin: 0 auto;
+    aspect-ratio: 4 / 5;
+  }
+
+  .gifts-suitcase,
+  .gifts-still {
+    box-shadow: 0 2px 4px rgba(10, 6, 2, 0.25), 0 14px 28px rgba(10, 6, 2, 0.35);
+  }
+
+  .gifts-suitcase {
+    left: 22%;
+    top: 30%; /* the still overlaps only the wall above the trunk */
+    width: 78%;
+    height: 70%;
+  }
+
+  .gifts-still {
+    left: 10%; /* room on the left for the seal to hang off the card's edge */
+    top: 4%;
+    width: 48%;
+    height: 50%;
+  }
+
+  .gifts-suitcase img,
+  .gifts-still img {
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .gifts-suitcase img {
+    object-position: 49% center; /* the trunk sits at the photo's center */
+  }
+
+  .gifts-still img {
+    object-position: 42% center; /* bottles, Man Bar box and the pine sprig */
+  }
+
+  /* tape is ~1.09x the still's width (as in Figma); its strip spans 29–71% of
+     the image height, so each piece is centered on the still's edge */
+  .gifts-tape {
+    width: 52%;
+  }
+
+  .gifts-tape--top {
+    left: 6%;
+    top: calc(4% - 6.9%);
+  }
+
+  .gifts-tape--bottom {
+    left: 20%;
+    top: calc(54% - 6.9%);
+  }
+
+  /* seal centered on the card's left edge, ~85% of the way down (as in Figma):
+     half on the card, half on the herringbone */
+  .gifts-seal {
+    left: calc(10% - 13%);
+    top: calc(4% + 50% * 0.85 - 10.4%);
+    width: 26%;
+  }
+}
+
+/* =====================================================================
+   Gifts on desktop (1024+): keep the Figma side-by-side scene
+   (copy on the herringbone, the taped still and seal mid-frame, the trunk
+   photo full height to the right edge) instead of stacking. The section
+   scales with the viewport like the 1440 frame (560 / 1440 = 38.89vw, up to
+   640), every piece is a % of the collage so the trunk photo always fills its
+   frame to the right edge, and the collage starts after the copy column.
+   ===================================================================== */
+@media (min-width: 1024px) {
+  .gifts {
+    display: block;
+    height: clamp(440px, 38.8889vw, 640px);
+    padding: 0;
+    background-size: 864.256px 864.256px, auto;
+  }
+
+  .gifts-copy {
+    position: absolute;
+    left: var(--gutter);
+    top: 50%;
+    transform: translateY(-50%);
+    padding: 0;
+  }
+
+  .gifts-title {
+    max-width: 320px;
+  }
+
+  .gifts-body {
+    width: 250px;
+    max-width: none;
+  }
+
+  .gifts-collage {
+    position: absolute;
+    top: 0;
+    left: max(29.9306%, calc(var(--gutter) + 360px));
+    right: 0;
+    width: auto;
+    height: 100%;
+    aspect-ratio: auto;
   }
 }

@@ -672,7 +672,7 @@ function Gifts() {
           From everyday favorites to party-ready finishing touches, find a gift he’ll reach for long after the holidays.
         </p>
         <div className="gifts-cta">
-          <TextureButton>Shop gifts for him</TextureButton>
+          <TextureButton>Shop Gifts for Him</TextureButton>
         </div>
       </div>
     </section>
@@ -869,11 +869,17 @@ function RailProgress({ rail }) {
 }
 
 // Figma "Image assets" new-arrival fills, labelled with the matching nav categories
+// Holiday '26 studio stills (MW_MO_HOL26 / FL26), labeled by category. The gray
+// seamless was lifted out (Apple Vision subject mask) so every product sits on
+// the same warm studio sweep as the Recently Viewed cards.
 const arrivals = [
-  { label: "Sport Coats", photo: "arrivals/coat.png" },
-  { label: "Suits", photo: "arrivals/suit.png" },
-  { label: "Dress Shirts", photo: "arrivals/shirt.png" },
-  { label: "Shoes", photo: "arrivals/shoes.png" },
+  { label: "Coats", photo: "arrivals/cutout-coats.png" },
+  { label: "Sweaters", photo: "arrivals/cutout-sweaters.png" },
+  { label: "Dress Shirts", photo: "arrivals/cutout-dress-shirts.png" },
+  { label: "Ties", photo: "arrivals/cutout-ties.png" },
+  { label: "Quarter-Zips", photo: "arrivals/cutout-quarter-zip.png" },
+  { label: "Casual Shirts", photo: "arrivals/cutout-casual-shirts.png" },
+  { label: "Pants", photo: "arrivals/cutout-pants.png" },
 ];
 
 function NewArrivals() {
@@ -895,11 +901,10 @@ function NewArrivals() {
         >
           {arrivals.map((item) => (
             <a key={item.label} className="arrival" href="#" onClick={stop}>
-              <img className="arrival-photo" src={A(item.photo)} alt="" />
-              <span className="arrival-shade" aria-hidden="true" />
+              <img className="arrival-photo" src={A(item.photo)} alt="" loading="lazy" />
               <span className="arrival-label t-eyebrow-lg">
                 {item.label}
-                <img className="arrival-arrow" src={A("sale/arrow.svg")} alt="" width="40" height="9" />
+                <span className="arrival-arrow" aria-hidden="true" />
               </span>
             </a>
           ))}
